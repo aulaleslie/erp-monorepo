@@ -14,6 +14,8 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { ActiveTenantGuard } from './guards/active-tenant.guard';
+import { TenantMembershipGuard } from './guards/tenant-membership.guard';
 import { TenantsService } from './tenants.service';
 import { FastifyReply, FastifyRequest } from 'fastify';
 
@@ -69,26 +71,8 @@ export class TenantsController {
   }
 
   @Get('active')
-  async getActiveTenant(
-    @Req() req: FastifyRequest & { user: any },
-  ) {
-    const tenantId = req.cookies['active_tenant'];
-
-    if (!tenantId) {
-      // It's acceptable to have no active tenant selected
-      throw new NotFoundException('No active tenant selected');
-    }
-
-    // Validate access again to ensure user still has permission
-    const hasAccess = await this.tenantsService.validateTenantAccess(
-      req.user.id,
-      tenantId,
-    );
-
-    if (!hasAccess) {
-       throw new ForbiddenException('You no longer have access to this tenant');
-    }
-
-    return this.tenantsService.getTenantById(tenantId);
+  @UseGuards(ActiveTenantGuard, TenantMembershipGuard)
+  async getActiveTenant(@Req() req: any) {
+    return this.tenantsService.getTenantById(req.tenantId);
   }
 }

@@ -8,6 +8,8 @@ import { RolePermissionEntity } from '../database/entities/role-permission.entit
 import { PermissionEntity } from '../database/entities/permission.entity';
 import { MeController } from './me.controller';
 
+import { PermissionGuard } from './guards/permission.guard';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -19,8 +21,8 @@ import { MeController } from './me.controller';
     ]),
   ],
   controllers: [MeController],
-  providers: [UsersService],
-  exports: [UsersService],
+  providers: [UsersService, PermissionGuard],
+  exports: [UsersService, PermissionGuard],
 })
 export class UsersModule {}
 
