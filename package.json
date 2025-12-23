@@ -7,5 +7,51 @@
     "build": "pnpm -r build",
     "docker:up": "docker compose up --build",
     "docker:down": "docker compose down -v"
+  },
+  "pnpm": {
+    "packageExtensions": {
+      "@nestjs/platform-fastify": {
+        "peerDependencies": {
+          "class-transformer": "*",
+          "class-validator": "*"
+        },
+        "peerDependenciesMeta": {
+          "class-transformer": {
+            "optional": true
+          },
+          "class-validator": {
+            "optional": true
+          }
+        }
+      },
+      "@nestjs/platform-express": {
+        "peerDependencies": {
+          "class-transformer": "*",
+          "class-validator": "*"
+        },
+        "peerDependenciesMeta": {
+          "class-transformer": {
+            "optional": true
+          },
+          "class-validator": {
+            "optional": true
+          }
+        }
+      },
+      "@nestjs/core": {
+        "peerDependencies": {
+          "class-transformer": "*",
+          "class-validator": "*"
+        },
+        "peerDependenciesMeta": {
+          "class-transformer": {
+            "optional": true
+          },
+          "class-validator": {
+            "optional": true
+          }
+        }
+      }
+    }
   }
 }
