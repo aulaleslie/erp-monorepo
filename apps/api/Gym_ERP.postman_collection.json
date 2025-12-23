@@ -148,6 +148,29 @@
             ]
         },
         {
+            "name": "User",
+            "item": [
+                {
+                    "name": "Get Permissions",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/me/permissions",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "me",
+                                "permissions"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
             "name": "Health",
             "request": {
                 "method": "GET",
