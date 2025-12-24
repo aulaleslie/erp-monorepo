@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { Repository, In, Not } from 'typeorm';
 import { TenantEntity } from '../database/entities/tenant.entity';
 import { TenantUserEntity } from '../database/entities/tenant-user.entity';
 import { RoleEntity } from '../database/entities/role.entity';
@@ -47,11 +47,29 @@ export class TenantsService {
   }
 
   async create(userId: string, data: { name: string; slug: string }): Promise<TenantEntity> {
-    // strict: checking if slug exists logic might be needed but db has unique constraint.
+    const errors: Record<string, string[]> = {};
+
+    const existingSlug = await this.tenantRepository.findOne({ where: { slug: data.slug } });
+    if (existingSlug) {
+        errors.slug = ['Slug is already taken'];
+    }
+
+    const existingName = await this.tenantRepository.findOne({ where: { name: data.name } });
+    if (existingName) {
+        errors.name = ['Name is already taken'];
+    }
+
+    if (Object.keys(errors).length > 0) {
+        throw new BadRequestException({
+            message: 'Validation failed',
+            errors,
+        });
+    }
+
     const tenant = this.tenantRepository.create({
       name: data.name,
       slug: data.slug,
-      status: 'ACTIVE',
+      status: 'DISABLED',
     });
     await this.tenantRepository.save(tenant);
 
@@ -72,6 +90,50 @@ export class TenantsService {
     await this.tenantUserRepository.save(membership);
 
     return tenant;
+  }
+
+  async findAll(): Promise<TenantEntity[]> {
+    return this.tenantRepository.find();
+  }
+
+  async update(id: string, data: Partial<TenantEntity>): Promise<TenantEntity> {
+    const tenant = await this.getTenantById(id);
+    
+    const errors: Record<string, string[]> = {};
+
+    if (data.slug) {
+        const existingSlug = await this.tenantRepository.findOne({ 
+            where: { slug: data.slug, id: Not(id) } 
+        });
+        if (existingSlug) {
+            errors.slug = ['Slug is already taken'];
+        }
+    }
+
+    if (data.name) {
+        const existingName = await this.tenantRepository.findOne({ 
+            where: { name: data.name, id: Not(id) } 
+        });
+        if (existingName) {
+            errors.name = ['Name is already taken'];
+        }
+    }
+
+    if (Object.keys(errors).length > 0) {
+        throw new BadRequestException({
+            message: 'Validation failed',
+            errors,
+        });
+    }
+
+    Object.assign(tenant, data);
+    return this.tenantRepository.save(tenant);
+  }
+
+  async delete(id: string): Promise<void> {
+    const tenant = await this.getTenantById(id);
+    tenant.status = 'DISABLED';
+    await this.tenantRepository.save(tenant);
   }
 }
 

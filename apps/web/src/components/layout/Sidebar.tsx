@@ -95,7 +95,7 @@ export function Sidebar() {
         // Ideally persist to localStorage here
     };
 
-    const isItemVisible = (item: SidebarItem) => {
+    const isItemVisible = (item: SidebarItem): boolean => {
         if (item.superAdminOnly && !isSuperAdmin) return false;
         if (item.permissions && !canAny(item.permissions)) return false;
         if (item.children) {
