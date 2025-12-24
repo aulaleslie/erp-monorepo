@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { TenantEntity } from '../database/entities/tenant.entity';
 import { TenantUserEntity } from '../database/entities/tenant-user.entity';
+import { RoleEntity } from '../database/entities/role.entity';
 
 @Injectable()
 export class TenantsService {
@@ -11,6 +12,8 @@ export class TenantsService {
     private readonly tenantRepository: Repository<TenantEntity>,
     @InjectRepository(TenantUserEntity)
     private readonly tenantUserRepository: Repository<TenantUserEntity>,
+    @InjectRepository(RoleEntity)
+    private readonly roleRepository: Repository<RoleEntity>,
   ) {}
 
   async getMyTenants(userId: string): Promise<TenantEntity[]> {
@@ -42,4 +45,33 @@ export class TenantsService {
     }
     return tenant;
   }
+
+  async create(userId: string, data: { name: string; slug: string }): Promise<TenantEntity> {
+    // strict: checking if slug exists logic might be needed but db has unique constraint.
+    const tenant = this.tenantRepository.create({
+      name: data.name,
+      slug: data.slug,
+      status: 'ACTIVE',
+    });
+    await this.tenantRepository.save(tenant);
+
+    // Create a Super Admin role for this tenant
+    const superAdminRole = this.roleRepository.create({
+      tenantId: tenant.id,
+      name: 'Super Admin',
+      isSuperAdmin: true,
+    });
+    await this.roleRepository.save(superAdminRole);
+
+    // Assign the creator as Super Admin
+    const membership = this.tenantUserRepository.create({
+      tenantId: tenant.id,
+      userId,
+      roleId: superAdminRole.id,
+    });
+    await this.tenantUserRepository.save(membership);
+
+    return tenant;
+  }
 }
+

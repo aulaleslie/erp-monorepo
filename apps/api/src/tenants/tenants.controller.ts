@@ -75,4 +75,18 @@ export class TenantsController {
   async getActiveTenant(@Req() req: any) {
     return this.tenantsService.getTenantById(req.tenantId);
   }
+
+  @Post()
+  @UseGuards(AuthGuard('jwt')) // No tenant/membership guard needed, but need superadmin check
+  async createTenant(
+    @Req() req: any,
+    @Body() body: { name: string; slug: string },
+  ) {
+    // Check if user is superadmin
+    if (!req.user.isSuperAdmin) {
+      throw new ForbiddenException('Only Super Admins can create tenants');
+    }
+    return this.tenantsService.create(req.user.id, body);
+  }
 }
+
