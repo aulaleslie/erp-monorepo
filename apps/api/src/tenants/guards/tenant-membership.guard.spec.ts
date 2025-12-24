@@ -40,7 +40,10 @@ describe('TenantMembershipGuard', () => {
     it('should return true if user is super admin', async () => {
       const mockContext = {
         switchToHttp: () => ({
-          getRequest: () => ({ user: { isSuperAdmin: true }, tenantId: 'tenant-1' }),
+          getRequest: () => ({
+            user: { isSuperAdmin: true },
+            tenantId: 'tenant-1',
+          }),
         }),
       } as ExecutionContext;
 

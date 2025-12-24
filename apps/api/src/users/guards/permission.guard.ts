@@ -40,7 +40,7 @@ export class PermissionGuard implements CanActivate {
 
     // If no tenant context, and not super admin, we can't check tenant permissions.
     // However, getPermissions handles undefined tenantId gracefully (returns empty).
-    
+
     // 2. Allow if role.isSuperAdmin
     // 3. Allow if userPermissions include the required values
     const { superAdmin, permissions } = await this.usersService.getPermissions(

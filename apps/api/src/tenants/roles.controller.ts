@@ -11,6 +11,7 @@ import {
   HttpCode,
   HttpStatus,
   BadRequestException,
+  Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ActiveTenantGuard } from '../tenants/guards/active-tenant.guard';
@@ -31,20 +32,12 @@ export class RolesController {
 
   @Get()
   @RequirePermissions('roles.read')
-  async findAll(@Req() req: any) {
-    const roles = await this.rolesService.findAll(req.tenantId);
-    // Determine permissions for each role?
-    // The requirement didn't specify responding with permissions for list,
-    // but usually it's helpful. For now, let's stick to returning roles.
-    // If UI needs permissions, we might need to fetch them.
-    // Let's add permissions to the response to be safe/useful.
-    
-    // Efficiently fetching permissions for all roles:
-    // This might be N+1 if we iterate.
-    // Let's iterate and fetch for now or update service to fetch with join if we had relation.
-    // Since no relation, we do it the hard way or simpler way.
-    // Let's just return roles for now as per spec `GET /roles`.
-    return roles;
+  async findAll(
+    @Req() req: any,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.rolesService.findAll(req.tenantId, Number(page), Number(limit));
   }
 
   @Get(':id')
@@ -69,15 +62,19 @@ export class RolesController {
   @RequirePermissions('roles.create')
   async create(
     @Req() req: any,
-    @Body() body: { name: string; isSuperAdmin?: boolean; permissions?: string[] },
+    @Body()
+    body: { name: string; isSuperAdmin?: boolean; permissions?: string[] },
   ) {
-    if ((!body.permissions || body.permissions.length === 0) && !body.isSuperAdmin) {
-        throw new BadRequestException({
-            message: 'Validation failed',
-            errors: {
-                permissions: ['At least one permission is required'],
-            },
-        });
+    if (
+      (!body.permissions || body.permissions.length === 0) &&
+      !body.isSuperAdmin
+    ) {
+      throw new BadRequestException({
+        message: 'Validation failed',
+        errors: {
+          permissions: ['At least one permission is required'],
+        },
+      });
     }
 
     const role = await this.rolesService.create(req.tenantId, {
@@ -92,7 +89,7 @@ export class RolesController {
         body.permissions,
       );
     }
-    
+
     return role;
   }
 

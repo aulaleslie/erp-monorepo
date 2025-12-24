@@ -22,7 +22,7 @@ export class TenantMembershipGuard implements CanActivate {
     // ActiveTenantGuard should have set this or thrown bad request.
     // However, if ActiveTenantGuard was optional, we need to check.
     if (!tenantId) {
-      // If no tenant is selected, we can't check membership. 
+      // If no tenant is selected, we can't check membership.
       // This guard implies a tenant context is required.
       throw new ForbiddenException('Tenant context required');
     }

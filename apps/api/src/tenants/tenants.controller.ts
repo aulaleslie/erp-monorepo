@@ -15,6 +15,7 @@ import {
   HttpCode,
   HttpStatus,
   BadRequestException,
+  Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ActiveTenantGuard } from './guards/active-tenant.guard';
@@ -82,10 +83,7 @@ export class TenantsController {
 
   @Post()
   @UseGuards(AuthGuard('jwt')) // No tenant/membership guard needed, but need superadmin check
-  async createTenant(
-    @Req() req: any,
-    @Body() body: CreateTenantDto,
-  ) {
+  async createTenant(@Req() req: any, @Body() body: CreateTenantDto) {
     // Check if user is superadmin
     if (!req.user.isSuperAdmin) {
       throw new ForbiddenException('Only Super Admins can create tenants');
@@ -95,11 +93,15 @@ export class TenantsController {
 
   @Get()
   @UseGuards(AuthGuard('jwt'))
-  async findAll(@Req() req: any) {
+  async findAll(
+    @Req() req: any,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
     if (!req.user.isSuperAdmin) {
       throw new ForbiddenException('Only Super Admins can view all tenants');
     }
-    return this.tenantsService.findAll();
+    return this.tenantsService.findAll(Number(page), Number(limit));
   }
 
   @Get(':id')
@@ -111,16 +113,19 @@ export class TenantsController {
     // Existing logic has `getTenantById` which serves both.
     // But let's restrict this route for Admin context or check membership.
     // Given the requirement "like roles but for tenants menu", it implies management.
-    
+
     if (req.user.isSuperAdmin) {
-       return this.tenantsService.getTenantById(id);
+      return this.tenantsService.getTenantById(id);
     }
-    
+
     // Check membership if not super admin?
     // tenantsService.validateTenantAccess(req.user.id, id)
-    const hasAccess = await this.tenantsService.validateTenantAccess(req.user.id, id);
+    const hasAccess = await this.tenantsService.validateTenantAccess(
+      req.user.id,
+      id,
+    );
     if (hasAccess) {
-        return this.tenantsService.getTenantById(id);
+      return this.tenantsService.getTenantById(id);
     }
 
     throw new ForbiddenException('You do not have access to this tenant');
@@ -149,4 +154,3 @@ export class TenantsController {
     await this.tenantsService.delete(id);
   }
 }
-

@@ -25,4 +25,3 @@ import { PermissionGuard } from './guards/permission.guard';
   exports: [UsersService, PermissionGuard],
 })
 export class UsersModule {}
-

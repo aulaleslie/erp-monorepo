@@ -86,13 +86,13 @@ export class TenantUsersService {
 
     if (!user) {
       // Create new user
-      // Password generation? Let's clear that. 
+      // Password generation? Let's clear that.
       // Spec says "No registration", assumes admin creation.
-      // Set a default password or random one? 
+      // Set a default password or random one?
       // For now, let's set a default one (e.g. 'password123') and hash it.
       // In production, we'd send an invite email.
       const hashedPassword = await bcrypt.hash('password123', 10);
-      
+
       user = this.userRepository.create({
         email: data.email,
         fullName: data.fullName,
@@ -117,7 +117,7 @@ export class TenantUsersService {
       userId: user.id,
       roleId: data.roleId,
     });
-    
+
     await this.tenantUserRepository.save(membership);
 
     return {

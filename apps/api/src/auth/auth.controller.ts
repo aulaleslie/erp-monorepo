@@ -21,7 +21,10 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() body: LoginDto, @Res({ passthrough: true }) res: FastifyReply) {
+  async login(
+    @Body() body: LoginDto,
+    @Res({ passthrough: true }) res: FastifyReply,
+  ) {
     const user = await this.authService.validateUser(body.email, body.password);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');

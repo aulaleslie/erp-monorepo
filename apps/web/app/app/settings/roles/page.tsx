@@ -1,6 +1,7 @@
 "use client";
 
 import { PageHeader } from "@/components/common/PageHeader";
+import { PaginationControls } from "@/components/common/PaginationControls";
 import { PermissionGuard } from "@/components/guards/PermissionGuard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -32,17 +33,29 @@ import {
 export default function RolesPage() {
     const [roles, setRoles] = useState<Role[]>([]);
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1);
+    const [total, setTotal] = useState(0);
+    const limit = 10;
+
     const [roleToDelete, setRoleToDelete] = useState<string | null>(null);
     const { toast } = useToast();
 
     useEffect(() => {
         fetchRoles();
-    }, []);
+    }, [page]);
 
     const fetchRoles = async () => {
+        setLoading(true);
         try {
-            const data = await rolesService.getAll();
-            setRoles(data);
+            const data: any = await rolesService.getAll(page, limit);
+            if (data.items) {
+                setRoles(data.items);
+                setTotal(data.total);
+            } else {
+                // Fallback for backward compatibility
+                setRoles(data);
+                setTotal(data.length);
+            }
         } catch (error) {
             toast({
                 title: "Error fetching roles",
@@ -169,6 +182,13 @@ export default function RolesPage() {
                         </TableBody>
                     </Table>
                 </div>
+
+                <PaginationControls
+                    currentPage={page}
+                    totalPages={Math.ceil(total / limit)}
+                    onPageChange={setPage}
+                    loading={loading}
+                />
             </div>
 
             <AlertDialog open={!!roleToDelete} onOpenChange={(open) => !open && setRoleToDelete(null)}>

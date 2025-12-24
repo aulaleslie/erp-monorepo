@@ -21,21 +21,31 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   });
 
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    transform: true,
-    disableErrorMessages: false,
-    exceptionFactory: (errors) => {
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      disableErrorMessages: false,
+      exceptionFactory: (errors) => {
         const result: Record<string, string[]> = {};
-        errors.forEach(error => {
-            if (error.constraints) {
-                result[error.property] = Object.values(error.constraints);
-            }
+        errors.forEach((error) => {
+          if (error.constraints) {
+            result[error.property] = Object.values(error.constraints);
+          }
         });
-        return new BadRequestException({ message: 'Validation failed', errors: result });
-    }
-  }));
-  app.useGlobalInterceptors(new TransformInterceptor());
+        return new BadRequestException({
+          message: 'Validation failed',
+          errors: result,
+        });
+      },
+    }),
+  );
+  app.useGlobalInterceptors(
+    new TransformInterceptor(),
+    // We will register the UserContextInterceptor in AppModule or via useGlobalInterceptors if it doesn't need DI.
+    // However, ClsService is injectable. So we should probably register it in AppModule as a provider with APP_INTERCEPTOR.
+    // But for now, let's stick to the plan of refactoring entities first.
+  );
   app.useGlobalFilters(new HttpExceptionFilter());
 
   await app.register(import('@fastify/cookie') as any);

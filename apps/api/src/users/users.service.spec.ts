@@ -97,7 +97,10 @@ describe('UsersService', () => {
       const mockUser = { id: '1', isSuperAdmin: false } as UserEntity;
       const mockTenantUser = { roleId: 'role-1' } as TenantUserEntity;
       const mockRole = { id: 'role-1', isSuperAdmin: true } as RoleEntity;
-      const mockPermissions = [{ code: 'perm1' }, { code: 'perm2' }] as PermissionEntity[];
+      const mockPermissions = [
+        { code: 'perm1' },
+        { code: 'perm2' },
+      ] as PermissionEntity[];
 
       usersRepository.findOne!.mockResolvedValue(mockUser);
       tenantUsersRepository.findOne!.mockResolvedValue(mockTenantUser);
@@ -112,33 +115,37 @@ describe('UsersService', () => {
     });
 
     it('should return specific permissions for valid role', async () => {
-        const mockUser = { id: '1', isSuperAdmin: false } as UserEntity;
-        const mockTenantUser = { roleId: 'role-1' } as TenantUserEntity;
-        const mockRole = { id: 'role-1', isSuperAdmin: false } as RoleEntity;
-        const mockRolePermissions = [{ permissionId: 'perm-id-1' }] as RolePermissionEntity[];
-        const mockPermissions = [{ id: 'perm-id-1', code: 'perm1' }] as PermissionEntity[];
-  
-        usersRepository.findOne!.mockResolvedValue(mockUser);
-        tenantUsersRepository.findOne!.mockResolvedValue(mockTenantUser);
-        rolesRepository.findOne!.mockResolvedValue(mockRole);
-        rolePermissionsRepository.find!.mockResolvedValue(mockRolePermissions);
-        permissionsRepository.find!.mockResolvedValue(mockPermissions);
-  
-        const result = await service.getPermissions('1', 'tenant-1');
-        expect(result).toEqual({
-          superAdmin: false,
-          permissions: ['perm1'],
-        });
-      });
+      const mockUser = { id: '1', isSuperAdmin: false } as UserEntity;
+      const mockTenantUser = { roleId: 'role-1' } as TenantUserEntity;
+      const mockRole = { id: 'role-1', isSuperAdmin: false } as RoleEntity;
+      const mockRolePermissions = [
+        { permissionId: 'perm-id-1' },
+      ] as RolePermissionEntity[];
+      const mockPermissions = [
+        { id: 'perm-id-1', code: 'perm1' },
+      ] as PermissionEntity[];
 
-      it('should return empty permissions if user has no role in tenant', async () => {
-        const mockUser = { id: '1', isSuperAdmin: false } as UserEntity;
-        
-        usersRepository.findOne!.mockResolvedValue(mockUser);
-        tenantUsersRepository.findOne!.mockResolvedValue(null);
-  
-        const result = await service.getPermissions('1', 'tenant-1');
-        expect(result).toEqual({ superAdmin: false, permissions: [] });
+      usersRepository.findOne!.mockResolvedValue(mockUser);
+      tenantUsersRepository.findOne!.mockResolvedValue(mockTenantUser);
+      rolesRepository.findOne!.mockResolvedValue(mockRole);
+      rolePermissionsRepository.find!.mockResolvedValue(mockRolePermissions);
+      permissionsRepository.find!.mockResolvedValue(mockPermissions);
+
+      const result = await service.getPermissions('1', 'tenant-1');
+      expect(result).toEqual({
+        superAdmin: false,
+        permissions: ['perm1'],
       });
+    });
+
+    it('should return empty permissions if user has no role in tenant', async () => {
+      const mockUser = { id: '1', isSuperAdmin: false } as UserEntity;
+
+      usersRepository.findOne!.mockResolvedValue(mockUser);
+      tenantUsersRepository.findOne!.mockResolvedValue(null);
+
+      const result = await service.getPermissions('1', 'tenant-1');
+      expect(result).toEqual({ superAdmin: false, permissions: [] });
+    });
   });
 });

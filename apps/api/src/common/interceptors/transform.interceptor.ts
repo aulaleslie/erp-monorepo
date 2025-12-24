@@ -9,9 +9,10 @@ import { map } from 'rxjs/operators';
 import { BaseResponse } from '@gym-monorepo/shared';
 
 @Injectable()
-export class TransformInterceptor<T>
-  implements NestInterceptor<T, BaseResponse<T>>
-{
+export class TransformInterceptor<T> implements NestInterceptor<
+  T,
+  BaseResponse<T>
+> {
   intercept(
     context: ExecutionContext,
     next: CallHandler,

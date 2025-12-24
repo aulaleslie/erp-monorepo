@@ -51,12 +51,11 @@ describe('AuthService', () => {
       };
 
       (usersService.findOneByEmail as jest.Mock).mockResolvedValue(mockUser);
-      jest.spyOn(bcrypt, 'compare').mockImplementation(() => Promise.resolve(true));
+      jest
+        .spyOn(bcrypt, 'compare')
+        .mockImplementation(() => Promise.resolve(true));
 
-      const result = await service.validateUser(
-        'test@example.com',
-        'password',
-      );
+      const result = await service.validateUser('test@example.com', 'password');
 
       expect(result).toEqual({
         id: '1',
@@ -68,10 +67,7 @@ describe('AuthService', () => {
     it('should return null if user not found', async () => {
       (usersService.findOneByEmail as jest.Mock).mockResolvedValue(null);
 
-      const result = await service.validateUser(
-        'test@example.com',
-        'password',
-      );
+      const result = await service.validateUser('test@example.com', 'password');
 
       expect(result).toBeNull();
     });
@@ -84,7 +80,9 @@ describe('AuthService', () => {
       };
 
       (usersService.findOneByEmail as jest.Mock).mockResolvedValue(mockUser);
-      jest.spyOn(bcrypt, 'compare').mockImplementation(() => Promise.resolve(false));
+      jest
+        .spyOn(bcrypt, 'compare')
+        .mockImplementation(() => Promise.resolve(false));
 
       const result = await service.validateUser(
         'test@example.com',

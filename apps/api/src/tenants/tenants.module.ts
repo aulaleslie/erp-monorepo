@@ -38,12 +38,12 @@ import { TenantMembershipGuard } from './guards/tenant-membership.guard';
     TenantUsersController,
   ],
   providers: [
-    TenantsService, 
-    RolesService, 
-    PermissionsService, 
+    TenantsService,
+    RolesService,
+    PermissionsService,
     TenantUsersService,
-    ActiveTenantGuard, 
-    TenantMembershipGuard
+    ActiveTenantGuard,
+    TenantMembershipGuard,
   ],
   exports: [TenantsService, ActiveTenantGuard, TenantMembershipGuard],
 })

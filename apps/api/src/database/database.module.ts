@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Global } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PermissionEntity } from './entities/permission.entity';
@@ -8,6 +8,9 @@ import { TenantUserEntity } from './entities/tenant-user.entity';
 import { TenantEntity } from './entities/tenant.entity';
 import { UserEntity } from './entities/user.entity';
 
+import { AuditLogEntity } from './entities/audit-log.entity';
+
+@Global()
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
@@ -28,10 +31,13 @@ import { UserEntity } from './entities/user.entity';
           RoleEntity,
           RolePermissionEntity,
           TenantUserEntity,
+          AuditLogEntity,
         ],
+        autoLoadEntities: true,
         synchronize: false, // checking explicitly as per requirements
       }),
     }),
   ],
+  exports: [TypeOrmModule],
 })
 export class DatabaseModule {}

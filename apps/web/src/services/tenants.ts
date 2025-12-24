@@ -21,8 +21,10 @@ export interface UpdateTenantDto {
 }
 
 export const tenantsService = {
-  getAll: async () => {
-    const response = await api.get<Tenant[]>('/tenants');
+  getAll: async (page = 1, limit = 10) => {
+    const response = await api.get<Tenant[] | { items: Tenant[]; total: number }>('/tenants', {
+      params: { page, limit },
+    });
     return response.data;
   },
 

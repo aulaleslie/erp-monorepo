@@ -1,40 +1,43 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { ClsModule } from 'nestjs-cls';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { TenantsModule } from './tenants/tenants.module';
 import { UsersModule } from './users/users.module';
+import { AuditSubscriber } from './database/subscribers/audit.subscriber';
+import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
+
+
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { UserContextInterceptor } from './common/interceptors/user-context.interceptor';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ClsModule.forRoot({
+      global: true,
+      middleware: { mount: true },
+    }),
     DatabaseModule,
     AuthModule,
     TenantsModule,
     UsersModule,
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get<string>('DB_HOST'),
-        port: configService.get<number>('DB_PORT'),
-        username: configService.get<string>('DB_USER'),
-        password: configService.get<string>('DB_PASSWORD'),
-        database: configService.get<string>('DB_NAME'),
-        entities: [],
-        synchronize: false,
-        migrationsRun: false,
-        ssl: configService.get<string>('DB_SSL') === 'true',
-      }),
-      inject: [ConfigService],
-    }),
+    AuditLogsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    AuditSubscriber,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: UserContextInterceptor,
+    },
+  ],
 })
 export class AppModule {}

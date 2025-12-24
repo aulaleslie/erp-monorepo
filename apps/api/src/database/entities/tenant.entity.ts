@@ -1,13 +1,8 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseAuditEntity } from '../../common/entities/base-audit.entity';
 
 @Entity('tenants')
-export class TenantEntity {
+export class TenantEntity extends BaseAuditEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -23,10 +18,4 @@ export class TenantEntity {
     default: 'ACTIVE',
   })
   status: 'ACTIVE' | 'DISABLED';
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 }

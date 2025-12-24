@@ -81,6 +81,11 @@ const sidebarConfig: SidebarItem[] = [
                 icon: Building,
                 href: '/app/platform/tenants',
             },
+            {
+                label: 'Audit Logs',
+                icon: Shield,
+                href: '/app/platform/audit-logs',
+            },
         ],
     },
 ];

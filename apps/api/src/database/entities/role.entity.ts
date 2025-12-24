@@ -1,16 +1,15 @@
 import {
   Column,
-  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 import { TenantEntity } from './tenant.entity';
+import { BaseAuditEntity } from '../../common/entities/base-audit.entity';
 
 @Entity('roles')
-export class RoleEntity {
+export class RoleEntity extends BaseAuditEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -26,10 +25,4 @@ export class RoleEntity {
 
   @Column({ default: false })
   isSuperAdmin: boolean;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 }

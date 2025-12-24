@@ -40,8 +40,10 @@ export const rolesService = {
     return response.data;
   },
 
-  getAll: async () => {
-    const response = await api.get<Role[]>('/roles');
+  getAll: async (page = 1, limit = 10) => {
+    const response = await api.get<Role[] | { items: Role[]; total: number }>('/roles', {
+      params: { page, limit },
+    });
     return response.data;
   },
 

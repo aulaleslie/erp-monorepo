@@ -47,6 +47,10 @@ export class TenantUsersController {
     @Param('userId') userId: string,
     @Body() body: { roleId: string },
   ) {
-    return this.tenantUsersService.updateRole(req.tenantId, userId, body.roleId);
+    return this.tenantUsersService.updateRole(
+      req.tenantId,
+      userId,
+      body.roleId,
+    );
   }
 }

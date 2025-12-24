@@ -1,6 +1,7 @@
 "use client";
 
 import { PageHeader } from "@/components/common/PageHeader";
+import { PaginationControls } from "@/components/common/PaginationControls";
 import { PermissionGuard } from "@/components/guards/PermissionGuard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,10 @@ import {
 export default function TenantsPage() {
     const [tenants, setTenants] = useState<Tenant[]>([]);
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1);
+    const [total, setTotal] = useState(0);
+    const limit = 10;
+
     const [tenantToDisable, setTenantToDisable] = useState<string | null>(null);
     const { toast } = useToast();
     const { isSuperAdmin } = usePermissions();
@@ -44,12 +49,24 @@ export default function TenantsPage() {
         } else {
             setLoading(false);
         }
-    }, [isSuperAdmin]);
+    }, [isSuperAdmin, page]);
 
     const fetchTenants = async () => {
+        setLoading(true);
         try {
-            const data = await tenantsService.getAll();
-            setTenants(data);
+            // Updated service call to accept pagination params
+            // Assuming tenantsService.getAll is updated to accept params or we update usage here
+            // Wait, I need to update tenantsService in frontend first!
+            // Let's assume the service method signature is `getAll(page?: number, limit?: number)`
+            const data: any = await tenantsService.getAll(page, limit);
+            if (data.items) {
+                setTenants(data.items);
+                setTotal(data.total);
+            } else {
+                // Fallback if API hasn't fully propagated or service not updated yet
+                setTenants(data);
+                setTotal(data.length);
+            }
         } catch (error) {
             toast({
                 title: "Error fetching tenants",
@@ -198,6 +215,13 @@ export default function TenantsPage() {
                     </TableBody>
                 </Table>
             </div>
+
+            <PaginationControls
+                currentPage={page}
+                totalPages={Math.ceil(total / limit)}
+                onPageChange={setPage}
+                loading={loading}
+            />
 
             <AlertDialog open={!!tenantToDisable} onOpenChange={(open) => !open && setTenantToDisable(null)}>
                 <AlertDialogContent>

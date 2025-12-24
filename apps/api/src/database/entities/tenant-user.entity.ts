@@ -1,8 +1,9 @@
-import { Column, CreateDateColumn, Entity, Unique, PrimaryColumn } from 'typeorm';
+import { Column, Entity, Unique, PrimaryColumn } from 'typeorm';
+import { BaseAuditEntity } from '../../common/entities/base-audit.entity';
 
 @Entity('tenant_users')
 @Unique(['tenantId', 'userId'])
-export class TenantUserEntity {
+export class TenantUserEntity extends BaseAuditEntity {
   @PrimaryColumn()
   tenantId: string;
 
@@ -11,7 +12,4 @@ export class TenantUserEntity {
 
   @Column()
   roleId: string;
-
-  @CreateDateColumn()
-  createdAt: Date;
 }
