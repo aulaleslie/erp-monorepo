@@ -3,8 +3,64 @@
 import { PageHeader } from "@/components/common/PageHeader";
 import { PermissionGuard } from "@/components/guards/PermissionGuard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+import { rolesService, Role } from "@/services/roles";
+import { Check, Loader2, Plus, Eye, Pencil, Trash2, X } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function RolesPage() {
+    const [roles, setRoles] = useState<Role[]>([]);
+    const [loading, setLoading] = useState(true);
+    const { toast } = useToast();
+
+    useEffect(() => {
+        fetchRoles();
+    }, []);
+
+    const fetchRoles = async () => {
+        try {
+            const data = await rolesService.getAll();
+            setRoles(data);
+        } catch (error) {
+            toast({
+                title: "Error fetching roles",
+                description: "Failed to load roles list.",
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDelete = async (id: string) => {
+        if (!confirm("Are you sure you want to delete this role?")) return;
+
+        try {
+            await rolesService.delete(id);
+            toast({
+                title: "Role deleted",
+                description: "The role has been successfully deleted.",
+            });
+            fetchRoles();
+        } catch (error) {
+            toast({
+                title: "Error deleting role",
+                description: "Failed to delete the role.",
+                variant: "destructive",
+            });
+        }
+    };
+
     return (
         <PermissionGuard
             requiredPermissions={['roles.read']}
@@ -15,14 +71,89 @@ export default function RolesPage() {
             }
         >
             <div className="space-y-6">
-                <PageHeader
-                    title="Roles Management"
-                    description="Manage roles and their permissions here."
-                />
+                <div className="flex items-center justify-between">
+                    <PageHeader
+                        title="Roles Management"
+                        description="Manage roles and their permissions here."
+                    />
+                    <PermissionGuard requiredPermissions={['roles.create']}>
+                        <Button asChild>
+                            <Link href="/app/settings/roles/create">
+                                <Plus className="mr-2 h-4 w-4" />
+                                Create Role
+                            </Link>
+                        </Button>
+                    </PermissionGuard>
+                </div>
 
-                {/* Future: Role list table */}
-                <div className="rounded-md border p-4">
-                    <p className="text-sm text-muted-foreground">Role list will be implemented here.</p>
+                <div className="rounded-md border">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Super Admin</TableHead>
+                                <TableHead className="w-[150px]">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {loading ? (
+                                <TableRow>
+                                    <TableCell colSpan={3} className="text-center py-10">
+                                        <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+                                    </TableCell>
+                                </TableRow>
+                            ) : roles.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={3} className="text-center py-10">
+                                        No roles found.
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                roles.map((role) => (
+                                    <TableRow key={role.id}>
+                                        <TableCell className="font-medium">{role.name}</TableCell>
+                                        <TableCell>
+                                            {role.isSuperAdmin ? (
+                                                <div className="flex items-center text-green-600">
+                                                    <Check className="h-4 w-4 mr-1" /> Yes
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center text-muted-foreground">
+                                                    <X className="h-4 w-4 mr-1" /> No
+                                                </div>
+                                            )}
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-2">
+                                                <Button variant="ghost" size="icon" asChild>
+                                                    <Link href={`/app/settings/roles/${role.id}`}>
+                                                        <Eye className="h-4 w-4" />
+                                                    </Link>
+                                                </Button>
+                                                <PermissionGuard requiredPermissions={['roles.update']}>
+                                                    <Button variant="ghost" size="icon" asChild>
+                                                        <Link href={`/app/settings/roles/${role.id}/edit`}>
+                                                            <Pencil className="h-4 w-4" />
+                                                        </Link>
+                                                    </Button>
+                                                </PermissionGuard>
+                                                <PermissionGuard requiredPermissions={['roles.delete']}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => handleDelete(role.id)}
+                                                        disabled={role.isSuperAdmin}
+                                                    >
+                                                        <Trash2 className="h-4 w-4 text-destructive" />
+                                                    </Button>
+                                                </PermissionGuard>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
                 </div>
             </div>
         </PermissionGuard>

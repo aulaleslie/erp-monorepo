@@ -46,6 +46,24 @@ export class RolesController {
     return roles;
   }
 
+  @Get(':id')
+  @RequirePermissions('roles.read')
+  async findOne(@Req() req: any, @Param('id') id: string) {
+    const role = await this.rolesService.findOne(req.tenantId, id);
+    // Fetch permissions for this role
+    const permissions = await this.rolesService.getPermissionsForRole(role.id);
+    return {
+      ...role,
+      permissions,
+    };
+  }
+
+  @Get(':id/users')
+  @RequirePermissions('roles.read')
+  async getAssignedUsers(@Req() req: any, @Param('id') id: string) {
+    return this.rolesService.getAssignedUsers(req.tenantId, id);
+  }
+
   @Post()
   @RequirePermissions('roles.create')
   async create(

@@ -9,6 +9,8 @@ import { Repository, In } from 'typeorm';
 import { RoleEntity } from '../database/entities/role.entity';
 import { RolePermissionEntity } from '../database/entities/role-permission.entity';
 import { PermissionEntity } from '../database/entities/permission.entity';
+import { TenantUserEntity } from '../database/entities/tenant-user.entity';
+import { UserEntity } from '../database/entities/user.entity';
 
 @Injectable()
 export class RolesService {
@@ -19,11 +21,15 @@ export class RolesService {
     private readonly rolePermissionRepository: Repository<RolePermissionEntity>,
     @InjectRepository(PermissionEntity)
     private readonly permissionRepository: Repository<PermissionEntity>,
+    @InjectRepository(TenantUserEntity)
+    private readonly tenantUserRepository: Repository<TenantUserEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
   ) {}
 
   async findAll(tenantId: string): Promise<RoleEntity[]> {
     return this.roleRepository.find({
-      where: { tenantId },
+      where: { tenantId, isSuperAdmin: false },
       order: { name: 'ASC' },
     });
   }
@@ -120,13 +126,7 @@ export class RolesService {
   async getPermissionsForRole(roleId: string): Promise<string[]> {
       const rolePermissions = await this.rolePermissionRepository.find({
           where: { roleId },
-          relations: ['permission'] // We can't use relations directly if we didn't define relation in entity
-          // wait, let's check RolePermissionEntity definition.
       });
-      // If relations are not defined in entity, we need to join manually or definitions need update.
-      // Checking CYCLE_1.md, RolePermissionEntity has no relations defined in the content shown in step 7.
-      // It just has columns.
-      // So we have to query differently.
       
       const permissionIds = rolePermissions.map(rp => rp.permissionId);
       if (permissionIds.length === 0) return [];
@@ -136,5 +136,21 @@ export class RolesService {
       });
       
       return permissions.map(p => p.code);
+  }
+
+  async getAssignedUsers(tenantId: string, roleId: string): Promise<UserEntity[]> {
+    const tenantUsers = await this.tenantUserRepository.find({
+      where: { tenantId, roleId },
+    });
+
+    if (tenantUsers.length === 0) {
+      return [];
+    }
+
+    const userIds = tenantUsers.map((tu) => tu.userId);
+    
+    return this.userRepository.find({
+      where: { id: In(userIds) },
+    });
   }
 }
