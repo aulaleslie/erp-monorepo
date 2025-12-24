@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
+import { usePermissions } from "@/hooks/use-permissions";
 import { ReactNode } from "react";
 
 interface PermissionGuardProps {
@@ -16,29 +16,13 @@ export const PermissionGuard = ({
     fallback = null,
     requireAll = false
 }: PermissionGuardProps) => {
-    const { permissions, user } = useAuth();
+    const { can, canAny, isSuperAdmin } = usePermissions();
 
-    if (!user) return <>{fallback}</>;
+    if (isSuperAdmin) return <>{children}</>;
 
-    // Super Admin bypass
-    if (user.isSuperAdmin || permissions?.superAdmin) {
-        return <>{children}</>;
-    }
-
-    if (!permissions || !permissions.permissions) {
-        return <>{fallback}</>;
-    }
-
-    const userPerms = permissions.permissions;
-
-    // Check
-    let hasAccess = false;
-
-    if (requireAll) {
-        hasAccess = requiredPermissions.every(p => userPerms.includes(p));
-    } else {
-        hasAccess = requiredPermissions.some(p => userPerms.includes(p));
-    }
+    const hasAccess = requireAll
+        ? requiredPermissions.every(p => can(p))
+        : canAny(requiredPermissions);
 
     if (hasAccess) {
         return <>{children}</>;

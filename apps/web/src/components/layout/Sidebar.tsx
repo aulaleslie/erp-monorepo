@@ -1,31 +1,43 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Shield, Users, Building, LucideIcon, ChevronDown } from "lucide-react";
-import { PermissionGuard } from "../guards/PermissionGuard";
-import styles from "./sidebar.module.css";
+import {
+    Home,
+    Settings,
+    Shield,
+    Users,
+    Building,
+    ChevronLeft,
+    Menu
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+    Collapsible,
+    CollapsibleTrigger,
+    CollapsibleContent
+} from "@/components/ui/collapsible";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { usePermissions } from "@/hooks/use-permissions";
 
 interface SidebarItem {
     label: string;
-    icon?: LucideIcon;
-    href: string;
+    icon: React.ElementType;
+    href?: string;
     permissions?: string[];
     superAdminOnly?: boolean;
     children?: SidebarItem[];
+    collapsed?: boolean; // internal use for structure, though config is usually static
 }
 
-interface SidebarSection {
-    label: string;
-    icon?: LucideIcon;
-    href?: string;
-    collapsible?: boolean;
-    children?: SidebarItem[];
-    superAdminOnly?: boolean;
-}
-
-const sidebarConfig: (SidebarItem | SidebarSection)[] = [
+const sidebarConfig: SidebarItem[] = [
     {
         label: 'Dashboard',
         icon: Home,
@@ -33,7 +45,7 @@ const sidebarConfig: (SidebarItem | SidebarSection)[] = [
     },
     {
         label: 'Settings',
-        collapsible: true,
+        icon: Settings, // Placeholder icon for group
         children: [
             {
                 label: 'Roles',
@@ -61,6 +73,7 @@ const sidebarConfig: (SidebarItem | SidebarSection)[] = [
     },
     {
         label: 'Platform',
+        icon: Building, // Placeholder
         superAdminOnly: true,
         children: [
             {
@@ -72,96 +85,105 @@ const sidebarConfig: (SidebarItem | SidebarSection)[] = [
     },
 ];
 
-const SidebarSectionComponent = ({ item }: { item: SidebarSection }) => {
+export function Sidebar() {
+    const [isCollapsed, setIsCollapsed] = React.useState(false);
     const pathname = usePathname();
-    const [isOpen, setIsOpen] = useState(
-        // Default open if not collapsible, or if active child
-        !item.collapsible || item.children?.some(child => pathname === child.href)
-    );
+    const { canAny, isSuperAdmin } = usePermissions();
 
-    // Auto-open if a child becomes active
-    useEffect(() => {
-        if (item.collapsible && item.children?.some(child => pathname === child.href)) {
-            setIsOpen(true);
-        }
-    }, [pathname, item.collapsible, item.children]);
+    const toggleSidebar = () => {
+        setIsCollapsed(!isCollapsed);
+        // Ideally persist to localStorage here
+    };
 
-    const toggle = () => {
-        if (item.collapsible) {
-            setIsOpen(!isOpen);
+    const isItemVisible = (item: SidebarItem) => {
+        if (item.superAdminOnly && !isSuperAdmin) return false;
+        if (item.permissions && !canAny(item.permissions)) return false;
+        if (item.children) {
+            return item.children.some(child => isItemVisible(child));
         }
+        return true;
+    };
+
+    const renderItem = (item: SidebarItem, level = 0) => {
+        if (!isItemVisible(item)) return null;
+
+        const isActive = item.href ? pathname === item.href : false;
+        const Icon = item.icon;
+        const hasChildren = item.children && item.children.length > 0;
+
+        if (hasChildren) {
+            if (isCollapsed) {
+                // When collapsed, we might want to show children in a popover or just hide the group header if it's purely structural
+                // For now, let's just render the children's icon if top level, or skip if it's a structural group without href.
+                // Actually, sidebarConfig has 'Settings' as a group.
+                // In collapsed mode, groups usually just show children flat or in a menu.
+                // Simplification: Render children directly if collapsed, or skip group header.
+                return (
+                    <div key={item.label} className="flex flex-col gap-1">
+                        {!isCollapsed && (
+                            <h4 className="px-2 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1 mt-2">
+                                {item.label}
+                            </h4>
+                        )}
+                        {item.children?.map(child => renderItem(child, level))}
+                    </div>
+                );
+            }
+
+            return (
+                <div key={item.label} className="space-y-1">
+                    <h4 className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        {item.label}
+                    </h4>
+                    {item.children?.map(child => renderItem(child, level + 1))}
+                </div>
+            );
+        }
+
+        // Leaf node
+        return (
+            <TooltipProvider key={item.href || item.label}>
+                <Tooltip delayDuration={0}>
+                    <TooltipTrigger asChild>
+                        <Link
+                            href={item.href || '#'}
+                            className={cn(
+                                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
+                                isActive ? "bg-accent text-accent-foreground" : "text-muted-foreground",
+                                isCollapsed && "justify-center px-2"
+                            )}
+                        >
+                            <Icon className="h-5 w-5" />
+                            {!isCollapsed && <span>{item.label}</span>}
+                        </Link>
+                    </TooltipTrigger>
+                    {isCollapsed && (
+                        <TooltipContent side="right">
+                            {item.label}
+                        </TooltipContent>
+                    )}
+                </Tooltip>
+            </TooltipProvider>
+        );
     };
 
     return (
-        <div className={styles.section}>
-            <div
-                className={item.collapsible ? styles.collapsibleHeader : styles.sectionLabel}
-                onClick={toggle}
-            >
-                <span>{item.label}</span>
-                {item.collapsible && (
-                    <ChevronDown
-                        size={16}
-                        className={`${styles.chevron} ${!isOpen ? styles.rotate : ''}`}
-                    />
-                )}
+        <div
+            className={cn(
+                "relative flex flex-col border-r bg-card transition-all duration-300",
+                isCollapsed ? "w-16" : "w-64"
+            )}
+        >
+            <div className="flex h-14 items-center border-b px-3 justify-between">
+                {!isCollapsed && <span className="font-bold text-lg px-2">Gym ERP</span>}
+                <Button variant="ghost" size="icon" onClick={toggleSidebar} className="ml-auto">
+                    {isCollapsed ? <Menu className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+                </Button>
             </div>
-            {isOpen && item.children?.map((child, cIndex) => {
-                const Item = (
-                    <Link key={cIndex} href={child.href} className={`${styles.link} ${pathname === child.href ? styles.active : ''}`}>
-                        {child.icon && <child.icon size={18} />}
-                        <span>{child.label}</span>
-                    </Link>
-                );
 
-                if (child.permissions) {
-                    return (
-                        <PermissionGuard key={cIndex} requiredPermissions={child.permissions}>
-                            {Item}
-                        </PermissionGuard>
-                    );
-                }
-                return Item;
-            })}
+            <div className="flex-1 overflow-auto py-2 px-2 space-y-1">
+                {sidebarConfig.map(item => renderItem(item))}
+            </div>
         </div>
     );
-};
-
-export const Sidebar = () => {
-    const pathname = usePathname();
-
-    return (
-        <aside className={styles.sidebar}>
-            <div className={styles.logo}>
-                Gym ERP
-            </div>
-            <nav className={styles.nav}>
-                {sidebarConfig.map((item, index) => {
-                    // Check if it's a section with children
-                    if ('children' in item && item.children) {
-                        const Section = <SidebarSectionComponent key={index} item={item as SidebarSection} />;
-
-                        if (item.superAdminOnly) {
-                            return (
-                                <PermissionGuard key={index} requiredPermissions={['__SUPER_ADMIN_ONLY__']}>
-                                    {Section}
-                                </PermissionGuard>
-                            );
-                        }
-                        return Section;
-                    }
-
-                    // Single item
-                    const singleItem = item as SidebarItem;
-
-                    return (
-                        <Link key={index} href={singleItem.href} className={`${styles.link} ${pathname === singleItem.href ? styles.active : ''}`}>
-                            {singleItem.icon && <singleItem.icon size={18} />}
-                            <span>{singleItem.label}</span>
-                        </Link>
-                    );
-                })}
-            </nav>
-        </aside>
-    );
-};
+}

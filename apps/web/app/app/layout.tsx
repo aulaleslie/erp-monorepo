@@ -1,7 +1,7 @@
 "use client";
 
 import { AuthGuard } from "@/components/guards/AuthGuard";
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { AppShell } from "@/components/layout/AppShell";
 
 export default function AppLayout({
     children,
@@ -10,9 +10,9 @@ export default function AppLayout({
 }) {
     return (
         <AuthGuard requireTenant={true}>
-            <DashboardLayout>
+            <AppShell>
                 {children}
-            </DashboardLayout>
+            </AppShell>
         </AuthGuard>
     );
 }

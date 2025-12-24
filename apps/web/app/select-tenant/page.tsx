@@ -3,8 +3,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import styles from "./select-tenant.module.css";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Building } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { LoadingState } from "@/components/common/LoadingState";
+import { EmptyState } from "@/components/common/EmptyState";
 
 interface Tenant {
     id: string;
@@ -15,12 +18,9 @@ interface Tenant {
 export default function SelectTenantPage() {
     const [tenants, setTenants] = useState<Tenant[]>([]);
     const [loading, setLoading] = useState(true);
-    const { refreshAuth } = useAuth(); // We might need this to redirect if user not logged in, but better to use AuthGuard logic or just fetch.
-    // Actually, this page should be protected. If fetch fails (401), we redirect.
-
+    const { refreshAuth } = useAuth();
     const router = useRouter();
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
-
 
     useEffect(() => {
         const fetchTenants = async () => {
@@ -55,7 +55,7 @@ export default function SelectTenantPage() {
             });
 
             if (res.ok) {
-                await refreshAuth(); // Updating active tenant in context
+                await refreshAuth();
                 router.push("/app/dashboard");
             } else {
                 console.error("Failed to set active tenant");
@@ -65,39 +65,42 @@ export default function SelectTenantPage() {
         }
     };
 
-    return (
-        <div className={styles.container}>
-            <div className={styles.card}>
-                <div className={styles.header}>
-                    <h1 className={styles.title}>Select Workspace</h1>
-                    <p className={styles.subtitle}>Choose which organization you want to access</p>
-                </div>
+    if (loading) return <div className="flex min-h-screen items-center justify-center"><LoadingState /></div>;
 
-                {loading ? (
-                    <div className={styles.loading}>Loading workspaces...</div>
-                ) : tenants.length === 0 ? (
-                    <div className={styles.empty}>
-                        <p>No workspaces found.</p>
-                        <p className="text-sm mt-2">Please contact your administrator.</p>
-                    </div>
-                ) : (
-                    <div className={styles.list}>
-                        {tenants.map((tenant) => (
-                            <div
-                                key={tenant.id}
-                                className={styles.tenantItem}
-                                onClick={() => handleSelect(tenant.id)}
-                            >
-                                <div className={styles.tenantInfo}>
-                                    <span className={styles.tenantName}>{tenant.name}</span>
-                                    <span className={styles.tenantSlug}>{tenant.slug}</span>
-                                </div>
-                                <ChevronRight className={styles.arrow} size={20} />
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
+    return (
+        <div className="flex min-h-screen items-center justify-center bg-muted/50 p-4">
+            <Card className="w-full max-w-md">
+                <CardHeader className="space-y-1">
+                    <CardTitle className="text-2xl font-bold">Select Workspace</CardTitle>
+                    <CardDescription>Choose which organization you want to access</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {tenants.length === 0 ? (
+                        <EmptyState
+                            icon={Building}
+                            title="No workspaces found"
+                            description="Please contact your administrator."
+                        />
+                    ) : (
+                        <div className="space-y-2">
+                            {tenants.map((tenant) => (
+                                <Button
+                                    key={tenant.id}
+                                    variant="outline"
+                                    className="w-full justify-between h-auto py-4 px-4"
+                                    onClick={() => handleSelect(tenant.id)}
+                                >
+                                    <div className="flex flex-col items-start gap-1">
+                                        <span className="font-semibold">{tenant.name}</span>
+                                        <span className="text-xs text-muted-foreground">{tenant.slug}</span>
+                                    </div>
+                                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                                </Button>
+                            ))}
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
         </div>
     );
 }

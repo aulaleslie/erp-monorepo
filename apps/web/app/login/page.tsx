@@ -3,7 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import styles from "./login.module.css";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2 } from "lucide-react";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -14,8 +19,6 @@ export default function LoginPage() {
     const router = useRouter();
 
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
-
-
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -29,23 +32,14 @@ export default function LoginPage() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({ email, password }),
-                credentials: "include", // Important for cookies
+                credentials: "include",
             });
 
             if (!res.ok) {
                 throw new Error("Invalid credentials");
             }
 
-            // Refresh auth state to get user and potentially active tenant
             await refreshAuth();
-
-            // Determine where to go
-            // We can't immediately check 'activeTenant' from context because closure might be stale depending on how refreshAuth updates
-            // However, after await refreshAuth(), the context should have updated if we could access it. 
-            // Instead, we can fetch active tenant explicitly or just go to select-tenant.
-            // Easiest is to go to select-tenant, which will redirect to app if active is set. (We'll implement that logic there)
-            // OR we can default to /select-tenant
-
             router.push("/select-tenant");
 
         } catch (err) {
@@ -56,47 +50,48 @@ export default function LoginPage() {
     };
 
     return (
-        <div className={styles.container}>
-            <div className={styles.card}>
-                <div className={styles.header}>
-                    <h1 className={styles.title}>Welcome back</h1>
-                    <p className={styles.subtitle}>Sign in to your account</p>
-                </div>
-
-                <form onSubmit={handleSubmit} className={styles.form}>
-                    {error && <div className={styles.error}>{error}</div>}
-
-                    <div className={styles.field}>
-                        <label htmlFor="email" className={styles.label}>Email</label>
-                        <input
-                            id="email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className={styles.input}
-                            placeholder="admin@gym.com"
-                            required
-                        />
-                    </div>
-
-                    <div className={styles.field}>
-                        <label htmlFor="password" className={styles.label}>Password</label>
-                        <input
-                            id="password"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className={styles.input}
-                            placeholder="••••••••"
-                            required
-                        />
-                    </div>
-
-                    <button type="submit" className={styles.button} disabled={isSubmitting}>
-                        {isSubmitting ? "Signing in..." : "Sign in"}
-                    </button>
-                </form>
-            </div>
+        <div className="flex min-h-screen items-center justify-center bg-muted/50 p-4">
+            <Card className="w-full max-w-sm">
+                <CardHeader className="space-y-1">
+                    <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
+                    <CardDescription>Sign in to your account</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        {error && (
+                            <Alert variant="destructive">
+                                <AlertDescription>{error}</AlertDescription>
+                            </Alert>
+                        )}
+                        <div className="space-y-2">
+                            <Label htmlFor="email">Email</Label>
+                            <Input
+                                id="email"
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="admin@gym.com"
+                                required
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="password">Password</Label>
+                            <Input
+                                id="password"
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="••••••••"
+                                required
+                            />
+                        </div>
+                        <Button type="submit" className="w-full" disabled={isSubmitting}>
+                            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {isSubmitting ? "Signing in..." : "Sign in"}
+                        </Button>
+                    </form>
+                </CardContent>
+            </Card>
         </div>
     );
 }
