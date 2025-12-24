@@ -10,6 +10,7 @@ import {
   Req,
   HttpCode,
   HttpStatus,
+  BadRequestException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ActiveTenantGuard } from '../tenants/guards/active-tenant.guard';
@@ -70,6 +71,15 @@ export class RolesController {
     @Req() req: any,
     @Body() body: { name: string; isSuperAdmin?: boolean; permissions?: string[] },
   ) {
+    if ((!body.permissions || body.permissions.length === 0) && !body.isSuperAdmin) {
+        throw new BadRequestException({
+            message: 'Validation failed',
+            errors: {
+                permissions: ['At least one permission is required'],
+            },
+        });
+    }
+
     const role = await this.rolesService.create(req.tenantId, {
       name: body.name,
       isSuperAdmin: body.isSuperAdmin,

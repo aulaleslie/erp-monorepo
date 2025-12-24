@@ -48,6 +48,8 @@ export class RolesService {
     tenantId: string,
     data: { name: string; isSuperAdmin?: boolean },
   ): Promise<RoleEntity> {
+    await this.validateRoleName(tenantId, data.name);
+
     const role = this.roleRepository.create({
       ...data,
       tenantId,
@@ -61,6 +63,11 @@ export class RolesService {
     data: { name?: string },
   ): Promise<RoleEntity> {
     const role = await this.findOne(tenantId, id);
+    
+    if (data.name && data.name !== role.name) {
+      await this.validateRoleName(tenantId, data.name, id);
+    }
+
     if (role.isSuperAdmin) {
       // Prevent renaming super admin role if we want to enforce structure, 
       // but usually just preventing deletion is enough. 
@@ -70,6 +77,26 @@ export class RolesService {
     
     Object.assign(role, data);
     return this.roleRepository.save(role);
+  }
+
+  private async validateRoleName(tenantId: string, name: string, excludeId?: string): Promise<void> {
+    const normalize = (str: string) => str.toLowerCase().replace(/\s+/g, '');
+    const normalizedName = normalize(name);
+
+    const roles = await this.findAll(tenantId);
+    
+    const duplicate = roles.find(r => 
+      normalize(r.name) === normalizedName && r.id !== excludeId
+    );
+
+    if (duplicate) {
+      throw new BadRequestException({
+        message: 'Validation failed',
+        errors: {
+          name: ['Role with this name already exists'],
+        },
+      });
+    }
   }
 
   async delete(tenantId: string, id: string): Promise<void> {

@@ -44,15 +44,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const fetchUser = async () => {
         try {
             const res = await fetch(`${API_URL}/auth/me`, {
-                // We rely on the browser sending the cookie automatically for same-origin or configured CORS
-                // For development, we might need proxy or cors settings. 
-                // Assuming strict-origin-when-cross-origin or similar defaults, but cookies need 'include' if cross-site.
-                // However, nextjs dev server proxies or is on same usage usually.
-                // Let's assume standard fetch for now, we might need credentials: 'include'
+                // ... comments
             });
             if (res.ok) {
-                const data = await res.json();
-                setUser(data);
+                const responseData = await res.json();
+                setUser(responseData.data);
                 return true;
             } else {
                 setUser(null);
@@ -69,8 +65,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             const res = await fetch(`${API_URL}/tenants/active`);
             if (res.ok) {
-                const data = await res.json();
-                setActiveTenant(data);
+                const responseData = await res.json();
+                setActiveTenant(responseData.data);
             } else {
                 setActiveTenant(null);
             }
@@ -84,8 +80,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             const res = await fetch(`${API_URL}/me/permissions`);
             if (res.ok) {
-                const data = await res.json();
-                setPermissions(data);
+                const responseData = await res.json();
+                setPermissions(responseData.data);
             } else {
                 setPermissions(null);
             }
@@ -114,19 +110,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             ]);
 
             if (userRes.status === 'fulfilled' && userRes.value.ok) {
-                setUser(await userRes.value.json());
+                const data = await userRes.value.json();
+                setUser(data.data);
             } else {
                 setUser(null);
             }
 
             if (tenantRes.status === 'fulfilled' && tenantRes.value.ok) {
-                setActiveTenant(await tenantRes.value.json());
+                const data = await tenantRes.value.json();
+                setActiveTenant(data.data);
             } else {
                 setActiveTenant(null);
             }
 
             if (permRes.status === 'fulfilled' && permRes.value.ok) {
-                setPermissions(await permRes.value.json());
+                const data = await permRes.value.json();
+                setPermissions(data.data);
             } else {
                 setPermissions(null);
             }
@@ -141,11 +140,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             const res = await fetch(`${API_URL}/me/permissions`, { credentials: 'include' });
             if (res.ok) {
-                setPermissions(await res.json());
+                const data = await res.json();
+                setPermissions(data.data);
             }
             const tenantRes = await fetch(`${API_URL}/tenants/active`, { credentials: 'include' });
             if (tenantRes.ok) {
-                setActiveTenant(await tenantRes.json());
+                const data = await tenantRes.json();
+                setActiveTenant(data.data);
             }
         } catch (e) {
             console.error("Refresh permissions error", e);

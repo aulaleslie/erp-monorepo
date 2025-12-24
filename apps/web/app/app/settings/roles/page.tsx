@@ -18,9 +18,21 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
 export default function RolesPage() {
     const [roles, setRoles] = useState<Role[]>([]);
     const [loading, setLoading] = useState(true);
+    const [roleToDelete, setRoleToDelete] = useState<string | null>(null);
     const { toast } = useToast();
 
     useEffect(() => {
@@ -42,11 +54,11 @@ export default function RolesPage() {
         }
     };
 
-    const handleDelete = async (id: string) => {
-        if (!confirm("Are you sure you want to delete this role?")) return;
+    const confirmDelete = async () => {
+        if (!roleToDelete) return;
 
         try {
-            await rolesService.delete(id);
+            await rolesService.delete(roleToDelete);
             toast({
                 title: "Role deleted",
                 description: "The role has been successfully deleted.",
@@ -58,6 +70,8 @@ export default function RolesPage() {
                 description: "Failed to delete the role.",
                 variant: "destructive",
             });
+        } finally {
+            setRoleToDelete(null);
         }
     };
 
@@ -141,7 +155,7 @@ export default function RolesPage() {
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
-                                                        onClick={() => handleDelete(role.id)}
+                                                        onClick={() => setRoleToDelete(role.id)}
                                                         disabled={role.isSuperAdmin}
                                                     >
                                                         <Trash2 className="h-4 w-4 text-destructive" />
@@ -156,6 +170,24 @@ export default function RolesPage() {
                     </Table>
                 </div>
             </div>
+
+            <AlertDialog open={!!roleToDelete} onOpenChange={(open) => !open && setRoleToDelete(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the role
+                            and remove permissions from any users assigned to it.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </PermissionGuard>
     );
 }

@@ -23,6 +23,7 @@ export default function CreateRolePage() {
         isSuperAdmin: false,
         permissions: [] as string[],
     });
+    const [errors, setErrors] = useState<Record<string, string | string[]>>({});
 
     useEffect(() => {
         const fetchPermissions = async () => {
@@ -52,6 +53,13 @@ export default function CreateRolePage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
+        setErrors({});
+
+        if (formData.permissions.length === 0 && !formData.isSuperAdmin) {
+            setErrors({ permissions: "Please select at least one permission." });
+            setLoading(false);
+            return;
+        }
 
         try {
             await rolesService.create(formData);
@@ -60,10 +68,19 @@ export default function CreateRolePage() {
                 description: "Role created successfully.",
             });
             router.push("/app/settings/roles");
-        } catch (error) {
+        } catch (error: any) {
+            const responseData = error.response?.data;
+            const errorMessage = responseData?.message || "Failed to create role.";
+
+            if (responseData?.errors) {
+                setErrors(responseData.errors);
+            } else if (errorMessage.toLowerCase().includes("name")) {
+                setErrors({ name: errorMessage });
+            }
+
             toast({
                 title: "Error",
-                description: "Failed to create role.",
+                description: errorMessage,
                 variant: "destructive",
             });
         } finally {
@@ -136,10 +153,17 @@ export default function CreateRolePage() {
                         <Input
                             id="name"
                             value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            onChange={(e) => {
+                                setFormData({ ...formData, name: e.target.value });
+                                if (errors.name) setErrors({ ...errors, name: "" });
+                            }}
                             placeholder="e.g. Manager"
                             required
+                            className={errors.name ? "border-red-500 focus-visible:ring-red-500" : ""}
                         />
+                        {errors.name && (
+                            <p className="text-sm text-red-500 mt-1">{Array.isArray(errors.name) ? errors.name[0] : errors.name}</p>
+                        )}
                     </div>
 
                     <div className="flex items-center space-x-2">
@@ -153,7 +177,7 @@ export default function CreateRolePage() {
                         <Label htmlFor="isSuperAdmin">Is Super Admin?</Label>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className={`space-y-4 ${errors.permissions ? "border border-red-500 rounded-md p-4" : ""}`}>
                         <div className="flex items-center justify-between">
                             <h3 className="text-lg font-medium">Permissions</h3>
                             <div className="flex items-center space-x-2">
@@ -165,6 +189,12 @@ export default function CreateRolePage() {
                                 <Label htmlFor="select-all" className="cursor-pointer">Select All</Label>
                             </div>
                         </div>
+
+                        {errors.permissions && (
+                            <p className="text-sm text-red-500 font-medium">
+                                {Array.isArray(errors.permissions) ? errors.permissions[0] : errors.permissions}
+                            </p>
+                        )}
 
                         {Object.entries(groupedPermissions).map(([group, perms]) => (
                             <div key={group} className="space-y-2 p-4 border rounded-md">

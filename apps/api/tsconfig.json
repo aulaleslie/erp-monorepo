@@ -16,6 +16,11 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@gym-monorepo/shared": [
+        "../../packages/shared/src/index.ts"
+      ]
+    }
   }
 }

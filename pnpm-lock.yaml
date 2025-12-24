@@ -15,10 +15,13 @@ importers:
       '@fastify/cookie':
         specifier: ^11.0.2
         version: 11.0.2
+      '@fastify/cors':
+        specifier: ^11.2.0
+        version: 11.2.0
       '@fastify/static':
         specifier: ^8.3.0
         version: 8.3.0
-      '@gym-erp/shared':
+      '@gym-monorepo/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       '@nestjs/common':
@@ -163,7 +166,7 @@ importers:
 
   apps/web:
     dependencies:
-      '@gym-erp/shared':
+      '@gym-monorepo/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       '@radix-ui/react-alert-dialog':

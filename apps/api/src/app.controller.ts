@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
-import { HealthResponse } from '@gym-erp/shared';
+import { HealthResponse } from '@gym-monorepo/shared';
 
 @Controller()
 export class AppController {

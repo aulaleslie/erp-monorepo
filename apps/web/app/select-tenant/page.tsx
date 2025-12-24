@@ -33,8 +33,8 @@ export default function SelectTenantPage() {
                     return;
                 }
                 if (res.ok) {
-                    const data = await res.json();
-                    setTenants(data);
+                    const responseData = await res.json();
+                    setTenants(responseData.data || []);
                 }
             } catch (error) {
                 console.error("Failed to fetch tenants", error);

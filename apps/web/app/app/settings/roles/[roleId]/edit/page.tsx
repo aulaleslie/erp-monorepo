@@ -27,6 +27,7 @@ export default function EditRolePage() {
         permissions: [] as string[],
     });
     const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string | string[]>>({});
 
     useEffect(() => {
         const fetchData = async () => {
@@ -69,6 +70,7 @@ export default function EditRolePage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
+        setErrors({});
 
         try {
             await rolesService.update(roleId, formData);
@@ -77,10 +79,16 @@ export default function EditRolePage() {
                 description: "Role updated successfully.",
             });
             router.push("/app/settings/roles");
-        } catch (error) {
+        } catch (error: any) {
+            const errorMessage = error.response?.data?.message || "Failed to update role.";
+
+            if (errorMessage.toLowerCase().includes("name")) {
+                setErrors({ name: errorMessage });
+            }
+
             toast({
                 title: "Error",
-                description: "Failed to update role.",
+                description: errorMessage,
                 variant: "destructive",
             });
         } finally {
@@ -161,10 +169,17 @@ export default function EditRolePage() {
                         <Input
                             id="name"
                             value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            onChange={(e) => {
+                                setFormData({ ...formData, name: e.target.value });
+                                if (errors.name) setErrors({ ...errors, name: "" });
+                            }}
                             placeholder="e.g. Manager"
                             required
+                            className={errors.name ? "border-red-500 focus-visible:ring-red-500" : ""}
                         />
+                        {errors.name && (
+                            <p className="text-sm text-red-500">{Array.isArray(errors.name) ? errors.name[0] : errors.name}</p>
+                        )}
                     </div>
 
                     <div className="flex items-center space-x-2">
