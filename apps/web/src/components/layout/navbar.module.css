@@ -1,0 +1,79 @@
+.navbar {
+    height: 64px;
+    background-color: var(--background);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+}
+
+.left,
+.right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.tenantSelector {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.tenantSelector:hover {
+    background-color: var(--surface);
+}
+
+.userMenu {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.userInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.userName {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.userRole {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.logoutBtn {
+    padding: 0.5rem;
+    color: #6b7280;
+    cursor: pointer;
+    border-radius: var(--radius);
+}
+
+.logoutBtn:hover {
+    background-color: #fee2e2;
+    color: #ef4444;
+}

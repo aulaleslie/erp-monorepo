@@ -1,12 +1,23 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --primary: #6366f1; /* Indigo 500 */
+  --primary-hover: #4f46e5;
+  --surface: #f3f4f6; /* Gray 100 */
+  --border: #e5e7eb;
+  --ring: 0 0 0 2px rgba(99, 102, 241, 0.5);
+  --radius: 0.5rem;
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --primary: #818cf8; /* Indigo 400 */
+    --primary-hover: #6366f1;
+    --surface: #171717;
+    --border: #262626;
   }
 }
 
