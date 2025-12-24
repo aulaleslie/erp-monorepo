@@ -19,7 +19,8 @@ export default function SelectTenantPage() {
     // Actually, this page should be protected. If fetch fails (401), we redirect.
 
     const router = useRouter();
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+    const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
+
 
     useEffect(() => {
         const fetchTenants = async () => {

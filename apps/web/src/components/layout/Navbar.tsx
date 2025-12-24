@@ -9,7 +9,8 @@ import Link from "next/link";
 export const Navbar = () => {
     const { user, activeTenant, refreshAuth } = useAuth();
     const router = useRouter();
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+    const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
+
 
     const handleLogout = async () => {
         try {
