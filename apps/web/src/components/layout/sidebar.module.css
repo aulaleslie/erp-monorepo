@@ -40,6 +40,32 @@
     padding: 0.5rem 0.75rem;
 }
 
+.collapsibleHeader {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #6b7280;
+    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s;
+}
+
+.collapsibleHeader:hover {
+    color: var(--foreground);
+}
+
+.chevron {
+    transition: transform 0.2s;
+}
+
+.rotate {
+    transform: rotate(-90deg);
+}
+
 .link {
     display: flex;
     align-items: center;
