@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TenantsService } from './tenants.service';
 import { TenantsController } from './tenants.controller';
@@ -29,7 +29,7 @@ import { TenantMembershipGuard } from './guards/tenant-membership.guard';
       RolePermissionEntity,
       PermissionEntity,
     ]),
-    UsersModule,
+    forwardRef(() => UsersModule),
   ],
   controllers: [
     TenantsController,

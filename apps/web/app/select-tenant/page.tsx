@@ -25,7 +25,7 @@ export default function SelectTenantPage() {
     useEffect(() => {
         const fetchTenants = async () => {
             try {
-                const res = await fetch(`${API_URL}/tenants/my`, {
+                const res = await fetch(`${API_URL}/me/tenants`, {
                     credentials: "include",
                 });
                 if (res.status === 401) {
@@ -59,7 +59,7 @@ export default function SelectTenantPage() {
 
     const handleSelect = async (tenantId: string) => {
         try {
-            const res = await fetch(`${API_URL}/tenants/active`, {
+            const res = await fetch(`${API_URL}/me/tenants/active`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ tenantId }),

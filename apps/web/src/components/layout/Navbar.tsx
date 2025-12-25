@@ -44,7 +44,7 @@ export function Navbar() {
         setCheckingTenants(true);
         try {
             // Fetch latest tenants to check if any new ones were assigned
-            const res = await fetch(`${API_URL}/tenants/my`, {
+            const res = await fetch(`${API_URL}/me/tenants`, {
                 credentials: "include",
             });
 

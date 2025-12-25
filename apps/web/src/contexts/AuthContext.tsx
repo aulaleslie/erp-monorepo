@@ -65,7 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const fetchActiveTenant = async () => {
         try {
-            const res = await fetch(`${API_URL}/tenants/active`);
+            const res = await fetch(`${API_URL}/me/tenants/active`, { credentials: 'include' });
             if (res.ok) {
                 const responseData = await res.json();
                 setActiveTenant(responseData.data);
@@ -80,7 +80,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const fetchPermissions = async () => {
         try {
-            const res = await fetch(`${API_URL}/me/permissions`);
+            const res = await fetch(`${API_URL}/me/permissions`, { credentials: 'include' });
             if (res.ok) {
                 const responseData = await res.json();
                 setPermissions(responseData.data);
@@ -107,9 +107,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             const [userRes, tenantRes, permRes, myTenantsRes] = await Promise.allSettled([
                 fetch(`${API_URL}/auth/me`, { credentials: 'include' }),
-                fetch(`${API_URL}/tenants/active`, { credentials: 'include' }),
+                fetch(`${API_URL}/me/tenants/active`, { credentials: 'include' }),
                 fetch(`${API_URL}/me/permissions`, { credentials: 'include' }),
-                fetch(`${API_URL}/tenants/my`, { credentials: 'include' })
+                fetch(`${API_URL}/me/tenants`, { credentials: 'include' })
             ]);
 
             if (userRes.status === 'fulfilled' && userRes.value.ok) {
@@ -155,7 +155,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 const data = await res.json();
                 setPermissions(data.data);
             }
-            const tenantRes = await fetch(`${API_URL}/tenants/active`, { credentials: 'include' });
+            const tenantRes = await fetch(`${API_URL}/me/tenants/active`, { credentials: 'include' });
             if (tenantRes.ok) {
                 const data = await tenantRes.json();
                 setActiveTenant(data.data);
