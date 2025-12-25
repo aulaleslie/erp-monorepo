@@ -1,4 +1,5 @@
 import { api } from '@/lib/api';
+import { PaginatedResponse } from './types';
 
 export interface TenantUser {
   tenantId: string;
@@ -51,7 +52,7 @@ export interface UserTenant {
 
 export const usersService = {
   getAll: async (page = 1, limit = 10) => {
-    const response = await api.get<{ items: TenantUser[]; total: number; page: number; limit: number; totalPages: number }>(
+    const response = await api.get<PaginatedResponse<TenantUser>>(
       '/tenant-users',
       { params: { page, limit } }
     );

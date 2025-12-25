@@ -11,6 +11,8 @@ import { RolePermissionEntity } from '../database/entities/role-permission.entit
 import { PermissionEntity } from '../database/entities/permission.entity';
 import { TenantUserEntity } from '../database/entities/tenant-user.entity';
 import { UserEntity } from '../database/entities/user.entity';
+import { PaginatedResponse, paginate, calculateSkip } from '../common/dto/pagination.dto';
+import { createValidationBuilder } from '../common/utils/validation.util';
 
 @Injectable()
 export class RolesService {
@@ -27,21 +29,15 @@ export class RolesService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async findAll(tenantId: string, page: number = 1, limit: number = 10) {
+  async findAll(tenantId: string, page: number = 1, limit: number = 10): Promise<PaginatedResponse<RoleEntity>> {
     const [items, total] = await this.roleRepository.findAndCount({
       where: { tenantId, isSuperAdmin: false },
       order: { name: 'ASC' },
-      skip: (page - 1) * limit,
+      skip: calculateSkip(page, limit),
       take: limit,
     });
 
-    return {
-      items,
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    };
+    return paginate(items, total, page, limit);
   }
 
   async findOne(tenantId: string, id: string): Promise<RoleEntity> {
@@ -98,7 +94,6 @@ export class RolesService {
     const normalizedName = normalize(name);
 
     // Fetch all roles for the tenant to check for duplicates
-    // In valid production scenario, this should be done via a unique constraint or a smarter query
     const roles = await this.roleRepository.find({
       where: { tenantId },
     });
@@ -108,12 +103,9 @@ export class RolesService {
     );
 
     if (duplicate) {
-      throw new BadRequestException({
-        message: 'Validation failed',
-        errors: {
-          name: ['Role with this name already exists'],
-        },
-      });
+      const validator = createValidationBuilder();
+      validator.addError('name', 'Role with this name already exists');
+      validator.throwIfErrors();
     }
   }
 

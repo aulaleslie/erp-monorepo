@@ -1,14 +1,14 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { UserEntity } from '../database/entities/user.entity';
 import { TenantUserEntity } from '../database/entities/tenant-user.entity';
 import { RoleEntity } from '../database/entities/role.entity';
 import { RolePermissionEntity } from '../database/entities/role-permission.entity';
 import { PermissionEntity } from '../database/entities/permission.entity';
 import { TenantEntity } from '../database/entities/tenant.entity';
-import { In } from 'typeorm';
-import * as bcrypt from 'bcrypt';
+import { hashPassword, comparePassword } from '../common/utils/password.util';
+import { calculateSkip } from '../common/dto/pagination.dto';
 
 @Injectable()
 export class UsersService {
@@ -123,13 +123,12 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    const isPasswordValid = await bcrypt.compare(currentPassword, user.passwordHash);
+    const isPasswordValid = await comparePassword(currentPassword, user.passwordHash);
     if (!isPasswordValid) {
       throw new BadRequestException('Current password is incorrect');
     }
 
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    user.passwordHash = hashedPassword;
+    user.passwordHash = await hashPassword(newPassword);
     await this.usersRepository.save(user);
   }
 
@@ -229,7 +228,7 @@ export class UsersService {
     const users = await queryBuilder
       .select(['user.id', 'user.email', 'user.fullName'])
       .orderBy('user.email', 'ASC')
-      .skip((page - 1) * limit)
+      .skip(calculateSkip(page, limit))
       .take(limit)
       .getMany();
 

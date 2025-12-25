@@ -1,4 +1,5 @@
 import { api } from '@/lib/api';
+import { PaginatedResponse } from './types';
 
 export interface Role {
   id: string;
@@ -41,7 +42,7 @@ export const rolesService = {
   },
 
   getAll: async (page = 1, limit = 10) => {
-    const response = await api.get<Role[] | { items: Role[]; total: number }>('/roles', {
+    const response = await api.get<PaginatedResponse<Role>>('/roles', {
       params: { page, limit },
     });
     return response.data;

@@ -1,14 +1,14 @@
 import {
   Injectable,
   NotFoundException,
-  ForbiddenException,
-  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, Not } from 'typeorm';
 import { TenantEntity } from '../database/entities/tenant.entity';
 import { TenantUserEntity } from '../database/entities/tenant-user.entity';
 import { RoleEntity } from '../database/entities/role.entity';
+import { PaginatedResponse, paginate, calculateSkip } from '../common/dto/pagination.dto';
+import { createValidationBuilder } from '../common/utils/validation.util';
 
 @Injectable()
 export class TenantsService {
@@ -60,28 +60,23 @@ export class TenantsService {
     userId: string,
     data: { name: string; slug: string },
   ): Promise<TenantEntity> {
-    const errors: Record<string, string[]> = {};
+    const validator = createValidationBuilder();
 
     const existingSlug = await this.tenantRepository.findOne({
       where: { slug: data.slug },
     });
     if (existingSlug) {
-      errors.slug = ['Slug is already taken'];
+      validator.addError('slug', 'Slug is already taken');
     }
 
     const existingName = await this.tenantRepository.findOne({
       where: { name: data.name },
     });
     if (existingName) {
-      errors.name = ['Name is already taken'];
+      validator.addError('name', 'Name is already taken');
     }
 
-    if (Object.keys(errors).length > 0) {
-      throw new BadRequestException({
-        message: 'Validation failed',
-        errors,
-      });
-    }
+    validator.throwIfErrors();
 
     const tenant = this.tenantRepository.create({
       name: data.name,
@@ -109,35 +104,28 @@ export class TenantsService {
     return tenant;
   }
 
-  async findAll(page: number = 1, limit: number = 10) {
+  async findAll(page: number = 1, limit: number = 10): Promise<PaginatedResponse<TenantEntity>> {
     const [items, total] = await this.tenantRepository.findAndCount({
-      skip: (page - 1) * limit,
+      skip: calculateSkip(page, limit),
       take: limit,
       order: {
         createdAt: 'DESC',
       },
     });
 
-    return {
-      items,
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    };
+    return paginate(items, total, page, limit);
   }
 
   async update(id: string, data: Partial<TenantEntity>): Promise<TenantEntity> {
     const tenant = await this.getTenantById(id);
-
-    const errors: Record<string, string[]> = {};
+    const validator = createValidationBuilder();
 
     if (data.slug) {
       const existingSlug = await this.tenantRepository.findOne({
         where: { slug: data.slug, id: Not(id) },
       });
       if (existingSlug) {
-        errors.slug = ['Slug is already taken'];
+        validator.addError('slug', 'Slug is already taken');
       }
     }
 
@@ -146,16 +134,11 @@ export class TenantsService {
         where: { name: data.name, id: Not(id) },
       });
       if (existingName) {
-        errors.name = ['Name is already taken'];
+        validator.addError('name', 'Name is already taken');
       }
     }
 
-    if (Object.keys(errors).length > 0) {
-      throw new BadRequestException({
-        message: 'Validation failed',
-        errors,
-      });
-    }
+    validator.throwIfErrors();
 
     Object.assign(tenant, data);
     return this.tenantRepository.save(tenant);

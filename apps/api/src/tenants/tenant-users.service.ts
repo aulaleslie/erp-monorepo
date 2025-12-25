@@ -6,10 +6,21 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-import * as bcrypt from 'bcrypt';
 import { TenantUserEntity } from '../database/entities/tenant-user.entity';
 import { UserEntity } from '../database/entities/user.entity';
 import { RoleEntity } from '../database/entities/role.entity';
+import {
+  PaginatedResponse,
+  paginate,
+  calculateSkip,
+} from '../common/dto/pagination.dto';
+import {
+  TenantUserResponseDto,
+  toTenantUserResponseDto,
+  toUserResponseDto,
+  toRoleResponseDto,
+} from '../common/dto/user.dto';
+import { hashPassword } from '../common/utils/password.util';
 
 @Injectable()
 export class TenantUsersService {
@@ -26,27 +37,15 @@ export class TenantUsersService {
     tenantId: string,
     page: number = 1,
     limit: number = 10,
-  ): Promise<{
-    items: any[];
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  }> {
+  ): Promise<PaginatedResponse<TenantUserResponseDto>> {
     const [tenantUsers, total] = await this.tenantUserRepository.findAndCount({
       where: { tenantId },
-      skip: (page - 1) * limit,
+      skip: calculateSkip(page, limit),
       take: limit,
     });
 
     if (tenantUsers.length === 0) {
-      return {
-        items: [],
-        total: 0,
-        page,
-        limit,
-        totalPages: 0,
-      };
+      return paginate<TenantUserResponseDto>([], 0, page, limit);
     }
 
     const userIds = tenantUsers.map((tu) => tu.userId);
@@ -65,40 +64,15 @@ export class TenantUsersService {
         : [];
 
     const items = tenantUsers.map((tu) => {
-      const user = users.find((u) => u.id === tu.userId);
-      const role = roles.find((r) => r.id === tu.roleId);
-      return {
-        tenantId: tu.tenantId,
-        userId: tu.userId,
-        roleId: tu.roleId,
-        user: user
-          ? {
-              id: user.id,
-              email: user.email,
-              fullName: user.fullName,
-              status: user.status,
-            }
-          : null,
-        role: role
-          ? {
-              id: role.id,
-              name: role.name,
-              isSuperAdmin: role.isSuperAdmin,
-            }
-          : null,
-      };
+      const user = users.find((u) => u.id === tu.userId) || null;
+      const role = roles.find((r) => r.id === tu.roleId) || null;
+      return toTenantUserResponseDto(tu, user, role);
     });
 
-    return {
-      items,
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    };
+    return paginate(items, total, page, limit);
   }
 
-  async findOne(tenantId: string, userId: string): Promise<any> {
+  async findOne(tenantId: string, userId: string): Promise<TenantUserResponseDto> {
     const membership = await this.tenantUserRepository.findOne({
       where: { tenantId, userId },
     });
@@ -117,32 +91,13 @@ export class TenantUsersService {
         })
       : null;
 
-    return {
-      tenantId: membership.tenantId,
-      userId: membership.userId,
-      roleId: membership.roleId,
-      user: user
-        ? {
-            id: user.id,
-            email: user.email,
-            fullName: user.fullName,
-            status: user.status,
-          }
-        : null,
-      role: role
-        ? {
-            id: role.id,
-            name: role.name,
-            isSuperAdmin: role.isSuperAdmin,
-          }
-        : null,
-    };
+    return toTenantUserResponseDto(membership, user, role);
   }
 
   async create(
     tenantId: string,
     data: { email: string; fullName?: string; roleId?: string; password: string },
-  ): Promise<any> {
+  ): Promise<TenantUserResponseDto> {
     // Check if user already exists
     let user = await this.userRepository.findOne({
       where: { email: data.email },
@@ -164,7 +119,7 @@ export class TenantUsersService {
     }
 
     // Create new user with provided password
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const hashedPassword = await hashPassword(data.password);
 
     user = this.userRepository.create({
       email: data.email,
@@ -182,27 +137,13 @@ export class TenantUsersService {
     });
     await this.tenantUserRepository.save(membership);
 
-    return {
-      user: {
-        id: user.id,
-        email: user.email,
-        fullName: user.fullName,
-        status: user.status,
-      },
-      role: role
-        ? {
-            id: role.id,
-            name: role.name,
-            isSuperAdmin: role.isSuperAdmin,
-          }
-        : null,
-    };
+    return toTenantUserResponseDto(membership, user, role);
   }
 
   async inviteExistingUser(
     tenantId: string,
     data: { userId: string; roleId: string },
-  ): Promise<any> {
+  ): Promise<TenantUserResponseDto> {
     // Find user by ID
     const user = await this.userRepository.findOne({
       where: { id: data.userId },
@@ -242,22 +183,7 @@ export class TenantUsersService {
 
     await this.tenantUserRepository.save(membership);
 
-    return {
-      tenantId: membership.tenantId,
-      userId: membership.userId,
-      roleId: membership.roleId,
-      user: {
-        id: user.id,
-        email: user.email,
-        fullName: user.fullName,
-        status: user.status,
-      },
-      role: {
-        id: role.id,
-        name: role.name,
-        isSuperAdmin: role.isSuperAdmin,
-      },
-    };
+    return toTenantUserResponseDto(membership, user, role);
   }
 
   async updateRole(
@@ -310,7 +236,7 @@ export class TenantUsersService {
       password?: string;
       roleId?: string | null;
     },
-  ): Promise<any> {
+  ): Promise<TenantUserResponseDto> {
     // Check membership
     const membership = await this.tenantUserRepository.findOne({
       where: { tenantId, userId },
@@ -348,8 +274,7 @@ export class TenantUsersService {
 
     // Update password if provided
     if (data.password) {
-      const hashedPassword = await bcrypt.hash(data.password, 10);
-      user.passwordHash = hashedPassword;
+      user.passwordHash = await hashPassword(data.password);
     }
 
     // Save user changes
@@ -375,23 +300,6 @@ export class TenantUsersService {
       ? await this.roleRepository.findOne({ where: { id: membership.roleId } })
       : null;
 
-    return {
-      tenantId: membership.tenantId,
-      userId: membership.userId,
-      roleId: membership.roleId,
-      user: {
-        id: user.id,
-        email: user.email,
-        fullName: user.fullName,
-        status: user.status,
-      },
-      role: role
-        ? {
-            id: role.id,
-            name: role.name,
-            isSuperAdmin: role.isSuperAdmin,
-          }
-        : null,
-    };
+    return toTenantUserResponseDto(membership, user, role);
   }
 }

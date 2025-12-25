@@ -1,4 +1,5 @@
 import { api } from '@/lib/api';
+import { PaginatedResponse } from './types';
 
 export interface Tenant {
   id: string;
@@ -22,7 +23,7 @@ export interface UpdateTenantDto {
 
 export const tenantsService = {
   getAll: async (page = 1, limit = 10) => {
-    const response = await api.get<Tenant[] | { items: Tenant[]; total: number }>('/tenants', {
+    const response = await api.get<PaginatedResponse<Tenant>>('/tenants', {
       params: { page, limit },
     });
     return response.data;
