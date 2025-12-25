@@ -34,7 +34,15 @@ export default function SelectTenantPage() {
                 }
                 if (res.ok) {
                     const responseData = await res.json();
-                    setTenants(responseData.data || []);
+                    const tenantList = responseData.data || [];
+
+                    // If user has no tenants, redirect to dashboard directly
+                    if (tenantList.length === 0) {
+                        router.push("/app/dashboard");
+                        return;
+                    }
+
+                    setTenants(tenantList);
                 }
             } catch (error) {
                 console.error("Failed to fetch tenants", error);

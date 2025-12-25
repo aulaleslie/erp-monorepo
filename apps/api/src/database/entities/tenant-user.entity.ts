@@ -10,6 +10,6 @@ export class TenantUserEntity extends BaseAuditEntity {
   @PrimaryColumn()
   userId: string;
 
-  @Column()
-  roleId: string;
+  @Column({ type: 'uuid', nullable: true })
+  roleId: string | null;
 }

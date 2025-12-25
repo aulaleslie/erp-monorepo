@@ -12,11 +12,13 @@ import { Loader2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function EditRolePage() {
     const params = useParams();
     const router = useRouter();
     const { toast } = useToast();
+    const { user } = useAuth();
     const roleId = params.roleId as string;
 
     const [loading, setLoading] = useState(true);
@@ -182,14 +184,16 @@ export default function EditRolePage() {
                         )}
                     </div>
 
-                    <div className="flex items-center space-x-2">
-                        <Checkbox
-                            id="isSuperAdmin"
-                            checked={isSuperAdmin}
-                            disabled={true} // Usually cannot change isSuperAdmin status
-                        />
-                        <Label htmlFor="isSuperAdmin" className="text-muted-foreground">Is Super Admin? (Cannot be changed)</Label>
-                    </div>
+                    {user?.isSuperAdmin && (
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                                id="isSuperAdmin"
+                                checked={isSuperAdmin}
+                                disabled={true} // Usually cannot change isSuperAdmin status
+                            />
+                            <Label htmlFor="isSuperAdmin" className="text-muted-foreground">Is Super Admin? (Cannot be changed)</Label>
+                        </div>
+                    )}
 
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">

@@ -24,6 +24,7 @@ interface AuthContextType {
     user: User | null;
     activeTenant: Tenant | null;
     permissions: Permissions | null;
+    hasTenants: boolean | null; // null = not yet checked, true/false = has/doesn't have tenants
     isLoading: boolean;
     refreshPermissions: () => Promise<void>;
     refreshAuth: () => Promise<void>;
@@ -39,6 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [user, setUser] = useState<User | null>(null);
     const [activeTenant, setActiveTenant] = useState<Tenant | null>(null);
     const [permissions, setPermissions] = useState<Permissions | null>(null);
+    const [hasTenants, setHasTenants] = useState<boolean | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     const fetchUser = async () => {
@@ -103,10 +105,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // Changing fetch to include credentials.
         try {
-            const [userRes, tenantRes, permRes] = await Promise.allSettled([
+            const [userRes, tenantRes, permRes, myTenantsRes] = await Promise.allSettled([
                 fetch(`${API_URL}/auth/me`, { credentials: 'include' }),
                 fetch(`${API_URL}/tenants/active`, { credentials: 'include' }),
-                fetch(`${API_URL}/me/permissions`, { credentials: 'include' })
+                fetch(`${API_URL}/me/permissions`, { credentials: 'include' }),
+                fetch(`${API_URL}/tenants/my`, { credentials: 'include' })
             ]);
 
             if (userRes.status === 'fulfilled' && userRes.value.ok) {
@@ -128,6 +131,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setPermissions(data.data);
             } else {
                 setPermissions(null);
+            }
+
+            // Check if user has any tenants
+            if (myTenantsRes.status === 'fulfilled' && myTenantsRes.value.ok) {
+                const data = await myTenantsRes.value.json();
+                const tenants = data.data || [];
+                setHasTenants(tenants.length > 0);
+            } else {
+                setHasTenants(false);
             }
         } catch (e) {
             console.error("Auth init error", e);
@@ -158,7 +170,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, [refreshAuth]);
 
     return (
-        <AuthContext.Provider value={{ user, activeTenant, permissions, isLoading, refreshPermissions, refreshAuth }}>
+        <AuthContext.Provider value={{ user, activeTenant, permissions, hasTenants, isLoading, refreshPermissions, refreshAuth }}>
             {children}
         </AuthContext.Provider>
     );

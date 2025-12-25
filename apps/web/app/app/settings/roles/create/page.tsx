@@ -12,10 +12,12 @@ import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function CreateRolePage() {
     const router = useRouter();
     const { toast } = useToast();
+    const { user } = useAuth();
     const [loading, setLoading] = useState(false);
     const [permissions, setPermissions] = useState<Permission[]>([]);
     const [formData, setFormData] = useState({
@@ -166,16 +168,18 @@ export default function CreateRolePage() {
                         )}
                     </div>
 
-                    <div className="flex items-center space-x-2">
-                        <Checkbox
-                            id="isSuperAdmin"
-                            checked={formData.isSuperAdmin}
-                            onCheckedChange={(checked) =>
-                                setFormData({ ...formData, isSuperAdmin: checked === true })
-                            }
-                        />
-                        <Label htmlFor="isSuperAdmin">Is Super Admin?</Label>
-                    </div>
+                    {user?.isSuperAdmin && (
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                                id="isSuperAdmin"
+                                checked={formData.isSuperAdmin}
+                                onCheckedChange={(checked) =>
+                                    setFormData({ ...formData, isSuperAdmin: checked === true })
+                                }
+                            />
+                            <Label htmlFor="isSuperAdmin">Is Super Admin?</Label>
+                        </div>
+                    )}
 
                     <div className={`space-y-4 ${errors.permissions ? "border border-red-500 rounded-md p-4" : ""}`}>
                         <div className="flex items-center justify-between">

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { User, LogOut, Settings as SettingsIcon } from "lucide-react";
+import { useState } from "react";
+import { User, LogOut, Building, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -14,44 +15,83 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
+
+const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
 
 export function Navbar() {
-    const { user, activeTenant } = useAuth();
-    // We assume there's a way to logout. For cycle 1, we might just clear cookie or hit endpoint.
-    // The context likely doesn't expose logout directly yet, or we use a basic fetch.
-    // AuthContext shows no logout function, so we'll link to /auth/logout or implement it.
-
-    // Actually AuthContext interface has `refreshAuth`.
-    // Cycle 1 spec says POST /auth/logout.
-
+    const { user, activeTenant, hasTenants, refreshAuth } = useAuth();
     const router = useRouter();
+    const { toast } = useToast();
+    const [checkingTenants, setCheckingTenants] = useState(false);
 
     const handleLogout = async () => {
         try {
-            await fetch('/api/auth/logout', { method: 'POST' }); // Using nextjs proxy or direct API?
-            // Assuming API is on localhost:3001 and we might need full URL or proxy.
-            // For now, let's just redirect to /login which might clear things or we assume a page handler.
-            // Docs say POST /auth/logout.
-
-            // Let's assume we navigate to /login for now, or use a server action/api route wrapper.
-            // We'll just hard refresh to /auth/logout if configured, but better to fetch and redirect.
+            await fetch('/api/auth/logout', { method: 'POST' });
             window.location.href = '/login';
         } catch (e) {
             console.error("Logout failed", e);
         }
     };
 
+    const handleSelectTenantClick = async () => {
+        setCheckingTenants(true);
+        try {
+            // Fetch latest tenants to check if any new ones were assigned
+            const res = await fetch(`${API_URL}/tenants/my`, {
+                credentials: "include",
+            });
+
+            if (res.ok) {
+                const responseData = await res.json();
+                const tenants = responseData.data || [];
+
+                if (tenants.length === 0) {
+                    // No tenants available - show notification
+                    toast({
+                        title: "No workspaces available",
+                        description: "You don't have access to any workspaces. Please contact your administrator.",
+                        variant: "destructive",
+                    });
+                } else {
+                    // Has tenants - refresh auth and navigate to select-tenant
+                    await refreshAuth();
+                    router.push("/select-tenant");
+                }
+            } else {
+                toast({
+                    title: "Error",
+                    description: "Failed to check workspace availability.",
+                    variant: "destructive",
+                });
+            }
+        } catch (error) {
+            console.error("Failed to check tenants", error);
+            toast({
+                title: "Error",
+                description: "Failed to check workspace availability.",
+                variant: "destructive",
+            });
+        } finally {
+            setCheckingTenants(false);
+        }
+    };
+
     return (
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-6">
             <div className="flex flex-1 items-center gap-4">
-                {/* Tenant Selector Placeholder - In Cycle 1 we have /select-tenant page, 
-            but sidebar allows switching? Docs say "Left side: Tenant dropdown".
-            We'll implement a basic button linking to select-tenant or a dropdown later.
-        */}
-                <Button variant="outline" size="sm" asChild>
-                    <Link href="/select-tenant">
-                        {activeTenant?.name || "Select Tenant"}
-                    </Link>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSelectTenantClick}
+                    disabled={checkingTenants}
+                >
+                    {checkingTenants ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                        <Building className="mr-2 h-4 w-4" />
+                    )}
+                    {activeTenant?.name || "Select Workspace"}
                 </Button>
             </div>
             <div className="flex items-center gap-4">
@@ -91,3 +131,4 @@ export function Navbar() {
         </header>
     );
 }
+

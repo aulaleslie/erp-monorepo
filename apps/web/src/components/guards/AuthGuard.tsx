@@ -10,7 +10,7 @@ interface AuthGuardProps {
 }
 
 export const AuthGuard = ({ children, requireTenant = true }: AuthGuardProps) => {
-    const { user, activeTenant, isLoading } = useAuth();
+    const { user, activeTenant, hasTenants, isLoading } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
 
@@ -22,11 +22,16 @@ export const AuthGuard = ({ children, requireTenant = true }: AuthGuardProps) =>
             return;
         }
 
-        if (requireTenant && !activeTenant && pathname !== '/select-tenant') {
+        // Only redirect to select-tenant if:
+        // 1. Tenant is required
+        // 2. No active tenant selected
+        // 3. User HAS tenants to select from (hasTenants === true)
+        // 4. Not already on select-tenant page
+        if (requireTenant && !activeTenant && hasTenants === true && pathname !== '/select-tenant') {
             router.push('/select-tenant');
         }
 
-    }, [user, activeTenant, isLoading, router, pathname, requireTenant]);
+    }, [user, activeTenant, hasTenants, isLoading, router, pathname, requireTenant]);
 
     if (isLoading) {
         return (
@@ -37,7 +42,13 @@ export const AuthGuard = ({ children, requireTenant = true }: AuthGuardProps) =>
     }
 
     // If redirected, render null until router pushes (optimization)
-    if (!user || (requireTenant && !activeTenant)) {
+    // Allow users without tenants to access the app
+    if (!user) {
+        return null;
+    }
+
+    // Only block if tenant required AND user has tenants but no active one selected
+    if (requireTenant && !activeTenant && hasTenants === true) {
         return null;
     }
 
