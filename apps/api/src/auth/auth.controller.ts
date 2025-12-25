@@ -45,6 +45,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async logout(@Res({ passthrough: true }) res: FastifyReply) {
     res.clearCookie('access_token', { path: '/' });
+    res.clearCookie('active_tenant', { path: '/' });
     return { message: 'Logged out successfully' };
   }
 

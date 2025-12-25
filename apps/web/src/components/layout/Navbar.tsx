@@ -27,10 +27,16 @@ export function Navbar() {
 
     const handleLogout = async () => {
         try {
-            await fetch('/api/auth/logout', { method: 'POST' });
+            await fetch(`${API_URL}/auth/logout`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+            // Force a hard reload to clear any client-side state
             window.location.href = '/login';
         } catch (e) {
             console.error("Logout failed", e);
+            // Even if api call fails, redirect to login
+            window.location.href = '/login';
         }
     };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -15,10 +15,20 @@ export default function LoginPage() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const { refreshAuth } = useAuth();
+    const { refreshAuth, user, activeTenant, isLoading } = useAuth();
     const router = useRouter();
 
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
+
+    useEffect(() => {
+        if (!isLoading && user) {
+            if (activeTenant) {
+                router.replace("/app/dashboard");
+            } else {
+                router.replace("/select-tenant");
+            }
+        }
+    }, [isLoading, user, activeTenant, router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

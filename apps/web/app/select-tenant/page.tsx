@@ -29,7 +29,11 @@ export default function SelectTenantPage() {
                     credentials: "include",
                 });
                 if (res.status === 401) {
-                    router.push("/login");
+                    console.error("Unauthorized access to tenants");
+                    // Do not redirect to login here if we believe we are authenticated.
+                    // Let the AuthContext/Guard handle global session state.
+                    // If we redirect here, we risk a loop if AuthContext thinks we are logged in.
+                    setLoading(false);
                     return;
                 }
                 if (res.ok) {
@@ -87,7 +91,7 @@ export default function SelectTenantPage() {
                         <EmptyState
                             icon={Building}
                             title="No workspaces found"
-                            description="Please contact your administrator."
+                            description="Please contact your administrator or try reloading."
                         />
                     ) : (
                         <div className="space-y-2">
