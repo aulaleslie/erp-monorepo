@@ -41,7 +41,7 @@ const sidebarConfig: SidebarItem[] = [
     {
         label: 'Dashboard',
         icon: Home,
-        href: '/app/dashboard',
+        href: '/dashboard',
     },
     {
         label: 'Settings',
@@ -50,7 +50,7 @@ const sidebarConfig: SidebarItem[] = [
             {
                 label: 'Roles',
                 icon: Shield,
-                href: '/app/settings/roles',
+                href: '/settings/roles',
                 permissions: [
                     'roles.read',
                     'roles.create',
@@ -61,7 +61,7 @@ const sidebarConfig: SidebarItem[] = [
             {
                 label: 'Users',
                 icon: Users,
-                href: '/app/settings/users',
+                href: '/settings/users',
                 permissions: [
                     'users.read',
                     'users.create',
@@ -79,12 +79,12 @@ const sidebarConfig: SidebarItem[] = [
             {
                 label: 'Tenants',
                 icon: Building,
-                href: '/app/platform/tenants',
+                href: '/platform/tenants',
             },
             {
                 label: 'Audit Logs',
                 icon: Shield,
-                href: '/app/platform/audit-logs',
+                href: '/platform/audit-logs',
             },
         ],
     },

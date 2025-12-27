@@ -121,7 +121,7 @@ export function Navbar() {
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
-                            <Link href="/app/profile">
+                            <Link href="/profile">
                                 <User className="mr-2 h-4 w-4" />
                                 <span>Profile</span>
                             </Link>
