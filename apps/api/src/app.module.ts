@@ -10,6 +10,7 @@ import { TenantsModule } from './modules/tenants/tenants.module';
 import { UsersModule } from './modules/users/users.module';
 import { AuditSubscriber } from './database/subscribers/audit.subscriber';
 import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
+import { TaxesModule } from './modules/taxes/taxes.module';
 
 
 import { APP_INTERCEPTOR } from '@nestjs/core';
@@ -29,6 +30,7 @@ import { UserContextInterceptor } from './common/interceptors/user-context.inter
     TenantsModule,
     UsersModule,
     AuditLogsModule,
+    TaxesModule,
   ],
   controllers: [AppController],
   providers: [
