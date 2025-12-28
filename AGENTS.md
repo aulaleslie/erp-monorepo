@@ -6,10 +6,6 @@ Future agents have to deliver work that feels like a natural continuation of the
 ## Primary references
 - `docs/CYCLE_0.md` (locked decisions, pnpm setup, Docker-compose baseline, shared DTO expectations).
 - `docs/CYCLE_1.md` (Cycle 1 domain model, migrations order, seed data, authentication and permission endpoints).
-- `docs/CYCLE_2.md` (Cycle 2 domain model: tax and product POS foundation).
-- `docs/CYCLE_3.md` (Cycle 3 domain model: members, memberships, day pass, entry scan).
-- `docs/CYCLE_4.md` (Cycle 4 domain model: session packages and subscriptions).
-- `docs/CYCLE_5.md` (Cycle 5 domain model: staff and trainer monitoring).
 - `docs/TASK_MIGRATE_UI.md` (Tailwind + shadcn UI guide, app shell expectations, menu permissions, component list, and cycle-1 page targets).
 
 Always cite the relevant section of these docs when you describe your plan or justify an implementation in your response.

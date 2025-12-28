@@ -18,4 +18,10 @@ export class TenantEntity extends BaseAuditEntity {
     default: 'ACTIVE',
   })
   status: 'ACTIVE' | 'DISABLED';
+
+  @Column({ default: false })
+  isTaxable: boolean;
+
+  @Column({ default: false })
+  isEatery: boolean;
 }

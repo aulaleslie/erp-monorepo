@@ -24,4 +24,10 @@ export class UpdateTenantDto {
   @IsOptional()
   @IsEnum(['ACTIVE', 'DISABLED'])
   status?: 'ACTIVE' | 'DISABLED';
+
+  @IsOptional()
+  isTaxable?: boolean;
+
+  @IsOptional()
+  isEatery?: boolean;
 }
