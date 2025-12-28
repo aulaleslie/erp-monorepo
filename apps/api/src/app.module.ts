@@ -5,9 +5,9 @@ import { ClsModule } from 'nestjs-cls';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
-import { AuthModule } from './auth/auth.module';
-import { TenantsModule } from './tenants/tenants.module';
-import { UsersModule } from './users/users.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { TenantsModule } from './modules/tenants/tenants.module';
+import { UsersModule } from './modules/users/users.module';
 import { AuditSubscriber } from './database/subscribers/audit.subscriber';
 import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
 

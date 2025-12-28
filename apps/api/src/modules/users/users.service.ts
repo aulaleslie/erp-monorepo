@@ -1,14 +1,14 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-import { UserEntity } from '../database/entities/user.entity';
-import { TenantUserEntity } from '../database/entities/tenant-user.entity';
-import { RoleEntity } from '../database/entities/role.entity';
-import { RolePermissionEntity } from '../database/entities/role-permission.entity';
-import { PermissionEntity } from '../database/entities/permission.entity';
-import { TenantEntity } from '../database/entities/tenant.entity';
-import { hashPassword, comparePassword } from '../common/utils/password.util';
-import { calculateSkip } from '../common/dto/pagination.dto';
+import { UserEntity } from '../../database/entities/user.entity';
+import { TenantUserEntity } from '../../database/entities/tenant-user.entity';
+import { RoleEntity } from '../../database/entities/role.entity';
+import { RolePermissionEntity } from '../../database/entities/role-permission.entity';
+import { PermissionEntity } from '../../database/entities/permission.entity';
+import { TenantEntity } from '../../database/entities/tenant.entity';
+import { hashPassword, comparePassword } from '../../common/utils/password.util';
+import { calculateSkip } from '../../common/dto/pagination.dto';
 
 @Injectable()
 export class UsersService {

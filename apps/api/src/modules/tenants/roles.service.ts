@@ -6,13 +6,13 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-import { RoleEntity } from '../database/entities/role.entity';
-import { RolePermissionEntity } from '../database/entities/role-permission.entity';
-import { PermissionEntity } from '../database/entities/permission.entity';
-import { TenantUserEntity } from '../database/entities/tenant-user.entity';
-import { UserEntity } from '../database/entities/user.entity';
-import { PaginatedResponse, paginate, calculateSkip } from '../common/dto/pagination.dto';
-import { createValidationBuilder } from '../common/utils/validation.util';
+import { RoleEntity } from '../../database/entities/role.entity';
+import { RolePermissionEntity } from '../../database/entities/role-permission.entity';
+import { PermissionEntity } from '../../database/entities/permission.entity';
+import { TenantUserEntity } from '../../database/entities/tenant-user.entity';
+import { UserEntity } from '../../database/entities/user.entity';
+import { PaginatedResponse, paginate, calculateSkip } from '../../common/dto/pagination.dto';
+import { createValidationBuilder } from '../../common/utils/validation.util';
 
 @Injectable()
 export class RolesService {

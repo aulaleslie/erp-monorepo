@@ -6,21 +6,21 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-import { TenantUserEntity } from '../database/entities/tenant-user.entity';
-import { UserEntity } from '../database/entities/user.entity';
-import { RoleEntity } from '../database/entities/role.entity';
+import { TenantUserEntity } from '../../database/entities/tenant-user.entity';
+import { UserEntity } from '../../database/entities/user.entity';
+import { RoleEntity } from '../../database/entities/role.entity';
 import {
   PaginatedResponse,
   paginate,
   calculateSkip,
-} from '../common/dto/pagination.dto';
+} from '../../common/dto/pagination.dto';
 import {
   TenantUserResponseDto,
   toTenantUserResponseDto,
   toUserResponseDto,
   toRoleResponseDto,
-} from '../common/dto/user.dto';
-import { hashPassword } from '../common/utils/password.util';
+} from '../../common/dto/user.dto';
+import { hashPassword } from '../../common/utils/password.util';
 
 @Injectable()
 export class TenantUsersService {

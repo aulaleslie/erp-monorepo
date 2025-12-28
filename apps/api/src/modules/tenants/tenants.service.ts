@@ -4,11 +4,11 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, Not } from 'typeorm';
-import { TenantEntity } from '../database/entities/tenant.entity';
-import { TenantUserEntity } from '../database/entities/tenant-user.entity';
-import { RoleEntity } from '../database/entities/role.entity';
-import { PaginatedResponse, paginate, calculateSkip } from '../common/dto/pagination.dto';
-import { createValidationBuilder } from '../common/utils/validation.util';
+import { TenantEntity } from '../../database/entities/tenant.entity';
+import { TenantUserEntity } from '../../database/entities/tenant-user.entity';
+import { RoleEntity } from '../../database/entities/role.entity';
+import { PaginatedResponse, paginate, calculateSkip } from '../../common/dto/pagination.dto';
+import { createValidationBuilder } from '../../common/utils/validation.util';
 
 @Injectable()
 export class TenantsService {
