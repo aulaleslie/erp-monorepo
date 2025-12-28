@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { TenantTaxEntity } from './tenant-tax.entity';
 import { BaseAuditEntity } from '../../common/entities/base-audit.entity';
 
 @Entity('tenants')
@@ -19,9 +20,12 @@ export class TenantEntity extends BaseAuditEntity {
   })
   status: 'ACTIVE' | 'DISABLED';
 
-  @Column({ default: false })
+  @Column({ name: 'is_taxable', default: false })
   isTaxable: boolean;
 
-  @Column({ default: false })
+  @Column({ name: 'is_eatery', default: false })
   isEatery: boolean;
+
+  @OneToMany(() => TenantTaxEntity, (tenantTax) => tenantTax.tenant)
+  taxes: TenantTaxEntity[];
 }

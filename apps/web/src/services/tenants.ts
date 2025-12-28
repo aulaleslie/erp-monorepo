@@ -6,6 +6,8 @@ export interface Tenant {
   name: string;
   slug: string;
   status: 'ACTIVE' | 'DISABLED';
+  isTaxable: boolean;
+  isEatery: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -13,12 +15,16 @@ export interface Tenant {
 export interface CreateTenantDto {
   name: string;
   slug: string;
+  isTaxable?: boolean;
+  isEatery?: boolean;
 }
 
 export interface UpdateTenantDto {
   name?: string;
   slug?: string;
   status?: 'ACTIVE' | 'DISABLED';
+  isTaxable?: boolean;
+  isEatery?: boolean;
 }
 
 export const tenantsService = {

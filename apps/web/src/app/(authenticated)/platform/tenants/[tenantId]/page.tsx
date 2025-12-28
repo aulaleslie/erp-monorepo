@@ -185,6 +185,24 @@ export default function TenantDetailPage() {
 
                             <span className="text-muted-foreground">Updated At</span>
                             <span>{new Date(tenant.updatedAt).toLocaleString()}</span>
+
+                            <span className="text-muted-foreground">Taxable</span>
+                            <span>
+                                {tenant.isTaxable ? (
+                                    <Badge variant="default" className="bg-green-600 hover:bg-green-700">Yes</Badge>
+                                ) : (
+                                    <Badge variant="outline">No</Badge>
+                                )}
+                            </span>
+
+                            <span className="text-muted-foreground">Eatery</span>
+                            <span>
+                                {tenant.isEatery ? (
+                                    <Badge variant="default" className="bg-green-600 hover:bg-green-700">Yes</Badge>
+                                ) : (
+                                    <Badge variant="outline">No</Badge>
+                                )}
+                            </span>
                         </div>
                     </div>
                 </div>

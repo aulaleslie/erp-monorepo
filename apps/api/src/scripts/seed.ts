@@ -24,14 +24,32 @@ async function seed() {
     { code: 'users.update', name: 'Update Users', group: 'Users' },
     { code: 'users.assignRole', name: 'Assign Role', group: 'Users' },
     { code: 'tenants.create', name: 'Create Tenants', group: 'Platform' },
+    // Cycle 2 Permissions
+    {
+      code: 'tenantSettings.tax.read',
+      name: 'Read Tax Settings',
+      group: 'Settings',
+    },
+    {
+      code: 'tenantSettings.tax.update',
+      name: 'Update Tax Settings',
+      group: 'Settings',
+    },
+    { code: 'taxes.read', name: 'Read Platform Taxes', group: 'Platform' },
+    { code: 'taxes.create', name: 'Create Platform Taxes', group: 'Platform' },
+    { code: 'taxes.update', name: 'Update Platform Taxes', group: 'Platform' },
+    { code: 'taxes.delete', name: 'Delete Platform Taxes', group: 'Platform' },
   ];
 
   const permissionRepo = AppDataSource.getRepository(PermissionEntity);
+  const allPermissions: PermissionEntity[] = [];
+
   for (const perm of permissionsData) {
-    const exists = await permissionRepo.findOneBy({ code: perm.code });
-    if (!exists) {
-      await permissionRepo.save(permissionRepo.create(perm));
+    let permission = await permissionRepo.findOneBy({ code: perm.code });
+    if (!permission) {
+      permission = await permissionRepo.save(permissionRepo.create(perm));
     }
+    allPermissions.push(permission);
   }
 
   // 2. Seed Tenants
@@ -76,14 +94,6 @@ async function seed() {
   const tenantUserRepo = AppDataSource.getRepository(TenantUserEntity);
   const rolePermissionRepo = AppDataSource.getRepository(RolePermissionEntity);
 
-  // Get all permissions to assign to Super Admin Role (optional, as isSuperAdmin=true on role should handle it, but specs say "Permissions to seed... Create one Super Admin role")
-  // Actually, CYCLE_1 says "Create one Super Admin user (`isSuperAdmin = true`) and a Super Admin role per tenant (`isSuperAdmin = true`)."
-  // Permission guard logic: Allow if role.isSuperAdmin. So we don't strictly need to link all permissions to this role, but for completeness or if logic changes, we might?
-  // Check Guard Logic:
-  // 1. Allow if user.isSuperAdmin. (Admin User has this)
-  // 2. Allow if role.isSuperAdmin. (Admin Role has this)
-  // So linking permissions is not strictly required for the Super Admin Role to work, but we should create the role.
-
   for (const tenant of createdTenants) {
     let adminRole = await roleRepo.findOne({
       where: { tenantId: tenant.id, name: 'Super Admin' },
@@ -97,6 +107,23 @@ async function seed() {
           isSuperAdmin: true,
         }),
       );
+    }
+
+    // Assign all permissions to Super Admin Role (Ensuring they are linked)
+    for (const perm of allPermissions) {
+      const exists = await rolePermissionRepo.findOneBy({
+        roleId: adminRole.id,
+        permissionId: perm.id,
+      });
+
+      if (!exists) {
+        await rolePermissionRepo.save(
+          rolePermissionRepo.create({
+            roleId: adminRole.id,
+            permissionId: perm.id,
+          }),
+        );
+      }
     }
 
     // Assign Admin User to this Tenant with this Role

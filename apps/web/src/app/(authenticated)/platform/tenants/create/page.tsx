@@ -5,7 +5,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { tenantsService } from "@/services/tenants";
+import { Checkbox } from "@/components/ui/checkbox";
+import { tenantsService, CreateTenantDto } from "@/services/tenants";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -17,9 +18,11 @@ export default function CreateTenantPage() {
     const { toast } = useToast();
     const { isSuperAdmin } = usePermissions();
     const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<CreateTenantDto>({
         name: "",
         slug: "",
+        isTaxable: false,
+        isEatery: false,
     });
     const [errors, setErrors] = useState<Record<string, string | string[]>>({});
 
@@ -105,6 +108,24 @@ export default function CreateTenantPage() {
                             <p className="text-sm text-red-500 mt-1">{Array.isArray(errors.slug) ? errors.slug[0] : errors.slug}</p>
                         )}
                         <p className="text-xs text-muted-foreground">Unique identifier for the tenant, used in URLs.</p>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="isTaxable"
+                            checked={formData.isTaxable}
+                            onCheckedChange={(checked) => setFormData({ ...formData, isTaxable: checked as boolean })}
+                        />
+                        <Label htmlFor="isTaxable">Taxable Tenant</Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="isEatery"
+                            checked={formData.isEatery}
+                            onCheckedChange={(checked) => setFormData({ ...formData, isEatery: checked as boolean })}
+                        />
+                        <Label htmlFor="isEatery">Eatery Tenant</Label>
                     </div>
                 </div>
 

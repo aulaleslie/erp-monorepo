@@ -9,6 +9,8 @@ import { TenantEntity } from './entities/tenant.entity';
 import { UserEntity } from './entities/user.entity';
 
 import { AuditLogEntity } from './entities/audit-log.entity';
+import { Tax } from './entities/tax.entity';
+import { TenantTaxEntity } from './entities/tenant-tax.entity';
 
 @Global()
 @Module({
@@ -32,6 +34,8 @@ import { AuditLogEntity } from './entities/audit-log.entity';
           RolePermissionEntity,
           TenantUserEntity,
           AuditLogEntity,
+          Tax,
+          TenantTaxEntity,
         ],
         autoLoadEntities: true,
         synchronize: false, // checking explicitly as per requirements

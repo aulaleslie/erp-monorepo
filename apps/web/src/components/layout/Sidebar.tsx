@@ -45,7 +45,7 @@ const sidebarConfig: SidebarItem[] = [
     },
     {
         label: 'Settings',
-        icon: Settings, // Placeholder icon for group
+        icon: Settings,
         children: [
             {
                 label: 'Roles',
@@ -69,17 +69,31 @@ const sidebarConfig: SidebarItem[] = [
                     'users.assignRole',
                 ],
             },
+            {
+                label: 'Tax',
+                icon: Building, // Using Building for now
+                href: '/settings/tax',
+                permissions: [
+                    'tenantSettings.tax.read',
+                    'tenantSettings.tax.update'
+                ],
+            },
         ],
     },
     {
         label: 'Platform',
-        icon: Building, // Placeholder
+        icon: Building,
         superAdminOnly: true,
         children: [
             {
                 label: 'Tenants',
                 icon: Building,
                 href: '/platform/tenants',
+            },
+            {
+                label: 'Taxes',
+                icon: Building,
+                href: '/platform/taxes',
             },
             {
                 label: 'Audit Logs',

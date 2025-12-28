@@ -8,6 +8,7 @@ import { RolePermissionEntity } from './src/database/entities/role-permission.en
 import { TenantUserEntity } from './src/database/entities/tenant-user.entity';
 import { AuditLogEntity } from './src/database/entities/audit-log.entity';
 import { Tax } from './src/database/entities/tax.entity';
+import { TenantTaxEntity } from './src/database/entities/tenant-tax.entity';
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ export const AppDataSource = new DataSource({
     TenantUserEntity,
     AuditLogEntity,
     Tax,
+    TenantTaxEntity,
   ],
   migrations: ['src/database/migrations/*.ts'],
   synchronize: false,

@@ -5,7 +5,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { tenantsService } from "@/services/tenants";
+import { Checkbox } from "@/components/ui/checkbox";
+import { tenantsService, CreateTenantDto } from "@/services/tenants";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -21,9 +22,11 @@ export default function EditTenantPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<CreateTenantDto>({
         name: "",
         slug: "",
+        isTaxable: false,
+        isEatery: false,
     });
     const [errors, setErrors] = useState<Record<string, string | string[]>>({});
 
@@ -32,7 +35,12 @@ export default function EditTenantPage() {
             if (!tenantId) return;
             try {
                 const data = await tenantsService.getOne(tenantId);
-                setFormData({ name: data.name, slug: data.slug });
+                setFormData({
+                    name: data.name,
+                    slug: data.slug,
+                    isTaxable: data.isTaxable,
+                    isEatery: data.isEatery
+                });
             } catch (error) {
                 toast({
                     title: "Error",
@@ -142,6 +150,24 @@ export default function EditTenantPage() {
                         {errors.slug && (
                             <p className="text-sm text-red-500 mt-1">{Array.isArray(errors.slug) ? errors.slug[0] : errors.slug}</p>
                         )}
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="isTaxable"
+                            checked={formData.isTaxable}
+                            onCheckedChange={(checked) => setFormData({ ...formData, isTaxable: checked as boolean })}
+                        />
+                        <Label htmlFor="isTaxable">Taxable Tenant</Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="isEatery"
+                            checked={formData.isEatery}
+                            onCheckedChange={(checked) => setFormData({ ...formData, isEatery: checked as boolean })}
+                        />
+                        <Label htmlFor="isEatery">Eatery Tenant</Label>
                     </div>
                 </div>
 

@@ -13,6 +13,8 @@ interface Tenant {
     id: string;
     name: string;
     slug: string;
+    isTaxable: boolean;
+    isEatery: boolean;
 }
 
 interface Permissions {

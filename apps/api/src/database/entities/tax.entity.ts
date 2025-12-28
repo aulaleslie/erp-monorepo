@@ -1,8 +1,10 @@
 import {
   Column,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { TenantTaxEntity } from './tenant-tax.entity';
 import { BaseAuditEntity } from '../../common/entities/base-audit.entity';
 
 export enum TaxType {
@@ -45,4 +47,7 @@ export class Tax extends BaseAuditEntity {
     default: TaxStatus.ACTIVE,
   })
   status: TaxStatus;
+
+  @OneToMany(() => TenantTaxEntity, (tenantTax) => tenantTax.tax)
+  tenantTaxes: TenantTaxEntity[];
 }

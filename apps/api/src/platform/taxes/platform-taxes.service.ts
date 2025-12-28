@@ -1,0 +1,106 @@
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, Not } from 'typeorm';
+import { Tax, TaxStatus, TaxType } from '../../database/entities/tax.entity';
+import { CreateTaxDto } from './dto/create-tax.dto';
+import { UpdateTaxDto } from './dto/update-tax.dto';
+import { TaxQueryDto } from './dto/tax-query.dto';
+import { paginate, PaginatedResponse, calculateSkip } from '../../common/dto/pagination.dto';
+
+@Injectable()
+export class PlatformTaxesService {
+  constructor(
+    @InjectRepository(Tax)
+    private taxRepository: Repository<Tax>,
+  ) {}
+
+  async create(createTaxDto: CreateTaxDto): Promise<Tax> {
+    // Validate uniqueness of code if provided
+    if (createTaxDto.code) {
+      const existing = await this.taxRepository.findOne({ where: { code: createTaxDto.code } });
+      if (existing) {
+        throw new BadRequestException(`Tax with code ${createTaxDto.code} already exists`);
+      }
+    }
+
+    // Additional validation logic can be here, though DTO handles most
+    if (createTaxDto.type === TaxType.PERCENTAGE && createTaxDto.rate === undefined) {
+       throw new BadRequestException('Rate is required for PERCENTAGE tax type');
+    }
+    if (createTaxDto.type === TaxType.FIXED && createTaxDto.amount === undefined) {
+       throw new BadRequestException('Amount is required for FIXED tax type');
+    }
+
+    const tax = this.taxRepository.create(createTaxDto);
+    return this.taxRepository.save(tax);
+  }
+
+  async findAll(query: TaxQueryDto): Promise<PaginatedResponse<Tax>> {
+    const { page = 1, limit = 10, search, status } = query;
+    const skip = calculateSkip(page, limit);
+
+    const qb = this.taxRepository.createQueryBuilder('tax');
+
+    if (search) {
+      qb.andWhere('(tax.name ILIKE :search OR tax.code ILIKE :search)', { search: `%${search}%` });
+    }
+
+    if (status) {
+      qb.andWhere('tax.status = :status', { status });
+    }
+
+    qb.skip(skip).take(limit).orderBy('tax.createdAt', 'DESC');
+
+    const [items, total] = await qb.getManyAndCount();
+
+    return paginate(items, total, page, limit);
+  }
+
+  async findOne(id: string): Promise<Tax> {
+    const tax = await this.taxRepository.findOne({ where: { id } });
+    if (!tax) {
+      throw new NotFoundException(`Tax with ID ${id} not found`);
+    }
+    return tax;
+  }
+
+  async update(id: string, updateTaxDto: UpdateTaxDto): Promise<Tax> {
+    const tax = await this.findOne(id);
+
+    if (updateTaxDto.code && updateTaxDto.code !== tax.code) {
+        const existing = await this.taxRepository.findOne({ where: { code: updateTaxDto.code } });
+        if (existing) {
+          throw new BadRequestException(`Tax with code ${updateTaxDto.code} already exists`);
+        }
+    }
+    
+    // Validate logic for type change or rate/amount updates if necessary
+    // Here we trust DTO but can add cross-field checks if needed
+     if (updateTaxDto.type === TaxType.PERCENTAGE && !updateTaxDto.rate && !tax.rate) {
+         // If switching to PERCENTAGE without providing rate, and no rate existed (e.g. was FIXED)
+         // But type default is PERCENTAGE, so maybe check more carefully.
+         // Simpler: just merge and save, if specific validations needed, add them.
+         // DTO doesn't enforce 'rate if type is PERCENTAGE' on update well because it's partial.
+         // We can enforce consistency:
+    }
+    
+    // For now simple merge
+    Object.assign(tax, updateTaxDto);
+    
+    // Sanity check after merge
+    if (tax.type === TaxType.PERCENTAGE && (tax.rate === null || tax.rate === undefined)) {
+         throw new BadRequestException('Rate is required for PERCENTAGE tax type');
+    }
+    if (tax.type === TaxType.FIXED && (tax.amount === null || tax.amount === undefined)) {
+         throw new BadRequestException('Amount is required for FIXED tax type');
+    }
+
+    return this.taxRepository.save(tax);
+  }
+
+  async remove(id: string): Promise<void> {
+    const tax = await this.findOne(id);
+    tax.status = TaxStatus.INACTIVE;
+    await this.taxRepository.save(tax);
+  }
+}
