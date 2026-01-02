@@ -23,6 +23,7 @@ async function seed() {
     { code: 'users.create', name: 'Create Users', group: 'Users' },
     { code: 'users.update', name: 'Update Users', group: 'Users' },
     { code: 'users.assignRole', name: 'Assign Role', group: 'Users' },
+    { code: 'users.delete', name: 'Delete Users', group: 'Users' },
     { code: 'tenants.create', name: 'Create Tenants', group: 'Platform' },
     // Cycle 2 Permissions
     {

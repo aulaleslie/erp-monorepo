@@ -48,7 +48,7 @@ export default function PlatformTaxesPage() {
             });
             setData(response.items);
             pagination.setTotal(response.total);
-        } catch (error) {
+        } catch {
             toast({
                 title: "Error",
                 description: "Failed to load taxes",
@@ -73,7 +73,7 @@ export default function PlatformTaxesPage() {
                 description: "Tax disabled successfully",
             });
             fetchData();
-        } catch (error) {
+        } catch {
             toast({
                 title: "Error",
                 description: "Failed to disable tax",

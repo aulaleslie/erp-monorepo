@@ -159,7 +159,7 @@ All foreign keys must be enforced and `synchronize: true` is not allowed.
 
 ## 3 Seed script (mandatory)
 - Seed once per environment.
-- Permissions to seed: `roles.read`, `roles.create`, `roles.update`, `roles.delete`, `users.read`, `users.create`, `users.update`, `users.assignRole`, `tenants.create`.
+- Permissions to seed: `roles.read`, `roles.create`, `roles.update`, `roles.delete`, `users.read`, `users.create`, `users.update`, `users.assignRole`, `users.delete`, `tenants.create`.
 - Tenants to seed: Gym, Cafeteria.
 - Create one Super Admin user (`isSuperAdmin = true`) and a Super Admin role per tenant (`isSuperAdmin = true`).
 - Assign the Super Admin user to both tenants so the system is demo-ready without registration.
@@ -236,6 +236,7 @@ All foreign keys must be enforced and `synchronize: true` is not allowed.
 - `GET /tenant-users` (`users.read`)
 - `POST /tenant-users` (`users.create`)
 - `PUT /tenant-users/:userId/role` (`users.assignRole`)
+- `DELETE /tenant-users/:userId` (`users.delete`)
 
 **Tenants (platform)**
 - `POST /tenants` — restricted to `user.isSuperAdmin === true`.
@@ -243,12 +244,11 @@ All foreign keys must be enforced and `synchronize: true` is not allowed.
 ## 9 Frontend — routes & guards
 - `/login`
 - `/select-tenant`
-- `/app`
-- `/app/dashboard`
-- `/app/settings/roles`
-- `/app/settings/users`
-- `/app/platform/tenants`
-- `/app/profile`
+- `/dashboard`
+- `/settings/roles`
+- `/settings/users`
+- `/platform/tenants`
+- `/profile`
 
 Guarded UI must reflect permission checks from the backend.
 
@@ -258,7 +258,7 @@ const sidebar = [
   {
     label: 'Dashboard',
     icon: Home,
-    href: '/app/dashboard',
+    href: '/dashboard',
   },
   {
     label: 'Settings',
@@ -267,7 +267,7 @@ const sidebar = [
       {
         label: 'Roles',
         icon: Shield,
-        href: '/app/settings/roles',
+        href: '/settings/roles',
         permissions: [
           'roles.read',
           'roles.create',
@@ -278,12 +278,13 @@ const sidebar = [
       {
         label: 'Users',
         icon: Users,
-        href: '/app/settings/users',
+        href: '/settings/users',
         permissions: [
           'users.read',
           'users.create',
           'users.update',
           'users.assignRole',
+          'users.delete',
         ],
       },
     ],
@@ -295,7 +296,7 @@ const sidebar = [
       {
         label: 'Tenants',
         icon: Building,
-        href: '/app/platform/tenants',
+        href: '/platform/tenants',
       },
     ],
   },
@@ -303,7 +304,7 @@ const sidebar = [
 ```
 
 ## 11 Navbar
-- **Right side:** Avatar dropdown → Profile (`/app/profile`) and Logout (`/auth/logout`).
+- **Right side:** Avatar dropdown → Profile (`/profile`) and Logout (`/auth/logout`).
 - **Left side:** Tenant dropdown that calls `/tenants/active` and triggers a permission reload.
 
 ## 12 UI guard rules (strict)

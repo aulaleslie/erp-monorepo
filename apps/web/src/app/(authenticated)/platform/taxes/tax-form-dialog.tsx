@@ -1,5 +1,11 @@
 "use client";
 
+import { useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Loader2 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -19,10 +25,34 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { CreateTaxDto, Tax, TaxStatus, TaxType, UpdateTaxDto, taxesService } from "@/services/taxes";
-import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tax, TaxType, taxesService } from "@/services/taxes";
+
+// Zod schema with discriminatedUnion for type-specific validation
+const baseSchema = {
+    name: z.string().min(1, "Name is required"),
+    code: z.string().optional(),
+};
+
+const percentageSchema = z.object({
+    ...baseSchema,
+    type: z.literal(TaxType.PERCENTAGE),
+    rate: z.coerce.number()
+        .gt(0, "Rate must be greater than 0")
+        .lte(1, "Rate must be at most 1 (e.g., 0.1 for 10%)"),
+    amount: z.coerce.number().optional(),
+});
+
+const fixedSchema = z.object({
+    ...baseSchema,
+    type: z.literal(TaxType.FIXED),
+    rate: z.coerce.number().optional(),
+    amount: z.coerce.number()
+        .gt(0, "Amount must be greater than 0"),
+});
+
+const platformTaxSchema = z.discriminatedUnion("type", [percentageSchema, fixedSchema]);
+
+type PlatformTaxFormValues = z.infer<typeof platformTaxSchema>;
 
 interface TaxFormDialogProps {
     open: boolean;
@@ -34,100 +64,77 @@ interface TaxFormDialogProps {
 export function TaxFormDialog({ open, onOpenChange, tax, onSuccess }: TaxFormDialogProps) {
     const { toast } = useToast();
     const isEditing = !!tax;
-    const [loading, setLoading] = useState(false);
-    const [errors, setErrors] = useState<Record<string, string>>({});
 
-    const [formData, setFormData] = useState<{
-        name: string;
-        code: string;
-        type: TaxType;
-        rate: string;
-        amount: string;
-    }>({
-        name: "",
-        code: "",
-        type: TaxType.PERCENTAGE,
-        rate: "0",
-        amount: "0",
+    const form = useForm<PlatformTaxFormValues>({
+        resolver: zodResolver(platformTaxSchema),
+        defaultValues: {
+            name: "",
+            code: "",
+            type: TaxType.PERCENTAGE,
+            rate: 0,
+            amount: 0,
+        },
     });
+
+    const { control, handleSubmit, watch, reset, setError, formState: { errors, isSubmitting } } = form;
+    const selectedType = watch("type");
 
     useEffect(() => {
         if (open) {
-            setFormData({
+            reset({
                 name: tax?.name || "",
                 code: tax?.code || "",
                 type: tax?.type || TaxType.PERCENTAGE,
-                rate: tax?.rate?.toString() || "0",
-                amount: tax?.amount?.toString() || "0",
+                rate: tax?.rate || 0,
+                amount: tax?.amount || 0,
             });
-            setErrors({});
         }
-    }, [open, tax]);
+    }, [open, tax, reset]);
 
-    const validate = () => {
-        const newErrors: Record<string, string> = {};
-        if (!formData.name.trim()) newErrors.name = "Name is required";
-
-        if (formData.type === TaxType.PERCENTAGE) {
-            const rateVal = parseFloat(formData.rate);
-            if (isNaN(rateVal) || rateVal <= 0 || rateVal > 1) {
-                newErrors.rate = "Rate must be between 0 and 1 (e.g., 0.1 for 10%)";
-            }
-        } else {
-            const amountVal = parseFloat(formData.amount);
-            if (isNaN(amountVal) || amountVal <= 0) {
-                newErrors.amount = "Amount must be greater than 0";
-            }
-        }
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const onSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!validate()) return;
-        setLoading(true);
-
+    const onSubmit = async (data: PlatformTaxFormValues) => {
         try {
+            const payload = {
+                name: data.name,
+                code: data.code || undefined,
+                type: data.type,
+                rate: data.type === TaxType.PERCENTAGE ? data.rate : undefined,
+                amount: data.type === TaxType.FIXED ? data.amount : undefined,
+            };
+
             if (isEditing && tax) {
-                const updateData: UpdateTaxDto = {
-                    name: formData.name,
-                    code: formData.code || undefined,
-                    type: formData.type,
-                    rate: formData.type === TaxType.PERCENTAGE ? parseFloat(formData.rate) : undefined,
-                    amount: formData.type === TaxType.FIXED ? parseFloat(formData.amount) : undefined,
-                };
-                await taxesService.update(tax.id, updateData);
+                await taxesService.update(tax.id, payload);
                 toast({ title: "Success", description: "Tax updated successfully" });
             } else {
-                const createData: CreateTaxDto = {
-                    name: formData.name,
-                    code: formData.code || undefined,
-                    type: formData.type,
-                    rate: formData.type === TaxType.PERCENTAGE ? parseFloat(formData.rate) : undefined,
-                    amount: formData.type === TaxType.FIXED ? parseFloat(formData.amount) : undefined,
-                };
-                await taxesService.create(createData);
+                await taxesService.create(payload);
                 toast({ title: "Success", description: "Tax created successfully" });
             }
             onSuccess();
             onOpenChange(false);
-        } catch (error: any) {
-            const message = error.response?.data?.message || "Something went wrong";
+        } catch (error: unknown) {
+            // Handle axios error with proper type narrowing
+            let message = "Something went wrong";
+            let responseErrors: Record<string, string[]> | undefined;
+
+            if (error && typeof error === 'object' && 'response' in error) {
+                const axiosError = error as { response?: { data?: { message?: string; errors?: Record<string, string[]> } } };
+                message = axiosError.response?.data?.message || message;
+                responseErrors = axiosError.response?.data?.errors;
+            }
+
             toast({
                 title: "Error",
                 description: message,
                 variant: "destructive",
             });
-            if (error.response?.data?.errors) {
-                const serverErrors: Record<string, string> = {};
-                Object.entries(error.response.data.errors).forEach(([key, msgs]) => {
-                    serverErrors[key] = (msgs as string[])[0];
+
+            // Map server errors to form fields
+            if (responseErrors) {
+                Object.entries(responseErrors).forEach(([key, msgs]) => {
+                    if (key in form.getValues()) {
+                        setError(key as keyof PlatformTaxFormValues, { message: msgs[0] });
+                    }
                 });
-                setErrors(serverErrors);
             }
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -143,76 +150,103 @@ export function TaxFormDialog({ open, onOpenChange, tax, onSuccess }: TaxFormDia
                     </DialogDescription>
                 </DialogHeader>
 
-                <form onSubmit={onSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="name">Name</Label>
-                        <Input
-                            id="name"
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            placeholder="e.g. VAT, Service Charge"
-                            className={errors.name ? "border-red-500" : ""}
+                        <Controller
+                            control={control}
+                            name="name"
+                            render={({ field }) => (
+                                <Input
+                                    {...field}
+                                    id="name"
+                                    placeholder="e.g. VAT, Service Charge"
+                                    className={errors.name ? "border-red-500" : ""}
+                                />
+                            )}
                         />
-                        {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
+                        {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
                     </div>
 
                     <div className="space-y-2">
                         <Label htmlFor="code">Code (Optional)</Label>
-                        <Input
-                            id="code"
-                            value={formData.code}
-                            onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                            placeholder="e.g. VAT-11"
-                            className={errors.code ? "border-red-500" : ""}
+                        <Controller
+                            control={control}
+                            name="code"
+                            render={({ field }) => (
+                                <Input
+                                    {...field}
+                                    value={field.value || ""}
+                                    id="code"
+                                    placeholder="e.g. VAT-11"
+                                    className={errors.code ? "border-red-500" : ""}
+                                />
+                            )}
                         />
-                        {errors.code && <p className="text-sm text-red-500">{errors.code}</p>}
+                        {errors.code && <p className="text-sm text-red-500">{errors.code.message}</p>}
                     </div>
 
                     <div className="space-y-2">
                         <Label>Type</Label>
-                        <Select
-                            value={formData.type}
-                            onValueChange={(val: TaxType) => setFormData({ ...formData, type: val })}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value={TaxType.PERCENTAGE}>Percentage</SelectItem>
-                                <SelectItem value={TaxType.FIXED}>Fixed Amount</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <Controller
+                            control={control}
+                            name="type"
+                            render={({ field }) => (
+                                <Select
+                                    value={field.value}
+                                    onValueChange={field.onChange}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value={TaxType.PERCENTAGE}>Percentage</SelectItem>
+                                        <SelectItem value={TaxType.FIXED}>Fixed Amount</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            )}
+                        />
                     </div>
 
-                    {formData.type === TaxType.PERCENTAGE && (
+                    {selectedType === TaxType.PERCENTAGE && (
                         <div className="space-y-2">
                             <Label htmlFor="rate">Rate (0 - 1)</Label>
-                            <Input
-                                id="rate"
-                                type="number"
-                                step="0.0001"
-                                value={formData.rate}
-                                onChange={(e) => setFormData({ ...formData, rate: e.target.value })}
-                                placeholder="0.11"
-                                className={errors.rate ? "border-red-500" : ""}
+                            <Controller
+                                control={control}
+                                name="rate"
+                                render={({ field }) => (
+                                    <Input
+                                        {...field}
+                                        id="rate"
+                                        type="number"
+                                        step="0.0001"
+                                        placeholder="0.11"
+                                        className={errors.rate ? "border-red-500" : ""}
+                                    />
+                                )}
                             />
-                            {errors.rate && <p className="text-sm text-red-500">{errors.rate}</p>}
+                            {errors.rate && <p className="text-sm text-red-500">{errors.rate.message}</p>}
                         </div>
                     )}
 
-                    {formData.type === TaxType.FIXED && (
+                    {selectedType === TaxType.FIXED && (
                         <div className="space-y-2">
                             <Label htmlFor="amount">Amount</Label>
-                            <Input
-                                id="amount"
-                                type="number"
-                                step="0.01"
-                                value={formData.amount}
-                                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                                placeholder="0.00"
-                                className={errors.amount ? "border-red-500" : ""}
+                            <Controller
+                                control={control}
+                                name="amount"
+                                render={({ field }) => (
+                                    <Input
+                                        {...field}
+                                        id="amount"
+                                        type="number"
+                                        step="0.01"
+                                        placeholder="0.00"
+                                        className={errors.amount ? "border-red-500" : ""}
+                                    />
+                                )}
                             />
-                            {errors.amount && <p className="text-sm text-red-500">{errors.amount}</p>}
+                            {errors.amount && <p className="text-sm text-red-500">{errors.amount.message}</p>}
                         </div>
                     )}
 
@@ -224,8 +258,8 @@ export function TaxFormDialog({ open, onOpenChange, tax, onSuccess }: TaxFormDia
                         >
                             Cancel
                         </Button>
-                        <Button type="submit" disabled={loading}>
-                            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        <Button type="submit" disabled={isSubmitting}>
+                            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Save
                         </Button>
                     </DialogFooter>

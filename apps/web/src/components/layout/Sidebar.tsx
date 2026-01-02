@@ -25,7 +25,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { usePermissions } from "@/hooks/use-permissions";
+import { usePermissions, useActiveTenant } from "@/hooks/use-permissions";
 
 interface SidebarItem {
     label: string;
@@ -33,6 +33,7 @@ interface SidebarItem {
     href?: string;
     permissions?: string[];
     superAdminOnly?: boolean;
+    requiresTaxable?: boolean;
     children?: SidebarItem[];
     collapsed?: boolean; // internal use for structure, though config is usually static
 }
@@ -73,10 +74,8 @@ const sidebarConfig: SidebarItem[] = [
                 label: 'Tax',
                 icon: Building, // Using Building for now
                 href: '/settings/tax',
-                permissions: [
-                    'tenantSettings.tax.read',
-                    'tenantSettings.tax.update'
-                ],
+                superAdminOnly: true,
+                requiresTaxable: true,
             },
         ],
     },
@@ -108,6 +107,7 @@ export function Sidebar() {
     const [isCollapsed, setIsCollapsed] = React.useState(false);
     const pathname = usePathname();
     const { canAny, isSuperAdmin } = usePermissions();
+    const activeTenant = useActiveTenant();
 
     const toggleSidebar = () => {
         setIsCollapsed(!isCollapsed);
@@ -116,6 +116,7 @@ export function Sidebar() {
 
     const isItemVisible = (item: SidebarItem): boolean => {
         if (item.superAdminOnly && !isSuperAdmin) return false;
+        if (item.requiresTaxable && !activeTenant?.isTaxable) return false;
         if (item.permissions && !canAny(item.permissions)) return false;
         if (item.children) {
             return item.children.some(child => isItemVisible(child));

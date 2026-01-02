@@ -50,7 +50,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export function TenantTaxForm() {
     const activeTenant = useActiveTenant();
-    const { can } = usePermissions();
+    const { isSuperAdmin } = usePermissions();
     const { toast } = useToast();
 
     const [loading, setLoading] = useState(true);
@@ -96,7 +96,6 @@ export function TenantTaxForm() {
                     setAvailableTaxes(prev => {
                         const map = new Map(prev.map(t => [t.id, t]));
                         data.taxes?.forEach(t => map.set(t.id, t));
-                        returnArrayFromMap(map);
                         return Array.from(map.values());
                     });
                 }
@@ -120,11 +119,6 @@ export function TenantTaxForm() {
 
         loadData();
     }, [activeTenant, form, toast]);
-
-    // Helper function for returnArrayFromMap isn't needed if I just return Array.from
-    function returnArrayFromMap(map: Map<string, PlatformTax>) {
-        // Just a placeholder to fix my thought process above
-    }
 
     const fetchTaxes = async ({ search, page, limit }: { search: string; page: number; limit: number }) => {
         const res = await getPlatformTaxes({
@@ -191,7 +185,7 @@ export function TenantTaxForm() {
         );
     }
 
-    const canEdit = can("tenantSettings.tax.update");
+    const canEdit = isSuperAdmin;
 
     // Filter available taxes to only selected ones for the default tax dropdown
     const selectedTaxesList = availableTaxes.filter(t => selectedTaxIds.includes(t.id));

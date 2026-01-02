@@ -80,7 +80,7 @@ DoD:
 - FK constraints ok.
 - Entity created.
 
-### C2-BE-05 - Tenant tax settings API (tenant-scoped, permission-guarded)
+### C2-BE-05 - Tenant tax settings API (tenant-scoped, super-admin-only)
 
 Scope:
 - Module: `src/tenant-settings/tax`
@@ -97,7 +97,7 @@ Scope:
   - `AuthGuard`
   - `ActiveTenantGuard`
   - `TenantMembershipGuard`
-  - `RequirePermissions('tenantSettings.tax.read')` / `RequirePermissions('tenantSettings.tax.update')`
+  - `SuperAdminGuard`
 - Rules:
   - If `tenant.isTaxable=false`, PUT returns 409 (or 400) `TENANT_NOT_TAXABLE`.
   - Only `ACTIVE` taxes can be selected.
@@ -118,6 +118,7 @@ Scope:
 - Seed permission codes:
   - `tenantSettings.tax.read`
   - `tenantSettings.tax.update`
+  - (Seeded for future delegation; tax settings are super-admin-only in this cycle)
   - Optional for future-only, not enforced now:
     - `taxes.read`
     - `taxes.create`
@@ -128,7 +129,7 @@ Scope:
 DoD:
 - Seed runs idempotently.
 - Permissions appear in `/permissions`.
-- Role assignment works and affects UI gating.
+- Role assignment works for future delegation (not enforced in UI for tax settings).
 
 ## Frontend Tickets (apps/web)
 
@@ -152,8 +153,8 @@ Scope:
 - Add Platform -> Taxes menu item:
   - visible only if `user.isSuperAdmin`
 - Add Settings -> Tax menu item:
-  - visible only if `activeTenant.isTaxable === true`
-  - and permission `tenantSettings.tax.read` or `tenantSettings.tax.update` (or super admin)
+  - visible only if `user.isSuperAdmin`
+  - and `activeTenant.isTaxable === true`
 
 DoD:
 - Menu items appear/hide correctly based on context.
@@ -162,7 +163,7 @@ DoD:
 ### C2-FE-03 - Platform taxes screen (DataTable + CRUD)
 
 Scope:
-- Route: `/app/platform/taxes`
+- Route: `/platform/taxes`
 - UI:
   - Table columns: Name, Code, Type, Rate/Amount, Status, UpdatedAt, Actions
   - Filters: Search + Status
@@ -181,15 +182,17 @@ DoD:
 ### C2-FE-04 - Tenant tax settings screen (multi-select + default)
 
 Scope:
-- Route: `/app/settings/tax`
+- Route: `/settings/tax`
 - Behavior:
+  - If `!user.isSuperAdmin`:
+    - show a 403/EmptyState and block access
   - If `activeTenant.isTaxable=false`:
     - show informational EmptyState/StatusBadge
   - Else:
     - show "Applicable taxes" multi-select
     - use SearchableSelect (debounced) hitting `/platform/taxes?status=ACTIVE&search=...`
     - show "Default tax" select limited to selected taxes
-    - Save button guarded by `tenantSettings.tax.update`
+    - Save button guarded by super admin
 - Show inline server validation errors.
 
 DoD:
