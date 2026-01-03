@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { AuditAction } from '@gym-monorepo/shared';
 
 export class AuditLogsQueryDto {
   @IsOptional()
@@ -21,6 +22,10 @@ export class AuditLogsQueryDto {
   @IsOptional()
   @IsString()
   performedBy?: string;
+
+  @IsOptional()
+  @IsEnum(AuditAction)
+  action?: AuditAction;
 
   @IsOptional()
   @IsString()

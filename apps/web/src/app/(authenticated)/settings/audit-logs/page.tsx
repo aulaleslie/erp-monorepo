@@ -4,34 +4,85 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { DateTimeInput } from '@/components/ui/date-time-input';
 import { Label } from '@/components/ui/label';
-import { format } from 'date-fns';
+import { SearchableDropdown } from '@/components/ui/searchable-dropdown';
+import { format, subMinutes } from 'date-fns';
 import { DataTable, Column } from '@/components/common/DataTable';
 import { usePagination } from '@/hooks/use-pagination';
 import { Badge } from '@/components/ui/badge';
 import { usePermissions } from '@/hooks/use-permissions';
-import { AuditLog, AuditLogFilters } from '@gym-monorepo/shared';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { AuditLog, AuditLogFilters, AuditAction } from '@gym-monorepo/shared';
 import { AuditLogDetailsDialog } from '@/components/audit-logs/audit-log-details-dialog';
 import { Button } from '@/components/ui/button';
 import { auditLogsService } from '@/services/audit-logs';
 import { toUtcIso } from '@/lib/utils';
 
-type LocalDateRange = {
+const ACTION_OPTIONS: { value: AuditAction; label: string }[] = [
+    { value: AuditAction.CREATE, label: 'Create' },
+    { value: AuditAction.UPDATE, label: 'Update' },
+    { value: AuditAction.DELETE, label: 'Delete' },
+    { value: AuditAction.SOFT_REMOVE, label: 'Soft Remove' },
+];
+
+type FilterState = {
     from: string;
     to: string;
+    entityName: string;
+    performedBy: string;
+    action?: AuditAction;
 };
+
+const DEFAULT_FILTER_STATE: FilterState = {
+    from: '',
+    to: '',
+    entityName: '',
+    performedBy: '',
+};
+
+const QUICK_RANGE_PRESETS = [
+    { label: 'Last 15 minutes', minutes: 15 },
+    { label: 'Last 1 hour', minutes: 60 },
+];
 
 export default function AuditLogsPage() {
     const [logs, setLogs] = useState<AuditLog[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
     const [dialogOpen, setDialogOpen] = useState(false);
-    const [draftFilters, setDraftFilters] = useState<LocalDateRange>({ from: '', to: '' });
-    const [appliedFilters, setAppliedFilters] = useState<LocalDateRange>({ from: '', to: '' });
+    const [draftFilters, setDraftFilters] = useState<FilterState>({ ...DEFAULT_FILTER_STATE });
+    const [appliedFilters, setAppliedFilters] = useState<FilterState>({ ...DEFAULT_FILTER_STATE });
+    const [quickRange, setQuickRange] = useState('');
     const pagination = usePagination({ initialLimit: 20 });
     const { page, limit, setTotal, resetPagination } = pagination;
     const { isSuperAdmin } = usePermissions();
+
+    const hasDraftFilters = useMemo(
+        () =>
+            Object.values(draftFilters).some((value) => {
+                if (typeof value === 'string') {
+                    return value !== '';
+                }
+                return value !== undefined;
+            }),
+        [draftFilters],
+    );
+
+    const entityOptions = useMemo(() => {
+        const values = logs
+            .map((log) => log.entityName)
+            .filter((value): value is string => Boolean(value));
+        return Array.from(new Set(values));
+    }, [logs]);
+
+    const performedByOptions = useMemo(() => {
+        const values = logs.flatMap((log) => [
+            log.performedByUser?.fullName,
+            log.performedBy,
+        ]);
+        return Array.from(new Set(values.filter((value): value is string => Boolean(value))));
+    }, [logs]);
 
     const fetchLogs = useCallback(async () => {
         if (!isSuperAdmin) {
@@ -46,9 +97,24 @@ export default function AuditLogsPage() {
         if (fromIso) {
             filterParams.from = fromIso;
         }
+
         const toIso = toUtcIso(appliedFilters.to);
         if (toIso) {
             filterParams.to = toIso;
+        }
+
+        const entityName = appliedFilters.entityName.trim();
+        if (entityName) {
+            filterParams.entityName = entityName;
+        }
+
+        const performedBy = appliedFilters.performedBy.trim();
+        if (performedBy) {
+            filterParams.performedBy = performedBy;
+        }
+
+        if (appliedFilters.action) {
+            filterParams.action = appliedFilters.action;
         }
 
         try {
@@ -73,10 +139,43 @@ export default function AuditLogsPage() {
         fetchLogs();
     }, [fetchLogs, isSuperAdmin]);
 
-    const handleDraftChange =
-        (field: keyof LocalDateRange) => (event: React.ChangeEvent<HTMLInputElement>) => {
-            setDraftFilters((prev) => ({ ...prev, [field]: event.target.value }));
-        };
+    const handleActionChange = (value: string) => {
+        setDraftFilters((prev) => ({
+            ...prev,
+            action: value === '' ? undefined : (value as AuditAction),
+        }));
+    };
+
+    const handleEntityChange = (value: string) => {
+        setDraftFilters((prev) => ({ ...prev, entityName: value }));
+    };
+
+    const handlePerformedByChange = (value: string) => {
+        setDraftFilters((prev) => ({ ...prev, performedBy: value }));
+    };
+
+    const handleDateChange = (field: 'from' | 'to') => (event: React.ChangeEvent<HTMLInputElement>) => {
+        setDraftFilters((prev) => ({ ...prev, [field]: event.target.value }));
+    };
+
+    const formatLocalInputValue = (date: Date) => format(date, "yyyy-MM-dd'T'HH:mm");
+
+    const applyRelativeRange = (minutes: number) => {
+        const now = new Date();
+        setDraftFilters((prev) => ({
+            ...prev,
+            from: formatLocalInputValue(subMinutes(now, minutes)),
+            to: formatLocalInputValue(now),
+        }));
+    };
+
+    const handleQuickRangeChange = (value: string) => {
+        setQuickRange(value);
+        const preset = QUICK_RANGE_PRESETS.find((option) => option.label === value);
+        if (preset) {
+            applyRelativeRange(preset.minutes);
+        }
+    };
 
     const applyFilters = () => {
         setAppliedFilters({ ...draftFilters });
@@ -84,8 +183,9 @@ export default function AuditLogsPage() {
     };
 
     const clearFilters = () => {
-        setDraftFilters({ from: '', to: '' });
-        setAppliedFilters({ from: '', to: '' });
+        setDraftFilters({ ...DEFAULT_FILTER_STATE });
+        setAppliedFilters({ ...DEFAULT_FILTER_STATE });
+        setQuickRange('');
         resetPagination();
     };
 
@@ -160,32 +260,88 @@ export default function AuditLogsPage() {
             />
 
             <Card className="border border-border bg-background">
-                <CardContent className="space-y-4 p-4">
-                    <div className="grid gap-4 md:grid-cols-3">
+                <CardContent className="space-y-6 p-4">
+                    <div className="space-y-1 text-sm text-muted-foreground">
+                        <p>
+                            Audit timestamps stay in UTC but are rendered in your browser’s timezone so the
+                            filters you choose match your local clock.
+                        </p>
+                        <p>Apply multiple filters at once to narrow down a specific change window.</p>
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-4 items-end">
                         <div className="space-y-1">
-                            <Label htmlFor="audit-filter-from">Start time</Label>
-                            <Input
+                            <Label htmlFor="audit-filter-from">Start time (local)</Label>
+                            <DateTimeInput
                                 id="audit-filter-from"
-                                type="datetime-local"
                                 value={draftFilters.from}
-                                onChange={handleDraftChange('from')}
+                                onChange={handleDateChange('from')}
+                                placeholder="Select start time"
+                                showIcon={false}
                             />
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="audit-filter-to">End time</Label>
-                            <Input
+                            <Label htmlFor="audit-filter-to">End time (local)</Label>
+                            <DateTimeInput
                                 id="audit-filter-to"
-                                type="datetime-local"
                                 value={draftFilters.to}
-                                onChange={handleDraftChange('to')}
+                                onChange={handleDateChange('to')}
+                                placeholder="Select end time"
+                                showIcon={false}
                             />
                         </div>
-                        <div className="flex items-end gap-2">
-                            <Button
-                                variant="ghost"
-                                onClick={clearFilters}
-                                disabled={!draftFilters.from && !draftFilters.to}
+                        <div className="space-y-1">
+                            <Label htmlFor="audit-filter-action">Action</Label>
+                            <Select value={draftFilters.action} onValueChange={handleActionChange}>
+                                <SelectTrigger id="audit-filter-action">
+                                    <SelectValue placeholder="Any action" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {ACTION_OPTIONS.map((option) => (
+                                        <SelectItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="audit-filter-quick-range">Quick range</Label>
+                            <Select
+                                value={quickRange}
+                                onValueChange={handleQuickRangeChange}
                             >
+                                <SelectTrigger className="w-full" id="audit-filter-quick-range">
+                                    <SelectValue placeholder="Pick a preset" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {QUICK_RANGE_PRESETS.map((preset) => (
+                                        <SelectItem key={preset.label} value={preset.label}>
+                                            {preset.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-4">
+                        <SearchableDropdown
+                            label="Entity name"
+                            value={draftFilters.entityName}
+                            options={entityOptions}
+                            placeholder="Entity name"
+                            onChange={handleEntityChange}
+                        />
+                        <SearchableDropdown
+                            label="Performed by"
+                            value={draftFilters.performedBy}
+                            options={performedByOptions}
+                            placeholder="User ID or name"
+                            onChange={handlePerformedByChange}
+                        />
+                        <div className="md:col-span-2 flex items-end justify-end gap-2">
+                            <Button variant="ghost" onClick={clearFilters} disabled={!hasDraftFilters}>
                                 Clear filters
                             </Button>
                             <Button onClick={applyFilters}>Apply filters</Button>

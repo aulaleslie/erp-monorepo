@@ -39,6 +39,7 @@ export class AuditLogsController {
       performedBy: query.performedBy,
       from,
       to,
+      action: query.action,
     });
   }
 }

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuditLogEntity } from '../../database/entities/audit-log.entity';
 import { UserEntity } from '../../database/entities/user.entity';
+import { AuditAction } from '@gym-monorepo/shared';
 
 @Injectable()
 export class AuditLogsService {
@@ -21,6 +22,7 @@ export class AuditLogsService {
       performedBy?: string;
       from?: Date;
       to?: Date;
+      action?: AuditAction;
     },
   ) {
     const query = this.auditLogRepository.createQueryBuilder('log');
@@ -35,6 +37,10 @@ export class AuditLogsService {
       query.andWhere('log.performedBy = :performedBy', {
         performedBy: filters.performedBy,
       });
+    }
+
+    if (filters?.action) {
+      query.andWhere('log.action = :action', { action: filters.action });
     }
 
     if (filters?.from) {

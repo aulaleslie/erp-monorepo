@@ -2,6 +2,8 @@
 // Re-exports from organized modules
 // ============================================================================
 
+import { AuditAction } from './types/audit';
+
 export * from './constants';
 export * from './types';
 
@@ -48,8 +50,6 @@ export const TENANT_TYPE_OPTIONS = [
 // ============================================================================
 // Audit Types
 // ============================================================================
-
-export type AuditAction = 'CREATE' | 'UPDATE' | 'DELETE' | 'SOFT_REMOVE';
 
 export interface AuditLog {
   id: string;
