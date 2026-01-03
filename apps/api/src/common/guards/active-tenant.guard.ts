@@ -5,6 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { FastifyRequest } from 'fastify';
+import { TENANT_ERRORS } from '@gym-monorepo/shared';
 
 @Injectable()
 export class ActiveTenantGuard implements CanActivate {
@@ -13,7 +14,7 @@ export class ActiveTenantGuard implements CanActivate {
     const tenantId = request.cookies['active_tenant'];
 
     if (!tenantId) {
-      throw new BadRequestException('Active tenant is required');
+      throw new BadRequestException(TENANT_ERRORS.ACTIVE_TENANT_REQUIRED.message);
     }
 
     // Attach to request for easier access

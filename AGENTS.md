@@ -17,6 +17,15 @@ Always cite the relevant section of these docs when you describe your plan or ju
 - `packages/shared`: shared DTOs/types consumed by both apps (build via `pnpm --filter @gym-monorepo/shared build` after changes).
 - Root scripts (`pnpm dev`, `pnpm build`, `pnpm docker:up`, `pnpm docker:down`) orchestrate the workspace-wide flow.
 
+## Shared package structure (`packages/shared`)
+The shared package exports common types, constants, and utilities:
+- `constants/error-codes.ts` — Centralized error codes (`AUTH_ERRORS`, `TENANT_ERRORS`, `USER_ERRORS`, `ROLE_ERRORS`, `TAX_ERRORS`, `VALIDATION_ERRORS`)
+- `constants/permissions.ts` — Permission code constants (`PERMISSIONS.ROLES.READ`, etc.)
+- `types/pagination.ts` — `PaginatedResponse<T>`, `PaginationParams`, `PAGINATION_DEFAULTS`
+- Root exports for `BaseResponse`, `TenantType`, `AuditLog`, etc.
+
+**Always rebuild after edits:** `pnpm --filter @gym-monorepo/shared build`
+
 ## Development workflow
 1. Use pnpm commands from the root unless a package-specific script is required (e.g., `pnpm --filter web dev` or `pnpm --filter api test`).
 2. Keep the workspace in sync with `pnpm install` after dependency edits and commit the updated `pnpm-lock.yaml`.
@@ -30,6 +39,30 @@ Always cite the relevant section of these docs when you describe your plan or ju
 - After backend changes, execute `apps/api/verify.sh` against a running instance to ensure the auth cookie flows still work.
 - `pnpm --filter @gym-monorepo/shared build` keeps the shared package consumable by both apps.
 - For Docker workflows, `pnpm docker:up`/`docker:down` should bring up the Postgres + Nest + Next stack described in `docs/CYCLE_0.md`.
+
+## Code standards
+
+### Error handling
+- **Use centralized error codes** from `@gym-monorepo/shared` for all thrown exceptions:
+  ```typescript
+  import { USER_ERRORS, ROLE_ERRORS } from '@gym-monorepo/shared';
+  throw new NotFoundException(USER_ERRORS.NOT_FOUND.message);
+  ```
+- Error codes live in `packages/shared/src/constants/error-codes.ts` — add new codes there when introducing new error scenarios.
+
+### API client (frontend)
+- **Use axios exclusively** via the configured `api` instance from `@/lib/api`.
+- For auth context (where manual response handling is needed), use `apiRaw` which doesn't unwrap responses.
+- Never use native `fetch()` in the frontend — axios handles credentials, interceptors, and error redirects.
+
+### Shared types
+- **Pagination types** (`PaginatedResponse`, `PAGINATION_DEFAULTS`) are defined in `packages/shared` and re-exported by both apps.
+- Backend uses helper functions `paginate()` and `calculateSkip()` from `apps/api/src/common/dto/pagination.dto.ts`.
+- Frontend imports types via `@/services/types` which re-exports from shared.
+
+### Entity barrel exports
+- Backend entities have a barrel export at `apps/api/src/database/entities/index.ts`.
+- Prefer importing from the barrel: `import { UserEntity, TenantEntity } from '../../database/entities';`
 
 ## Key conventions
 - Auth/permission hooks (`useAuth`, `useMe`, `usePermissions`, `useActiveTenant`) should live in `apps/web/src/contexts` or `src/hooks`, expose `can()`/`canAny()` helpers, and be the single source for guarding UI and sidebar routes.

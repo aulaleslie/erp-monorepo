@@ -13,6 +13,7 @@ import { TenantUserEntity } from '../../database/entities/tenant-user.entity';
 import { UserEntity } from '../../database/entities/user.entity';
 import { PaginatedResponse, paginate, calculateSkip } from '../../common/dto/pagination.dto';
 import { createValidationBuilder } from '../../common/utils/validation.util';
+import { ROLE_ERRORS } from '@gym-monorepo/shared';
 
 @Injectable()
 export class RolesService {
@@ -45,7 +46,7 @@ export class RolesService {
       where: { id, tenantId },
     });
     if (!role) {
-      throw new NotFoundException('Role not found');
+      throw new NotFoundException(ROLE_ERRORS.NOT_FOUND.message);
     }
     return role;
   }
@@ -104,7 +105,7 @@ export class RolesService {
 
     if (duplicate) {
       const validator = createValidationBuilder();
-      validator.addError('name', 'Role with this name already exists');
+      validator.addError('name', ROLE_ERRORS.NAME_EXISTS.message);
       validator.throwIfErrors();
     }
   }
@@ -112,7 +113,7 @@ export class RolesService {
   async delete(tenantId: string, id: string): Promise<void> {
     const role = await this.findOne(tenantId, id);
     if (role.isSuperAdmin) {
-      throw new ForbiddenException('Cannot delete Super Admin role');
+      throw new ForbiddenException(ROLE_ERRORS.CANNOT_DELETE_SUPER_ADMIN.message);
     }
 
     // We should probably check if users are assigned to this role before deleting
@@ -142,7 +143,7 @@ export class RolesService {
       const missing = permissionCodes.filter((c) => !foundCodes.includes(c));
       if (missing.length > 0) {
         throw new BadRequestException(
-          `Permissions not found: ${missing.join(', ')}`,
+          `${ROLE_ERRORS.INVALID_PERMISSIONS.message}: ${missing.join(', ')}`,
         );
       }
     }

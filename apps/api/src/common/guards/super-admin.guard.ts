@@ -1,5 +1,6 @@
 
 import { CanActivate, ExecutionContext, Injectable, ForbiddenException } from '@nestjs/common';
+import { AUTH_ERRORS } from '@gym-monorepo/shared';
 
 @Injectable()
 export class SuperAdminGuard implements CanActivate {
@@ -8,7 +9,7 @@ export class SuperAdminGuard implements CanActivate {
     const user = request.user;
 
     if (!user || !user.isSuperAdmin) {
-      throw new ForbiddenException('Only Super Admins can access this resource');
+      throw new ForbiddenException(AUTH_ERRORS.SUPER_ADMIN_ONLY.message);
     }
 
     return true;

@@ -7,6 +7,7 @@ import { CreateTaxDto } from './dto/create-tax.dto';
 import { UpdateTaxDto } from './dto/update-tax.dto';
 import { TaxQueryDto } from './dto/tax-query.dto';
 import { paginate, PaginatedResponse, calculateSkip } from '../../common/dto/pagination.dto';
+import { TAX_ERRORS } from '@gym-monorepo/shared';
 
 @Injectable()
 export class PlatformTaxesService {
@@ -20,7 +21,7 @@ export class PlatformTaxesService {
   private async assertNotInUse(id: string): Promise<void> {
     const usageCount = await this.tenantTaxRepository.count({ where: { taxId: id } });
     if (usageCount > 0) {
-      throw new BadRequestException('Tax is selected by one or more tenants and cannot be modified.');
+      throw new BadRequestException(TAX_ERRORS.IN_USE_BY_TENANTS.message);
     }
   }
 
@@ -29,16 +30,16 @@ export class PlatformTaxesService {
     if (createTaxDto.code) {
       const existing = await this.taxRepository.findOne({ where: { code: createTaxDto.code } });
       if (existing) {
-        throw new BadRequestException(`Tax with code ${createTaxDto.code} already exists`);
+        throw new BadRequestException(TAX_ERRORS.CODE_EXISTS.message);
       }
     }
 
     // Additional validation logic can be here, though DTO handles most
     if (createTaxDto.type === TaxType.PERCENTAGE && createTaxDto.rate === undefined) {
-       throw new BadRequestException('Rate is required for PERCENTAGE tax type');
+       throw new BadRequestException(TAX_ERRORS.RATE_REQUIRED.message);
     }
     if (createTaxDto.type === TaxType.FIXED && createTaxDto.amount === undefined) {
-       throw new BadRequestException('Amount is required for FIXED tax type');
+       throw new BadRequestException(TAX_ERRORS.AMOUNT_REQUIRED.message);
     }
 
     const tax = this.taxRepository.create(createTaxDto);
@@ -70,7 +71,7 @@ export class PlatformTaxesService {
   async findOne(id: string): Promise<Tax> {
     const tax = await this.taxRepository.findOne({ where: { id } });
     if (!tax) {
-      throw new NotFoundException(`Tax with ID ${id} not found`);
+      throw new NotFoundException(TAX_ERRORS.NOT_FOUND.message);
     }
     return tax;
   }
@@ -82,7 +83,7 @@ export class PlatformTaxesService {
     if (updateTaxDto.code && updateTaxDto.code !== tax.code) {
         const existing = await this.taxRepository.findOne({ where: { code: updateTaxDto.code } });
         if (existing) {
-          throw new BadRequestException(`Tax with code ${updateTaxDto.code} already exists`);
+          throw new BadRequestException(TAX_ERRORS.CODE_EXISTS.message);
         }
     }
     
@@ -101,10 +102,10 @@ export class PlatformTaxesService {
     
     // Sanity check after merge
     if (tax.type === TaxType.PERCENTAGE && (tax.rate === null || tax.rate === undefined)) {
-         throw new BadRequestException('Rate is required for PERCENTAGE tax type');
+         throw new BadRequestException(TAX_ERRORS.RATE_REQUIRED.message);
     }
     if (tax.type === TaxType.FIXED && (tax.amount === null || tax.amount === undefined)) {
-         throw new BadRequestException('Amount is required for FIXED tax type');
+         throw new BadRequestException(TAX_ERRORS.AMOUNT_REQUIRED.message);
     }
 
     return this.taxRepository.save(tax);

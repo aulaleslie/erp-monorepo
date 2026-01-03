@@ -1,0 +1,21 @@
+/**
+ * Barrel export for all database entities
+ */
+
+export { AuditLogEntity } from './audit-log.entity';
+export { PermissionEntity } from './permission.entity';
+export { RolePermissionEntity } from './role-permission.entity';
+export { RoleEntity } from './role.entity';
+export { Tax } from './tax.entity';
+export { TenantTaxEntity } from './tenant-tax.entity';
+export { TenantUserEntity } from './tenant-user.entity';
+export { TenantEntity } from './tenant.entity';
+export { UserEntity } from './user.entity';
+
+/**
+ * Array of all entities for TypeORM configuration
+ */
+export const ALL_ENTITIES = [
+  // Note: Import dynamically to avoid circular dependency issues
+  // This is used in database.module.ts and typeorm-datasource.ts
+];

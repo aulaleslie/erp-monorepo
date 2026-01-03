@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { TenantType } from "@gym-monorepo/shared";
+import { apiRaw } from "@/lib/api";
 
 interface User {
     id: string;
@@ -35,10 +36,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
-
-
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [activeTenant, setActiveTenant] = useState<Tenant | null>(null);
@@ -46,106 +43,52 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [hasTenants, setHasTenants] = useState<boolean | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    const fetchUser = async () => {
-        try {
-            const res = await fetch(`${API_URL}/auth/me`, {
-                // ... comments
-            });
-            if (res.ok) {
-                const responseData = await res.json();
-                setUser(responseData.data);
-                return true;
-            } else {
-                setUser(null);
-                return false;
-            }
-        } catch (error) {
-            console.error("Failed to fetch user:", error);
-            setUser(null);
-            return false;
-        }
-    };
-
-    const fetchActiveTenant = async () => {
-        try {
-            const res = await fetch(`${API_URL}/me/tenants/active`, { credentials: 'include' });
-            if (res.ok) {
-                const responseData = await res.json();
-                setActiveTenant(responseData.data);
-            } else {
-                setActiveTenant(null);
-            }
-        } catch (error) {
-            console.error("Failed to fetch active tenant:", error);
-            setActiveTenant(null);
-        }
-    };
-
-    const fetchPermissions = async () => {
-        try {
-            const res = await fetch(`${API_URL}/me/permissions`, { credentials: 'include' });
-            if (res.ok) {
-                const responseData = await res.json();
-                setPermissions(responseData.data);
-            } else {
-                setPermissions(null);
-            }
-        } catch (error) {
-            console.error("Failed to fetch permissions:", error);
-            setPermissions(null);
-        }
-    };
-
     const refreshAuth = useCallback(async () => {
         setIsLoading(true);
-        // Needed to ensure cookies are sent
-        // We are adding specific headers just in case of proxy issues, but standard fetch usually suffices if proxy handled.
-        // Actually, creating a wrapper for fetch that adds credentials: 'include' is better practice.
-        // For now, I'll add it here.
-
-        // Note: If separate domains (3000 vs 4000), we MUST use credentials: 'include'.
-        // And backend must allow origin 3000 with credentials.
-
-        // Changing fetch to include credentials.
         try {
+            // Use Promise.allSettled to fetch all data in parallel
+            // apiRaw doesn't unwrap responses, giving us full control
             const [userRes, tenantRes, permRes, myTenantsRes] = await Promise.allSettled([
-                fetch(`${API_URL}/auth/me`, { credentials: 'include' }),
-                fetch(`${API_URL}/me/tenants/active`, { credentials: 'include' }),
-                fetch(`${API_URL}/me/permissions`, { credentials: 'include' }),
-                fetch(`${API_URL}/me/tenants`, { credentials: 'include' })
+                apiRaw.get('/auth/me'),
+                apiRaw.get('/me/tenants/active'),
+                apiRaw.get('/me/permissions'),
+                apiRaw.get('/me/tenants')
             ]);
 
-            if (userRes.status === 'fulfilled' && userRes.value.ok) {
-                const data = await userRes.value.json();
-                setUser(data.data);
+            // Handle user response
+            if (userRes.status === 'fulfilled' && userRes.value.data?.success) {
+                setUser(userRes.value.data.data);
             } else {
                 setUser(null);
             }
 
-            if (tenantRes.status === 'fulfilled' && tenantRes.value.ok) {
-                const data = await tenantRes.value.json();
-                setActiveTenant(data.data);
+            // Handle active tenant response
+            if (tenantRes.status === 'fulfilled' && tenantRes.value.data?.success) {
+                setActiveTenant(tenantRes.value.data.data);
             } else {
                 setActiveTenant(null);
             }
 
-            if (permRes.status === 'fulfilled' && permRes.value.ok) {
-                const data = await permRes.value.json();
-                setPermissions(data.data);
+            // Handle permissions response
+            if (permRes.status === 'fulfilled' && permRes.value.data?.success) {
+                setPermissions(permRes.value.data.data);
             } else {
                 setPermissions(null);
             }
 
             // Check if user has any tenants
-            if (myTenantsRes.status === 'fulfilled' && myTenantsRes.value.ok) {
-                const data = await myTenantsRes.value.json();
-                const tenants = data.data || [];
+            if (myTenantsRes.status === 'fulfilled' && myTenantsRes.value.data?.success) {
+                const tenants = myTenantsRes.value.data.data || [];
                 setHasTenants(tenants.length > 0);
             } else {
                 setHasTenants(false);
             }
         } catch (e) {
             console.error("Auth init error", e);
+            setUser(null);
+            setActiveTenant(null);
+            setPermissions(null);
+            setHasTenants(false);
         } finally {
             setIsLoading(false);
         }
@@ -153,15 +96,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const refreshPermissions = useCallback(async () => {
         try {
-            const res = await fetch(`${API_URL}/me/permissions`, { credentials: 'include' });
-            if (res.ok) {
-                const data = await res.json();
-                setPermissions(data.data);
+            const [permRes, tenantRes] = await Promise.allSettled([
+                apiRaw.get('/me/permissions'),
+                apiRaw.get('/me/tenants/active')
+            ]);
+
+            if (permRes.status === 'fulfilled' && permRes.value.data?.success) {
+                setPermissions(permRes.value.data.data);
             }
-            const tenantRes = await fetch(`${API_URL}/me/tenants/active`, { credentials: 'include' });
-            if (tenantRes.ok) {
-                const data = await tenantRes.json();
-                setActiveTenant(data.data);
+
+            if (tenantRes.status === 'fulfilled' && tenantRes.value.data?.success) {
+                setActiveTenant(tenantRes.value.data.data);
             }
         } catch (e) {
             console.error("Refresh permissions error", e);

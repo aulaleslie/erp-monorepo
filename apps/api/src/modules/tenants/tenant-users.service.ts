@@ -22,6 +22,7 @@ import {
   toRoleResponseDto,
 } from '../../common/dto/user.dto';
 import { hashPassword } from '../../common/utils/password.util';
+import { USER_ERRORS, ROLE_ERRORS } from '@gym-monorepo/shared';
 
 @Injectable()
 export class TenantUsersService {
@@ -88,7 +89,7 @@ export class TenantUsersService {
     });
 
     if (!membership) {
-      throw new NotFoundException('User is not a member of this tenant');
+      throw new NotFoundException(USER_ERRORS.NOT_TENANT_MEMBER.message);
     }
 
     const user = await this.userRepository.findOne({
@@ -115,7 +116,7 @@ export class TenantUsersService {
     });
 
     if (user) {
-      throw new ConflictException('User with this email already exists. Use invite to add existing users.');
+      throw new ConflictException(USER_ERRORS.USE_INVITE_FOR_EXISTING.message);
     }
 
     // Validate role if provided
@@ -125,10 +126,10 @@ export class TenantUsersService {
         where: { id: data.roleId, tenantId },
       });
       if (!role) {
-        throw new NotFoundException('Role not found in this tenant');
+        throw new NotFoundException(ROLE_ERRORS.NOT_FOUND_IN_TENANT.message);
       }
       if (role.isSuperAdmin && !actorIsSuperAdmin) {
-        throw new ForbiddenException('Only Super Admins can assign Super Admin roles');
+        throw new ForbiddenException(ROLE_ERRORS.SUPER_ADMIN_ASSIGNMENT_FORBIDDEN.message);
       }
     }
 
@@ -165,11 +166,11 @@ export class TenantUsersService {
     });
 
     if (!user) {
-      throw new NotFoundException('User does not exist');
+      throw new NotFoundException(USER_ERRORS.NOT_FOUND.message);
     }
 
     if (user.isSuperAdmin) {
-      throw new BadRequestException('Cannot invite super admin users');
+      throw new BadRequestException(USER_ERRORS.CANNOT_INVITE_SUPER_ADMIN.message);
     }
 
     // Check if role exists and belongs to tenant
@@ -177,10 +178,10 @@ export class TenantUsersService {
       where: { id: data.roleId, tenantId },
     });
     if (!role) {
-      throw new NotFoundException('Role not found in this tenant');
+      throw new NotFoundException(ROLE_ERRORS.NOT_FOUND_IN_TENANT.message);
     }
     if (role.isSuperAdmin && !actorIsSuperAdmin) {
-      throw new ForbiddenException('Only Super Admins can assign Super Admin roles');
+      throw new ForbiddenException(ROLE_ERRORS.SUPER_ADMIN_ASSIGNMENT_FORBIDDEN.message);
     }
 
     // Check if already in tenant
@@ -189,7 +190,7 @@ export class TenantUsersService {
     });
 
     if (existingMembership) {
-      throw new ConflictException('User is already a member of this tenant');
+      throw new ConflictException(USER_ERRORS.ALREADY_TENANT_MEMBER.message);
     }
 
     // Create membership
@@ -216,7 +217,7 @@ export class TenantUsersService {
     });
 
     if (!membership) {
-      throw new NotFoundException('User is not a member of this tenant');
+      throw new NotFoundException(USER_ERRORS.NOT_TENANT_MEMBER.message);
     }
 
     // If roleId is provided, validate it exists in tenant
@@ -225,10 +226,10 @@ export class TenantUsersService {
         where: { id: roleId, tenantId },
       });
       if (!role) {
-        throw new NotFoundException('Role not found in this tenant');
+        throw new NotFoundException(ROLE_ERRORS.NOT_FOUND_IN_TENANT.message);
       }
       if (role.isSuperAdmin && !actorIsSuperAdmin) {
-        throw new ForbiddenException('Only Super Admins can assign Super Admin roles');
+        throw new ForbiddenException(ROLE_ERRORS.SUPER_ADMIN_ASSIGNMENT_FORBIDDEN.message);
       }
     }
 
@@ -243,7 +244,7 @@ export class TenantUsersService {
     });
 
     if (!membership) {
-      throw new NotFoundException('User is not a member of this tenant');
+      throw new NotFoundException(USER_ERRORS.NOT_TENANT_MEMBER.message);
     }
 
     await this.tenantUserRepository.remove(membership);
@@ -266,7 +267,7 @@ export class TenantUsersService {
     });
 
     if (!membership) {
-      throw new NotFoundException('User is not a member of this tenant');
+      throw new NotFoundException(USER_ERRORS.NOT_TENANT_MEMBER.message);
     }
 
     // Get the user
@@ -275,7 +276,7 @@ export class TenantUsersService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(USER_ERRORS.NOT_FOUND.message);
     }
 
     // Update email if provided
@@ -285,7 +286,7 @@ export class TenantUsersService {
         where: { email: data.email },
       });
       if (existingUser && existingUser.id !== userId) {
-        throw new ConflictException('Email is already in use');
+        throw new ConflictException(USER_ERRORS.EMAIL_IN_USE.message);
       }
       user.email = data.email;
     }
@@ -311,10 +312,10 @@ export class TenantUsersService {
           where: { id: data.roleId, tenantId },
         });
         if (!role) {
-          throw new NotFoundException('Role not found in this tenant');
+          throw new NotFoundException(ROLE_ERRORS.NOT_FOUND_IN_TENANT.message);
         }
         if (role.isSuperAdmin && !actorIsSuperAdmin) {
-          throw new ForbiddenException('Only Super Admins can assign Super Admin roles');
+          throw new ForbiddenException(ROLE_ERRORS.SUPER_ADMIN_ASSIGNMENT_FORBIDDEN.message);
         }
       }
       membership.roleId = data.roleId === null ? null : data.roleId;

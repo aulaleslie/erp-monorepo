@@ -2,16 +2,10 @@
  * Pagination utilities for consistent paginated responses across services
  */
 
-/**
- * Generic paginated response structure
- */
-export interface PaginatedResponse<T> {
-  items: T[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
+import { PaginatedResponse, PAGINATION_DEFAULTS } from '@gym-monorepo/shared';
+
+// Re-export from shared for backward compatibility
+export { PaginatedResponse, PAGINATION_DEFAULTS };
 
 /**
  * Create a paginated response object

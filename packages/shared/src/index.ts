@@ -1,8 +1,19 @@
+// ============================================================================
+// Re-exports from organized modules
+// ============================================================================
+
+export * from './constants';
+export * from './types';
+
+// ============================================================================
+// Core Types
+// ============================================================================
+
 export type HealthResponse = {
   status: string;
 };
 
-export interface BaseResponse<T = any> {
+export interface BaseResponse<T = unknown> {
   success: boolean;
   message?: string;
   data?: T;
@@ -15,6 +26,10 @@ export interface Permission {
   name: string;
   group: string;
 }
+
+// ============================================================================
+// Tenant Types
+// ============================================================================
 
 export enum TenantType {
   GYM = 'GYM',
@@ -30,15 +45,21 @@ export const TENANT_TYPE_OPTIONS = [
   { value: TenantType.GROCERY, slug: 'grocery', label: 'Grocery' },
 ] as const;
 
+// ============================================================================
+// Audit Types
+// ============================================================================
+
+export type AuditAction = 'CREATE' | 'UPDATE' | 'DELETE' | 'SOFT_REMOVE';
+
 export interface AuditLog {
   id: string;
   entityName: string;
   entityId: string;
-  action: 'CREATE' | 'UPDATE' | 'DELETE' | 'SOFT_REMOVE';
+  action: AuditAction;
   performedBy: string | null;
   timestamp: string;
-  previousValues: any;
-  newValues: any;
+  previousValues: Record<string, unknown>;
+  newValues: Record<string, unknown>;
   performedByUser?: {
     id: string;
     fullName: string;

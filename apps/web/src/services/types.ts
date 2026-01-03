@@ -2,22 +2,15 @@
  * Shared types for frontend services
  */
 
-/**
- * Generic paginated response structure
- * Matches the backend PaginatedResponse format
- */
-export interface PaginatedResponse<T> {
-  items: T[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
+// Re-export pagination types from shared package
+export type { PaginatedResponse } from '@gym-monorepo/shared';
+export { PAGINATION_DEFAULTS } from '@gym-monorepo/shared';
 
 /**
  * API error response structure
  */
 export interface ApiErrorResponse {
   message: string;
+  code?: string;
   errors?: Record<string, string[]>;
 }
