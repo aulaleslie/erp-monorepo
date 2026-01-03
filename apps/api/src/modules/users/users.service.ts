@@ -148,16 +148,24 @@ export class UsersService {
 
     // Fetch tenants and roles
     const tenantIds = tenantUsers.map((tu) => tu.tenantId);
-    const roleIds = tenantUsers
-      .map((tu) => tu.roleId)
-      .filter((id): id is string => id !== undefined && id !== null);
 
     // Use query builder to get tenant info since we don't have relation defined
+    // Only fetch ACTIVE tenants
     const tenants = await this.usersRepository.manager
       .getRepository(TenantEntity)
       .find({
-        where: { id: In(tenantIds) },
+        where: { id: In(tenantIds), status: 'ACTIVE' },
       });
+
+    // Filter tenantUsers to only include those with active tenants
+    const activeTenantIds = new Set(tenants.map((t) => t.id));
+    const activeTenantUsers = tenantUsers.filter((tu) =>
+      activeTenantIds.has(tu.tenantId),
+    );
+
+    const roleIds = activeTenantUsers
+      .map((tu) => tu.roleId)
+      .filter((id): id is string => id !== undefined && id !== null);
 
     const roles =
       roleIds.length > 0
@@ -166,7 +174,7 @@ export class UsersService {
           })
         : [];
 
-    return tenantUsers.map((tu) => {
+    return activeTenantUsers.map((tu) => {
       const tenant = tenants.find((t) => t.id === tu.tenantId);
       const role = tu.roleId ? roles.find((r) => r.id === tu.roleId) : null;
 

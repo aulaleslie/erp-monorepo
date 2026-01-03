@@ -38,8 +38,8 @@ export class MeController {
 
   @Get('tenants')
   async getMyTenants(@Req() req: FastifyRequest & { user: any }) {
-    // Moved from TenantsController
-    return this.tenantsService.getMyTenants(req.user.id);
+    // Returns tenants with role information for the authenticated user
+    return this.usersService.getUserTenants(req.user.id);
   }
 
   @Post('tenants/active')
