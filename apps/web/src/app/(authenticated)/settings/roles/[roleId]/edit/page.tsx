@@ -189,7 +189,7 @@ export default function EditRolePage() {
                             <Checkbox
                                 id="isSuperAdmin"
                                 checked={isSuperAdmin}
-                                disabled={true} // Usually cannot change isSuperAdmin status
+                                disabled={true} // Cannot change isSuperAdmin status on edit
                             />
                             <Label htmlFor="isSuperAdmin" className="text-muted-foreground">Is Super Admin? (Cannot be changed)</Label>
                         </div>

@@ -121,7 +121,7 @@ export default function UserDetailsPage() {
                                 <Button variant="outline" size="sm" asChild>
                                     <Link href={`/settings/users/${userId}/edit`}>
                                         <Pencil className="mr-2 h-4 w-4" />
-                                        Edit Role
+                                        Edit
                                     </Link>
                                 </Button>
                             </PermissionGuard>

@@ -13,5 +13,5 @@ export class PermissionEntity extends BaseAuditEntity {
   name: string;
 
   @Column()
-  group: string; // Settings, Users, Platform
+  group: string; // e.g. Tenant, Roles, Users
 }

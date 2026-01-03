@@ -159,11 +159,11 @@ All foreign keys must be enforced and `synchronize: true` is not allowed.
 
 ## 3 Seed script (mandatory)
 - Seed once per environment.
-- Permissions to seed: `roles.read`, `roles.create`, `roles.update`, `roles.delete`, `users.read`, `users.create`, `users.update`, `users.assignRole`, `users.delete`, `tenants.create`, `settings.tenant.read`, `settings.tenant.update`.
+- Permissions to seed: `roles.read`, `roles.create`, `roles.update`, `roles.delete`, `users.read`, `users.create`, `users.update`, `users.assignRole`, `users.delete`, `settings.tenant.read`, `settings.tenant.update`.
 - Tenants to seed: Gym, Cafeteria.
 - Create one Super Admin user (`isSuperAdmin = true`) and a Super Admin role per tenant (`isSuperAdmin = true`).
 - Assign the Super Admin user to both tenants so the system is demo-ready without registration.
-- Only Super Admins can create new tenants or create/promote Super Admin users; keep `tenants.create` for future delegation but enforce SuperAdminGuard on creation.
+- Only Super Admins can create new tenants or create/promote Super Admin users. Tenant creation is guarded by `isSuperAdmin` flag, not by permissions.
 - Assign `settings.tenant.read`/`settings.tenant.update` to the Super Admin role and any default admin role you want to allow for tenant profile editing.
 - Permission seed lists live under `apps/api/src/scripts/seeds/permissions` so new features can add their own permission sets without editing the main seed script.
 

@@ -60,6 +60,7 @@ export class TenantUsersController {
       req.tenantId,
       Number(page),
       Number(limit),
+      req.user?.isSuperAdmin === true,
     );
   }
 

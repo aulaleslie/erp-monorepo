@@ -11,6 +11,7 @@ import {
     Building,
     Building2,
     Percent,
+    History,
     ChevronLeft,
     ChevronDown,
     Menu
@@ -114,34 +115,6 @@ const sidebarConfig: SidebarItem[] = [
         href: '/dashboard',
     },
     {
-        label: 'Users',
-        icon: Users,
-        children: [
-            {
-                label: 'Roles',
-                icon: Shield,
-                href: '/settings/roles',
-                permissions: [
-                    'roles.read',
-                    'roles.create',
-                    'roles.update',
-                    'roles.delete',
-                ],
-            },
-            {
-                label: 'Users',
-                icon: Users,
-                href: '/settings/users',
-                permissions: [
-                    'users.read',
-                    'users.create',
-                    'users.update',
-                    'users.assignRole',
-                ],
-            },
-        ],
-    },
-    {
         label: 'Settings',
         icon: Settings,
         children: [
@@ -168,9 +141,31 @@ const sidebarConfig: SidebarItem[] = [
             },
             {
                 label: 'Audit Logs',
-                icon: Shield,
+                icon: History,
                 href: '/settings/audit-logs',
                 superAdminOnly: true,
+            },
+            {
+                label: 'Roles',
+                icon: Shield,
+                href: '/settings/roles',
+                permissions: [
+                    'roles.read',
+                    'roles.create',
+                    'roles.update',
+                    'roles.delete',
+                ],
+            },
+            {
+                label: 'Users',
+                icon: Users,
+                href: '/settings/users',
+                permissions: [
+                    'users.read',
+                    'users.create',
+                    'users.update',
+                    'users.assignRole',
+                ],
             },
         ],
     },

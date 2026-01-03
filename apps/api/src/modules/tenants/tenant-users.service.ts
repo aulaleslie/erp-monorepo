@@ -38,6 +38,7 @@ export class TenantUsersService {
     tenantId: string,
     page: number = 1,
     limit: number = 10,
+    actorIsSuperAdmin: boolean = false,
   ): Promise<PaginatedResponse<TenantUserResponseDto>> {
     const [tenantUsers, total] = await this.tenantUserRepository.findAndCount({
       where: { tenantId },
@@ -64,7 +65,15 @@ export class TenantUsersService {
           })
         : [];
 
-    const items = tenantUsers.map((tu) => {
+    // Filter out superadmin users unless the actor is a superadmin
+    const filteredTenantUsers = actorIsSuperAdmin
+      ? tenantUsers
+      : tenantUsers.filter((tu) => {
+          const user = users.find((u) => u.id === tu.userId);
+          return !user?.isSuperAdmin;
+        });
+
+    const items = filteredTenantUsers.map((tu) => {
       const user = users.find((u) => u.id === tu.userId) || null;
       const role = roles.find((r) => r.id === tu.roleId) || null;
       return toTenantUserResponseDto(tu, user, role);

@@ -10,21 +10,15 @@ import { DataTable, Column } from '@/components/common/DataTable';
 import { usePagination } from '@/hooks/use-pagination';
 import { Badge } from '@/components/ui/badge';
 import { usePermissions } from '@/hooks/use-permissions';
-
-interface AuditLog {
-    id: string;
-    entityName: string;
-    entityId: string;
-    action: string;
-    performedBy: string;
-    timestamp: string;
-    previousValues: any;
-    newValues: any;
-}
+import { AuditLog } from '@gym-monorepo/shared';
+import { AuditLogDetailsDialog } from '@/components/audit-logs/audit-log-details-dialog';
+import { Button } from '@/components/ui/button';
 
 export default function AuditLogsPage() {
     const [logs, setLogs] = useState<AuditLog[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
     const pagination = usePagination({ initialLimit: 20 });
     const { isSuperAdmin } = usePermissions();
 
@@ -85,17 +79,26 @@ export default function AuditLogsPage() {
         },
         {
             header: "Performed By",
-            cell: (log) => <span className="font-mono text-xs">{log.performedBy || 'System'}</span>,
+            cell: (log) => (
+                <span className="text-sm">
+                    {log.performedByUser?.fullName || log.performedBy || 'System'}
+                </span>
+            ),
         },
         {
             header: "Details",
             cell: (log) => (
-                <details>
-                    <summary className="cursor-pointer text-xs text-blue-500 hover:underline">View Changes</summary>
-                    <div className="mt-2 text-xs font-mono bg-muted p-2 rounded max-w-md overflow-hidden text-clip whitespace-pre-wrap">
-                        {JSON.stringify(log.newValues || log.previousValues, null, 2)}
-                    </div>
-                </details>
+                <Button
+                    variant="link"
+                    size="sm"
+                    className="p-0 h-auto text-xs text-blue-500 hover:underline"
+                    onClick={() => {
+                        setSelectedLog(log);
+                        setDialogOpen(true);
+                    }}
+                >
+                    View Changes
+                </Button>
             ),
         },
     ], []);
@@ -126,6 +129,12 @@ export default function AuditLogsPage() {
                     />
                 </CardContent>
             </Card>
+
+            <AuditLogDetailsDialog
+                log={selectedLog}
+                open={dialogOpen}
+                onOpenChange={setDialogOpen}
+            />
         </div>
     );
 }

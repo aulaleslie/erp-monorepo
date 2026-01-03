@@ -140,6 +140,7 @@ export default function CreateUserPage() {
                                         if (errors.email) setErrors({ ...errors, email: "" });
                                     }}
                                     className={errors.email ? "border-red-500" : ""}
+                                    autoComplete="off"
                                 />
                                 {errors.email && (
                                     <p className="text-sm text-red-500">{errors.email}</p>
@@ -171,6 +172,7 @@ export default function CreateUserPage() {
                                             if (errors.password) setErrors({ ...errors, password: "" });
                                         }}
                                         className={errors.password ? "border-red-500" : ""}
+                                        autoComplete="new-password"
                                     />
                                     {errors.password && (
                                         <p className="text-sm text-red-500">{errors.password}</p>

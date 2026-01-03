@@ -10,6 +10,7 @@ import { Plus, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { InviteUserDialog } from "@/components/users/InviteUserDialog";
 import { DataTable, Column } from "@/components/common/DataTable";
 import { usePagination } from "@/hooks/use-pagination";
@@ -18,6 +19,7 @@ import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { StatusBadge } from "@/components/common/StatusBadge";
 
 export default function UsersPage() {
+    const { user } = useAuth();
     const [users, setUsers] = useState<TenantUser[]>([]);
     const [loading, setLoading] = useState(true);
     const pagination = usePagination();
@@ -34,7 +36,11 @@ export default function UsersPage() {
         setLoading(true);
         try {
             const data = await usersService.getAll(pagination.page, pagination.limit);
-            setUsers(data.items);
+            // Filter out superadmin users unless the current user is a superadmin
+            const filteredUsers = user?.isSuperAdmin
+                ? data.items
+                : data.items.filter((tenantUser) => !tenantUser.role?.isSuperAdmin);
+            setUsers(filteredUsers);
             pagination.setTotal(data.total);
         } catch (error) {
             toast({
