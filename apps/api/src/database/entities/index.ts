@@ -6,7 +6,7 @@ export { AuditLogEntity } from './audit-log.entity';
 export { PermissionEntity } from './permission.entity';
 export { RolePermissionEntity } from './role-permission.entity';
 export { RoleEntity } from './role.entity';
-export { Tax } from './tax.entity';
+export { TaxEntity } from './tax.entity';
 export { TenantTaxEntity } from './tenant-tax.entity';
 export { TenantUserEntity } from './tenant-user.entity';
 export { TenantEntity } from './tenant.entity';

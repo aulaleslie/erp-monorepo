@@ -18,7 +18,7 @@ export enum TaxStatus {
 }
 
 @Entity('taxes')
-export class Tax extends BaseAuditEntity {
+export class TaxEntity extends BaseAuditEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

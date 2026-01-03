@@ -4,7 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { TenantEntity } from '../../database/entities/tenant.entity';
 import { TenantUserEntity } from '../../database/entities/tenant-user.entity';
 import { RoleEntity } from '../../database/entities/role.entity';
-import { Tax } from '../../database/entities/tax.entity';
+import { TaxEntity } from '../../database/entities/tax.entity';
 import { TenantTaxEntity } from '../../database/entities/tenant-tax.entity';
 import { Repository, ObjectLiteral } from 'typeorm';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
@@ -19,7 +19,7 @@ describe('TenantsService', () => {
   let tenantRepository: MockRepository<TenantEntity>;
   let tenantUserRepository: MockRepository<TenantUserEntity>;
   let roleRepository: MockRepository<RoleEntity>;
-  let taxRepository: MockRepository<Tax>;
+  let taxRepository: MockRepository<TaxEntity>;
   let tenantTaxRepository: MockRepository<TenantTaxEntity>;
 
   beforeEach(async () => {
@@ -66,7 +66,7 @@ describe('TenantsService', () => {
           useValue: roleRepository,
         },
         {
-          provide: getRepositoryToken(Tax),
+          provide: getRepositoryToken(TaxEntity),
           useValue: taxRepository,
         },
         {

@@ -7,7 +7,7 @@ import { Repository, In, Not } from 'typeorm';
 import { TenantEntity } from '../../database/entities/tenant.entity';
 import { TenantUserEntity } from '../../database/entities/tenant-user.entity';
 import { RoleEntity } from '../../database/entities/role.entity';
-import { Tax, TaxStatus } from '../../database/entities/tax.entity';
+import { TaxEntity, TaxStatus } from '../../database/entities/tax.entity';
 import { TenantTaxEntity } from '../../database/entities/tenant-tax.entity';
 import { PaginatedResponse, paginate, calculateSkip } from '../../common/dto/pagination.dto';
 import { createValidationBuilder } from '../../common/utils/validation.util';
@@ -22,8 +22,8 @@ export class TenantsService {
     private readonly tenantUserRepository: Repository<TenantUserEntity>,
     @InjectRepository(RoleEntity)
     private readonly roleRepository: Repository<RoleEntity>,
-    @InjectRepository(Tax)
-    private readonly taxRepository: Repository<Tax>,
+    @InjectRepository(TaxEntity)
+    private readonly taxRepository: Repository<TaxEntity>,
     @InjectRepository(TenantTaxEntity)
     private readonly tenantTaxRepository: Repository<TenantTaxEntity>,
   ) {}

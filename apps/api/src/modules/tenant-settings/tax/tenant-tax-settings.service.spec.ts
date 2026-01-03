@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TenantTaxSettingsService } from './tenant-tax-settings.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { TenantEntity } from '../../../database/entities/tenant.entity';
-import { Tax, TaxStatus, TaxType } from '../../../database/entities/tax.entity';
+import { TaxEntity, TaxStatus, TaxType } from '../../../database/entities/tax.entity';
 import { TenantTaxEntity } from '../../../database/entities/tenant-tax.entity';
 import { DataSource, ObjectLiteral, Repository } from 'typeorm';
 import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
@@ -30,7 +30,7 @@ type MockRepository<T extends ObjectLiteral = any> = {
 describe('TenantTaxSettingsService', () => {
   let service: TenantTaxSettingsService;
   let tenantRepository: MockRepository<TenantEntity>;
-  let taxRepository: MockRepository<Tax>;
+  let taxRepository: MockRepository<TaxEntity>;
   let tenantTaxRepository: MockRepository<TenantTaxEntity>;
   let dataSource: any;
 
@@ -43,7 +43,7 @@ describe('TenantTaxSettingsService', () => {
           useFactory: mockTenantRepository,
         },
         {
-          provide: getRepositoryToken(Tax),
+          provide: getRepositoryToken(TaxEntity),
           useFactory: mockTaxRepository,
         },
         {
@@ -59,7 +59,7 @@ describe('TenantTaxSettingsService', () => {
 
     service = module.get<TenantTaxSettingsService>(TenantTaxSettingsService);
     tenantRepository = module.get(getRepositoryToken(TenantEntity));
-    taxRepository = module.get(getRepositoryToken(Tax));
+    taxRepository = module.get(getRepositoryToken(TaxEntity));
     tenantTaxRepository = module.get(getRepositoryToken(TenantTaxEntity));
     dataSource = module.get(DataSource);
   });
@@ -75,7 +75,7 @@ describe('TenantTaxSettingsService', () => {
       const taxes = [
         { id: 'tax-1', name: 'VAT', code: 'VAT', rate: 10, type: TaxType.PERCENTAGE, status: TaxStatus.ACTIVE },
         { id: 'tax-2', name: 'Service', code: 'SVC', rate: 5, type: TaxType.PERCENTAGE, status: TaxStatus.ACTIVE },
-      ] as Tax[];
+      ] as TaxEntity[];
       const tenantTaxes = [
         { tenantId, taxId: 'tax-1', isDefault: true, tax: taxes[0] },
       ] as TenantTaxEntity[];

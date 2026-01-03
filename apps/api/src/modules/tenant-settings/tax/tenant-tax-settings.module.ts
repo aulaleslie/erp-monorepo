@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TenantEntity } from '../../../database/entities/tenant.entity';
-import { Tax } from '../../../database/entities/tax.entity';
+import { TaxEntity } from '../../../database/entities/tax.entity';
 import { TenantTaxEntity } from '../../../database/entities/tenant-tax.entity';
 import { TenantTaxSettingsController } from './tenant-tax-settings.controller';
 import { TenantTaxSettingsService } from './tenant-tax-settings.service';
@@ -12,7 +12,7 @@ import { UsersModule } from '../../users/users.module';
   imports: [
     TypeOrmModule.forFeature([
       TenantEntity,
-      Tax,
+      TaxEntity,
       TenantTaxEntity,
     ]),
     TenantsModule,

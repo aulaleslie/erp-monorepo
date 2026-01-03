@@ -1,7 +1,7 @@
 
 import { DataSource } from 'typeorm';
 import { TenantEntity } from '../src/database/entities/tenant.entity';
-import { Tax, TaxType, TaxStatus } from '../src/database/entities/tax.entity';
+import { TaxEntity, TaxType, TaxStatus } from '../src/database/entities/tax.entity';
 import { TenantTaxEntity } from '../src/database/entities/tenant-tax.entity';
 import { config } from 'dotenv';
 
@@ -15,7 +15,7 @@ async function verify() {
     username: process.env.DB_USERNAME || 'postgres',
     password: process.env.DB_PASSWORD || 'postgres',
     database: process.env.DB_DATABASE || 'gym_monorepo',
-    entities: [TenantEntity, Tax, TenantTaxEntity],
+    entities: [TenantEntity, TaxEntity, TenantTaxEntity],
     synchronize: false,
   });
 
@@ -32,7 +32,7 @@ async function verify() {
     console.log('Tenant created:', tenant.id);
 
     // Create a Tax
-    const tax = new Tax();
+    const tax = new TaxEntity();
     tax.name = 'Test Tax Verification';
     tax.code = 'TAX-VERIFY-' + Date.now();
     tax.type = TaxType.PERCENTAGE;

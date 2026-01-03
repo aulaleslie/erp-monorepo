@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Tax, TaxStatus, TaxType } from '../../database/entities/tax.entity';
+import { TaxEntity, TaxStatus, TaxType } from '../../database/entities/tax.entity';
 import { TenantTaxEntity } from '../../database/entities/tenant-tax.entity';
 import { CreateTaxDto } from './dto/create-tax.dto';
 import { UpdateTaxDto } from './dto/update-tax.dto';
@@ -12,8 +12,8 @@ import { TAX_ERRORS } from '@gym-monorepo/shared';
 @Injectable()
 export class PlatformTaxesService {
   constructor(
-    @InjectRepository(Tax)
-    private taxRepository: Repository<Tax>,
+    @InjectRepository(TaxEntity)
+    private taxRepository: Repository<TaxEntity>,
     @InjectRepository(TenantTaxEntity)
     private tenantTaxRepository: Repository<TenantTaxEntity>,
   ) {}
@@ -25,7 +25,7 @@ export class PlatformTaxesService {
     }
   }
 
-  async create(createTaxDto: CreateTaxDto): Promise<Tax> {
+  async create(createTaxDto: CreateTaxDto): Promise<TaxEntity> {
     // Validate uniqueness of code if provided
     if (createTaxDto.code) {
       const existing = await this.taxRepository.findOne({ where: { code: createTaxDto.code } });
@@ -46,7 +46,7 @@ export class PlatformTaxesService {
     return this.taxRepository.save(tax);
   }
 
-  async findAll(query: TaxQueryDto): Promise<PaginatedResponse<Tax>> {
+  async findAll(query: TaxQueryDto): Promise<PaginatedResponse<TaxEntity>> {
     const { page = 1, limit = 10, search, status } = query;
     const skip = calculateSkip(page, limit);
 
@@ -68,7 +68,7 @@ export class PlatformTaxesService {
     return paginate(items, total, page, limit);
   }
 
-  async findOne(id: string): Promise<Tax> {
+  async findOne(id: string): Promise<TaxEntity> {
     const tax = await this.taxRepository.findOne({ where: { id } });
     if (!tax) {
       throw new NotFoundException(TAX_ERRORS.NOT_FOUND.message);
@@ -76,7 +76,7 @@ export class PlatformTaxesService {
     return tax;
   }
 
-  async update(id: string, updateTaxDto: UpdateTaxDto): Promise<Tax> {
+  async update(id: string, updateTaxDto: UpdateTaxDto): Promise<TaxEntity> {
     const tax = await this.findOne(id);
     await this.assertNotInUse(id);
 

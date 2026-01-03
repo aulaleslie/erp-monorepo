@@ -7,7 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
 import { TenantEntity } from '../../../database/entities/tenant.entity';
-import { Tax, TaxStatus } from '../../../database/entities/tax.entity';
+import { TaxEntity, TaxStatus } from '../../../database/entities/tax.entity';
 import { TenantTaxEntity } from '../../../database/entities/tenant-tax.entity';
 import { UpdateTenantTaxSettingsDto } from './dto/update-tenant-tax-settings.dto';
 import { TenantTaxSettingsResponseDto } from './dto/tenant-tax-settings-response.dto';
@@ -17,8 +17,8 @@ export class TenantTaxSettingsService {
   constructor(
     @InjectRepository(TenantEntity)
     private readonly tenantRepository: Repository<TenantEntity>,
-    @InjectRepository(Tax)
-    private readonly taxRepository: Repository<Tax>,
+    @InjectRepository(TaxEntity)
+    private readonly taxRepository: Repository<TaxEntity>,
     @InjectRepository(TenantTaxEntity)
     private readonly tenantTaxRepository: Repository<TenantTaxEntity>,
     private readonly dataSource: DataSource,
@@ -91,7 +91,7 @@ export class TenantTaxSettingsService {
 
       // 2. Validate Taxes
       if (taxIds.length > 0) {
-        const taxes = await manager.find(Tax, {
+        const taxes = await manager.find(TaxEntity, {
           where: {
             id: In(taxIds),
             status: TaxStatus.ACTIVE,

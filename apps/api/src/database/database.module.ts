@@ -9,7 +9,7 @@ import { TenantEntity } from './entities/tenant.entity';
 import { UserEntity } from './entities/user.entity';
 
 import { AuditLogEntity } from './entities/audit-log.entity';
-import { Tax } from './entities/tax.entity';
+import { TaxEntity } from './entities/tax.entity';
 import { TenantTaxEntity } from './entities/tenant-tax.entity';
 
 @Global()
@@ -34,7 +34,7 @@ import { TenantTaxEntity } from './entities/tenant-tax.entity';
           RolePermissionEntity,
           TenantUserEntity,
           AuditLogEntity,
-          Tax,
+          TaxEntity,
           TenantTaxEntity,
         ],
         autoLoadEntities: true,
