@@ -4,7 +4,6 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent } from '@/components/ui/card';
-import { api } from '@/lib/api';
 import { format } from 'date-fns';
 import { DataTable, Column } from '@/components/common/DataTable';
 import { usePagination } from '@/hooks/use-pagination';
@@ -13,6 +12,7 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { AuditLog } from '@gym-monorepo/shared';
 import { AuditLogDetailsDialog } from '@/components/audit-logs/audit-log-details-dialog';
 import { Button } from '@/components/ui/button';
+import { auditLogsService } from '@/services/audit-logs';
 
 export default function AuditLogsPage() {
     const [logs, setLogs] = useState<AuditLog[]>([]);
@@ -33,16 +33,12 @@ export default function AuditLogsPage() {
     const fetchLogs = async () => {
         setLoading(true);
         try {
-            const response = await api.get('/audit-logs', {
-                params: {
-                    page: pagination.page,
-                    limit: pagination.limit,
-                },
-            });
-            setLogs(response.data.items);
-            pagination.setTotal(response.data.total);
+            const data = await auditLogsService.getAll(pagination.page, pagination.limit);
+            setLogs(data.items || []);
+            pagination.setTotal(data.total || 0);
         } catch (error) {
             console.error('Failed to fetch audit logs', error);
+            setLogs([]);
         } finally {
             setLoading(false);
         }

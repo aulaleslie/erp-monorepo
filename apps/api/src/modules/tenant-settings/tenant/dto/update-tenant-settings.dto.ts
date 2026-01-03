@@ -32,4 +32,8 @@ export class UpdateTenantSettingsDto {
   @IsArray()
   @IsUUID('4', { each: true })
   taxIds?: string[];
+
+  @IsOptional()
+  @IsString({ message: 'Theme preset ID must be a string' })
+  themePresetId?: string;
 }

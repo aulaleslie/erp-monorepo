@@ -67,7 +67,7 @@ export interface TenantThemeSettings {
 
 export const THEME_PRESETS: Record<string, ThemePreset> = {
   // Corporate Blue: Professional, trustworthy, widely used in enterprise software
-  CORPORATE_BLUE: {
+  'corporate-blue': {
     id: 'corporate-blue',
     name: 'Corporate Blue',
     description: 'Professional blue theme with strong contrast for enterprise environments',
@@ -110,7 +110,7 @@ export const THEME_PRESETS: Record<string, ThemePreset> = {
   },
 
   // Forest Green: Eco-friendly, growth-oriented, modern appeal
-  FOREST_GREEN: {
+  'forest-green': {
     id: 'forest-green',
     name: 'Forest Green',
     description: 'Eco-friendly green theme perfect for sustainability-focused businesses',
@@ -153,7 +153,7 @@ export const THEME_PRESETS: Record<string, ThemePreset> = {
   },
 
   // Slate Gray: Minimalist, professional, clean design aesthetic
-  SLATE_GRAY: {
+  'slate-gray': {
     id: 'slate-gray',
     name: 'Slate Gray',
     description: 'Minimalist slate gray theme for a clean, modern enterprise look',
@@ -196,7 +196,7 @@ export const THEME_PRESETS: Record<string, ThemePreset> = {
   },
 
   // Modern Purple: Creative, innovative, premium feel
-  MODERN_PURPLE: {
+  'modern-purple': {
     id: 'modern-purple',
     name: 'Modern Purple',
     description: 'Creative purple theme with modern gradient aesthetics',
@@ -239,7 +239,7 @@ export const THEME_PRESETS: Record<string, ThemePreset> = {
   },
 
   // Deep Teal: Balanced, calming, technology-focused
-  DEEP_TEAL: {
+  'deep-teal': {
     id: 'deep-teal',
     name: 'Deep Teal',
     description: 'Balanced teal theme ideal for tech-forward organizations',

@@ -6,13 +6,14 @@ import { TenantUserEntity } from '../../database/entities/tenant-user.entity';
 import { RoleEntity } from '../../database/entities/role.entity';
 import { TaxEntity, TaxStatus } from '../../database/entities/tax.entity';
 import { TenantTaxEntity } from '../../database/entities/tenant-tax.entity';
+import { TenantThemeEntity } from '../../database/entities/tenant-theme.entity';
 import {
   PaginatedResponse,
   paginate,
   calculateSkip,
 } from '../../common/dto/pagination.dto';
 import { createValidationBuilder } from '../../common/utils/validation.util';
-import { TenantType } from '@gym-monorepo/shared';
+import { TenantType, THEME_PRESETS } from '@gym-monorepo/shared';
 
 @Injectable()
 export class TenantsService {
@@ -27,6 +28,8 @@ export class TenantsService {
     private readonly taxRepository: Repository<TaxEntity>,
     @InjectRepository(TenantTaxEntity)
     private readonly tenantTaxRepository: Repository<TenantTaxEntity>,
+    @InjectRepository(TenantThemeEntity)
+    private readonly tenantThemeRepository: Repository<TenantThemeEntity>,
   ) {}
 
   async getMyTenants(userId: string): Promise<TenantEntity[]> {
@@ -57,7 +60,7 @@ export class TenantsService {
   async getTenantById(tenantId: string): Promise<TenantEntity> {
     const tenant = await this.tenantRepository.findOne({
       where: { id: tenantId },
-      relations: ['taxes', 'taxes.tax'],
+      relations: ['taxes', 'taxes.tax', 'theme'],
     });
     if (!tenant) {
       throw new NotFoundException('Tenant not found');
@@ -73,12 +76,14 @@ export class TenantsService {
       type?: TenantType;
       isTaxable?: boolean;
       taxIds?: string[];
+      themePresetId?: string;
     },
   ): Promise<TenantEntity> {
     const validator = createValidationBuilder();
     const taxIds = data.taxIds ?? [];
     const isTaxable = data.isTaxable ?? false;
     const uniqueTaxIds = Array.from(new Set(taxIds));
+    const themePresetId = data.themePresetId ?? 'corporate-blue';
 
     const existingSlug = await this.tenantRepository.findOne({
       where: { slug: data.slug },
@@ -92,6 +97,16 @@ export class TenantsService {
     });
     if (existingName) {
       validator.addError('name', 'Name is already taken');
+    }
+
+    // Validate theme preset
+    if (data.themePresetId) {
+      const isValidPreset = Object.values(THEME_PRESETS).some(
+        (preset) => preset.id === data.themePresetId,
+      );
+      if (!isValidPreset) {
+        validator.addError('themePresetId', 'Invalid theme preset ID');
+      }
     }
 
     if (taxIds.length > 0 && !isTaxable) {
@@ -149,6 +164,13 @@ export class TenantsService {
     });
     await this.tenantUserRepository.save(membership);
 
+    // Create default theme for the tenant
+    const theme = this.tenantThemeRepository.create({
+      tenantId: tenant.id,
+      presetId: themePresetId,
+    });
+    await this.tenantThemeRepository.save(theme);
+
     if (uniqueTaxIds.length > 0) {
       const defaultTaxId = uniqueTaxIds[0];
       const tenantTaxes = uniqueTaxIds.map((taxId) =>
@@ -183,11 +205,11 @@ export class TenantsService {
 
   async update(
     id: string,
-    data: Partial<TenantEntity> & { taxIds?: string[] },
+    data: Partial<TenantEntity> & { taxIds?: string[]; themePresetId?: string },
   ): Promise<TenantEntity> {
     const tenant = await this.getTenantById(id);
     const validator = createValidationBuilder();
-    const hasTaxIds = Object.prototype.hasOwnProperty.call(data, 'taxIds');
+    const hasTaxIds = Object.hasOwn(data, 'taxIds');
     const taxIds = data.taxIds ?? [];
     const uniqueTaxIds = Array.from(new Set(taxIds));
     const nextIsTaxable = data.isTaxable ?? tenant.isTaxable;
@@ -207,6 +229,16 @@ export class TenantsService {
       });
       if (existingName) {
         validator.addError('name', 'Name is already taken');
+      }
+    }
+
+    // Validate theme preset
+    if (data.themePresetId) {
+      const isValidPreset = Object.values(THEME_PRESETS).some(
+        (preset) => preset.id === data.themePresetId,
+      );
+      if (!isValidPreset) {
+        validator.addError('themePresetId', 'Invalid theme preset ID');
       }
     }
 
@@ -252,9 +284,26 @@ export class TenantsService {
 
     validator.throwIfErrors();
 
-    const { taxIds: _taxIds, ...tenantUpdate } = data;
+    const { taxIds: _taxIds, themePresetId, ...tenantUpdate } = data;
     Object.assign(tenant, tenantUpdate);
-    const savedTenant = await this.tenantRepository.save(tenant);
+    await this.tenantRepository.save(tenant);
+
+    // Update theme if provided
+    if (themePresetId) {
+      const existingTheme = await this.tenantThemeRepository.findOne({
+        where: { tenantId: id },
+      });
+      if (existingTheme) {
+        existingTheme.presetId = themePresetId;
+        await this.tenantThemeRepository.save(existingTheme);
+      } else {
+        const newTheme = this.tenantThemeRepository.create({
+          tenantId: id,
+          presetId: themePresetId,
+        });
+        await this.tenantThemeRepository.save(newTheme);
+      }
+    }
 
     if (data.isTaxable === false) {
       await this.tenantTaxRepository.delete({ tenantId: id });
@@ -275,7 +324,8 @@ export class TenantsService {
       }
     }
 
-    return savedTenant;
+    // Return the updated tenant with relations
+    return this.getTenantById(id);
   }
 
   async delete(id: string): Promise<void> {

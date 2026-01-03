@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/common/PageHeader";
 import { SearchableSelect } from "@/components/common/SearchableSelect";
+import { ThemeSelector } from "@/components/common/ThemeSelector";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,6 +48,7 @@ export default function TenantSettingsPage() {
         type: TenantType.GYM,
         isTaxable: false,
         taxIds: [] as string[],
+        themePresetId: "corporate-blue",
     });
     const [errors, setErrors] = useState<Record<string, string | string[]>>({});
 
@@ -70,12 +72,14 @@ export default function TenantSettingsPage() {
                 const defaultTaxId = data.isTaxable
                     ? taxSettings.defaultTaxId || taxSettings.selectedTaxIds?.[0] || ""
                     : "";
+                const currentThemePresetId = data.theme?.[0]?.presetId || "corporate-blue";
                 setFormData({
                     name: data.name,
                     slug: data.slug,
                     type: data.type,
                     isTaxable: data.isTaxable,
                     taxIds: defaultTaxId ? [defaultTaxId] : [],
+                    themePresetId: currentThemePresetId,
                 });
             } catch (error) {
                 toast({
@@ -130,14 +134,17 @@ export default function TenantSettingsPage() {
                 type: formData.type,
                 isTaxable: formData.isTaxable,
                 taxIds: formData.taxIds,
+                themePresetId: formData.themePresetId,
             });
             setTenant(response.data);
+            const updatedThemePresetId = response.data.theme?.[0]?.presetId || formData.themePresetId;
             setFormData({
                 name: response.data.name,
                 slug: response.data.slug,
                 type: response.data.type,
                 isTaxable: response.data.isTaxable,
                 taxIds: formData.taxIds,
+                themePresetId: updatedThemePresetId,
             });
             toast({
                 title: "Success",
@@ -322,6 +329,19 @@ export default function TenantSettingsPage() {
                             </p>
                         </div>
                     )}
+
+                    {/* Theme Selection */}
+                    <div className="pt-4 border-t">
+                        <ThemeSelector
+                            value={formData.themePresetId}
+                            onChange={(presetId) => {
+                                setFormData({ ...formData, themePresetId: presetId });
+                            }}
+                            disabled={!canEdit || saving}
+                            label="Theme"
+                            description="Select a color theme for your organization. The preview applies immediately."
+                        />
+                    </div>
                 </div>
 
                 {errors.form && (

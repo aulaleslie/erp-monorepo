@@ -7,6 +7,15 @@ import { UpdateTenantThemeSettingsDto } from './dto/update-tenant-theme-settings
 import { TenantThemeSettingsResponseDto } from './dto/tenant-theme-settings-response.dto';
 import { THEME_PRESETS, THEME_ERRORS } from '@gym-monorepo/shared';
 
+const resolvePresetId = (presetId: string) => {
+  if (THEME_PRESETS[presetId]) {
+    return presetId;
+  }
+
+  const normalizedPresetId = presetId.toLowerCase().replace(/_/g, '-');
+  return THEME_PRESETS[normalizedPresetId] ? normalizedPresetId : presetId;
+};
+
 @Injectable()
 export class TenantThemeSettingsService {
   constructor(
@@ -39,14 +48,20 @@ export class TenantThemeSettingsService {
       await this.tenantThemeRepository.save(theme);
     }
 
-    const preset = THEME_PRESETS[theme.presetId];
+    const resolvedPresetId = resolvePresetId(theme.presetId);
+    const preset = THEME_PRESETS[resolvedPresetId];
 
     if (!preset) {
       throw new NotFoundException(THEME_ERRORS.INVALID_PRESET.message);
     }
 
+    if (resolvedPresetId !== theme.presetId) {
+      theme.presetId = resolvedPresetId;
+      await this.tenantThemeRepository.save(theme);
+    }
+
     return {
-      presetId: theme.presetId,
+      presetId: resolvedPresetId,
       colors: preset.colors,
       logoUrl: theme.logoUrl,
     };
@@ -65,7 +80,9 @@ export class TenantThemeSettingsService {
     }
 
     // Validate preset exists
-    if (!THEME_PRESETS[dto.presetId]) {
+    const resolvedPresetId = resolvePresetId(dto.presetId);
+
+    if (!THEME_PRESETS[resolvedPresetId]) {
       throw new NotFoundException(THEME_ERRORS.INVALID_PRESET.message);
     }
 
@@ -76,11 +93,11 @@ export class TenantThemeSettingsService {
     if (!theme) {
       theme = this.tenantThemeRepository.create({
         tenantId,
-        presetId: dto.presetId,
+        presetId: resolvedPresetId,
         logoUrl: dto.logoUrl,
       });
     } else {
-      theme.presetId = dto.presetId;
+      theme.presetId = resolvedPresetId;
       theme.logoUrl = dto.logoUrl;
     }
 

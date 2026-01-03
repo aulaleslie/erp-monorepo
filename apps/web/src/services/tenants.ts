@@ -15,6 +15,13 @@ export interface TenantTaxMapping {
   };
 }
 
+export interface TenantTheme {
+  id: string;
+  tenantId: string;
+  presetId: string;
+  logoUrl?: string;
+}
+
 export interface Tenant {
   id: string;
   name: string;
@@ -23,6 +30,7 @@ export interface Tenant {
   type: TenantType;
   isTaxable: boolean;
   taxes?: TenantTaxMapping[];
+  theme?: TenantTheme[];
   createdAt: string;
   updatedAt: string;
 }
@@ -33,6 +41,7 @@ export interface CreateTenantDto {
   type: TenantType;
   isTaxable?: boolean;
   taxIds?: string[];
+  themePresetId?: string;
 }
 
 export interface UpdateTenantDto {
@@ -42,6 +51,7 @@ export interface UpdateTenantDto {
   type?: TenantType;
   isTaxable?: boolean;
   taxIds?: string[];
+  themePresetId?: string;
 }
 
 export const tenantsService = {

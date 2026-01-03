@@ -1,9 +1,9 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
-import { THEME_PRESETS, ThemeVariant } from "@gym-monorepo/shared";
-import { api } from "@/lib/api";
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
+import { THEME_PRESETS, ThemeVariant, ThemeColorSet } from "@gym-monorepo/shared";
 import { useAuth } from "@/contexts/AuthContext";
+import { getTenantThemeSettings, updateTenantThemeSettings } from "@/lib/api/tenant-settings";
 
 interface TenantTheme {
   presetId: string;
@@ -15,10 +15,51 @@ interface ThemeContextType {
   theme: TenantTheme | null;
   isLoading: boolean;
   updateTheme: (presetId: string, logoUrl?: string) => Promise<void>;
-  applyThemeColors: (variant: "light" | "dark") => void;
+  applyThemePreview: (colors: ThemeColorSet) => void;
+  refreshTheme: () => Promise<void>;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+// CSS variable mapping for theme colors
+const COLOR_MAPPING: Record<string, string> = {
+  primary: '--primary',
+  primaryForeground: '--primary-foreground',
+  secondary: '--secondary',
+  secondaryForeground: '--secondary-foreground',
+  accent: '--accent',
+  accentForeground: '--accent-foreground',
+  muted: '--muted',
+  mutedForeground: '--muted-foreground',
+  destructive: '--destructive',
+  destructiveForeground: '--destructive-foreground',
+  border: '--border',
+  background: '--background',
+  foreground: '--foreground',
+  card: '--card',
+  cardForeground: '--card-foreground',
+  popover: '--popover',
+  popoverForeground: '--popover-foreground',
+  input: '--input',
+  ring: '--ring',
+  sidebar: '--sidebar',
+  sidebarForeground: '--sidebar-foreground',
+  sidebarAccent: '--sidebar-accent',
+  sidebarAccentForeground: '--sidebar-accent-foreground',
+  sidebarBorder: '--sidebar-border',
+};
+
+// Apply theme colors to CSS variables
+const applyCssVariables = (colors: ThemeColorSet) => {
+  const root = document.documentElement;
+  
+  Object.entries(COLOR_MAPPING).forEach(([key, cssVar]) => {
+    const colorKey = key as keyof ThemeColorSet;
+    if (colors[colorKey]) {
+      root.style.setProperty(cssVar, colors[colorKey]);
+    }
+  });
+};
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -26,56 +67,66 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   const { activeTenant } = useAuth();
   const [theme, setTheme] = useState<TenantTheme | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const lastFetchedTenantId = useRef<string | null>(null);
 
-  // Apply CSS variables to the document root
-  const applyThemeColors = useCallback((variant: "light" | "dark") => {
-    if (!theme) return;
-
-    const colors = theme.colors[variant];
-    const root = document.documentElement;
-
-    // Apply all color variables
-    Object.entries(colors).forEach(([key, value]) => {
-      const cssVarName = `--${key.replace(/([A-Z])/g, "-$1").toLowerCase()}`;
-      root.style.setProperty(cssVarName, value);
-    });
-  }, [theme]);
-
-  // Fetch theme settings when active tenant changes
-  useEffect(() => {
+  // Function to fetch theme - extracted for reuse
+  const fetchTheme = useCallback(async () => {
     if (!activeTenant?.id) {
       setTheme(null);
       setIsLoading(false);
       return;
     }
 
-    const fetchTheme = async () => {
-      setIsLoading(true);
-      try {
-        const response = await api.get<TenantTheme>(
-          "/tenant-settings/theme"
-        );
-        setTheme(response.data);
+    setIsLoading(true);
+    try {
+      const response = await getTenantThemeSettings();
+      const themeData = response.data;
+      setTheme(themeData);
 
-        // Apply light mode by default (can be enhanced to detect system preference)
-        // Use a setTimeout to ensure DOM is ready
-        setTimeout(() => {
-          applyThemeColors("light");
-        }, 0);
-      } catch (error) {
-        console.error("Failed to fetch theme settings:", error);
-        // Fall back to default theme
-        setTheme({
-          presetId: "corporate-blue",
-          colors: THEME_PRESETS["corporate-blue"].colors,
-        });
-      } finally {
-        setIsLoading(false);
+      // Apply light mode theme
+      if (themeData?.colors?.light) {
+        applyCssVariables(themeData.colors.light);
       }
-    };
+    } catch (error) {
+      console.error("Failed to fetch theme settings:", error);
+      // Fall back to default theme
+      const defaultPresetId = "corporate-blue";
+      const defaultPreset = THEME_PRESETS[defaultPresetId];
+      
+      if (defaultPreset) {
+        setTheme({
+          presetId: defaultPresetId,
+          colors: defaultPreset.colors,
+        });
+        applyCssVariables(defaultPreset.colors.light);
+      } else {
+        setTheme(null);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [activeTenant?.id]);
 
+  // Fetch theme settings when active tenant changes
+  useEffect(() => {
+    // Only fetch if tenant actually changed
+    if (lastFetchedTenantId.current === activeTenant?.id) {
+      return;
+    }
+    
+    lastFetchedTenantId.current = activeTenant?.id ?? null;
     fetchTheme();
-  }, [activeTenant?.id, applyThemeColors]);
+  }, [activeTenant?.id, fetchTheme]);
+
+  // Apply theme preview without saving
+  const applyThemePreview = useCallback((colors: ThemeColorSet) => {
+    applyCssVariables(colors);
+  }, []);
+
+  // Refresh theme from server
+  const refreshTheme = useCallback(async () => {
+    await fetchTheme();
+  }, [fetchTheme]);
 
   const updateTheme = useCallback(
     async (presetId: string, logoUrl?: string) => {
@@ -84,7 +135,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       try {
-        await api.put("/tenant-settings/theme", {
+        await updateTenantThemeSettings({
           presetId,
           logoUrl,
         });
@@ -92,25 +143,24 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
         // Update local state
         const preset = THEME_PRESETS[presetId];
         if (preset) {
-          setTheme({
+          const newTheme = {
             presetId,
             colors: preset.colors,
             logoUrl,
-          });
-
-          // Apply the new theme colors
-          applyThemeColors("light");
+          };
+          setTheme(newTheme);
+          applyCssVariables(preset.colors.light);
         }
       } catch (error) {
         console.error("Failed to update theme settings:", error);
         throw error;
       }
     },
-    [activeTenant?.id, applyThemeColors]
+    [activeTenant?.id]
   );
 
   return (
-    <ThemeContext.Provider value={{ theme, isLoading, updateTheme, applyThemeColors }}>
+    <ThemeContext.Provider value={{ theme, isLoading, updateTheme, applyThemePreview, refreshTheme }}>
       {children}
     </ThemeContext.Provider>
   );

@@ -10,6 +10,7 @@ import { TenantUsersController } from './tenant-users.controller';
 import { TenantUsersService } from './tenant-users.service';
 import { TenantEntity } from '../../database/entities/tenant.entity';
 import { TenantUserEntity } from '../../database/entities/tenant-user.entity';
+import { TenantThemeEntity } from '../../database/entities/tenant-theme.entity';
 import { UserEntity } from '../../database/entities/user.entity';
 import { RoleEntity } from '../../database/entities/role.entity';
 import { RolePermissionEntity } from '../../database/entities/role-permission.entity';
@@ -25,6 +26,7 @@ import { TenantMembershipGuard } from './guards/tenant-membership.guard';
     TypeOrmModule.forFeature([
       TenantEntity,
       TenantUserEntity,
+      TenantThemeEntity,
       UserEntity,
       RoleEntity,
       RolePermissionEntity,

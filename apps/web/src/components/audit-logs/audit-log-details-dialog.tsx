@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -28,6 +29,9 @@ export function AuditLogDetailsDialog({
       <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Change Details - {log.action} {log.entityName}</DialogTitle>
+          <DialogDescription>
+            Detailed information about the changes made to this record.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">

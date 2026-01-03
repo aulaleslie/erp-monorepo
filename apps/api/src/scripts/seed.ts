@@ -1,10 +1,10 @@
 import * as bcrypt from 'bcrypt';
 import { AppDataSource } from '../../typeorm-datasource';
 import { PermissionEntity } from '../database/entities/permission.entity';
-import { RolePermissionEntity } from '../database/entities/role-permission.entity';
 import { RoleEntity } from '../database/entities/role.entity';
 import { TenantUserEntity } from '../database/entities/tenant-user.entity';
 import { TenantEntity } from '../database/entities/tenant.entity';
+import { TenantThemeEntity } from '../database/entities/tenant-theme.entity';
 import { UserEntity } from '../database/entities/user.entity';
 import { permissionsData } from './seeds/permissions';
 import { TenantType } from '@gym-monorepo/shared';
@@ -18,14 +18,12 @@ async function seed() {
   console.log('Seeding Permissions...');
 
   const permissionRepo = AppDataSource.getRepository(PermissionEntity);
-  const allPermissions: PermissionEntity[] = [];
 
   for (const perm of permissionsData) {
-    let permission = await permissionRepo.findOneBy({ code: perm.code });
+    const permission = await permissionRepo.findOneBy({ code: perm.code });
     if (!permission) {
-      permission = await permissionRepo.save(permissionRepo.create(perm));
+      await permissionRepo.save(permissionRepo.create(perm));
     }
-    allPermissions.push(permission);
   }
 
   // 2. Seed Tenants
@@ -68,7 +66,7 @@ async function seed() {
   console.log('Seeding Roles and Assigning to Admin...');
   const roleRepo = AppDataSource.getRepository(RoleEntity);
   const tenantUserRepo = AppDataSource.getRepository(TenantUserEntity);
-  const rolePermissionRepo = AppDataSource.getRepository(RolePermissionEntity);
+  const tenantThemeRepo = AppDataSource.getRepository(TenantThemeEntity);
 
   for (const tenant of createdTenants) {
     let adminRole = await roleRepo.findOne({
@@ -85,23 +83,6 @@ async function seed() {
       );
     }
 
-    // Assign all permissions to Super Admin Role (Ensuring they are linked)
-    for (const perm of allPermissions) {
-      const exists = await rolePermissionRepo.findOneBy({
-        roleId: adminRole.id,
-        permissionId: perm.id,
-      });
-
-      if (!exists) {
-        await rolePermissionRepo.save(
-          rolePermissionRepo.create({
-            roleId: adminRole.id,
-            permissionId: perm.id,
-          }),
-        );
-      }
-    }
-
     // Assign Admin User to this Tenant with this Role
     const tenantUser = await tenantUserRepo.findOneBy({
       tenantId: tenant.id,
@@ -114,6 +95,19 @@ async function seed() {
           tenantId: tenant.id,
           userId: adminUser.id,
           roleId: adminRole.id,
+        }),
+      );
+    }
+
+    // Create default theme for the tenant
+    const existingTheme = await tenantThemeRepo.findOneBy({
+      tenantId: tenant.id,
+    });
+    if (!existingTheme) {
+      await tenantThemeRepo.save(
+        tenantThemeRepo.create({
+          tenantId: tenant.id,
+          presetId: 'corporate-blue',
         }),
       );
     }

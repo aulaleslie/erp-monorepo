@@ -2,6 +2,7 @@
 
 import { PageHeader } from "@/components/common/PageHeader";
 import { SearchableSelect } from "@/components/common/SearchableSelect";
+import { ThemeSelector } from "@/components/common/ThemeSelector";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +40,7 @@ export default function EditTenantPage() {
         type: TenantType.GYM,
         isTaxable: false,
         taxIds: [],
+        themePresetId: "corporate-blue",
     });
     const [errors, setErrors] = useState<Record<string, string | string[]>>({});
 
@@ -58,12 +60,14 @@ export default function EditTenantPage() {
                     ? data.taxes?.find((tax) => tax.isDefault) || data.taxes?.[0]
                     : undefined;
                 const defaultTaxId = defaultTax?.taxId || "";
+                const currentThemePresetId = data.theme?.[0]?.presetId || "corporate-blue";
                 setFormData({
                     name: data.name,
                     slug: data.slug,
                     type: data.type,
                     isTaxable: data.isTaxable,
                     taxIds: defaultTaxId ? [defaultTaxId] : [],
+                    themePresetId: currentThemePresetId,
                 });
                 setInitialTaxLabel(defaultTax ? formatTaxLabel(defaultTax) : "");
             } catch (error) {
@@ -278,6 +282,19 @@ export default function EditTenantPage() {
                             </p>
                         </div>
                     )}
+
+                    {/* Theme Selection */}
+                    <div className="pt-4 border-t">
+                        <ThemeSelector
+                            value={formData.themePresetId || "corporate-blue"}
+                            onChange={(presetId) => {
+                                setFormData({ ...formData, themePresetId: presetId });
+                            }}
+                            disabled={saving}
+                            label="Theme"
+                            description="Select a color theme for this tenant. The preview applies immediately."
+                        />
+                    </div>
                 </div>
 
                 {errors.form && (

@@ -28,11 +28,15 @@ export class CreateTenantDto {
   @IsBoolean()
   isTaxable?: boolean;
 
-  @ValidateIf((obj) => obj.isTaxable === true)
+  @ValidateIf((obj: { isTaxable?: boolean }) => obj.isTaxable === true)
   @IsArray({ message: 'Tax selection is required for taxable tenants' })
   @ArrayNotEmpty({ message: 'Tax selection is required for taxable tenants' })
   @IsUUID('4', { each: true, message: 'Each tax must be a valid UUID' })
   taxIds?: string[];
+
+  @IsOptional()
+  @IsString({ message: 'Theme preset ID must be a string' })
+  themePresetId?: string;
 }
 
 export class UpdateTenantDto {
@@ -62,4 +66,8 @@ export class UpdateTenantDto {
   @IsArray()
   @IsUUID('4', { each: true })
   taxIds?: string[];
+
+  @IsOptional()
+  @IsString({ message: 'Theme preset ID must be a string' })
+  themePresetId?: string;
 }

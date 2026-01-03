@@ -1,5 +1,5 @@
 import { api } from '../api';
-import { TenantType } from '@gym-monorepo/shared';
+import { TenantType, ThemeVariant } from '@gym-monorepo/shared';
 import { TaxType } from './taxes';
 
 export interface TenantTaxSettingItem {
@@ -26,6 +26,13 @@ export interface TenantTaxMapping {
   isDefault: boolean;
 }
 
+export interface TenantThemeMapping {
+  id: string;
+  tenantId: string;
+  presetId: string;
+  logoUrl?: string;
+}
+
 export interface TenantProfileSettings {
   id: string;
   name: string;
@@ -34,6 +41,7 @@ export interface TenantProfileSettings {
   type: TenantType;
   isTaxable: boolean;
   taxes?: TenantTaxMapping[];
+  theme?: TenantThemeMapping[];
   createdAt: string;
   updatedAt: string;
 }
@@ -49,6 +57,7 @@ export interface UpdateTenantProfileSettingsDto {
   type?: TenantType;
   isTaxable?: boolean;
   taxIds?: string[];
+  themePresetId?: string;
 }
 
 export const getTenantProfileSettings = async () => {
@@ -67,4 +76,25 @@ export const getTenantTaxSettings = async () => {
 
 export const updateTenantTaxSettings = async (data: UpdateTenantTaxSettingsDto) => {
   return api.put<TenantTaxSettings>('/tenant-settings/tax', data);
+};
+
+export interface TenantThemeSettings {
+  presetId: string;
+  colors: ThemeVariant;
+  logoUrl?: string;
+}
+
+export interface UpdateTenantThemeSettingsDto {
+  presetId: string;
+  logoUrl?: string;
+}
+
+export const getTenantThemeSettings = async () => {
+  return api.get<TenantThemeSettings>('/tenant-settings/theme');
+};
+
+export const updateTenantThemeSettings = async (
+  data: UpdateTenantThemeSettingsDto,
+) => {
+  return api.put<void>('/tenant-settings/theme', data);
 };
