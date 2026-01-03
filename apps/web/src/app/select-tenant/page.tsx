@@ -15,12 +15,51 @@ interface Tenant {
     slug: string;
 }
 
+interface UserTenant {
+    tenant: Tenant;
+    role: { id: string; name: string; isSuperAdmin: boolean } | null;
+}
+
 export default function SelectTenantPage() {
     const [tenants, setTenants] = useState<Tenant[]>([]);
     const [loading, setLoading] = useState(true);
     const { refreshAuth } = useAuth();
     const router = useRouter();
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
+
+    const normalizeTenants = (data: unknown): Tenant[] => {
+        if (!Array.isArray(data)) return [];
+
+        return data
+            .map((item) => {
+                if (!item || typeof item !== "object") return null;
+
+                if ("tenant" in item) {
+                    const tenant = (item as UserTenant).tenant;
+                    if (tenant?.id) {
+                        return {
+                            id: tenant.id,
+                            name: tenant.name,
+                            slug: tenant.slug,
+                        };
+                    }
+                }
+
+                if ("id" in item) {
+                    const tenant = item as Tenant;
+                    if (tenant?.id) {
+                        return {
+                            id: tenant.id,
+                            name: tenant.name,
+                            slug: tenant.slug,
+                        };
+                    }
+                }
+
+                return null;
+            })
+            .filter((tenant): tenant is Tenant => tenant !== null);
+    };
 
     useEffect(() => {
         const fetchTenants = async () => {
@@ -38,7 +77,7 @@ export default function SelectTenantPage() {
                 }
                 if (res.ok) {
                     const responseData = await res.json();
-                    const tenantList = responseData.data || [];
+                    const tenantList = normalizeTenants(responseData.data);
 
                     // If user has no tenants, redirect to dashboard directly
                     if (tenantList.length === 0) {
