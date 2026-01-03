@@ -7,7 +7,7 @@ Future agents have to deliver work that feels like a natural continuation of the
 - `docs/CYCLE_0.md` (locked decisions, pnpm setup, Docker-compose baseline, shared DTO expectations).
 - `docs/CYCLE_1.md` (Cycle 1 domain model, migrations order, seed data, authentication and permission endpoints).
 - `docs/CYCLE_2.md` (tenant flags, platform taxes, tenant tax settings, and related permissions/guards).
-- `docs/TASK_MIGRATE_UI.md` (Tailwind + shadcn UI guide, app shell expectations, menu permissions, component list, and cycle-1 page targets).
+- UI migration guidance now lives in Cycle 1/2 (Tailwind + shadcn UI guide, app shell expectations, menu permissions, component list, and cycle-1 page targets).
 
 Always cite the relevant section of these docs when you describe your plan or justify an implementation in your response.
 
@@ -33,7 +33,7 @@ Always cite the relevant section of these docs when you describe your plan or ju
 
 ## Key conventions
 - Auth/permission hooks (`useAuth`, `useMe`, `usePermissions`, `useActiveTenant`) should live in `apps/web/src/contexts` or `src/hooks`, expose `can()`/`canAny()` helpers, and be the single source for guarding UI and sidebar routes.
-- Sidebar/menu configuration and permission checks should be centralized in one file so toggling items is simple (per `docs/TASK_MIGRATE_UI.md: section E`).
+- Sidebar/menu configuration and permission checks should be centralized in one file so toggling items is simple (per `docs/CYCLE_1.md: section 9.5`).
 - Entities, migrations, and seeds must follow the Cycle 1 schema order (`users`, `tenants`, `permissions`, `roles`, `role_permissions`, `tenant_users`) with enforced foreign keys; always add migrations via the TypeORM CLI rather than manual SQL.
 - JWTs for auth stay in HttpOnly cookies, tenant selection/state is stored via `active_tenant` cookie as described in `docs/CYCLE_1.md`.
 - PRs should reference the relevant docs section numbers when possible and confirm that `pnpm lint`, `pnpm --filter web test`, and `pnpm --filter api test` pass unless explained.

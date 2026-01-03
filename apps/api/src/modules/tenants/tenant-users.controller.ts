@@ -76,7 +76,11 @@ export class TenantUsersController {
     @Body()
     body: { email: string; fullName?: string; roleId?: string; password: string },
   ) {
-    return this.tenantUsersService.create(req.tenantId, body);
+    return this.tenantUsersService.create(
+      req.tenantId,
+      body,
+      req.user?.isSuperAdmin === true,
+    );
   }
 
   @Post('invite')
@@ -85,7 +89,11 @@ export class TenantUsersController {
     @Req() req: any,
     @Body() body: { userId: string; roleId: string },
   ) {
-    return this.tenantUsersService.inviteExistingUser(req.tenantId, body);
+    return this.tenantUsersService.inviteExistingUser(
+      req.tenantId,
+      body,
+      req.user?.isSuperAdmin === true,
+    );
   }
 
   @Put(':userId')
@@ -101,7 +109,12 @@ export class TenantUsersController {
       roleId?: string | null;
     },
   ) {
-    return this.tenantUsersService.updateUser(req.tenantId, userId, body);
+    return this.tenantUsersService.updateUser(
+      req.tenantId,
+      userId,
+      body,
+      req.user?.isSuperAdmin === true,
+    );
   }
 
   @Put(':userId/role')
@@ -109,12 +122,13 @@ export class TenantUsersController {
   async updateRole(
     @Req() req: any,
     @Param('userId') userId: string,
-    @Body() body: { roleId: string },
+    @Body() body: { roleId: string | null },
   ) {
     return this.tenantUsersService.updateRole(
       req.tenantId,
       userId,
       body.roleId,
+      req.user?.isSuperAdmin === true,
     );
   }
 

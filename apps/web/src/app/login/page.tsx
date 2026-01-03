@@ -80,7 +80,6 @@ export default function LoginPage() {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="admin@gym.com"
                                 required
                             />
                         </div>
@@ -91,7 +90,6 @@ export default function LoginPage() {
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                placeholder="••••••••"
                                 required
                             />
                         </div>

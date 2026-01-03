@@ -22,7 +22,8 @@
     "typeorm": "typeorm-ts-node-commonjs",
     "migration:generate": "typeorm-ts-node-commonjs migration:generate -d typeorm-datasource.ts",
     "migration:run": "typeorm-ts-node-commonjs migration:run -d typeorm-datasource.ts",
-    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d typeorm-datasource.ts"
+    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d typeorm-datasource.ts",
+    "db:fresh": "pnpm typeorm schema:drop -d typeorm-datasource.ts && pnpm migration:run && pnpm exec ts-node src/scripts/seed.ts"
   },
   "dependencies": {
     "@fastify/cookie": "^11.0.2",

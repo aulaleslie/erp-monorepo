@@ -8,6 +8,7 @@
 - **Migrations:** enabled from day one
 - **Auth:** email + password (local)
 - **Tenant UX:** tenant dropdown after login
+- **Platform settings scope:** platform-level Settings pages are not tenant-scoped; tenant settings rely on the active tenant (see Cycle 1/2).
 - **Node:** 22.x (v22.14.0 OK)
 - **Dev workflow:** FE + BE run separately, DB via Docker
 - **Prod-like workflow:** `docker compose up` runs everything
@@ -139,3 +140,6 @@ Services:
 - `pnpm dev` (FE on `localhost:3000`, BE on `localhost:3001`, health endpoint works)
 - `docker compose up --build` (apps run inside containers, DB connection succeeds)
 - `.env.example` committed, `.env` excluded
+
+## 0.10 Documentation hygiene
+- UI migration guidance is tracked in Cycle 1/2 specs; `docs/TASK_MIGRATE_UI.md` is deprecated and should not be referenced.

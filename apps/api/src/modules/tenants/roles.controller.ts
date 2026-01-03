@@ -11,6 +11,7 @@ import {
   HttpCode,
   HttpStatus,
   BadRequestException,
+  ForbiddenException,
   Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -65,6 +66,9 @@ export class RolesController {
     @Body()
     body: { name: string; isSuperAdmin?: boolean; permissions?: string[] },
   ) {
+    if (body.isSuperAdmin && !req.user?.isSuperAdmin) {
+      throw new ForbiddenException('Only Super Admins can create Super Admin roles');
+    }
     if (
       (!body.permissions || body.permissions.length === 0) &&
       !body.isSuperAdmin

@@ -2,12 +2,14 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent } from '@/components/ui/card';
 import { api } from '@/lib/api';
 import { format } from 'date-fns';
 import { DataTable, Column } from '@/components/common/DataTable';
 import { usePagination } from '@/hooks/use-pagination';
 import { Badge } from '@/components/ui/badge';
+import { usePermissions } from '@/hooks/use-permissions';
 
 interface AuditLog {
     id: string;
@@ -24,10 +26,15 @@ export default function AuditLogsPage() {
     const [logs, setLogs] = useState<AuditLog[]>([]);
     const [loading, setLoading] = useState(true);
     const pagination = usePagination({ initialLimit: 20 });
+    const { isSuperAdmin } = usePermissions();
 
     useEffect(() => {
+        if (!isSuperAdmin) {
+            setLoading(false);
+            return;
+        }
         fetchLogs();
-    }, [pagination.page]);
+    }, [pagination.page, isSuperAdmin]);
 
     const fetchLogs = async () => {
         setLoading(true);
@@ -92,6 +99,14 @@ export default function AuditLogsPage() {
             ),
         },
     ], []);
+
+    if (!isSuperAdmin) {
+        return (
+            <Alert variant="destructive">
+                <AlertDescription>You do not have permission to view audit logs.</AlertDescription>
+            </Alert>
+        );
+    }
 
     return (
         <div className="space-y-6">

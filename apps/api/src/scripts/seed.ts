@@ -6,6 +6,7 @@ import { RoleEntity } from '../database/entities/role.entity';
 import { TenantUserEntity } from '../database/entities/tenant-user.entity';
 import { TenantEntity } from '../database/entities/tenant.entity';
 import { UserEntity } from '../database/entities/user.entity';
+import { permissionsData } from './seeds/permissions';
 
 async function seed() {
   console.log('Initializing Data Source...');
@@ -14,33 +15,6 @@ async function seed() {
 
   // 1. Seed Permissions
   console.log('Seeding Permissions...');
-  const permissionsData = [
-    { code: 'roles.read', name: 'Read Roles', group: 'Settings' },
-    { code: 'roles.create', name: 'Create Roles', group: 'Settings' },
-    { code: 'roles.update', name: 'Update Roles', group: 'Settings' },
-    { code: 'roles.delete', name: 'Delete Roles', group: 'Settings' },
-    { code: 'users.read', name: 'Read Users', group: 'Users' },
-    { code: 'users.create', name: 'Create Users', group: 'Users' },
-    { code: 'users.update', name: 'Update Users', group: 'Users' },
-    { code: 'users.assignRole', name: 'Assign Role', group: 'Users' },
-    { code: 'users.delete', name: 'Delete Users', group: 'Users' },
-    { code: 'tenants.create', name: 'Create Tenants', group: 'Platform' },
-    // Cycle 2 Permissions
-    {
-      code: 'tenantSettings.tax.read',
-      name: 'Read Tax Settings',
-      group: 'Settings',
-    },
-    {
-      code: 'tenantSettings.tax.update',
-      name: 'Update Tax Settings',
-      group: 'Settings',
-    },
-    { code: 'taxes.read', name: 'Read Platform Taxes', group: 'Platform' },
-    { code: 'taxes.create', name: 'Create Platform Taxes', group: 'Platform' },
-    { code: 'taxes.update', name: 'Update Platform Taxes', group: 'Platform' },
-    { code: 'taxes.delete', name: 'Delete Platform Taxes', group: 'Platform' },
-  ];
 
   const permissionRepo = AppDataSource.getRepository(PermissionEntity);
   const allPermissions: PermissionEntity[] = [];

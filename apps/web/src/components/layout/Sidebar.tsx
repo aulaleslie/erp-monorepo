@@ -25,7 +25,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { usePermissions, useActiveTenant } from "@/hooks/use-permissions";
+import { usePermissions } from "@/hooks/use-permissions";
 
 interface SidebarItem {
     label: string;
@@ -33,7 +33,6 @@ interface SidebarItem {
     href?: string;
     permissions?: string[];
     superAdminOnly?: boolean;
-    requiresTaxable?: boolean;
     children?: SidebarItem[];
     collapsed?: boolean; // internal use for structure, though config is usually static
 }
@@ -47,6 +46,39 @@ const sidebarConfig: SidebarItem[] = [
     {
         label: 'Settings',
         icon: Settings,
+        children: [
+            {
+                label: 'Tenant',
+                icon: Building,
+                href: '/settings/tenant',
+                permissions: [
+                    'settings.tenant.read',
+                    'settings.tenant.update',
+                ],
+            },
+            {
+                label: 'Tenants',
+                icon: Building,
+                href: '/settings/tenants',
+                superAdminOnly: true,
+            },
+            {
+                label: 'Taxes',
+                icon: Building,
+                href: '/settings/taxes',
+                superAdminOnly: true,
+            },
+            {
+                label: 'Audit Logs',
+                icon: Shield,
+                href: '/settings/audit-logs',
+                superAdminOnly: true,
+            },
+        ],
+    },
+    {
+        label: 'Users',
+        icon: Users,
         children: [
             {
                 label: 'Roles',
@@ -70,35 +102,6 @@ const sidebarConfig: SidebarItem[] = [
                     'users.assignRole',
                 ],
             },
-            {
-                label: 'Tax',
-                icon: Building, // Using Building for now
-                href: '/settings/tax',
-                superAdminOnly: true,
-                requiresTaxable: true,
-            },
-        ],
-    },
-    {
-        label: 'Platform',
-        icon: Building,
-        superAdminOnly: true,
-        children: [
-            {
-                label: 'Tenants',
-                icon: Building,
-                href: '/platform/tenants',
-            },
-            {
-                label: 'Taxes',
-                icon: Building,
-                href: '/platform/taxes',
-            },
-            {
-                label: 'Audit Logs',
-                icon: Shield,
-                href: '/platform/audit-logs',
-            },
         ],
     },
 ];
@@ -107,7 +110,6 @@ export function Sidebar() {
     const [isCollapsed, setIsCollapsed] = React.useState(false);
     const pathname = usePathname();
     const { canAny, isSuperAdmin } = usePermissions();
-    const activeTenant = useActiveTenant();
 
     const toggleSidebar = () => {
         setIsCollapsed(!isCollapsed);
@@ -116,7 +118,6 @@ export function Sidebar() {
 
     const isItemVisible = (item: SidebarItem): boolean => {
         if (item.superAdminOnly && !isSuperAdmin) return false;
-        if (item.requiresTaxable && !activeTenant?.isTaxable) return false;
         if (item.permissions && !canAny(item.permissions)) return false;
         if (item.children) {
             return item.children.some(child => isItemVisible(child));

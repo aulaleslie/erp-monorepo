@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class MakeRoleIdNullable1735086000000 implements MigrationInterface {
-  name = 'MakeRoleIdNullable1735086000000';
+export class MakeRoleIdNullable1766527382662 implements MigrationInterface {
+  name = 'MakeRoleIdNullable1766527382662';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Make roleId column nullable to support users without assigned roles
@@ -19,4 +19,3 @@ export class MakeRoleIdNullable1735086000000 implements MigrationInterface {
     `);
   }
 }
-

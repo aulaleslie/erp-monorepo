@@ -118,7 +118,7 @@ describe('TenantUsersService', () => {
         email: 'new@test.com',
         password: 'password123',
         roleId: 'role-1',
-      });
+      }, false);
 
       expect(result.user!.email).toBe('new@test.com');
       expect(userRepository.save).toHaveBeenCalled();
@@ -129,7 +129,7 @@ describe('TenantUsersService', () => {
       userRepository.findOne!.mockResolvedValue({ id: 'existing', email: 'existing@test.com' });
 
       await expect(
-        service.create('tenant-1', { email: 'existing@test.com', password: 'pass' })
+        service.create('tenant-1', { email: 'existing@test.com', password: 'pass' }, false)
       ).rejects.toThrow(ConflictException);
     });
 
@@ -138,7 +138,7 @@ describe('TenantUsersService', () => {
       roleRepository.findOne!.mockResolvedValue(null);
 
       await expect(
-        service.create('tenant-1', { email: 'new@test.com', password: 'pass', roleId: 'invalid-role' })
+        service.create('tenant-1', { email: 'new@test.com', password: 'pass', roleId: 'invalid-role' }, false)
       ).rejects.toThrow(NotFoundException);
     });
   });
@@ -155,7 +155,7 @@ describe('TenantUsersService', () => {
       tenantUserRepository.create!.mockReturnValue(membership);
       tenantUserRepository.save!.mockResolvedValue(membership);
 
-      const result = await service.inviteExistingUser('tenant-1', { userId: 'user-1', roleId: 'role-1' });
+      const result = await service.inviteExistingUser('tenant-1', { userId: 'user-1', roleId: 'role-1' }, false);
 
       expect(result.user!.email).toBe('existing@test.com');
       expect(tenantUserRepository.save).toHaveBeenCalled();
@@ -165,7 +165,7 @@ describe('TenantUsersService', () => {
       userRepository.findOne!.mockResolvedValue(null);
 
       await expect(
-        service.inviteExistingUser('tenant-1', { userId: 'invalid', roleId: 'role-1' })
+        service.inviteExistingUser('tenant-1', { userId: 'invalid', roleId: 'role-1' }, false)
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -173,7 +173,7 @@ describe('TenantUsersService', () => {
       userRepository.findOne!.mockResolvedValue({ id: 'user-1', isSuperAdmin: true });
 
       await expect(
-        service.inviteExistingUser('tenant-1', { userId: 'user-1', roleId: 'role-1' })
+        service.inviteExistingUser('tenant-1', { userId: 'user-1', roleId: 'role-1' }, false)
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -186,7 +186,7 @@ describe('TenantUsersService', () => {
       tenantUserRepository.findOne!.mockResolvedValue({ id: 'tu-1' }); // Already exists
 
       await expect(
-        service.inviteExistingUser('tenant-1', { userId: 'user-1', roleId: 'role-1' })
+        service.inviteExistingUser('tenant-1', { userId: 'user-1', roleId: 'role-1' }, false)
       ).rejects.toThrow(ConflictException);
     });
   });
@@ -200,7 +200,7 @@ describe('TenantUsersService', () => {
       roleRepository.findOne!.mockResolvedValue(role);
       tenantUserRepository.save!.mockResolvedValue({ ...membership, roleId: 'new-role' });
 
-      await service.updateRole('tenant-1', 'user-1', 'new-role');
+      await service.updateRole('tenant-1', 'user-1', 'new-role', false);
 
       expect(tenantUserRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({ roleId: 'new-role' })
@@ -213,7 +213,7 @@ describe('TenantUsersService', () => {
       tenantUserRepository.findOne!.mockResolvedValue(membership);
       tenantUserRepository.save!.mockResolvedValue({ ...membership, roleId: null });
 
-      await service.updateRole('tenant-1', 'user-1', null);
+      await service.updateRole('tenant-1', 'user-1', null, false);
 
       expect(tenantUserRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({ roleId: null })
@@ -223,7 +223,7 @@ describe('TenantUsersService', () => {
     it('should throw NotFoundException if membership not found', async () => {
       tenantUserRepository.findOne!.mockResolvedValue(null);
 
-      await expect(service.updateRole('tenant-1', 'user-1', 'role-1')).rejects.toThrow(NotFoundException);
+      await expect(service.updateRole('tenant-1', 'user-1', 'role-1', false)).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -260,7 +260,7 @@ describe('TenantUsersService', () => {
       const result = await service.updateUser('tenant-1', 'user-1', {
         fullName: 'New Name',
         roleId: 'role-2',
-      });
+      }, false);
 
       expect(userRepository.save).toHaveBeenCalled();
     });
@@ -276,7 +276,7 @@ describe('TenantUsersService', () => {
         .mockResolvedValueOnce(otherUser); // Second call for email check
 
       await expect(
-        service.updateUser('tenant-1', 'user-1', { email: 'taken@test.com' })
+        service.updateUser('tenant-1', 'user-1', { email: 'taken@test.com' }, false)
       ).rejects.toThrow(ConflictException);
     });
 
@@ -284,7 +284,7 @@ describe('TenantUsersService', () => {
       tenantUserRepository.findOne!.mockResolvedValue(null);
 
       await expect(
-        service.updateUser('tenant-1', 'user-1', { fullName: 'New Name' })
+        service.updateUser('tenant-1', 'user-1', { fullName: 'New Name' }, false)
       ).rejects.toThrow(NotFoundException);
     });
   });

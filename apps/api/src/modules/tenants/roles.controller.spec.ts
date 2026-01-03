@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RolesController } from './roles.controller';
 import { RolesService } from './roles.service';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
 describe('RolesController', () => {
@@ -92,7 +92,7 @@ describe('RolesController', () => {
       (rolesService.create as jest.Mock).mockResolvedValue(newRole);
       (rolesService.assignPermissions as jest.Mock).mockResolvedValue(undefined);
 
-      const mockReq = { tenantId: 'tenant-1' };
+      const mockReq = { tenantId: 'tenant-1', user: { isSuperAdmin: false } };
       const result = await controller.create(mockReq, {
         name: 'New Role',
         permissions: ['users.read'],
@@ -103,7 +103,7 @@ describe('RolesController', () => {
     });
 
     it('should throw BadRequestException if no permissions and not super admin', async () => {
-      const mockReq = { tenantId: 'tenant-1' };
+      const mockReq = { tenantId: 'tenant-1', user: { isSuperAdmin: false } };
 
       await expect(
         controller.create(mockReq, { name: 'New Role', permissions: [] })
@@ -114,13 +114,24 @@ describe('RolesController', () => {
       const newRole = { id: 'role-1', name: 'Super Admin', isSuperAdmin: true };
       (rolesService.create as jest.Mock).mockResolvedValue(newRole);
 
-      const mockReq = { tenantId: 'tenant-1' };
+      const mockReq = { tenantId: 'tenant-1', user: { isSuperAdmin: true } };
       const result = await controller.create(mockReq, {
         name: 'Super Admin',
         isSuperAdmin: true,
       });
 
       expect(result).toEqual(newRole);
+    });
+
+    it('should forbid non-super admin from creating super admin role', async () => {
+      const mockReq = { tenantId: 'tenant-1', user: { isSuperAdmin: false } };
+
+      await expect(
+        controller.create(mockReq, {
+          name: 'Super Admin',
+          isSuperAdmin: true,
+        })
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 

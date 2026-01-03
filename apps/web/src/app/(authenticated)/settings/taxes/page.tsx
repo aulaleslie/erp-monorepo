@@ -5,6 +5,7 @@ import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { DataTable } from "@/components/common/DataTable";
 import { PageHeader } from "@/components/common/PageHeader";
 import { StatusBadge } from "@/components/common/StatusBadge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -23,7 +24,7 @@ import { Plus, Search, Pencil } from "lucide-react";
 import { useEffect, useState } from "react";
 import { TaxFormDialog } from "./tax-form-dialog";
 
-export default function PlatformTaxesPage() {
+export default function TaxesPage() {
     const { isSuperAdmin } = usePermissions();
     const { toast } = useToast();
     const pagination = usePagination();
@@ -60,9 +61,13 @@ export default function PlatformTaxesPage() {
     };
 
     useEffect(() => {
+        if (!isSuperAdmin) {
+            setLoading(false);
+            return;
+        }
         fetchData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pagination.page, pagination.limit, search, statusFilter]);
+    }, [pagination.page, pagination.limit, search, statusFilter, isSuperAdmin]);
 
     const handleDelete = async () => {
         if (!deletingTax) return;
@@ -148,17 +153,17 @@ export default function PlatformTaxesPage() {
 
     if (!isSuperAdmin) {
         return (
-            <div className="flex items-center justify-center h-full text-muted-foreground">
-                Access Denied. Super Admin only.
-            </div>
+            <Alert variant="destructive">
+                <AlertDescription>Only Super Admins can manage taxes.</AlertDescription>
+            </Alert>
         );
     }
 
     return (
         <div className="space-y-6">
             <PageHeader
-                title="Platform Taxes"
-                description="Manage system-wide tax rates and configurations."
+                title="Taxes"
+                description="Manage platform taxes."
             >
                 <Button onClick={() => setIsCreateOpen(true)}>
                     <Plus className="mr-2 h-4 w-4" />

@@ -148,7 +148,7 @@ export default function TenantDetailPage() {
                 </div>
                 <div className="flex gap-2">
                     <Button asChild>
-                        <Link href={`/platform/tenants/${tenantId}/edit`}>
+                        <Link href={`/settings/tenants/${tenantId}/edit`}>
                             <Pencil className="mr-2 h-4 w-4" /> Edit
                         </Link>
                     </Button>

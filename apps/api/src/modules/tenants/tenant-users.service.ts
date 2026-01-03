@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   ConflictException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
@@ -97,6 +98,7 @@ export class TenantUsersService {
   async create(
     tenantId: string,
     data: { email: string; fullName?: string; roleId?: string; password: string },
+    actorIsSuperAdmin: boolean,
   ): Promise<TenantUserResponseDto> {
     // Check if user already exists
     let user = await this.userRepository.findOne({
@@ -115,6 +117,9 @@ export class TenantUsersService {
       });
       if (!role) {
         throw new NotFoundException('Role not found in this tenant');
+      }
+      if (role.isSuperAdmin && !actorIsSuperAdmin) {
+        throw new ForbiddenException('Only Super Admins can assign Super Admin roles');
       }
     }
 
@@ -143,6 +148,7 @@ export class TenantUsersService {
   async inviteExistingUser(
     tenantId: string,
     data: { userId: string; roleId: string },
+    actorIsSuperAdmin: boolean,
   ): Promise<TenantUserResponseDto> {
     // Find user by ID
     const user = await this.userRepository.findOne({
@@ -163,6 +169,9 @@ export class TenantUsersService {
     });
     if (!role) {
       throw new NotFoundException('Role not found in this tenant');
+    }
+    if (role.isSuperAdmin && !actorIsSuperAdmin) {
+      throw new ForbiddenException('Only Super Admins can assign Super Admin roles');
     }
 
     // Check if already in tenant
@@ -190,6 +199,7 @@ export class TenantUsersService {
     tenantId: string,
     userId: string,
     roleId: string | null,
+    actorIsSuperAdmin: boolean,
   ): Promise<void> {
     // Check membership
     const membership = await this.tenantUserRepository.findOne({
@@ -207,6 +217,9 @@ export class TenantUsersService {
       });
       if (!role) {
         throw new NotFoundException('Role not found in this tenant');
+      }
+      if (role.isSuperAdmin && !actorIsSuperAdmin) {
+        throw new ForbiddenException('Only Super Admins can assign Super Admin roles');
       }
     }
 
@@ -236,6 +249,7 @@ export class TenantUsersService {
       password?: string;
       roleId?: string | null;
     },
+    actorIsSuperAdmin: boolean,
   ): Promise<TenantUserResponseDto> {
     // Check membership
     const membership = await this.tenantUserRepository.findOne({
@@ -289,6 +303,9 @@ export class TenantUsersService {
         });
         if (!role) {
           throw new NotFoundException('Role not found in this tenant');
+        }
+        if (role.isSuperAdmin && !actorIsSuperAdmin) {
+          throw new ForbiddenException('Only Super Admins can assign Super Admin roles');
         }
       }
       membership.roleId = data.roleId === null ? null : data.roleId;

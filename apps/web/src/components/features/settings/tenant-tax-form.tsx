@@ -50,7 +50,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export function TenantTaxForm() {
     const activeTenant = useActiveTenant();
-    const { isSuperAdmin } = usePermissions();
+    const { isSuperAdmin, can } = usePermissions();
     const { toast } = useToast();
 
     const [loading, setLoading] = useState(true);
@@ -142,6 +142,9 @@ export function TenantTaxForm() {
     };
 
     const onSubmit = async (data: FormValues) => {
+        if (!canEdit) {
+            return;
+        }
         try {
             setSaving(true);
             await updateTenantTaxSettings({
@@ -185,7 +188,7 @@ export function TenantTaxForm() {
         );
     }
 
-    const canEdit = isSuperAdmin;
+    const canEdit = isSuperAdmin || can("settings.tenant.update");
 
     // Filter available taxes to only selected ones for the default tax dropdown
     const selectedTaxesList = availableTaxes.filter(t => selectedTaxIds.includes(t.id));

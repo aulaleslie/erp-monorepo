@@ -80,7 +80,7 @@ DoD:
 - FK constraints ok.
 - Entity created.
 
-### C2-BE-05 - Tenant tax settings API (tenant-scoped, super-admin-only)
+### C2-BE-05 - Tenant tax settings API (tenant-scoped, tenant-admin enabled)
 
 Scope:
 - Module: `src/tenant-settings/tax`
@@ -97,7 +97,7 @@ Scope:
   - `AuthGuard`
   - `ActiveTenantGuard`
   - `TenantMembershipGuard`
-  - `SuperAdminGuard`
+  - `PermissionGuard` with `settings.tenant.read`/`settings.tenant.update`
 - Rules:
   - If `tenant.isTaxable=false`, PUT returns 409 (or 400) `TENANT_NOT_TAXABLE`.
   - Only `ACTIVE` taxes can be selected.
@@ -112,24 +112,15 @@ DoD:
 - Default tax logic correct.
 - Audit logs reflect changes (mapping changes ok).
 
-### C2-BE-06 - Seed permissions for Cycle 2
+### C2-BE-06 - Permissions note (Cycle 2)
 
 Scope:
-- Seed permission codes:
-  - `tenantSettings.tax.read`
-  - `tenantSettings.tax.update`
-  - (Seeded for future delegation; tax settings are super-admin-only in this cycle)
-  - Optional for future-only, not enforced now:
-    - `taxes.read`
-    - `taxes.create`
-    - `taxes.update`
-    - `taxes.delete`
-- Assign these permissions to your tenant super admin role or manager role.
+- No new tax-specific permissions are required.
+- Tenant tax settings are governed by `settings.tenant.read`/`settings.tenant.update`.
+- Platform tax CRUD remains Super Admin only.
 
 DoD:
-- Seed runs idempotently.
-- Permissions appear in `/permissions`.
-- Role assignment works for future delegation (not enforced in UI for tax settings).
+- Existing permission seeds cover tenant tax settings access.
 
 ## Frontend Tickets (apps/web)
 
@@ -147,23 +138,28 @@ DoD:
 - No TS errors.
 - Switching tenant updates flags correctly.
 
-### C2-FE-02 - Sidebar updates with tenant capability gating
+### C2-FE-02 - Sidebar updates with Settings/Users structure
 
 Scope:
-- Add Platform -> Taxes menu item:
-  - visible only if `user.isSuperAdmin`
-- Add Settings -> Tax menu item:
-  - visible only if `user.isSuperAdmin`
-  - and `activeTenant.isTaxable === true`
+- Replace the Platform group with Settings + Users groups.
+- Settings menu items:
+  - Tenant (`/settings/tenant`): visible to Super Admins or users with `settings.tenant.read`/`settings.tenant.update`.
+  - Tenants (`/settings/tenants`): Super Admin only.
+  - Taxes (`/settings/taxes`): Super Admin only.
+  - Audit Logs (`/settings/audit-logs`): Super Admin only.
+- Users menu items:
+  - Roles (tenant-scoped).
+  - Users (tenant-scoped).
+- Do not gate Settings visibility by active tenant flags; the Taxes menu stays visible for Super Admins even when `activeTenant.isTaxable` is false.
 
 DoD:
-- Menu items appear/hide correctly based on context.
+- Menu items appear/hide correctly based on context and permissions.
 - Sidebar collapse and tooltips still work.
 
-### C2-FE-03 - Platform taxes screen (DataTable + CRUD)
+### C2-FE-03 - Taxes screen (Platform taxes CRUD)
 
 Scope:
-- Route: `/platform/taxes`
+- Route: `/settings/taxes`
 - UI:
   - Table columns: Name, Code, Type, Rate/Amount, Status, UpdatedAt, Actions
   - Filters: Search + Status
@@ -175,16 +171,17 @@ Scope:
   - Action buttons permission-aware (optional since super admin)
 
 DoD:
-- Full CRUD works end-to-end.
+- Full CRUD works end-to-end on `/settings/taxes`.
 - Disabled taxes show as `INACTIVE`.
 - Toasts + inline server errors show correctly.
 
-### C2-FE-04 - Tenant tax settings screen (multi-select + default)
+### C2-FE-04 - Tenant tax settings section (multi-select + default)
 
 Scope:
-- Route: `/settings/tax`
+- Route: `/settings/tenant`
+- Super Admins can jump to tax configuration from `/settings/tenants` via a "Configure taxes" action that sets the active tenant and routes to `/settings/tenant`.
 - Behavior:
-  - If `!user.isSuperAdmin`:
+  - If user lacks `settings.tenant.read`/`settings.tenant.update`:
     - show a 403/EmptyState and block access
   - If `activeTenant.isTaxable=false`:
     - show informational EmptyState/StatusBadge
@@ -192,11 +189,11 @@ Scope:
     - show "Applicable taxes" multi-select
     - use SearchableSelect (debounced) hitting `/platform/taxes?status=ACTIVE&search=...`
     - show "Default tax" select limited to selected taxes
-    - Save button guarded by super admin
+    - Save button guarded by `settings.tenant.update`
 - Show inline server validation errors.
 
 DoD:
-- Works for taxable and non-taxable tenants.
+- Works for taxable and non-taxable tenants on `/settings/tenant`.
 - Saves selected taxes + default.
 - Reload reflects saved settings.
 
@@ -223,7 +220,8 @@ Scope:
 - Document steps:
   - Super admin creates tax (ACTIVE).
   - Super admin sets tenant `isTaxable` true (via tenant edit).
-  - Tenant settings selects taxes + default.
+  - Tenant tax settings selects taxes + default on `/settings/tenant`.
+  - From `/settings/tenants`, use "Configure taxes" to switch the active tenant and update tax settings.
   - Disable a tax; verify it no longer selectable but remains visible if already selected.
 
 DoD:

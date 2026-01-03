@@ -54,10 +54,9 @@ export class MeController {
       throw new BadRequestException('tenantId is required');
     }
 
-    const hasAccess = await this.tenantsService.validateTenantAccess(
-      req.user.id,
-      tenantId,
-    );
+    const hasAccess = req.user.isSuperAdmin
+      ? true
+      : await this.tenantsService.validateTenantAccess(req.user.id, tenantId);
 
     if (!hasAccess) {
       throw new ForbiddenException('You do not have access to this tenant');
@@ -93,18 +92,23 @@ export class MeController {
       // Let's assume the frontend calls this to populate context.
       return null;
     }
-    
+
     try {
-        // validate access again just in case?
-        // simple read is okay if we trust the cookie + service check
-        // but explicit access check is safer.
-        const hasAccess = await this.tenantsService.validateTenantAccess(req.user.id, tenantId);
+      // validate access again just in case?
+      // simple read is okay if we trust the cookie + service check
+      // but explicit access check is safer.
+      if (!req.user.isSuperAdmin) {
+        const hasAccess = await this.tenantsService.validateTenantAccess(
+          req.user.id,
+          tenantId,
+        );
         if (!hasAccess) {
-           return null;
+          return null;
         }
-        return this.tenantsService.getTenantById(tenantId);
+      }
+      return this.tenantsService.getTenantById(tenantId);
     } catch (e) {
-        return null;
+      return null;
     }
   }
 

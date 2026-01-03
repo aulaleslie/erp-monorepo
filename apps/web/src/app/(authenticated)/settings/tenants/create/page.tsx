@@ -37,7 +37,7 @@ export default function CreateTenantPage() {
                 title: "Success",
                 description: "Tenant created successfully. It is initially disabled.",
             });
-            router.push("/platform/tenants");
+            router.push("/settings/tenants");
         } catch (error: any) {
             const responseData = error.response?.data;
             const errorMessage = responseData?.message || "Failed to create tenant.";

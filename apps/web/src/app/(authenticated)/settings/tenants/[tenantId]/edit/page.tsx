@@ -70,7 +70,7 @@ export default function EditTenantPage() {
                 title: "Success",
                 description: "Tenant updated successfully.",
             });
-            router.push("/platform/tenants");
+            router.push("/settings/tenants");
         } catch (error: any) {
             const responseData = error.response?.data;
             const errorMessage = responseData?.message || "Failed to update tenant.";
