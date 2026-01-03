@@ -56,7 +56,7 @@ export class TenantsService {
   async getTenantById(tenantId: string): Promise<TenantEntity> {
     const tenant = await this.tenantRepository.findOne({
       where: { id: tenantId },
-      relations: ['taxes'],
+      relations: ['taxes', 'taxes.tax'],
     });
     if (!tenant) {
       throw new NotFoundException('Tenant not found');
@@ -114,7 +114,7 @@ export class TenantsService {
     const tenant = this.tenantRepository.create({
       name: data.name,
       slug: data.slug,
-      status: 'DISABLED',
+      status: 'ACTIVE',
       type: data.type ?? TenantType.GYM,
       isTaxable,
     });

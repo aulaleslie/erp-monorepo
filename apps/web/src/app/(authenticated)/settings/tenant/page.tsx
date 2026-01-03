@@ -189,6 +189,12 @@ export default function TenantSettingsPage() {
     }
 
     const statusLabel = tenant.status === "DISABLED" ? "Archived" : "Active";
+    const selectedTax = availableTaxes.find((tax) => tax.id === formData.taxIds?.[0]);
+    const selectedTaxLabel = selectedTax
+        ? selectedTax.code
+            ? `${selectedTax.name} (${selectedTax.code})`
+            : selectedTax.name
+        : "";
 
     return (
         <div className="space-y-6 max-w-2xl">
@@ -299,6 +305,7 @@ export default function TenantSettingsPage() {
                                 }}
                                 placeholder="Select a tax"
                                 searchPlaceholder="Search taxes..."
+                                initialLabel={selectedTaxLabel || undefined}
                                 fetchItems={fetchTaxes}
                                 getItemValue={(tax) => tax.id}
                                 getItemLabel={(tax) => tax.code ? `${tax.name} (${tax.code})` : tax.name}

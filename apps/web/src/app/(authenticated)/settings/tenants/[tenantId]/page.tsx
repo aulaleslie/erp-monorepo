@@ -127,6 +127,16 @@ export default function TenantDetailPage() {
     const statusLabel = tenant.status === 'DISABLED' ? 'Archived' : 'Active';
     const tenantTypeLabel =
         TENANT_TYPE_OPTIONS.find((option) => option.value === tenant.type)?.label ?? tenant.type;
+    const tenantTaxes = tenant.taxes ?? [];
+    const formatTaxLabel = (taxMapping: NonNullable<Tenant["taxes"]>[number]) => {
+        if (taxMapping.tax) {
+            return taxMapping.tax.code
+                ? `${taxMapping.tax.name} (${taxMapping.tax.code})`
+                : taxMapping.tax.name;
+        }
+        return taxMapping.taxId;
+    };
+    const selectedTax = tenantTaxes.find((tax) => tax.isDefault) ?? tenantTaxes[0];
 
     return (
         <div className="space-y-8">
@@ -173,18 +183,21 @@ export default function TenantDetailPage() {
                             <span className="text-muted-foreground">Slug</span>
                             <span className="font-mono">{tenant.slug}</span>
 
-                            <span className="text-muted-foreground">Created At</span>
-                            <span>{new Date(tenant.createdAt).toLocaleString()}</span>
-
-                            <span className="text-muted-foreground">Updated At</span>
-                            <span>{new Date(tenant.updatedAt).toLocaleString()}</span>
-
                             <span className="text-muted-foreground">Taxable</span>
                             <span>
                                 {tenant.isTaxable ? (
                                     <Badge variant="default" className="bg-green-600 hover:bg-green-700">Yes</Badge>
                                 ) : (
                                     <Badge variant="outline">No</Badge>
+                                )}
+                            </span>
+
+                            <span className="text-muted-foreground">Tax</span>
+                            <span>
+                                {tenant.isTaxable && selectedTax ? (
+                                    formatTaxLabel(selectedTax)
+                                ) : (
+                                    <span className="text-muted-foreground">None</span>
                                 )}
                             </span>
 

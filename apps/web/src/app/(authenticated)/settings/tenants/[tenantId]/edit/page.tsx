@@ -14,7 +14,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { tenantsService, CreateTenantDto } from "@/services/tenants";
+import { tenantsService, CreateTenantDto, Tenant } from "@/services/tenants";
 import { taxesService, Tax, TaxStatus } from "@/services/taxes";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -31,6 +31,7 @@ export default function EditTenantPage() {
     const { isSuperAdmin } = usePermissions();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [initialTaxLabel, setInitialTaxLabel] = useState("");
 
     const [formData, setFormData] = useState<CreateTenantDto>({
         name: "",
@@ -41,14 +42,22 @@ export default function EditTenantPage() {
     });
     const [errors, setErrors] = useState<Record<string, string | string[]>>({});
 
+    const formatTaxLabel = (tax: NonNullable<Tenant["taxes"]>[number]) => {
+        if (tax?.tax) {
+            return tax.tax.code ? `${tax.tax.name} (${tax.tax.code})` : tax.tax.name;
+        }
+        return tax?.taxId || "";
+    };
+
     useEffect(() => {
         const fetchTenant = async () => {
             if (!tenantId) return;
             try {
                 const data = await tenantsService.getOne(tenantId);
-                const defaultTaxId = data.isTaxable
-                    ? data.taxes?.find((tax) => tax.isDefault)?.taxId || data.taxes?.[0]?.taxId || ""
-                    : "";
+                const defaultTax = data.isTaxable
+                    ? data.taxes?.find((tax) => tax.isDefault) || data.taxes?.[0]
+                    : undefined;
+                const defaultTaxId = defaultTax?.taxId || "";
                 setFormData({
                     name: data.name,
                     slug: data.slug,
@@ -56,6 +65,7 @@ export default function EditTenantPage() {
                     isTaxable: data.isTaxable,
                     taxIds: defaultTaxId ? [defaultTaxId] : [],
                 });
+                setInitialTaxLabel(defaultTax ? formatTaxLabel(defaultTax) : "");
             } catch (error) {
                 toast({
                     title: "Error",
@@ -251,6 +261,7 @@ export default function EditTenantPage() {
                                 }}
                                 placeholder="Select a tax"
                                 searchPlaceholder="Search taxes..."
+                                initialLabel={initialTaxLabel || undefined}
                                 fetchItems={fetchTaxes}
                                 getItemValue={(tax) => tax.id}
                                 getItemLabel={(tax) => tax.code ? `${tax.name} (${tax.code})` : tax.name}

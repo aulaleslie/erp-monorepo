@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Gym ERP",
+  title: "Apupu ERP",
   description: "Gym Management System",
 };
 

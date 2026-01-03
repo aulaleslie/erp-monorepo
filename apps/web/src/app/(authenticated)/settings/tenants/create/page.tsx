@@ -71,7 +71,7 @@ export default function CreateTenantPage() {
             await tenantsService.create(formData);
             toast({
                 title: "Success",
-                description: "Tenant created successfully. It is initially archived.",
+                description: "Tenant created successfully.",
             });
             router.push("/settings/tenants");
         } catch (error: any) {

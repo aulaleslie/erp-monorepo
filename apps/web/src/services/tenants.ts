@@ -8,6 +8,11 @@ export interface TenantTaxMapping {
   id: string;
   taxId: string;
   isDefault: boolean;
+  tax?: {
+    id: string;
+    name: string;
+    code?: string | null;
+  };
 }
 
 export interface Tenant {

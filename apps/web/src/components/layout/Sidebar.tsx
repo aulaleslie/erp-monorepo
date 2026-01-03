@@ -251,7 +251,7 @@ export function Sidebar() {
             )}
         >
             <div className="flex h-14 items-center border-b px-3 justify-between">
-                {!isCollapsed && <span className="font-bold text-lg px-2">Gym ERP</span>}
+                {!isCollapsed && <span className="font-bold text-lg px-2">Apupu ERP</span>}
                 <Button variant="ghost" size="icon" onClick={toggleSidebar} className="ml-auto">
                     {isCollapsed ? <Menu className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
                 </Button>
