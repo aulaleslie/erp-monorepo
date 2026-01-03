@@ -8,6 +8,7 @@ export { RolePermissionEntity } from './role-permission.entity';
 export { RoleEntity } from './role.entity';
 export { TaxEntity } from './tax.entity';
 export { TenantTaxEntity } from './tenant-tax.entity';
+export { TenantThemeEntity } from './tenant-theme.entity';
 export { TenantUserEntity } from './tenant-user.entity';
 export { TenantEntity } from './tenant.entity';
 export { UserEntity } from './user.entity';

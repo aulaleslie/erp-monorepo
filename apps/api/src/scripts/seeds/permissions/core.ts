@@ -20,4 +20,14 @@ export const corePermissions: SeedPermission[] = [
     name: 'Update Tenant Settings',
     group: 'Tenant',
   },
+  {
+    code: 'settings.theme.read',
+    name: 'Read Theme Settings',
+    group: 'Theme',
+  },
+  {
+    code: 'settings.theme.update',
+    name: 'Update Theme Settings',
+    group: 'Theme',
+  },
 ];

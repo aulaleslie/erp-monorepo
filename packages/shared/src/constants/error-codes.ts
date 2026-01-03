@@ -184,6 +184,25 @@ export const TAX_ERRORS = {
 } as const;
 
 // ============================================================================
+// Theme Errors
+// ============================================================================
+
+export const THEME_ERRORS = {
+  NOT_FOUND: {
+    code: 'THEME_NOT_FOUND',
+    message: 'Theme not found',
+  },
+  INVALID_PRESET: {
+    code: 'THEME_INVALID_PRESET',
+    message: 'Invalid theme preset',
+  },
+  ALREADY_EXISTS: {
+    code: 'THEME_ALREADY_EXISTS',
+    message: 'Theme already exists for this tenant',
+  },
+} as const;
+
+// ============================================================================
 // Validation Errors
 // ============================================================================
 
@@ -220,6 +239,7 @@ export const ERROR_CODES = {
   USER: USER_ERRORS,
   ROLE: ROLE_ERRORS,
   TAX: TAX_ERRORS,
+  THEME: THEME_ERRORS,
   VALIDATION: VALIDATION_ERRORS,
 } as const;
 
@@ -232,6 +252,7 @@ export type TenantErrorCode = typeof TENANT_ERRORS[keyof typeof TENANT_ERRORS];
 export type UserErrorCode = typeof USER_ERRORS[keyof typeof USER_ERRORS];
 export type RoleErrorCode = typeof ROLE_ERRORS[keyof typeof ROLE_ERRORS];
 export type TaxErrorCode = typeof TAX_ERRORS[keyof typeof TAX_ERRORS];
+export type ThemeErrorCode = typeof THEME_ERRORS[keyof typeof THEME_ERRORS];
 export type ValidationErrorCode = typeof VALIDATION_ERRORS[keyof typeof VALIDATION_ERRORS];
 
 export type AnyErrorCode = 
@@ -240,4 +261,5 @@ export type AnyErrorCode =
   | UserErrorCode 
   | RoleErrorCode 
   | TaxErrorCode 
+  | ThemeErrorCode 
   | ValidationErrorCode;
