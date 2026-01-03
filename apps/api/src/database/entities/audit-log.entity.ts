@@ -28,6 +28,6 @@ export class AuditLogEntity {
   @Column({ type: 'jsonb', nullable: true })
   newValues: any;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   timestamp: Date;
 }

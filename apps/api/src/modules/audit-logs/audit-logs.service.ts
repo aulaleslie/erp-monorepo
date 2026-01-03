@@ -16,7 +16,12 @@ export class AuditLogsService {
   async findAll(
     page: number = 1,
     limit: number = 10,
-    filters?: { entityName?: string; performedBy?: string },
+    filters?: {
+      entityName?: string;
+      performedBy?: string;
+      from?: Date;
+      to?: Date;
+    },
   ) {
     const query = this.auditLogRepository.createQueryBuilder('log');
 
@@ -30,6 +35,14 @@ export class AuditLogsService {
       query.andWhere('log.performedBy = :performedBy', {
         performedBy: filters.performedBy,
       });
+    }
+
+    if (filters?.from) {
+      query.andWhere('log.timestamp >= :from', { from: filters.from });
+    }
+
+    if (filters?.to) {
+      query.andWhere('log.timestamp <= :to', { to: filters.to });
     }
 
     query

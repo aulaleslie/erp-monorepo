@@ -6,19 +6,19 @@ import {
 } from 'typeorm';
 
 export abstract class BaseAuditEntity {
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
   @Column({ type: 'uuid', nullable: true })
   createdBy: string;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
   @Column({ type: 'uuid', nullable: true })
   updatedBy: string;
 
-  @DeleteDateColumn()
+  @DeleteDateColumn({ type: 'timestamptz' })
   deletedAt: Date;
 
   @Column({ type: 'uuid', nullable: true })
