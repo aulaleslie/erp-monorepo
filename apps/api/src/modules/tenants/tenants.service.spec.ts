@@ -107,7 +107,10 @@ describe('TenantsService', () => {
 
   describe('validateTenantAccess', () => {
     it('should return true if user has membership', async () => {
-      tenantUserRepository.findOne!.mockResolvedValue({ userId: 'user-1', tenantId: 'tenant-1' });
+      tenantUserRepository.findOne!.mockResolvedValue({
+        userId: 'user-1',
+        tenantId: 'tenant-1',
+      });
 
       const result = await service.validateTenantAccess('user-1', 'tenant-1');
       expect(result).toBe(true);
@@ -133,16 +136,22 @@ describe('TenantsService', () => {
     it('should throw NotFoundException if tenant not found', async () => {
       tenantRepository.findOne!.mockResolvedValue(null);
 
-      await expect(service.getTenantById('tenant-1')).rejects.toThrow(NotFoundException);
+      await expect(service.getTenantById('tenant-1')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
   describe('create', () => {
     it('should create tenant with Super Admin role', async () => {
       tenantRepository.findOne!.mockResolvedValue(null); // No existing slug/name
-      const newTenant = { id: 'new-tenant', name: 'New Tenant', slug: 'new-tenant' };
+      const newTenant = {
+        id: 'new-tenant',
+        name: 'New Tenant',
+        slug: 'new-tenant',
+      };
       const newRole = { id: 'role-1', name: 'Super Admin', isSuperAdmin: true };
-      
+
       tenantRepository.create!.mockReturnValue(newTenant);
       tenantRepository.save!.mockResolvedValue(newTenant);
       roleRepository.create!.mockReturnValue(newRole);
@@ -179,14 +188,16 @@ describe('TenantsService', () => {
     });
 
     it('should throw BadRequestException if slug already exists', async () => {
-      tenantRepository.findOne!.mockResolvedValueOnce({ slug: 'existing-slug' }); // Slug exists
+      tenantRepository.findOne!.mockResolvedValueOnce({
+        slug: 'existing-slug',
+      }); // Slug exists
 
       await expect(
         service.create('user-1', {
           name: 'New Tenant',
           slug: 'existing-slug',
           type: TenantType.GYM,
-        })
+        }),
       ).rejects.toThrow(BadRequestException);
     });
   });
@@ -197,7 +208,7 @@ describe('TenantsService', () => {
         { id: 'tenant-1', name: 'Tenant 1' },
         { id: 'tenant-2', name: 'Tenant 2' },
       ] as TenantEntity[];
-      
+
       tenantRepository.findAndCount!.mockResolvedValue([tenants, 25]);
 
       const result = await service.findAll(1, 10);
@@ -212,14 +223,21 @@ describe('TenantsService', () => {
 
   describe('delete', () => {
     it('should soft delete by setting status to DISABLED', async () => {
-      const tenant = { id: 'tenant-1', name: 'Test', status: 'ACTIVE' } as TenantEntity;
+      const tenant = {
+        id: 'tenant-1',
+        name: 'Test',
+        status: 'ACTIVE',
+      } as TenantEntity;
       tenantRepository.findOne!.mockResolvedValue(tenant);
-      tenantRepository.save!.mockResolvedValue({ ...tenant, status: 'DISABLED' });
+      tenantRepository.save!.mockResolvedValue({
+        ...tenant,
+        status: 'DISABLED',
+      });
 
       await service.delete('tenant-1');
 
       expect(tenantRepository.save).toHaveBeenCalledWith(
-        expect.objectContaining({ status: 'DISABLED' })
+        expect.objectContaining({ status: 'DISABLED' }),
       );
     });
   });

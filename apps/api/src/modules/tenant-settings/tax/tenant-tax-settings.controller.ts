@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiCookieAuth } from '@nestjs/swagger';
 import { TenantTaxSettingsService } from './tenant-tax-settings.service';
 import { UpdateTenantTaxSettingsDto } from './dto/update-tenant-tax-settings.dto';
 import { TenantTaxSettingsResponseDto } from './dto/tenant-tax-settings-response.dto';
@@ -9,6 +10,8 @@ import { CurrentTenant } from '../../../common/decorators/current-tenant.decorat
 import { PermissionGuard } from '../../users/guards/permission.guard';
 import { RequirePermissions } from '../../../common/decorators/require-permissions.decorator';
 
+@ApiTags('taxes')
+@ApiCookieAuth('access_token')
 @Controller('tenant-settings/tax')
 @UseGuards(
   AuthGuard('jwt'),

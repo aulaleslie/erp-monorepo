@@ -1,7 +1,10 @@
-
 import { DataSource } from 'typeorm';
 import { TenantEntity } from '../src/database/entities/tenant.entity';
-import { TaxEntity, TaxType, TaxStatus } from '../src/database/entities/tax.entity';
+import {
+  TaxEntity,
+  TaxType,
+  TaxStatus,
+} from '../src/database/entities/tax.entity';
 import { TenantTaxEntity } from '../src/database/entities/tenant-tax.entity';
 import { config } from 'dotenv';
 
@@ -56,9 +59,11 @@ async function verify() {
     });
 
     if (!savedTenantTax) throw new Error('TenantTax not found');
-    if (savedTenantTax.tenant.id !== tenant.id) throw new Error('Tenant mismatch');
+    if (savedTenantTax.tenant.id !== tenant.id)
+      throw new Error('Tenant mismatch');
     if (savedTenantTax.tax.id !== tax.id) throw new Error('Tax mismatch');
-    if (savedTenantTax.isDefault !== true) throw new Error('isDefault mismatch');
+    if (savedTenantTax.isDefault !== true)
+      throw new Error('isDefault mismatch');
 
     console.log('Verification successful!');
 
@@ -67,7 +72,6 @@ async function verify() {
     await dataSource.manager.remove(tax);
     await dataSource.manager.remove(tenant);
     console.log('Cleanup successful');
-
   } catch (error) {
     console.error('Verification failed:', error);
     process.exit(1);

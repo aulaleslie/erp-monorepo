@@ -1,5 +1,9 @@
-
-import { CanActivate, ExecutionContext, Injectable, ForbiddenException } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  ForbiddenException,
+} from '@nestjs/common';
 import { AUTH_ERRORS } from '@gym-monorepo/shared';
 
 @Injectable()

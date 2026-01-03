@@ -117,7 +117,7 @@ export class TenantTaxSettingsService {
       if (!resolvedDefaultId && taxIds.length > 0) {
         resolvedDefaultId = taxIds[0];
       }
-      
+
       // If taxes are empty, default must be null (or undefined)
       if (taxIds.length === 0) {
         resolvedDefaultId = undefined;
@@ -130,11 +130,11 @@ export class TenantTaxSettingsService {
       // Insert new
       if (taxIds.length > 0) {
         const newMappings = taxIds.map((taxId) => ({
-            tenantId,
-            taxId,
-            isDefault: taxId === resolvedDefaultId,
+          tenantId,
+          taxId,
+          isDefault: taxId === resolvedDefaultId,
         }));
-        
+
         // Use create then save to trigger listeners/subscribers if any (Audit)
         // Or insert directly for bulk. Since TenantTaxEntity has BaseAuditEntity, better to use save or insert but ensuring audit columns?
         // insert() usually doesn't trigger subscribers. save() does.

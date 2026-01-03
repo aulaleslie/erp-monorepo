@@ -14,6 +14,7 @@ import {
   Inject,
   forwardRef,
 } from '@nestjs/common';
+import { ApiTags, ApiCookieAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
 import { TenantsService } from '../tenants/tenants.service';
@@ -21,6 +22,8 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 
+@ApiTags('users')
+@ApiCookieAuth('access_token')
 @Controller('me')
 @UseGuards(AuthGuard('jwt'))
 export class MeController {

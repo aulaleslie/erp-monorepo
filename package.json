@@ -6,7 +6,8 @@
     "dev": "pnpm -r --parallel dev",
     "build": "pnpm -r build",
     "docker:up": "docker compose up --build",
-    "docker:down": "docker compose down -v"
+    "docker:down": "docker compose down -v",
+    "prepare": "husky"
   },
   "pnpm": {
     "packageExtensions": {
@@ -53,5 +54,17 @@
         }
       }
     }
+  },
+  "lint-staged": {
+    "apps/api/src/**/*.ts": [
+      "eslint --config apps/api/eslint.config.mjs"
+    ],
+    "apps/web/src/**/*.{ts,tsx}": [
+      "eslint --config apps/web/eslint.config.mjs"
+    ]
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7"
   }
 }

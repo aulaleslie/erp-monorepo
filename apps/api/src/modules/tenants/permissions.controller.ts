@@ -1,4 +1,5 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiCookieAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { ActiveTenantGuard } from '../tenants/guards/active-tenant.guard';
 import { TenantMembershipGuard } from '../tenants/guards/tenant-membership.guard';
@@ -6,6 +7,8 @@ import { PermissionGuard } from '../users/guards/permission.guard';
 import { RequirePermissions } from '../../common/decorators/require-permissions.decorator';
 import { PermissionsService } from './permissions.service';
 
+@ApiTags('roles')
+@ApiCookieAuth('access_token')
 @Controller('permissions')
 @UseGuards(
   AuthGuard('jwt'),

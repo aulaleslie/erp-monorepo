@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiTags, ApiCookieAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { PlatformTaxesService } from './platform-taxes.service';
 import { CreateTaxDto } from './dto/create-tax.dto';
@@ -6,6 +17,8 @@ import { UpdateTaxDto } from './dto/update-tax.dto';
 import { TaxQueryDto } from './dto/tax-query.dto';
 import { SuperAdminGuard } from '../../common/guards/super-admin.guard';
 
+@ApiTags('platform')
+@ApiCookieAuth('access_token')
 @Controller('platform/taxes')
 @UseGuards(AuthGuard('jwt'), SuperAdminGuard)
 export class PlatformTaxesController {

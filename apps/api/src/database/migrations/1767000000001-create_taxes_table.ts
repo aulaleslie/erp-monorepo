@@ -1,15 +1,19 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class CreateTaxesTable1767000000001 implements MigrationInterface {
-    name = 'CreateTaxesTable1767000000001'
+  name = 'CreateTaxesTable1767000000001';
 
-    public async up(queryRunner: QueryRunner): Promise<void> {
-        // Create Enums
-        await queryRunner.query(`CREATE TYPE "taxes_type_enum" AS ENUM ('PERCENTAGE', 'FIXED')`);
-        await queryRunner.query(`CREATE TYPE "taxes_status_enum" AS ENUM ('ACTIVE', 'INACTIVE')`);
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    // Create Enums
+    await queryRunner.query(
+      `CREATE TYPE "taxes_type_enum" AS ENUM ('PERCENTAGE', 'FIXED')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "taxes_status_enum" AS ENUM ('ACTIVE', 'INACTIVE')`,
+    );
 
-        // Create Table
-        await queryRunner.query(`
+    // Create Table
+    await queryRunner.query(`
             CREATE TABLE "taxes" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "code" character varying,
@@ -28,11 +32,11 @@ export class CreateTaxesTable1767000000001 implements MigrationInterface {
                 CONSTRAINT "PK_taxes_id" PRIMARY KEY ("id")
             )
         `);
-    }
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`DROP TABLE "taxes"`);
-        await queryRunner.query(`DROP TYPE "taxes_status_enum"`);
-        await queryRunner.query(`DROP TYPE "taxes_type_enum"`);
-    }
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`DROP TABLE "taxes"`);
+    await queryRunner.query(`DROP TYPE "taxes_status_enum"`);
+    await queryRunner.query(`DROP TYPE "taxes_type_enum"`);
+  }
 }

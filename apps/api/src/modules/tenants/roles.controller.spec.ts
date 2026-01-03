@@ -31,9 +31,13 @@ describe('RolesController', () => {
       .useValue({ canActivate: () => true })
       .overrideGuard(require('./guards/active-tenant.guard').ActiveTenantGuard)
       .useValue({ canActivate: () => true })
-      .overrideGuard(require('./guards/tenant-membership.guard').TenantMembershipGuard)
+      .overrideGuard(
+        require('./guards/tenant-membership.guard').TenantMembershipGuard,
+      )
       .useValue({ canActivate: () => true })
-      .overrideGuard(require('../users/guards/permission.guard').PermissionGuard)
+      .overrideGuard(
+        require('../users/guards/permission.guard').PermissionGuard,
+      )
       .useValue({ canActivate: () => true })
       .compile();
 
@@ -65,7 +69,9 @@ describe('RolesController', () => {
       const permissions = ['users.read', 'users.write'];
 
       (rolesService.findOne as jest.Mock).mockResolvedValue(role);
-      (rolesService.getPermissionsForRole as jest.Mock).mockResolvedValue(permissions);
+      (rolesService.getPermissionsForRole as jest.Mock).mockResolvedValue(
+        permissions,
+      );
 
       const mockReq = { tenantId: 'tenant-1' };
       const result = await controller.findOne(mockReq, 'role-1');
@@ -90,7 +96,9 @@ describe('RolesController', () => {
     it('should create role with permissions', async () => {
       const newRole = { id: 'role-1', name: 'New Role' };
       (rolesService.create as jest.Mock).mockResolvedValue(newRole);
-      (rolesService.assignPermissions as jest.Mock).mockResolvedValue(undefined);
+      (rolesService.assignPermissions as jest.Mock).mockResolvedValue(
+        undefined,
+      );
 
       const mockReq = { tenantId: 'tenant-1', user: { isSuperAdmin: false } };
       const result = await controller.create(mockReq, {
@@ -106,7 +114,7 @@ describe('RolesController', () => {
       const mockReq = { tenantId: 'tenant-1', user: { isSuperAdmin: false } };
 
       await expect(
-        controller.create(mockReq, { name: 'New Role', permissions: [] })
+        controller.create(mockReq, { name: 'New Role', permissions: [] }),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -130,7 +138,7 @@ describe('RolesController', () => {
         controller.create(mockReq, {
           name: 'Super Admin',
           isSuperAdmin: true,
-        })
+        }),
       ).rejects.toThrow(ForbiddenException);
     });
   });
@@ -139,7 +147,9 @@ describe('RolesController', () => {
     it('should update role and assign new permissions', async () => {
       const updatedRole = { id: 'role-1', name: 'Updated Role' };
       (rolesService.update as jest.Mock).mockResolvedValue(updatedRole);
-      (rolesService.assignPermissions as jest.Mock).mockResolvedValue(undefined);
+      (rolesService.assignPermissions as jest.Mock).mockResolvedValue(
+        undefined,
+      );
 
       const mockReq = { tenantId: 'tenant-1' };
       const result = await controller.update(mockReq, 'role-1', {

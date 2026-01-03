@@ -17,9 +17,7 @@ describe('AuthController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
-      providers: [
-        { provide: AuthService, useValue: authService },
-      ],
+      providers: [{ provide: AuthService, useValue: authService }],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
@@ -27,13 +25,19 @@ describe('AuthController', () => {
 
   describe('login', () => {
     it('should return success message and set cookie on valid credentials', async () => {
-      const mockUser = { id: 'user-1', email: 'test@test.com', isSuperAdmin: false };
+      const mockUser = {
+        id: 'user-1',
+        email: 'test@test.com',
+        isSuperAdmin: false,
+      };
       const mockReply = {
         setCookie: jest.fn(),
       } as unknown as FastifyReply;
 
       (authService.validateUser as jest.Mock).mockResolvedValue(mockUser);
-      (authService.login as jest.Mock).mockResolvedValue({ access_token: 'jwt-token' });
+      (authService.login as jest.Mock).mockResolvedValue({
+        access_token: 'jwt-token',
+      });
 
       const result = await controller.login(
         { email: 'test@test.com', password: 'password' },
@@ -56,7 +60,10 @@ describe('AuthController', () => {
       (authService.validateUser as jest.Mock).mockResolvedValue(null);
 
       await expect(
-        controller.login({ email: 'test@test.com', password: 'wrong' }, mockReply)
+        controller.login(
+          { email: 'test@test.com', password: 'wrong' },
+          mockReply,
+        ),
       ).rejects.toThrow(UnauthorizedException);
     });
   });
@@ -70,8 +77,12 @@ describe('AuthController', () => {
       const result = await controller.logout(mockReply);
 
       expect(result).toEqual({ message: 'Logged out successfully' });
-      expect(mockReply.clearCookie).toHaveBeenCalledWith('access_token', { path: '/' });
-      expect(mockReply.clearCookie).toHaveBeenCalledWith('active_tenant', { path: '/' });
+      expect(mockReply.clearCookie).toHaveBeenCalledWith('access_token', {
+        path: '/',
+      });
+      expect(mockReply.clearCookie).toHaveBeenCalledWith('active_tenant', {
+        path: '/',
+      });
     });
   });
 
@@ -100,7 +111,9 @@ describe('AuthController', () => {
       (authService.findUserById as jest.Mock).mockResolvedValue(null);
 
       const mockRequest = { user: { id: 'user-1' } };
-      await expect(controller.getProfile(mockRequest)).rejects.toThrow(UnauthorizedException);
+      await expect(controller.getProfile(mockRequest)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 });

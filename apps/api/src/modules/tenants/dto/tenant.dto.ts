@@ -1,4 +1,14 @@
-import { IsNotEmpty, IsString, IsOptional, IsEnum, IsBoolean, IsArray, ArrayNotEmpty, IsUUID, ValidateIf } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsBoolean,
+  IsArray,
+  ArrayNotEmpty,
+  IsUUID,
+  ValidateIf,
+} from 'class-validator';
 import { TenantType } from '@gym-monorepo/shared';
 
 export class CreateTenantDto {

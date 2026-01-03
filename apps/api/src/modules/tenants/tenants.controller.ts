@@ -17,6 +17,7 @@ import {
   BadRequestException,
   Query,
 } from '@nestjs/common';
+import { ApiTags, ApiCookieAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { ActiveTenantGuard } from './guards/active-tenant.guard';
 import { TenantMembershipGuard } from './guards/tenant-membership.guard';
@@ -24,6 +25,8 @@ import { TenantsService } from './tenants.service';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { CreateTenantDto, UpdateTenantDto } from './dto/tenant.dto';
 
+@ApiTags('tenants')
+@ApiCookieAuth('access_token')
 @Controller('tenants')
 @UseGuards(AuthGuard('jwt'))
 export class TenantsController {
@@ -50,7 +53,11 @@ export class TenantsController {
     if (!req.user.isSuperAdmin) {
       throw new ForbiddenException('Only Super Admins can view all tenants');
     }
-    return this.tenantsService.findAll(Number(page), Number(limit), status ?? 'ACTIVE');
+    return this.tenantsService.findAll(
+      Number(page),
+      Number(limit),
+      status ?? 'ACTIVE',
+    );
   }
 
   @Get(':id')

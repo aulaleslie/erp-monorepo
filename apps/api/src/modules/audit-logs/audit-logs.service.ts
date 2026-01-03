@@ -40,8 +40,10 @@ export class AuditLogsService {
     const [logs, total] = await query.getManyAndCount();
 
     // Get unique user IDs from performedBy
-    const userIds = [...new Set(logs.map(log => log.performedBy).filter(Boolean))];
-    
+    const userIds = [
+      ...new Set(logs.map((log) => log.performedBy).filter(Boolean)),
+    ];
+
     // Fetch users in a single query
     const usersMap = new Map<string, { id: string; fullName: string | null }>();
     if (userIds.length > 0) {
@@ -50,14 +52,14 @@ export class AuditLogsService {
         .select(['user.id', 'user.fullName'])
         .where('user.id IN (:...userIds)', { userIds })
         .getMany();
-      
-      users.forEach(user => {
+
+      users.forEach((user) => {
         usersMap.set(user.id, { id: user.id, fullName: user.fullName || null });
       });
     }
 
     // Transform logs to include performedByUser
-    const items = logs.map(log => ({
+    const items = logs.map((log) => ({
       id: log.id,
       entityName: log.entityName,
       entityId: log.entityId,
@@ -66,7 +68,9 @@ export class AuditLogsService {
       previousValues: log.previousValues,
       newValues: log.newValues,
       timestamp: log.timestamp,
-      performedByUser: log.performedBy ? usersMap.get(log.performedBy) || null : null,
+      performedByUser: log.performedBy
+        ? usersMap.get(log.performedBy) || null
+        : null,
     }));
 
     return {

@@ -1,4 +1,12 @@
-import { IsNotEmpty, IsString, MinLength, Validate, ValidatorConstraint, ValidatorConstraintInterface, ValidationArguments } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  MinLength,
+  Validate,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+  ValidationArguments,
+} from 'class-validator';
 
 @ValidatorConstraint({ name: 'PasswordsMatch', async: false })
 export class PasswordsMatchConstraint implements ValidatorConstraintInterface {

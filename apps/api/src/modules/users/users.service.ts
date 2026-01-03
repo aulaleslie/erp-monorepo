@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { UserEntity } from '../../database/entities/user.entity';
@@ -7,7 +11,10 @@ import { RoleEntity } from '../../database/entities/role.entity';
 import { RolePermissionEntity } from '../../database/entities/role-permission.entity';
 import { PermissionEntity } from '../../database/entities/permission.entity';
 import { TenantEntity } from '../../database/entities/tenant.entity';
-import { hashPassword, comparePassword } from '../../common/utils/password.util';
+import {
+  hashPassword,
+  comparePassword,
+} from '../../common/utils/password.util';
 import { calculateSkip } from '../../common/dto/pagination.dto';
 
 @Injectable()
@@ -103,7 +110,10 @@ export class UsersService {
     };
   }
 
-  async updateProfile(userId: string, data: { fullName: string }): Promise<UserEntity> {
+  async updateProfile(
+    userId: string,
+    data: { fullName: string },
+  ): Promise<UserEntity> {
     const user = await this.findOneById(userId);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -123,7 +133,10 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    const isPasswordValid = await comparePassword(currentPassword, user.passwordHash);
+    const isPasswordValid = await comparePassword(
+      currentPassword,
+      user.passwordHash,
+    );
     if (!isPasswordValid) {
       throw new BadRequestException('Current password is incorrect');
     }

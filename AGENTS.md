@@ -32,6 +32,7 @@ The shared package exports common types, constants, and utilities:
 3. Behind the scenes, `apps/api` uses `typeorm-datasource.ts` for CLI migrations and seed logic; never enable `synchronize: true`.
 4. When editing frontend UI, make sure Tailwind is configured (`apps/web/tailwind.config.ts`, `apps/web/app/globals.css` with the `@tailwind` directives). The `cn()` helper in `apps/web/src/lib/utils.ts` should be used whenever class merging is needed.
 5. Frontend components that use hooks/state must include the `use client` directive, follow the shadcn + Tailwind conventions (shadcn components live in `apps/web/components/ui`), and keep layout concerns inside the `/app` directory.
+6. Git commits trigger lint-staged via Husky pre-commit hooks. Staged files in `apps/api/src` and `apps/web/src` are linted automatically.
 
 ## Testing & verification
 - Run `pnpm --filter web test` (or `pnpm --filter web test:run` for CI) to cover the client code.
@@ -40,7 +41,16 @@ The shared package exports common types, constants, and utilities:
 - `pnpm --filter @gym-monorepo/shared build` keeps the shared package consumable by both apps.
 - For Docker workflows, `pnpm docker:up`/`docker:down` should bring up the Postgres + Nest + Next stack described in `docs/CYCLE_0.md`.
 
+## API documentation
+- **Swagger/OpenAPI** is available at `/api/docs` when the API is running.
+- All controllers use `@ApiTags()` decorators for grouping and `@ApiCookieAuth()` for authentication.
+- Tags: `auth`, `users`, `tenants`, `roles`, `taxes`, `platform`.
+
 ## Code standards
+
+### Entity naming
+- All TypeORM entities use the `Entity` suffix: `UserEntity`, `TenantEntity`, `TaxEntity`, etc.
+- Import entities from the barrel: `import { UserEntity, TenantEntity } from '../../database/entities';`
 
 ### Error handling
 - **Use centralized error codes** from `@gym-monorepo/shared` for all thrown exceptions:
@@ -54,6 +64,7 @@ The shared package exports common types, constants, and utilities:
 - **Use axios exclusively** via the configured `api` instance from `@/lib/api`.
 - For auth context (where manual response handling is needed), use `apiRaw` which doesn't unwrap responses.
 - Never use native `fetch()` in the frontend — axios handles credentials, interceptors, and error redirects.
+- Helper functions `getApiErrorMessage()` and `getApiFieldErrors()` are available for error handling.
 
 ### Shared types
 - **Pagination types** (`PaginatedResponse`, `PAGINATION_DEFAULTS`) are defined in `packages/shared` and re-exported by both apps.

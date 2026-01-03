@@ -11,7 +11,11 @@ import { RolePermissionEntity } from '../../database/entities/role-permission.en
 import { PermissionEntity } from '../../database/entities/permission.entity';
 import { TenantUserEntity } from '../../database/entities/tenant-user.entity';
 import { UserEntity } from '../../database/entities/user.entity';
-import { PaginatedResponse, paginate, calculateSkip } from '../../common/dto/pagination.dto';
+import {
+  PaginatedResponse,
+  paginate,
+  calculateSkip,
+} from '../../common/dto/pagination.dto';
 import { createValidationBuilder } from '../../common/utils/validation.util';
 import { ROLE_ERRORS } from '@gym-monorepo/shared';
 
@@ -30,7 +34,11 @@ export class RolesService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async findAll(tenantId: string, page: number = 1, limit: number = 10): Promise<PaginatedResponse<RoleEntity>> {
+  async findAll(
+    tenantId: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<PaginatedResponse<RoleEntity>> {
     const [items, total] = await this.roleRepository.findAndCount({
       where: { tenantId, isSuperAdmin: false },
       order: { name: 'ASC' },
@@ -113,7 +121,9 @@ export class RolesService {
   async delete(tenantId: string, id: string): Promise<void> {
     const role = await this.findOne(tenantId, id);
     if (role.isSuperAdmin) {
-      throw new ForbiddenException(ROLE_ERRORS.CANNOT_DELETE_SUPER_ADMIN.message);
+      throw new ForbiddenException(
+        ROLE_ERRORS.CANNOT_DELETE_SUPER_ADMIN.message,
+      );
     }
 
     // We should probably check if users are assigned to this role before deleting

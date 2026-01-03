@@ -12,6 +12,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { ApiTags, ApiCookieAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { ActiveTenantGuard } from '../tenants/guards/active-tenant.guard';
 import { TenantMembershipGuard } from '../tenants/guards/tenant-membership.guard';
@@ -20,6 +21,8 @@ import { RequirePermissions } from '../../common/decorators/require-permissions.
 import { TenantUsersService } from './tenant-users.service';
 import { UsersService } from '../users/users.service';
 
+@ApiTags('users')
+@ApiCookieAuth('access_token')
 @Controller('tenant-users')
 @UseGuards(
   AuthGuard('jwt'),
@@ -75,7 +78,12 @@ export class TenantUsersController {
   async create(
     @Req() req: any,
     @Body()
-    body: { email: string; fullName?: string; roleId?: string; password: string },
+    body: {
+      email: string;
+      fullName?: string;
+      roleId?: string;
+      password: string;
+    },
   ) {
     return this.tenantUsersService.create(
       req.tenantId,

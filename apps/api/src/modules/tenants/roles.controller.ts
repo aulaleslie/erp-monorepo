@@ -14,6 +14,7 @@ import {
   ForbiddenException,
   Query,
 } from '@nestjs/common';
+import { ApiTags, ApiCookieAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { ActiveTenantGuard } from '../tenants/guards/active-tenant.guard';
 import { TenantMembershipGuard } from '../tenants/guards/tenant-membership.guard';
@@ -21,6 +22,8 @@ import { PermissionGuard } from '../users/guards/permission.guard';
 import { RequirePermissions } from '../../common/decorators/require-permissions.decorator';
 import { RolesService } from './roles.service';
 
+@ApiTags('roles')
+@ApiCookieAuth('access_token')
 @Controller('roles')
 @UseGuards(
   AuthGuard('jwt'),
@@ -67,7 +70,9 @@ export class RolesController {
     body: { name: string; isSuperAdmin?: boolean; permissions?: string[] },
   ) {
     if (body.isSuperAdmin && !req.user?.isSuperAdmin) {
-      throw new ForbiddenException('Only Super Admins can create Super Admin roles');
+      throw new ForbiddenException(
+        'Only Super Admins can create Super Admin roles',
+      );
     }
     if (
       (!body.permissions || body.permissions.length === 0) &&

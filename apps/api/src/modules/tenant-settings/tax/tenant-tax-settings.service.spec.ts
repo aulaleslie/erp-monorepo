@@ -2,10 +2,18 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TenantTaxSettingsService } from './tenant-tax-settings.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { TenantEntity } from '../../../database/entities/tenant.entity';
-import { TaxEntity, TaxStatus, TaxType } from '../../../database/entities/tax.entity';
+import {
+  TaxEntity,
+  TaxStatus,
+  TaxType,
+} from '../../../database/entities/tax.entity';
 import { TenantTaxEntity } from '../../../database/entities/tenant-tax.entity';
 import { DataSource, ObjectLiteral, Repository } from 'typeorm';
-import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 
 const mockTenantRepository = () => ({
   findOne: jest.fn(),
@@ -73,8 +81,22 @@ describe('TenantTaxSettingsService', () => {
       const tenantId = 'tenant-1';
       const tenant = { id: tenantId, isTaxable: true } as TenantEntity;
       const taxes = [
-        { id: 'tax-1', name: 'VAT', code: 'VAT', rate: 10, type: TaxType.PERCENTAGE, status: TaxStatus.ACTIVE },
-        { id: 'tax-2', name: 'Service', code: 'SVC', rate: 5, type: TaxType.PERCENTAGE, status: TaxStatus.ACTIVE },
+        {
+          id: 'tax-1',
+          name: 'VAT',
+          code: 'VAT',
+          rate: 10,
+          type: TaxType.PERCENTAGE,
+          status: TaxStatus.ACTIVE,
+        },
+        {
+          id: 'tax-2',
+          name: 'Service',
+          code: 'SVC',
+          rate: 5,
+          type: TaxType.PERCENTAGE,
+          status: TaxStatus.ACTIVE,
+        },
       ] as TaxEntity[];
       const tenantTaxes = [
         { tenantId, taxId: 'tax-1', isDefault: true, tax: taxes[0] },
@@ -99,52 +121,60 @@ describe('TenantTaxSettingsService', () => {
     });
 
     it('should throw NotFoundException if tenant not found', async () => {
-        tenantRepository.findOne.mockResolvedValue(null);
-        await expect(service.getSettings('bad-id')).rejects.toThrow(NotFoundException);
+      tenantRepository.findOne.mockResolvedValue(null);
+      await expect(service.getSettings('bad-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
   describe('updateSettings', () => {
     it('should throw ConflictException if tenant is not taxable', async () => {
-        // We mock the transaction execution to simulate the callback running
-        dataSource.transaction.mockImplementation(async (cb) => {
-            const mockManager = {
-                findOne: jest.fn().mockResolvedValue({ id: 'tenant-1', isTaxable: false }),
-            };
-            await cb(mockManager);
-        });
+      // We mock the transaction execution to simulate the callback running
+      dataSource.transaction.mockImplementation(async (cb) => {
+        const mockManager = {
+          findOne: jest
+            .fn()
+            .mockResolvedValue({ id: 'tenant-1', isTaxable: false }),
+        };
+        await cb(mockManager);
+      });
 
-        await expect(service.updateSettings('tenant-1', { taxIds: [] })).rejects.toThrow(ConflictException);
+      await expect(
+        service.updateSettings('tenant-1', { taxIds: [] }),
+      ).rejects.toThrow(ConflictException);
     });
 
     it('should update settings successfully', async () => {
-        const tenantId = 'tenant-1';
-        const taxIds = ['tax-1', 'tax-2'];
-        const defaultTaxId = 'tax-1';
+      const tenantId = 'tenant-1';
+      const taxIds = ['tax-1', 'tax-2'];
+      const defaultTaxId = 'tax-1';
 
-        const mockManager = {
-            findOne: jest.fn().mockResolvedValue({ id: tenantId, isTaxable: true }),
-            find: jest.fn().mockResolvedValue([
-                { id: 'tax-1', status: TaxStatus.ACTIVE },
-                { id: 'tax-2', status: TaxStatus.ACTIVE }
-            ]),
-            delete: jest.fn().mockResolvedValue({}),
-            create: jest.fn().mockReturnValue([{}]),
-            save: jest.fn().mockResolvedValue([{}]),
-        };
+      const mockManager = {
+        findOne: jest.fn().mockResolvedValue({ id: tenantId, isTaxable: true }),
+        find: jest.fn().mockResolvedValue([
+          { id: 'tax-1', status: TaxStatus.ACTIVE },
+          { id: 'tax-2', status: TaxStatus.ACTIVE },
+        ]),
+        delete: jest.fn().mockResolvedValue({}),
+        create: jest.fn().mockReturnValue([{}]),
+        save: jest.fn().mockResolvedValue([{}]),
+      };
 
-        dataSource.transaction.mockImplementation(async (cb) => {
-            await cb(mockManager);
-        });
+      dataSource.transaction.mockImplementation(async (cb) => {
+        await cb(mockManager);
+      });
 
-        await service.updateSettings(tenantId, { taxIds, defaultTaxId });
+      await service.updateSettings(tenantId, { taxIds, defaultTaxId });
 
-        expect(mockManager.delete).toHaveBeenCalledWith(TenantTaxEntity, { tenantId });
-        expect(mockManager.create).toHaveBeenCalledWith(TenantTaxEntity, [
-            { tenantId, taxId: 'tax-1', isDefault: true },
-            { tenantId, taxId: 'tax-2', isDefault: false },
-        ]);
-        expect(mockManager.save).toHaveBeenCalled();
+      expect(mockManager.delete).toHaveBeenCalledWith(TenantTaxEntity, {
+        tenantId,
+      });
+      expect(mockManager.create).toHaveBeenCalledWith(TenantTaxEntity, [
+        { tenantId, taxId: 'tax-1', isDefault: true },
+        { tenantId, taxId: 'tax-2', isDefault: false },
+      ]);
+      expect(mockManager.save).toHaveBeenCalled();
     });
   });
 });

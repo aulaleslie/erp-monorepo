@@ -1,12 +1,24 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { TaxEntity, TaxStatus, TaxType } from '../../database/entities/tax.entity';
+import {
+  TaxEntity,
+  TaxStatus,
+  TaxType,
+} from '../../database/entities/tax.entity';
 import { TenantTaxEntity } from '../../database/entities/tenant-tax.entity';
 import { CreateTaxDto } from './dto/create-tax.dto';
 import { UpdateTaxDto } from './dto/update-tax.dto';
 import { TaxQueryDto } from './dto/tax-query.dto';
-import { paginate, PaginatedResponse, calculateSkip } from '../../common/dto/pagination.dto';
+import {
+  paginate,
+  PaginatedResponse,
+  calculateSkip,
+} from '../../common/dto/pagination.dto';
 import { TAX_ERRORS } from '@gym-monorepo/shared';
 
 @Injectable()
@@ -19,7 +31,9 @@ export class PlatformTaxesService {
   ) {}
 
   private async assertNotInUse(id: string): Promise<void> {
-    const usageCount = await this.tenantTaxRepository.count({ where: { taxId: id } });
+    const usageCount = await this.tenantTaxRepository.count({
+      where: { taxId: id },
+    });
     if (usageCount > 0) {
       throw new BadRequestException(TAX_ERRORS.IN_USE_BY_TENANTS.message);
     }
@@ -28,18 +42,26 @@ export class PlatformTaxesService {
   async create(createTaxDto: CreateTaxDto): Promise<TaxEntity> {
     // Validate uniqueness of code if provided
     if (createTaxDto.code) {
-      const existing = await this.taxRepository.findOne({ where: { code: createTaxDto.code } });
+      const existing = await this.taxRepository.findOne({
+        where: { code: createTaxDto.code },
+      });
       if (existing) {
         throw new BadRequestException(TAX_ERRORS.CODE_EXISTS.message);
       }
     }
 
     // Additional validation logic can be here, though DTO handles most
-    if (createTaxDto.type === TaxType.PERCENTAGE && createTaxDto.rate === undefined) {
-       throw new BadRequestException(TAX_ERRORS.RATE_REQUIRED.message);
+    if (
+      createTaxDto.type === TaxType.PERCENTAGE &&
+      createTaxDto.rate === undefined
+    ) {
+      throw new BadRequestException(TAX_ERRORS.RATE_REQUIRED.message);
     }
-    if (createTaxDto.type === TaxType.FIXED && createTaxDto.amount === undefined) {
-       throw new BadRequestException(TAX_ERRORS.AMOUNT_REQUIRED.message);
+    if (
+      createTaxDto.type === TaxType.FIXED &&
+      createTaxDto.amount === undefined
+    ) {
+      throw new BadRequestException(TAX_ERRORS.AMOUNT_REQUIRED.message);
     }
 
     const tax = this.taxRepository.create(createTaxDto);
@@ -54,7 +76,9 @@ export class PlatformTaxesService {
     qb.loadRelationCountAndMap('tax.tenantUsageCount', 'tax.tenantTaxes');
 
     if (search) {
-      qb.andWhere('(tax.name ILIKE :search OR tax.code ILIKE :search)', { search: `%${search}%` });
+      qb.andWhere('(tax.name ILIKE :search OR tax.code ILIKE :search)', {
+        search: `%${search}%`,
+      });
     }
 
     if (status) {
@@ -81,31 +105,43 @@ export class PlatformTaxesService {
     await this.assertNotInUse(id);
 
     if (updateTaxDto.code && updateTaxDto.code !== tax.code) {
-        const existing = await this.taxRepository.findOne({ where: { code: updateTaxDto.code } });
-        if (existing) {
-          throw new BadRequestException(TAX_ERRORS.CODE_EXISTS.message);
-        }
+      const existing = await this.taxRepository.findOne({
+        where: { code: updateTaxDto.code },
+      });
+      if (existing) {
+        throw new BadRequestException(TAX_ERRORS.CODE_EXISTS.message);
+      }
     }
-    
+
     // Validate logic for type change or rate/amount updates if necessary
     // Here we trust DTO but can add cross-field checks if needed
-     if (updateTaxDto.type === TaxType.PERCENTAGE && !updateTaxDto.rate && !tax.rate) {
-         // If switching to PERCENTAGE without providing rate, and no rate existed (e.g. was FIXED)
-         // But type default is PERCENTAGE, so maybe check more carefully.
-         // Simpler: just merge and save, if specific validations needed, add them.
-         // DTO doesn't enforce 'rate if type is PERCENTAGE' on update well because it's partial.
-         // We can enforce consistency:
+    if (
+      updateTaxDto.type === TaxType.PERCENTAGE &&
+      !updateTaxDto.rate &&
+      !tax.rate
+    ) {
+      // If switching to PERCENTAGE without providing rate, and no rate existed (e.g. was FIXED)
+      // But type default is PERCENTAGE, so maybe check more carefully.
+      // Simpler: just merge and save, if specific validations needed, add them.
+      // DTO doesn't enforce 'rate if type is PERCENTAGE' on update well because it's partial.
+      // We can enforce consistency:
     }
-    
+
     // For now simple merge
     Object.assign(tax, updateTaxDto);
-    
+
     // Sanity check after merge
-    if (tax.type === TaxType.PERCENTAGE && (tax.rate === null || tax.rate === undefined)) {
-         throw new BadRequestException(TAX_ERRORS.RATE_REQUIRED.message);
+    if (
+      tax.type === TaxType.PERCENTAGE &&
+      (tax.rate === null || tax.rate === undefined)
+    ) {
+      throw new BadRequestException(TAX_ERRORS.RATE_REQUIRED.message);
     }
-    if (tax.type === TaxType.FIXED && (tax.amount === null || tax.amount === undefined)) {
-         throw new BadRequestException(TAX_ERRORS.AMOUNT_REQUIRED.message);
+    if (
+      tax.type === TaxType.FIXED &&
+      (tax.amount === null || tax.amount === undefined)
+    ) {
+      throw new BadRequestException(TAX_ERRORS.AMOUNT_REQUIRED.message);
     }
 
     return this.taxRepository.save(tax);

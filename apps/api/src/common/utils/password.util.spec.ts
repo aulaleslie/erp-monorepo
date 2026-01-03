@@ -6,7 +6,7 @@ describe('Password Utilities', () => {
     it('should return a hashed password', async () => {
       const password = 'testPassword123';
       const hashed = await hashPassword(password);
-      
+
       expect(hashed).toBeDefined();
       expect(hashed).not.toBe(password);
       expect(hashed.length).toBeGreaterThan(0);
@@ -16,14 +16,14 @@ describe('Password Utilities', () => {
       const password = 'testPassword123';
       const hash1 = await hashPassword(password);
       const hash2 = await hashPassword(password);
-      
+
       expect(hash1).not.toBe(hash2);
     });
 
     it('should generate bcrypt compatible hash', async () => {
       const password = 'testPassword123';
       const hashed = await hashPassword(password);
-      
+
       // bcrypt hashes start with $2b$ or $2a$
       expect(hashed).toMatch(/^\$2[ab]\$/);
     });
@@ -33,7 +33,7 @@ describe('Password Utilities', () => {
     it('should return true for matching password', async () => {
       const password = 'testPassword123';
       const hashed = await hashPassword(password);
-      
+
       const result = await comparePassword(password, hashed);
       expect(result).toBe(true);
     });
@@ -42,7 +42,7 @@ describe('Password Utilities', () => {
       const password = 'testPassword123';
       const wrongPassword = 'wrongPassword456';
       const hashed = await hashPassword(password);
-      
+
       const result = await comparePassword(wrongPassword, hashed);
       expect(result).toBe(false);
     });
@@ -50,7 +50,7 @@ describe('Password Utilities', () => {
     it('should handle empty string comparison', async () => {
       const password = 'testPassword123';
       const hashed = await hashPassword(password);
-      
+
       const result = await comparePassword('', hashed);
       expect(result).toBe(false);
     });
@@ -58,7 +58,7 @@ describe('Password Utilities', () => {
     it('should be case sensitive', async () => {
       const password = 'TestPassword123';
       const hashed = await hashPassword(password);
-      
+
       const result = await comparePassword('testpassword123', hashed);
       expect(result).toBe(false);
     });

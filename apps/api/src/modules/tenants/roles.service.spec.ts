@@ -7,7 +7,11 @@ import { PermissionEntity } from '../../database/entities/permission.entity';
 import { TenantUserEntity } from '../../database/entities/tenant-user.entity';
 import { UserEntity } from '../../database/entities/user.entity';
 import { Repository, ObjectLiteral } from 'typeorm';
-import { NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import {
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 
 type MockRepository<T extends ObjectLiteral = any> = Partial<
   Record<keyof Repository<T>, jest.Mock>
@@ -49,9 +53,18 @@ describe('RolesService', () => {
       providers: [
         RolesService,
         { provide: getRepositoryToken(RoleEntity), useValue: roleRepository },
-        { provide: getRepositoryToken(RolePermissionEntity), useValue: rolePermissionRepository },
-        { provide: getRepositoryToken(PermissionEntity), useValue: permissionRepository },
-        { provide: getRepositoryToken(TenantUserEntity), useValue: tenantUserRepository },
+        {
+          provide: getRepositoryToken(RolePermissionEntity),
+          useValue: rolePermissionRepository,
+        },
+        {
+          provide: getRepositoryToken(PermissionEntity),
+          useValue: permissionRepository,
+        },
+        {
+          provide: getRepositoryToken(TenantUserEntity),
+          useValue: tenantUserRepository,
+        },
         { provide: getRepositoryToken(UserEntity), useValue: userRepository },
       ],
     }).compile();
@@ -61,7 +74,9 @@ describe('RolesService', () => {
 
   describe('findAll', () => {
     it('should return paginated roles excluding super admin', async () => {
-      const roles = [{ id: 'role-1', name: 'Editor', isSuperAdmin: false }] as RoleEntity[];
+      const roles = [
+        { id: 'role-1', name: 'Editor', isSuperAdmin: false },
+      ] as RoleEntity[];
       roleRepository.findAndCount!.mockResolvedValue([roles, 10]);
 
       const result = await service.findAll('tenant-1', 1, 10);
@@ -79,7 +94,11 @@ describe('RolesService', () => {
 
   describe('findOne', () => {
     it('should return role if found', async () => {
-      const role = { id: 'role-1', name: 'Editor', tenantId: 'tenant-1' } as RoleEntity;
+      const role = {
+        id: 'role-1',
+        name: 'Editor',
+        tenantId: 'tenant-1',
+      } as RoleEntity;
       roleRepository.findOne!.mockResolvedValue(role);
 
       const result = await service.findOne('tenant-1', 'role-1');
@@ -89,7 +108,9 @@ describe('RolesService', () => {
     it('should throw NotFoundException if role not found', async () => {
       roleRepository.findOne!.mockResolvedValue(null);
 
-      await expect(service.findOne('tenant-1', 'role-1')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('tenant-1', 'role-1')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -106,17 +127,23 @@ describe('RolesService', () => {
     });
 
     it('should throw BadRequestException if role name exists', async () => {
-      roleRepository.find!.mockResolvedValue([{ id: 'role-1', name: 'Editor' }]);
+      roleRepository.find!.mockResolvedValue([
+        { id: 'role-1', name: 'Editor' },
+      ]);
 
       await expect(
-        service.create('tenant-1', { name: 'Editor' })
+        service.create('tenant-1', { name: 'Editor' }),
       ).rejects.toThrow(BadRequestException);
     });
   });
 
   describe('delete', () => {
     it('should delete non-super-admin role', async () => {
-      const role = { id: 'role-1', name: 'Editor', isSuperAdmin: false } as RoleEntity;
+      const role = {
+        id: 'role-1',
+        name: 'Editor',
+        isSuperAdmin: false,
+      } as RoleEntity;
       roleRepository.findOne!.mockResolvedValue(role);
       roleRepository.remove!.mockResolvedValue(role);
 
@@ -126,10 +153,16 @@ describe('RolesService', () => {
     });
 
     it('should throw ForbiddenException when deleting super admin role', async () => {
-      const role = { id: 'role-1', name: 'Super Admin', isSuperAdmin: true } as RoleEntity;
+      const role = {
+        id: 'role-1',
+        name: 'Super Admin',
+        isSuperAdmin: true,
+      } as RoleEntity;
       roleRepository.findOne!.mockResolvedValue(role);
 
-      await expect(service.delete('tenant-1', 'role-1')).rejects.toThrow(ForbiddenException);
+      await expect(service.delete('tenant-1', 'role-1')).rejects.toThrow(
+        ForbiddenException,
+      );
     });
   });
 
@@ -191,7 +224,9 @@ describe('RolesService', () => {
 
       await service.assignPermissions('tenant-1', 'role-1', ['users.read']);
 
-      expect(rolePermissionRepository.delete).toHaveBeenCalledWith({ roleId: 'role-1' });
+      expect(rolePermissionRepository.delete).toHaveBeenCalledWith({
+        roleId: 'role-1',
+      });
       expect(rolePermissionRepository.save).toHaveBeenCalled();
     });
 
@@ -201,7 +236,7 @@ describe('RolesService', () => {
       permissionRepository.find!.mockResolvedValue([]); // No matching permissions
 
       await expect(
-        service.assignPermissions('tenant-1', 'role-1', ['invalid.permission'])
+        service.assignPermissions('tenant-1', 'role-1', ['invalid.permission']),
       ).rejects.toThrow(BadRequestException);
     });
   });

@@ -83,7 +83,10 @@ export class TenantUsersService {
     return paginate(items, total, page, limit);
   }
 
-  async findOne(tenantId: string, userId: string): Promise<TenantUserResponseDto> {
+  async findOne(
+    tenantId: string,
+    userId: string,
+  ): Promise<TenantUserResponseDto> {
     const membership = await this.tenantUserRepository.findOne({
       where: { tenantId, userId },
     });
@@ -107,7 +110,12 @@ export class TenantUsersService {
 
   async create(
     tenantId: string,
-    data: { email: string; fullName?: string; roleId?: string; password: string },
+    data: {
+      email: string;
+      fullName?: string;
+      roleId?: string;
+      password: string;
+    },
     actorIsSuperAdmin: boolean,
   ): Promise<TenantUserResponseDto> {
     // Check if user already exists
@@ -129,7 +137,9 @@ export class TenantUsersService {
         throw new NotFoundException(ROLE_ERRORS.NOT_FOUND_IN_TENANT.message);
       }
       if (role.isSuperAdmin && !actorIsSuperAdmin) {
-        throw new ForbiddenException(ROLE_ERRORS.SUPER_ADMIN_ASSIGNMENT_FORBIDDEN.message);
+        throw new ForbiddenException(
+          ROLE_ERRORS.SUPER_ADMIN_ASSIGNMENT_FORBIDDEN.message,
+        );
       }
     }
 
@@ -170,7 +180,9 @@ export class TenantUsersService {
     }
 
     if (user.isSuperAdmin) {
-      throw new BadRequestException(USER_ERRORS.CANNOT_INVITE_SUPER_ADMIN.message);
+      throw new BadRequestException(
+        USER_ERRORS.CANNOT_INVITE_SUPER_ADMIN.message,
+      );
     }
 
     // Check if role exists and belongs to tenant
@@ -181,7 +193,9 @@ export class TenantUsersService {
       throw new NotFoundException(ROLE_ERRORS.NOT_FOUND_IN_TENANT.message);
     }
     if (role.isSuperAdmin && !actorIsSuperAdmin) {
-      throw new ForbiddenException(ROLE_ERRORS.SUPER_ADMIN_ASSIGNMENT_FORBIDDEN.message);
+      throw new ForbiddenException(
+        ROLE_ERRORS.SUPER_ADMIN_ASSIGNMENT_FORBIDDEN.message,
+      );
     }
 
     // Check if already in tenant
@@ -229,7 +243,9 @@ export class TenantUsersService {
         throw new NotFoundException(ROLE_ERRORS.NOT_FOUND_IN_TENANT.message);
       }
       if (role.isSuperAdmin && !actorIsSuperAdmin) {
-        throw new ForbiddenException(ROLE_ERRORS.SUPER_ADMIN_ASSIGNMENT_FORBIDDEN.message);
+        throw new ForbiddenException(
+          ROLE_ERRORS.SUPER_ADMIN_ASSIGNMENT_FORBIDDEN.message,
+        );
       }
     }
 
@@ -315,7 +331,9 @@ export class TenantUsersService {
           throw new NotFoundException(ROLE_ERRORS.NOT_FOUND_IN_TENANT.message);
         }
         if (role.isSuperAdmin && !actorIsSuperAdmin) {
-          throw new ForbiddenException(ROLE_ERRORS.SUPER_ADMIN_ASSIGNMENT_FORBIDDEN.message);
+          throw new ForbiddenException(
+            ROLE_ERRORS.SUPER_ADMIN_ASSIGNMENT_FORBIDDEN.message,
+          );
         }
       }
       membership.roleId = data.roleId === null ? null : data.roleId;

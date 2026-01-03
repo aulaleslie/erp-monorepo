@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, Not } from 'typeorm';
 import { TenantEntity } from '../../database/entities/tenant.entity';
@@ -9,7 +6,11 @@ import { TenantUserEntity } from '../../database/entities/tenant-user.entity';
 import { RoleEntity } from '../../database/entities/role.entity';
 import { TaxEntity, TaxStatus } from '../../database/entities/tax.entity';
 import { TenantTaxEntity } from '../../database/entities/tenant-tax.entity';
-import { PaginatedResponse, paginate, calculateSkip } from '../../common/dto/pagination.dto';
+import {
+  PaginatedResponse,
+  paginate,
+  calculateSkip,
+} from '../../common/dto/pagination.dto';
 import { createValidationBuilder } from '../../common/utils/validation.util';
 import { TenantType } from '@gym-monorepo/shared';
 
@@ -66,7 +67,13 @@ export class TenantsService {
 
   async create(
     userId: string,
-    data: { name: string; slug: string; type?: TenantType; isTaxable?: boolean; taxIds?: string[] },
+    data: {
+      name: string;
+      slug: string;
+      type?: TenantType;
+      isTaxable?: boolean;
+      taxIds?: string[];
+    },
   ): Promise<TenantEntity> {
     const validator = createValidationBuilder();
     const taxIds = data.taxIds ?? [];
@@ -92,7 +99,10 @@ export class TenantsService {
     }
 
     if (isTaxable && taxIds.length === 0) {
-      validator.addError('taxIds', 'Tax selection is required for taxable tenants');
+      validator.addError(
+        'taxIds',
+        'Tax selection is required for taxable tenants',
+      );
     }
 
     if (taxIds.length > 0) {
@@ -105,7 +115,10 @@ export class TenantsService {
       });
 
       if (taxes.length !== uniqueTaxIds.length) {
-        validator.addError('taxIds', 'One or more tax IDs are invalid or inactive');
+        validator.addError(
+          'taxIds',
+          'One or more tax IDs are invalid or inactive',
+        );
       }
     }
 
@@ -202,7 +215,10 @@ export class TenantsService {
     }
 
     if (hasTaxIds && nextIsTaxable && uniqueTaxIds.length === 0) {
-      validator.addError('taxIds', 'Tax selection is required for taxable tenants');
+      validator.addError(
+        'taxIds',
+        'Tax selection is required for taxable tenants',
+      );
     }
 
     if (hasTaxIds && uniqueTaxIds.length > 0) {
@@ -215,7 +231,10 @@ export class TenantsService {
       });
 
       if (taxes.length !== uniqueTaxIds.length) {
-        validator.addError('taxIds', 'One or more tax IDs are invalid or inactive');
+        validator.addError(
+          'taxIds',
+          'One or more tax IDs are invalid or inactive',
+        );
       }
     }
 
@@ -224,7 +243,10 @@ export class TenantsService {
         where: { tenantId: id },
       });
       if (existingTaxCount === 0) {
-        validator.addError('taxIds', 'Tax selection is required for taxable tenants');
+        validator.addError(
+          'taxIds',
+          'Tax selection is required for taxable tenants',
+        );
       }
     }
 

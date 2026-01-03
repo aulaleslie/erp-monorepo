@@ -4,7 +4,11 @@ import { PlatformTaxesService } from './platform-taxes.service';
 import { CreateTaxDto } from './dto/create-tax.dto';
 import { UpdateTaxDto } from './dto/update-tax.dto';
 import { TaxQueryDto } from './dto/tax-query.dto';
-import { TaxEntity, TaxStatus, TaxType } from '../../database/entities/tax.entity';
+import {
+  TaxEntity,
+  TaxStatus,
+  TaxType,
+} from '../../database/entities/tax.entity';
 import { PaginatedResponse } from '../../common/dto/pagination.dto';
 import { SuperAdminGuard } from '../../common/guards/super-admin.guard';
 import { AuthGuard } from '@nestjs/passport';
@@ -51,8 +55,22 @@ describe('PlatformTaxesController', () => {
 
   describe('create', () => {
     it('should create a tax', async () => {
-      const dto: CreateTaxDto = { name: 'VAT', rate: 0.1, type: TaxType.PERCENTAGE };
-      const result: TaxEntity = { id: '1', ...dto, status: TaxStatus.ACTIVE, code: 'VAT', amount: null, createdAt: new Date(), updatedAt: new Date(), createdBy: 'admin', updatedBy: 'admin' } as unknown as TaxEntity;
+      const dto: CreateTaxDto = {
+        name: 'VAT',
+        rate: 0.1,
+        type: TaxType.PERCENTAGE,
+      };
+      const result: TaxEntity = {
+        id: '1',
+        ...dto,
+        status: TaxStatus.ACTIVE,
+        code: 'VAT',
+        amount: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        createdBy: 'admin',
+        updatedBy: 'admin',
+      } as unknown as TaxEntity;
       mockService.create.mockResolvedValue(result);
 
       expect(await controller.create(dto)).toBe(result);
@@ -63,7 +81,13 @@ describe('PlatformTaxesController', () => {
   describe('findAll', () => {
     it('should return paginated taxes', async () => {
       const query: TaxQueryDto = { page: 1, limit: 10 };
-      const result: PaginatedResponse<TaxEntity> = { items: [], total: 0, page: 1, limit: 10, totalPages: 0 };
+      const result: PaginatedResponse<TaxEntity> = {
+        items: [],
+        total: 0,
+        page: 1,
+        limit: 10,
+        totalPages: 0,
+      };
       mockService.findAll.mockResolvedValue(result);
 
       expect(await controller.findAll(query)).toBe(result);

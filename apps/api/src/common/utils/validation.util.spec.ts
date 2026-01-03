@@ -1,4 +1,7 @@
-import { ValidationErrorBuilder, createValidationBuilder } from './validation.util';
+import {
+  ValidationErrorBuilder,
+  createValidationBuilder,
+} from './validation.util';
 import { BadRequestException } from '@nestjs/common';
 
 describe('ValidationErrorBuilder', () => {
@@ -34,7 +37,9 @@ describe('ValidationErrorBuilder', () => {
     });
 
     it('should support method chaining', () => {
-      const result = builder.addError('field1', 'error1').addError('field2', 'error2');
+      const result = builder
+        .addError('field1', 'error1')
+        .addError('field2', 'error2');
       expect(result).toBe(builder);
       expect(builder.hasErrors()).toBe(true);
     });
@@ -87,7 +92,7 @@ describe('ValidationErrorBuilder', () => {
     it('should clear all errors', () => {
       builder.addError('field', 'error');
       expect(builder.hasErrors()).toBe(true);
-      
+
       builder.clear();
       expect(builder.hasErrors()).toBe(false);
       expect(builder.getErrors()).toEqual({});
@@ -109,7 +114,7 @@ describe('createValidationBuilder', () => {
   it('should return independent instances', () => {
     const builder1 = createValidationBuilder();
     const builder2 = createValidationBuilder();
-    
+
     builder1.addError('field', 'error');
     expect(builder1.hasErrors()).toBe(true);
     expect(builder2.hasErrors()).toBe(false);

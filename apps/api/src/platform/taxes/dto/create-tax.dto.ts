@@ -1,4 +1,12 @@
-import { IsEnum, IsNumber, IsOptional, IsString, Max, Min, ValidateIf } from 'class-validator';
+import {
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+  ValidateIf,
+} from 'class-validator';
 import { TaxType } from '../../../database/entities/tax.entity';
 
 export class CreateTaxDto {

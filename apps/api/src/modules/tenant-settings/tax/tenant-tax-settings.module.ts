@@ -10,11 +10,7 @@ import { UsersModule } from '../../users/users.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      TenantEntity,
-      TaxEntity,
-      TenantTaxEntity,
-    ]),
+    TypeOrmModule.forFeature([TenantEntity, TaxEntity, TenantTaxEntity]),
     TenantsModule,
     UsersModule,
   ],

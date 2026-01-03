@@ -1,9 +1,4 @@
-import {
-  Column,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { TenantTaxEntity } from './tenant-tax.entity';
 import { BaseAuditEntity } from '../../common/entities/base-audit.entity';
 

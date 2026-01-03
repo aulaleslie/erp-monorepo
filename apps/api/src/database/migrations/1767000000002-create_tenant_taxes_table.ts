@@ -1,10 +1,10 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class CreateTenantTaxesTable1767000000002 implements MigrationInterface {
-    name = 'CreateTenantTaxesTable1767000000002'
+  name = 'CreateTenantTaxesTable1767000000002';
 
-    public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
             CREATE TABLE "tenant_taxes" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "tenantId" uuid NOT NULL,
@@ -21,22 +21,26 @@ export class CreateTenantTaxesTable1767000000002 implements MigrationInterface {
             )
         `);
 
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "tenant_taxes" 
             ADD CONSTRAINT "FK_tenant_taxes_tenantId" 
             FOREIGN KEY ("tenantId") REFERENCES "tenants"("id") ON DELETE NO ACTION ON UPDATE NO ACTION
         `);
 
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "tenant_taxes" 
             ADD CONSTRAINT "FK_tenant_taxes_taxId" 
             FOREIGN KEY ("taxId") REFERENCES "taxes"("id") ON DELETE NO ACTION ON UPDATE NO ACTION
         `);
-    }
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`ALTER TABLE "tenant_taxes" DROP CONSTRAINT "FK_tenant_taxes_taxId"`);
-        await queryRunner.query(`ALTER TABLE "tenant_taxes" DROP CONSTRAINT "FK_tenant_taxes_tenantId"`);
-        await queryRunner.query(`DROP TABLE "tenant_taxes"`);
-    }
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(
+      `ALTER TABLE "tenant_taxes" DROP CONSTRAINT "FK_tenant_taxes_taxId"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "tenant_taxes" DROP CONSTRAINT "FK_tenant_taxes_tenantId"`,
+    );
+    await queryRunner.query(`DROP TABLE "tenant_taxes"`);
+  }
 }

@@ -14,7 +14,6 @@ import { TaxesModule } from './modules/taxes/taxes.module';
 import { PlatformTaxesModule } from './platform/taxes/platform-taxes.module';
 import { TenantSettingsModule } from './modules/tenant-settings/tenant-settings.module';
 
-
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { UserContextInterceptor } from './common/interceptors/user-context.interceptor';
 

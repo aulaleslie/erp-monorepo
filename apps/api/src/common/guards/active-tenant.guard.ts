@@ -14,7 +14,9 @@ export class ActiveTenantGuard implements CanActivate {
     const tenantId = request.cookies['active_tenant'];
 
     if (!tenantId) {
-      throw new BadRequestException(TENANT_ERRORS.ACTIVE_TENANT_REQUIRED.message);
+      throw new BadRequestException(
+        TENANT_ERRORS.ACTIVE_TENANT_REQUIRED.message,
+      );
     }
 
     // Attach to request for easier access
