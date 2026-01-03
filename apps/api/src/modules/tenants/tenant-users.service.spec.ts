@@ -369,6 +369,7 @@ describe('TenantUsersService', () => {
         false,
       );
 
+      expect(result).toBeDefined();
       expect(userRepository.save).toHaveBeenCalled();
     });
 

@@ -138,7 +138,7 @@ export class RolesService {
     roleId: string,
     permissionCodes: string[],
   ): Promise<void> {
-    const role = await this.findOne(tenantId, roleId); // Ensure role exists and belongs to tenant
+    const _role = await this.findOne(tenantId, roleId); // Ensure role exists and belongs to tenant
 
     // validate permissions exist
     const permissions = await this.permissionRepository.find({

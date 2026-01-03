@@ -15,7 +15,8 @@ import { AuthGuard } from '@nestjs/passport';
 
 describe('PlatformTaxesController', () => {
   let controller: PlatformTaxesController;
-  let service: PlatformTaxesService;
+
+  let _service: PlatformTaxesService;
 
   const mockService = {
     create: jest.fn(),
@@ -42,7 +43,7 @@ describe('PlatformTaxesController', () => {
       .compile();
 
     controller = module.get<PlatformTaxesController>(PlatformTaxesController);
-    service = module.get<PlatformTaxesService>(PlatformTaxesService);
+    _service = module.get<PlatformTaxesService>(PlatformTaxesService);
   });
 
   afterEach(() => {

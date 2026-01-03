@@ -1,4 +1,4 @@
-import { paginate, calculateSkip, PaginatedResponse } from './pagination.dto';
+import { paginate, calculateSkip } from './pagination.dto';
 
 describe('Pagination Utilities', () => {
   describe('calculateSkip', () => {

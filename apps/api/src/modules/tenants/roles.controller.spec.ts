@@ -3,6 +3,10 @@ import { RolesController } from './roles.controller';
 import { RolesService } from './roles.service';
 import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { AuthGuard } from '@nestjs/passport';
+import { ActiveTenantGuard } from './guards/active-tenant.guard';
+import { TenantMembershipGuard } from './guards/tenant-membership.guard';
+import { PermissionGuard } from '../users/guards/permission.guard';
 
 describe('RolesController', () => {
   let controller: RolesController;
@@ -27,17 +31,13 @@ describe('RolesController', () => {
         { provide: Reflector, useValue: {} },
       ],
     })
-      .overrideGuard(require('@nestjs/passport').AuthGuard('jwt'))
+      .overrideGuard(AuthGuard('jwt'))
       .useValue({ canActivate: () => true })
-      .overrideGuard(require('./guards/active-tenant.guard').ActiveTenantGuard)
+      .overrideGuard(ActiveTenantGuard)
       .useValue({ canActivate: () => true })
-      .overrideGuard(
-        require('./guards/tenant-membership.guard').TenantMembershipGuard,
-      )
+      .overrideGuard(TenantMembershipGuard)
       .useValue({ canActivate: () => true })
-      .overrideGuard(
-        require('../users/guards/permission.guard').PermissionGuard,
-      )
+      .overrideGuard(PermissionGuard)
       .useValue({ canActivate: () => true })
       .compile();
 

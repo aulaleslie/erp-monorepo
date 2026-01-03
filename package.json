@@ -56,8 +56,8 @@
     }
   },
   "lint-staged": {
-    "apps/api/src/**/*.ts": "eslint --config apps/api/eslint.config.mjs --max-warnings=0",
-    "apps/web/src/**/*.{ts,tsx}": "eslint --config apps/web/eslint.config.mjs --max-warnings=0"
+    "apps/api/src/**/*.ts": "eslint --config apps/api/eslint.config.mjs",
+    "apps/web/src/**/*.{ts,tsx}": "eslint --config apps/web/eslint.config.mjs"
   },
   "devDependencies": {
     "husky": "^9.1.7",

@@ -18,8 +18,6 @@ import {
 import {
   TenantUserResponseDto,
   toTenantUserResponseDto,
-  toUserResponseDto,
-  toRoleResponseDto,
 } from '../../common/dto/user.dto';
 import { hashPassword } from '../../common/utils/password.util';
 import { USER_ERRORS, ROLE_ERRORS } from '@gym-monorepo/shared';

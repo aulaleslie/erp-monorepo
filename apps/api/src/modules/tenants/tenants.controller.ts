@@ -8,21 +8,14 @@ import {
   Param,
   UseGuards,
   Req,
-  Res,
-  UnauthorizedException,
   ForbiddenException,
-  NotFoundException,
   HttpCode,
   HttpStatus,
-  BadRequestException,
   Query,
 } from '@nestjs/common';
 import { ApiTags, ApiCookieAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { ActiveTenantGuard } from './guards/active-tenant.guard';
-import { TenantMembershipGuard } from './guards/tenant-membership.guard';
 import { TenantsService } from './tenants.service';
-import { FastifyReply, FastifyRequest } from 'fastify';
 import { CreateTenantDto, UpdateTenantDto } from './dto/tenant.dto';
 
 @ApiTags('tenants')

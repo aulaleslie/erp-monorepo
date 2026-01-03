@@ -9,11 +9,7 @@ import {
 } from '../../../database/entities/tax.entity';
 import { TenantTaxEntity } from '../../../database/entities/tenant-tax.entity';
 import { DataSource, ObjectLiteral, Repository } from 'typeorm';
-import {
-  BadRequestException,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 
 const mockTenantRepository = () => ({
   findOne: jest.fn(),

@@ -114,7 +114,7 @@ export class MeController {
         return null;
       }
       return tenant;
-    } catch (e) {
+    } catch {
       return null;
     }
   }

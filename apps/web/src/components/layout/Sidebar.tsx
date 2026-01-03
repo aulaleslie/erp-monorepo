@@ -36,8 +36,6 @@ function SidebarGroup({
     renderLeafItem,
 }: SidebarGroupProps) {
     const visibleChildren = item.children?.filter(child => isItemVisible(child)) ?? [];
-    if (visibleChildren.length === 0) return null;
-
     const Icon = item.icon;
     const isActiveGroup = visibleChildren.some(child => child.href === pathname);
     const [isOpen, setIsOpen] = React.useState(isActiveGroup);
@@ -47,6 +45,8 @@ function SidebarGroup({
             setIsOpen(true);
         }
     }, [isActiveGroup]);
+
+    if (visibleChildren.length === 0) return null;
 
     if (isCollapsed) {
         return (

@@ -1,5 +1,4 @@
 import { hashPassword, comparePassword } from './password.util';
-import * as bcrypt from 'bcrypt';
 
 describe('Password Utilities', () => {
   describe('hashPassword', () => {
