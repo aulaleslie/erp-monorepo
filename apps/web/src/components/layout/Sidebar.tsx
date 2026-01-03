@@ -3,19 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-    Home,
-    Settings,
-    Shield,
-    Users,
-    Building,
-    Building2,
-    Percent,
-    History,
-    ChevronLeft,
-    ChevronDown,
-    Menu
-} from "lucide-react";
+import { ChevronLeft, ChevronDown, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,16 +18,7 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { usePermissions } from "@/hooks/use-permissions";
-
-interface SidebarItem {
-    label: string;
-    icon: React.ElementType;
-    href?: string;
-    permissions?: string[];
-    superAdminOnly?: boolean;
-    children?: SidebarItem[];
-    collapsed?: boolean; // internal use for structure, though config is usually static
-}
+import { sidebarConfig, type SidebarItem } from "@/components/layout/sidebar-config";
 
 interface SidebarGroupProps {
     item: SidebarItem;
@@ -107,69 +86,6 @@ function SidebarGroup({
         </Collapsible>
     );
 }
-
-const sidebarConfig: SidebarItem[] = [
-    {
-        label: 'Dashboard',
-        icon: Home,
-        href: '/dashboard',
-    },
-    {
-        label: 'Settings',
-        icon: Settings,
-        children: [
-            {
-                label: 'Tenant',
-                icon: Building,
-                href: '/settings/tenant',
-                permissions: [
-                    'settings.tenant.read',
-                    'settings.tenant.update',
-                ],
-            },
-            {
-                label: 'Tenants',
-                icon: Building2,
-                href: '/settings/tenants',
-                superAdminOnly: true,
-            },
-            {
-                label: 'Taxes',
-                icon: Percent,
-                href: '/settings/taxes',
-                superAdminOnly: true,
-            },
-            {
-                label: 'Audit Logs',
-                icon: History,
-                href: '/settings/audit-logs',
-                superAdminOnly: true,
-            },
-            {
-                label: 'Roles',
-                icon: Shield,
-                href: '/settings/roles',
-                permissions: [
-                    'roles.read',
-                    'roles.create',
-                    'roles.update',
-                    'roles.delete',
-                ],
-            },
-            {
-                label: 'Users',
-                icon: Users,
-                href: '/settings/users',
-                permissions: [
-                    'users.read',
-                    'users.create',
-                    'users.update',
-                    'users.assignRole',
-                ],
-            },
-        ],
-    },
-];
 
 export function Sidebar() {
     const [isCollapsed, setIsCollapsed] = React.useState(false);

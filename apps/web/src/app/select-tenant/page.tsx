@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { ChevronRight, Building } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/common/LoadingState";
 import { EmptyState } from "@/components/common/EmptyState";
+import { usePermissions } from "@/hooks/use-permissions";
+import { getSidebarAccessForPath } from "@/components/layout/sidebar-config";
 
 interface Tenant {
     id: string;
@@ -20,12 +22,56 @@ interface UserTenant {
     role: { id: string; name: string; isSuperAdmin: boolean } | null;
 }
 
+const normalizeRedirectPath = (path: string | null) => {
+    if (!path || !path.startsWith("/") || path.startsWith("//")) return null;
+    if (path.startsWith("/select-tenant") || path.startsWith("/login")) return null;
+    return path;
+};
+
 export default function SelectTenantPage() {
     const [tenants, setTenants] = useState<Tenant[]>([]);
     const [loading, setLoading] = useState(true);
-    const { refreshAuth } = useAuth();
+    const [pendingRedirect, setPendingRedirect] = useState<string | null>(null);
+    const { refreshAuth, isLoading } = useAuth();
+    const { isSuperAdmin, canAny } = usePermissions();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
+
+    useEffect(() => {
+        if (!pendingRedirect || isLoading) return;
+        const normalizedPath = normalizeRedirectPath(pendingRedirect);
+        if (!normalizedPath) {
+            router.push("/dashboard");
+            setPendingRedirect(null);
+            return;
+        }
+
+        const access = getSidebarAccessForPath(normalizedPath);
+        if (!access) {
+            router.push(normalizedPath);
+            setPendingRedirect(null);
+            return;
+        }
+
+        if (isSuperAdmin) {
+            router.push(access.href);
+            setPendingRedirect(null);
+            return;
+        }
+
+        if (access.superAdminOnly) {
+            router.push("/dashboard");
+            setPendingRedirect(null);
+            return;
+        }
+
+        const target = access.permissions.length === 0 || canAny(access.permissions)
+            ? access.href
+            : "/dashboard";
+        router.push(target);
+        setPendingRedirect(null);
+    }, [pendingRedirect, isLoading, router, isSuperAdmin, canAny]);
 
     const normalizeTenants = (data: unknown): Tenant[] => {
         if (!Array.isArray(data)) return [];
@@ -107,7 +153,8 @@ export default function SelectTenantPage() {
 
             if (res.ok) {
                 await refreshAuth();
-                router.push("/dashboard");
+                const redirectPath = normalizeRedirectPath(searchParams.get("redirect"));
+                setPendingRedirect(redirectPath || "/dashboard");
             } else {
                 console.error("Failed to set active tenant");
             }

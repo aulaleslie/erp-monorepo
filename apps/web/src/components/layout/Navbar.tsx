@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
@@ -22,6 +22,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
 export function Navbar() {
     const { user, activeTenant, hasTenants, refreshAuth } = useAuth();
     const router = useRouter();
+    const pathname = usePathname();
     const { toast } = useToast();
     const [checkingTenants, setCheckingTenants] = useState(false);
 
@@ -62,7 +63,7 @@ export function Navbar() {
                 } else {
                     // Has tenants - refresh auth and navigate to select-tenant
                     await refreshAuth();
-                    router.push("/select-tenant");
+                    router.push(`/select-tenant?redirect=${encodeURIComponent(pathname)}`);
                 }
             } else {
                 toast({
@@ -137,4 +138,3 @@ export function Navbar() {
         </header>
     );
 }
-
