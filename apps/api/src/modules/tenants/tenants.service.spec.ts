@@ -6,6 +6,7 @@ import { TenantUserEntity } from '../../database/entities/tenant-user.entity';
 import { RoleEntity } from '../../database/entities/role.entity';
 import { Repository, ObjectLiteral } from 'typeorm';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { TenantType } from '@gym-monorepo/shared';
 
 type MockRepository<T extends ObjectLiteral = any> = Partial<
   Record<keyof Repository<T>, jest.Mock>
@@ -128,7 +129,11 @@ describe('TenantsService', () => {
       tenantUserRepository.create!.mockReturnValue({});
       tenantUserRepository.save!.mockResolvedValue({});
 
-      const result = await service.create('user-1', { name: 'New Tenant', slug: 'new-tenant' });
+      const result = await service.create('user-1', {
+        name: 'New Tenant',
+        slug: 'new-tenant',
+        type: TenantType.GYM,
+      });
 
       expect(result).toEqual(newTenant);
       expect(roleRepository.create).toHaveBeenCalledWith({
@@ -142,7 +147,11 @@ describe('TenantsService', () => {
       tenantRepository.findOne!.mockResolvedValueOnce({ slug: 'existing-slug' }); // Slug exists
 
       await expect(
-        service.create('user-1', { name: 'New Tenant', slug: 'existing-slug' })
+        service.create('user-1', {
+          name: 'New Tenant',
+          slug: 'existing-slug',
+          type: TenantType.GYM,
+        })
       ).rejects.toThrow(BadRequestException);
     });
   });

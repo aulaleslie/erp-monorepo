@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { tenantsService } from './tenants';
 import { api } from '@/lib/api';
+import { TenantType } from '@gym-monorepo/shared';
 
 // Mock the api module
 vi.mock('@/lib/api', () => ({
@@ -27,7 +28,16 @@ describe('tenantsService', () => {
   describe('getAll', () => {
     it('fetches paginated tenants with default params', async () => {
       const mockResponse = {
-        items: [{ id: '1', name: 'Tenant A', slug: 'tenant-a', status: 'ACTIVE' }],
+        items: [
+          {
+            id: '1',
+            name: 'Tenant A',
+            slug: 'tenant-a',
+            status: 'ACTIVE',
+            type: TenantType.GYM,
+            isTaxable: false,
+          },
+        ],
         total: 1,
         page: 1,
         limit: 10,
@@ -37,7 +47,7 @@ describe('tenantsService', () => {
       const result = await tenantsService.getAll();
 
       expect(mockApi.get).toHaveBeenCalledWith('/tenants', {
-        params: { page: 1, limit: 10 },
+        params: { page: 1, limit: 10, status: undefined },
       });
       expect(result).toEqual(mockResponse);
     });
@@ -48,14 +58,21 @@ describe('tenantsService', () => {
       await tenantsService.getAll(3, 25);
 
       expect(mockApi.get).toHaveBeenCalledWith('/tenants', {
-        params: { page: 3, limit: 25 },
+        params: { page: 3, limit: 25, status: undefined },
       });
     });
   });
 
   describe('getOne', () => {
     it('fetches a single tenant by id', async () => {
-      const mockTenant = { id: '1', name: 'Tenant A', slug: 'tenant-a', status: 'ACTIVE' };
+      const mockTenant = {
+        id: '1',
+        name: 'Tenant A',
+        slug: 'tenant-a',
+        status: 'ACTIVE',
+        type: TenantType.GYM,
+        isTaxable: false,
+      };
       mockApi.get.mockResolvedValue({ data: mockTenant });
 
       const result = await tenantsService.getOne('1');
@@ -67,7 +84,7 @@ describe('tenantsService', () => {
 
   describe('create', () => {
     it('creates a new tenant', async () => {
-      const newTenant = { name: 'New Tenant', slug: 'new-tenant' };
+      const newTenant = { name: 'New Tenant', slug: 'new-tenant', type: TenantType.GYM };
       const mockResponse = { id: '2', ...newTenant, status: 'ACTIVE' };
       mockApi.post.mockResolvedValue({ data: mockResponse });
 
@@ -100,11 +117,11 @@ describe('tenantsService', () => {
     });
   });
 
-  describe('disable', () => {
-    it('disables a tenant', async () => {
+  describe('archive', () => {
+    it('archives a tenant', async () => {
       mockApi.delete.mockResolvedValue({});
 
-      await tenantsService.disable('1');
+      await tenantsService.archive('1');
 
       expect(mockApi.delete).toHaveBeenCalledWith('/tenants/1');
     });

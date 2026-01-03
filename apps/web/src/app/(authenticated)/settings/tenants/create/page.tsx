@@ -6,12 +6,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { tenantsService, CreateTenantDto } from "@/services/tenants";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { usePermissions } from "@/hooks/use-permissions";
+import { TENANT_TYPE_OPTIONS, TenantType } from "@gym-monorepo/shared";
 
 export default function CreateTenantPage() {
     const router = useRouter();
@@ -21,8 +29,8 @@ export default function CreateTenantPage() {
     const [formData, setFormData] = useState<CreateTenantDto>({
         name: "",
         slug: "",
+        type: TenantType.GYM,
         isTaxable: false,
-        isEatery: false,
     });
     const [errors, setErrors] = useState<Record<string, string | string[]>>({});
 
@@ -35,7 +43,7 @@ export default function CreateTenantPage() {
             await tenantsService.create(formData);
             toast({
                 title: "Success",
-                description: "Tenant created successfully. It is initially disabled.",
+                description: "Tenant created successfully. It is initially archived.",
             });
             router.push("/settings/tenants");
         } catch (error: any) {
@@ -110,6 +118,33 @@ export default function CreateTenantPage() {
                         <p className="text-xs text-muted-foreground">Unique identifier for the tenant, used in URLs.</p>
                     </div>
 
+                    <div className="space-y-2">
+                        <Label>Tenant Type</Label>
+                        <Select
+                            value={formData.type}
+                            onValueChange={(value) => {
+                                setFormData({ ...formData, type: value as TenantType });
+                                if (errors.type) setErrors({ ...errors, type: "" });
+                            }}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a tenant type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {TENANT_TYPE_OPTIONS.map((option) => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        {errors.type && (
+                            <p className="text-sm text-red-500 mt-1">
+                                {Array.isArray(errors.type) ? errors.type[0] : errors.type}
+                            </p>
+                        )}
+                    </div>
+
                     <div className="flex items-center space-x-2">
                         <Checkbox
                             id="isTaxable"
@@ -117,15 +152,6 @@ export default function CreateTenantPage() {
                             onCheckedChange={(checked) => setFormData({ ...formData, isTaxable: checked as boolean })}
                         />
                         <Label htmlFor="isTaxable">Taxable Tenant</Label>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                        <Checkbox
-                            id="isEatery"
-                            checked={formData.isEatery}
-                            onCheckedChange={(checked) => setFormData({ ...formData, isEatery: checked as boolean })}
-                        />
-                        <Label htmlFor="isEatery">Eatery Tenant</Label>
                     </div>
                 </div>
 

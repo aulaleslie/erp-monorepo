@@ -6,12 +6,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { tenantsService, CreateTenantDto } from "@/services/tenants";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { usePermissions } from "@/hooks/use-permissions";
+import { TENANT_TYPE_OPTIONS, TenantType } from "@gym-monorepo/shared";
 
 export default function EditTenantPage() {
     const params = useParams();
@@ -25,8 +33,8 @@ export default function EditTenantPage() {
     const [formData, setFormData] = useState<CreateTenantDto>({
         name: "",
         slug: "",
+        type: TenantType.GYM,
         isTaxable: false,
-        isEatery: false,
     });
     const [errors, setErrors] = useState<Record<string, string | string[]>>({});
 
@@ -38,8 +46,8 @@ export default function EditTenantPage() {
                 setFormData({
                     name: data.name,
                     slug: data.slug,
+                    type: data.type,
                     isTaxable: data.isTaxable,
-                    isEatery: data.isEatery
                 });
             } catch (error) {
                 toast({
@@ -152,6 +160,33 @@ export default function EditTenantPage() {
                         )}
                     </div>
 
+                    <div className="space-y-2">
+                        <Label>Tenant Type</Label>
+                        <Select
+                            value={formData.type}
+                            onValueChange={(value) => {
+                                setFormData({ ...formData, type: value as TenantType });
+                                if (errors.type) setErrors({ ...errors, type: "" });
+                            }}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a tenant type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {TENANT_TYPE_OPTIONS.map((option) => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        {errors.type && (
+                            <p className="text-sm text-red-500 mt-1">
+                                {Array.isArray(errors.type) ? errors.type[0] : errors.type}
+                            </p>
+                        )}
+                    </div>
+
                     <div className="flex items-center space-x-2">
                         <Checkbox
                             id="isTaxable"
@@ -159,15 +194,6 @@ export default function EditTenantPage() {
                             onCheckedChange={(checked) => setFormData({ ...formData, isTaxable: checked as boolean })}
                         />
                         <Label htmlFor="isTaxable">Taxable Tenant</Label>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                        <Checkbox
-                            id="isEatery"
-                            checked={formData.isEatery}
-                            onCheckedChange={(checked) => setFormData({ ...formData, isEatery: checked as boolean })}
-                        />
-                        <Label htmlFor="isEatery">Eatery Tenant</Label>
                     </div>
                 </div>
 

@@ -14,6 +14,8 @@ import { usePermissions } from "@/hooks/use-permissions";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { TenantTaxForm } from "@/components/features/settings/tenant-tax-form";
+import { Badge } from "@/components/ui/badge";
+import { TENANT_TYPE_OPTIONS } from "@gym-monorepo/shared";
 import {
     getTenantProfileSettings,
     updateTenantProfileSettings,
@@ -133,6 +135,10 @@ export default function TenantSettingsPage() {
         );
     }
 
+    const statusLabel = tenant.status === "DISABLED" ? "Archived" : "Active";
+    const tenantTypeLabel =
+        TENANT_TYPE_OPTIONS.find((option) => option.value === tenant.type)?.label ?? tenant.type;
+
     return (
         <div className="space-y-6 max-w-2xl">
             <PageHeader
@@ -144,7 +150,7 @@ export default function TenantSettingsPage() {
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
                         <span className="text-sm text-muted-foreground">Status</span>
-                        <StatusBadge status={tenant.status} />
+                        <StatusBadge status={statusLabel} variantMap={{ Archived: "secondary" }} />
                     </div>
 
                     <div className="space-y-2">
@@ -188,11 +194,9 @@ export default function TenantSettingsPage() {
                         </Label>
                     </div>
 
-                    <div className="flex items-center space-x-2">
-                        <Checkbox id="isEatery" checked={tenant.isEatery} disabled />
-                        <Label htmlFor="isEatery" className="text-muted-foreground">
-                            Eatery Tenant
-                        </Label>
+                    <div className="flex items-center gap-3">
+                        <Label className="text-muted-foreground">Tenant Type</Label>
+                        <Badge variant="secondary">{tenantTypeLabel}</Badge>
                     </div>
                 </div>
 

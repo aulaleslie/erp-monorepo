@@ -106,7 +106,11 @@ export class MeController {
           return null;
         }
       }
-      return this.tenantsService.getTenantById(tenantId);
+      const tenant = await this.tenantsService.getTenantById(tenantId);
+      if (tenant.status !== 'ACTIVE') {
+        return null;
+      }
+      return tenant;
     } catch (e) {
       return null;
     }

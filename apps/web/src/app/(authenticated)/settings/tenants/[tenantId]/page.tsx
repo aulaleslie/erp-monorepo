@@ -4,13 +4,14 @@ import { PageHeader } from "@/components/common/PageHeader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { tenantsService, Tenant } from "@/services/tenants";
-import { Check, Loader2, Pencil, Ban, Power, ArrowLeft } from "lucide-react";
+import { Loader2, Pencil, Archive, RotateCcw, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { usePermissions } from "@/hooks/use-permissions";
+import { TENANT_TYPE_OPTIONS } from "@gym-monorepo/shared";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -31,7 +32,7 @@ export default function TenantDetailPage() {
 
     const [tenant, setTenant] = useState<Tenant | null>(null);
     const [loading, setLoading] = useState(true);
-    const [tenantToDisable, setTenantToDisable] = useState<boolean>(false);
+    const [tenantToArchive, setTenantToArchive] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -59,50 +60,43 @@ export default function TenantDetailPage() {
     }, [tenantId, isSuperAdmin]);
 
 
-    const toggleStatus = async () => {
+    const restoreTenant = async () => {
         if (!tenant) return;
 
         try {
-            if (tenant.status === 'ACTIVE') {
-                setTenantToDisable(true);
-                return;
-            }
-
-            // Activate
             const updated = await tenantsService.update(tenant.id, { status: 'ACTIVE' });
             setTenant(updated);
             toast({
-                title: "Tenant activated",
+                title: "Tenant restored",
                 description: "The tenant is now active.",
             });
-
         } catch (error) {
             toast({
-                title: "Error updating tenant",
-                description: "Failed to update tenant status.",
+                title: "Error restoring tenant",
+                description: "Failed to restore the tenant.",
                 variant: "destructive",
             });
         }
     };
 
-    const confirmDisable = async () => {
+    const confirmArchive = async () => {
         if (!tenant) return;
 
         try {
-            await tenantsService.disable(tenant.id);
+            await tenantsService.archive(tenant.id);
             setTenant({ ...tenant, status: 'DISABLED' });
             toast({
-                title: "Tenant disabled",
-                description: "The tenant has been disabled.",
+                title: "Tenant archived",
+                description: "The tenant has been archived.",
             });
         } catch (error) {
             toast({
-                title: "Error disabling tenant",
-                description: "Failed to disable the tenant.",
+                title: "Error archiving tenant",
+                description: "Failed to archive the tenant.",
                 variant: "destructive",
             });
         } finally {
-            setTenantToDisable(false);
+            setTenantToArchive(false);
         }
     };
 
@@ -130,6 +124,10 @@ export default function TenantDetailPage() {
         );
     }
 
+    const statusLabel = tenant.status === 'DISABLED' ? 'Archived' : 'Active';
+    const tenantTypeLabel =
+        TENANT_TYPE_OPTIONS.find((option) => option.value === tenant.type)?.label ?? tenant.type;
+
     return (
         <div className="space-y-8">
             <Button variant="ghost" className="pl-0" onClick={() => router.back()}>
@@ -141,7 +139,7 @@ export default function TenantDetailPage() {
                     <h1 className="text-3xl font-bold tracking-tight">{tenant.name}</h1>
                     <div className="flex items-center gap-2 mt-2">
                         <Badge variant={tenant.status === 'ACTIVE' ? 'default' : 'secondary'}>
-                            {tenant.status}
+                            {statusLabel}
                         </Badge>
                         <span className="text-muted-foreground text-sm">Created on {new Date(tenant.createdAt).toLocaleDateString()}</span>
                     </div>
@@ -152,20 +150,15 @@ export default function TenantDetailPage() {
                             <Pencil className="mr-2 h-4 w-4" /> Edit
                         </Link>
                     </Button>
-                    <Button
-                        variant={tenant.status === 'ACTIVE' ? "destructive" : "default"}
-                        onClick={toggleStatus}
-                    >
-                        {tenant.status === 'ACTIVE' ? (
-                            <>
-                                <Ban className="mr-2 h-4 w-4" /> Disable
-                            </>
-                        ) : (
-                            <>
-                                <Power className="mr-2 h-4 w-4" /> Activate
-                            </>
-                        )}
-                    </Button>
+                    {tenant.status === 'ACTIVE' ? (
+                        <Button variant="destructive" onClick={() => setTenantToArchive(true)}>
+                            <Archive className="mr-2 h-4 w-4" /> Archive
+                        </Button>
+                    ) : (
+                        <Button onClick={restoreTenant}>
+                            <RotateCcw className="mr-2 h-4 w-4" /> Restore
+                        </Button>
+                    )}
                 </div>
             </div>
 
@@ -195,32 +188,28 @@ export default function TenantDetailPage() {
                                 )}
                             </span>
 
-                            <span className="text-muted-foreground">Eatery</span>
+                            <span className="text-muted-foreground">Tenant Type</span>
                             <span>
-                                {tenant.isEatery ? (
-                                    <Badge variant="default" className="bg-green-600 hover:bg-green-700">Yes</Badge>
-                                ) : (
-                                    <Badge variant="outline">No</Badge>
-                                )}
+                                <Badge variant="secondary">{tenantTypeLabel}</Badge>
                             </span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <AlertDialog open={tenantToDisable} onOpenChange={setTenantToDisable}>
+            <AlertDialog open={tenantToArchive} onOpenChange={setTenantToArchive}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Disable Tenant?</AlertDialogTitle>
+                        <AlertDialogTitle>Archive Tenant?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This will disable the tenant. Users belonging to this tenant may lose access.
-                            You can reactivate it later.
+                            This will archive the tenant. Users belonging to this tenant may lose access.
+                            You can restore it later.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={confirmDisable} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                            Disable
+                        <AlertDialogAction onClick={confirmArchive} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                            Archive
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

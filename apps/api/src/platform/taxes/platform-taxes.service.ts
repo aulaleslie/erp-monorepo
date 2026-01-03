@@ -1,7 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Not } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Tax, TaxStatus, TaxType } from '../../database/entities/tax.entity';
+import { TenantTaxEntity } from '../../database/entities/tenant-tax.entity';
 import { CreateTaxDto } from './dto/create-tax.dto';
 import { UpdateTaxDto } from './dto/update-tax.dto';
 import { TaxQueryDto } from './dto/tax-query.dto';
@@ -12,7 +13,16 @@ export class PlatformTaxesService {
   constructor(
     @InjectRepository(Tax)
     private taxRepository: Repository<Tax>,
+    @InjectRepository(TenantTaxEntity)
+    private tenantTaxRepository: Repository<TenantTaxEntity>,
   ) {}
+
+  private async assertNotInUse(id: string): Promise<void> {
+    const usageCount = await this.tenantTaxRepository.count({ where: { taxId: id } });
+    if (usageCount > 0) {
+      throw new BadRequestException('Tax is selected by one or more tenants and cannot be modified.');
+    }
+  }
 
   async create(createTaxDto: CreateTaxDto): Promise<Tax> {
     // Validate uniqueness of code if provided
@@ -40,6 +50,7 @@ export class PlatformTaxesService {
     const skip = calculateSkip(page, limit);
 
     const qb = this.taxRepository.createQueryBuilder('tax');
+    qb.loadRelationCountAndMap('tax.tenantUsageCount', 'tax.tenantTaxes');
 
     if (search) {
       qb.andWhere('(tax.name ILIKE :search OR tax.code ILIKE :search)', { search: `%${search}%` });
@@ -66,6 +77,7 @@ export class PlatformTaxesService {
 
   async update(id: string, updateTaxDto: UpdateTaxDto): Promise<Tax> {
     const tax = await this.findOne(id);
+    await this.assertNotInUse(id);
 
     if (updateTaxDto.code && updateTaxDto.code !== tax.code) {
         const existing = await this.taxRepository.findOne({ where: { code: updateTaxDto.code } });
@@ -100,6 +112,7 @@ export class PlatformTaxesService {
 
   async remove(id: string): Promise<void> {
     const tax = await this.findOne(id);
+    await this.assertNotInUse(id);
     tax.status = TaxStatus.INACTIVE;
     await this.taxRepository.save(tax);
   }

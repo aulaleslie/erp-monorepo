@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsString, IsOptional, IsEnum } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsEnum, IsBoolean } from 'class-validator';
+import { TenantType } from '@gym-monorepo/shared';
 
 export class CreateTenantDto {
   @IsString()
@@ -8,6 +9,14 @@ export class CreateTenantDto {
   @IsString()
   @IsNotEmpty({ message: 'Slug is required' })
   slug: string;
+
+  @IsOptional()
+  @IsEnum(TenantType)
+  type?: TenantType;
+
+  @IsOptional()
+  @IsBoolean()
+  isTaxable?: boolean;
 }
 
 export class UpdateTenantDto {
@@ -26,8 +35,10 @@ export class UpdateTenantDto {
   status?: 'ACTIVE' | 'DISABLED';
 
   @IsOptional()
-  isTaxable?: boolean;
+  @IsEnum(TenantType)
+  type?: TenantType;
 
   @IsOptional()
-  isEatery?: boolean;
+  @IsBoolean()
+  isTaxable?: boolean;
 }

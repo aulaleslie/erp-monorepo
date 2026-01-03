@@ -1,4 +1,5 @@
 import { api } from '../api';
+import { TenantType } from '@gym-monorepo/shared';
 import { PlatformTax } from './taxes';
 
 export interface TenantTaxSettings {
@@ -13,8 +14,8 @@ export interface TenantProfileSettings {
   name: string;
   slug: string;
   status: 'ACTIVE' | 'DISABLED';
+  type: TenantType;
   isTaxable: boolean;
-  isEatery: boolean;
   createdAt: string;
   updatedAt: string;
 }

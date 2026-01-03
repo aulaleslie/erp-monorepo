@@ -7,6 +7,7 @@ import { TenantUserEntity } from '../database/entities/tenant-user.entity';
 import { TenantEntity } from '../database/entities/tenant.entity';
 import { UserEntity } from '../database/entities/user.entity';
 import { permissionsData } from './seeds/permissions';
+import { TenantType } from '@gym-monorepo/shared';
 
 async function seed() {
   console.log('Initializing Data Source...');
@@ -30,8 +31,8 @@ async function seed() {
   // 2. Seed Tenants
   console.log('Seeding Tenants...');
   const tenantsData = [
-    { name: 'Gym', slug: 'gym' },
-    { name: 'Cafeteria', slug: 'cafeteria' },
+    { name: 'Gym', slug: 'gym', type: TenantType.GYM },
+    { name: 'Cafeteria', slug: 'cafeteria', type: TenantType.EATERY },
   ];
   const tenantRepo = AppDataSource.getRepository(TenantEntity);
   const createdTenants: TenantEntity[] = [];

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { TenantType } from "@gym-monorepo/shared";
 
 interface User {
     id: string;
@@ -13,8 +14,8 @@ interface Tenant {
     id: string;
     name: string;
     slug: string;
+    type: TenantType;
     isTaxable: boolean;
-    isEatery: boolean;
 }
 
 interface Permissions {

@@ -1,4 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { TenantType } from '@gym-monorepo/shared';
 import { TenantTaxEntity } from './tenant-tax.entity';
 import { BaseAuditEntity } from '../../common/entities/base-audit.entity';
 
@@ -20,11 +21,15 @@ export class TenantEntity extends BaseAuditEntity {
   })
   status: 'ACTIVE' | 'DISABLED';
 
+  @Column({
+    type: 'enum',
+    enum: TenantType,
+    default: TenantType.GYM,
+  })
+  type: TenantType;
+
   @Column({ name: 'is_taxable', default: false })
   isTaxable: boolean;
-
-  @Column({ name: 'is_eatery', default: false })
-  isEatery: boolean;
 
   @OneToMany(() => TenantTaxEntity, (tenantTax) => tenantTax.tenant)
   taxes: TenantTaxEntity[];

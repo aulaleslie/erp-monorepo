@@ -19,6 +19,7 @@ export interface Tax {
   rate?: number; // 0-1
   amount?: number;
   status: TaxStatus;
+  tenantUsageCount?: number;
   createdAt: string;
   updatedAt: string;
 }

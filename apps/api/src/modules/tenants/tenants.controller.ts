@@ -45,11 +45,12 @@ export class TenantsController {
     @Req() req: any,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
+    @Query('status') status?: 'ACTIVE' | 'DISABLED',
   ) {
     if (!req.user.isSuperAdmin) {
       throw new ForbiddenException('Only Super Admins can view all tenants');
     }
-    return this.tenantsService.findAll(Number(page), Number(limit));
+    return this.tenantsService.findAll(Number(page), Number(limit), status ?? 'ACTIVE');
   }
 
   @Get(':id')

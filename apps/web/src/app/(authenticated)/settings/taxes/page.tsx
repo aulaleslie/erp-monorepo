@@ -1,6 +1,5 @@
 "use client";
 
-import { ActionButtons } from "@/components/common/ActionButtons";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { DataTable } from "@/components/common/DataTable";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -15,13 +14,20 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { usePagination } from "@/hooks/use-pagination";
 import { usePermissions } from "@/hooks/use-permissions";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 import { Tax, TaxStatus, TaxType, taxesService } from "@/services/taxes";
 import { format } from "date-fns";
-import { Plus, Search, Pencil } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Plus, Search, Pencil, Trash2 } from "lucide-react";
+import { useEffect, useState, type ReactElement } from "react";
 import { TaxFormDialog } from "./tax-form-dialog";
 
 export default function TaxesPage() {
@@ -37,6 +43,9 @@ export default function TaxesPage() {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [editingTax, setEditingTax] = useState<Tax | null>(null);
     const [deletingTax, setDeletingTax] = useState<Tax | null>(null);
+
+    const lockedActionMessage =
+        "This tax is already selected by a tenant. Remove it from tenant tax settings to edit or disable.";
 
     const fetchData = async () => {
         setLoading(true);
@@ -130,24 +139,62 @@ export default function TaxesPage() {
         },
         {
             header: "Actions",
-            cell: (tax: Tax) => (
-                <div className="flex items-center gap-2">
+            cell: (tax: Tax) => {
+                const isLocked = (tax.tenantUsageCount ?? 0) > 0;
+
+                const editButton = (
                     <Button
                         variant="ghost"
                         size="icon"
+                        disabled={isLocked}
                         onClick={() => {
+                            if (isLocked) return;
                             setEditingTax(tax);
                             setIsCreateOpen(true);
                         }}
                     >
                         <Pencil className="h-4 w-4" />
                     </Button>
-                    <ActionButtons
-                        onDelete={() => setDeletingTax(tax)}
-                        deleteLabel="Disable"
-                    />
-                </div>
-            ),
+                );
+
+                const deleteButton = (
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        disabled={isLocked}
+                        onClick={() => {
+                            if (isLocked) return;
+                            setDeletingTax(tax);
+                        }}
+                        className={cn(
+                            "text-destructive hover:text-destructive",
+                            isLocked && "text-muted-foreground"
+                        )}
+                    >
+                        <Trash2 className="h-4 w-4" />
+                    </Button>
+                );
+
+                const withLockTooltip = (button: ReactElement) => (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <span className="inline-flex">{button}</span>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-[240px] text-xs">
+                            {lockedActionMessage}
+                        </TooltipContent>
+                    </Tooltip>
+                );
+
+                return (
+                    <TooltipProvider>
+                        <div className="flex items-center gap-2">
+                            {isLocked ? withLockTooltip(editButton) : editButton}
+                            {isLocked ? withLockTooltip(deleteButton) : deleteButton}
+                        </div>
+                    </TooltipProvider>
+                );
+            },
         },
     ];
 

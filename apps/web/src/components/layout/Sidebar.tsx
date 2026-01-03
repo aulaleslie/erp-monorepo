@@ -9,7 +9,10 @@ import {
     Shield,
     Users,
     Building,
+    Building2,
+    Percent,
     ChevronLeft,
+    ChevronDown,
     Menu
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -37,44 +40,78 @@ interface SidebarItem {
     collapsed?: boolean; // internal use for structure, though config is usually static
 }
 
+interface SidebarGroupProps {
+    item: SidebarItem;
+    isCollapsed: boolean;
+    pathname: string;
+    isItemVisible: (item: SidebarItem) => boolean;
+    renderLeafItem: (item: SidebarItem) => React.ReactNode;
+}
+
+function SidebarGroup({
+    item,
+    isCollapsed,
+    pathname,
+    isItemVisible,
+    renderLeafItem,
+}: SidebarGroupProps) {
+    const visibleChildren = item.children?.filter(child => isItemVisible(child)) ?? [];
+    if (visibleChildren.length === 0) return null;
+
+    const Icon = item.icon;
+    const isActiveGroup = visibleChildren.some(child => child.href === pathname);
+    const [isOpen, setIsOpen] = React.useState(isActiveGroup);
+
+    React.useEffect(() => {
+        if (isActiveGroup) {
+            setIsOpen(true);
+        }
+    }, [isActiveGroup]);
+
+    if (isCollapsed) {
+        return (
+            <div className="flex flex-col gap-1">
+                {visibleChildren.map(child => renderLeafItem(child))}
+            </div>
+        );
+    }
+
+    return (
+        <Collapsible open={isOpen} onOpenChange={setIsOpen} className="space-y-1">
+            <CollapsibleTrigger asChild>
+                <button
+                    type="button"
+                    className={cn(
+                        "group flex w-full items-center justify-between rounded-md px-3 py-2 text-sm font-semibold transition-colors",
+                        isActiveGroup
+                            ? "bg-accent text-accent-foreground"
+                            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    )}
+                >
+                    <span className="flex items-center gap-2">
+                        <Icon className="h-4 w-4" />
+                        <span>{item.label}</span>
+                    </span>
+                    <ChevronDown
+                        className={cn(
+                            "h-4 w-4 transition-transform",
+                            isOpen && "rotate-180"
+                        )}
+                    />
+                </button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="ml-4 space-y-1 border-l border-border/60 pl-2">
+                {visibleChildren.map(child => renderLeafItem(child))}
+            </CollapsibleContent>
+        </Collapsible>
+    );
+}
+
 const sidebarConfig: SidebarItem[] = [
     {
         label: 'Dashboard',
         icon: Home,
         href: '/dashboard',
-    },
-    {
-        label: 'Settings',
-        icon: Settings,
-        children: [
-            {
-                label: 'Tenant',
-                icon: Building,
-                href: '/settings/tenant',
-                permissions: [
-                    'settings.tenant.read',
-                    'settings.tenant.update',
-                ],
-            },
-            {
-                label: 'Tenants',
-                icon: Building,
-                href: '/settings/tenants',
-                superAdminOnly: true,
-            },
-            {
-                label: 'Taxes',
-                icon: Building,
-                href: '/settings/taxes',
-                superAdminOnly: true,
-            },
-            {
-                label: 'Audit Logs',
-                icon: Shield,
-                href: '/settings/audit-logs',
-                superAdminOnly: true,
-            },
-        ],
     },
     {
         label: 'Users',
@@ -104,6 +141,39 @@ const sidebarConfig: SidebarItem[] = [
             },
         ],
     },
+    {
+        label: 'Settings',
+        icon: Settings,
+        children: [
+            {
+                label: 'Tenant',
+                icon: Building,
+                href: '/settings/tenant',
+                permissions: [
+                    'settings.tenant.read',
+                    'settings.tenant.update',
+                ],
+            },
+            {
+                label: 'Tenants',
+                icon: Building2,
+                href: '/settings/tenants',
+                superAdminOnly: true,
+            },
+            {
+                label: 'Taxes',
+                icon: Percent,
+                href: '/settings/taxes',
+                superAdminOnly: true,
+            },
+            {
+                label: 'Audit Logs',
+                icon: Shield,
+                href: '/settings/audit-logs',
+                superAdminOnly: true,
+            },
+        ],
+    },
 ];
 
 export function Sidebar() {
@@ -125,43 +195,12 @@ export function Sidebar() {
         return true;
     };
 
-    const renderItem = (item: SidebarItem, level = 0) => {
+    const renderLeafItem = (item: SidebarItem) => {
         if (!isItemVisible(item)) return null;
 
         const isActive = item.href ? pathname === item.href : false;
         const Icon = item.icon;
-        const hasChildren = item.children && item.children.length > 0;
 
-        if (hasChildren) {
-            if (isCollapsed) {
-                // When collapsed, we might want to show children in a popover or just hide the group header if it's purely structural
-                // For now, let's just render the children's icon if top level, or skip if it's a structural group without href.
-                // Actually, sidebarConfig has 'Settings' as a group.
-                // In collapsed mode, groups usually just show children flat or in a menu.
-                // Simplification: Render children directly if collapsed, or skip group header.
-                return (
-                    <div key={item.label} className="flex flex-col gap-1">
-                        {!isCollapsed && (
-                            <h4 className="px-2 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1 mt-2">
-                                {item.label}
-                            </h4>
-                        )}
-                        {item.children?.map(child => renderItem(child, level))}
-                    </div>
-                );
-            }
-
-            return (
-                <div key={item.label} className="space-y-1">
-                    <h4 className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                        {item.label}
-                    </h4>
-                    {item.children?.map(child => renderItem(child, level + 1))}
-                </div>
-            );
-        }
-
-        // Leaf node
         return (
             <TooltipProvider key={item.href || item.label}>
                 <Tooltip delayDuration={0}>
@@ -186,6 +225,22 @@ export function Sidebar() {
                 </Tooltip>
             </TooltipProvider>
         );
+    };
+
+    const renderItem = (item: SidebarItem) => {
+        if (item.children && item.children.length > 0) {
+            return (
+                <SidebarGroup
+                    key={item.label}
+                    item={item}
+                    isCollapsed={isCollapsed}
+                    pathname={pathname}
+                    isItemVisible={isItemVisible}
+                    renderLeafItem={renderLeafItem}
+                />
+            );
+        }
+        return renderLeafItem(item);
     };
 
     return (

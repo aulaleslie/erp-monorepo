@@ -9,6 +9,7 @@ import { TenantUserEntity } from '../../database/entities/tenant-user.entity';
 import { RoleEntity } from '../../database/entities/role.entity';
 import { PaginatedResponse, paginate, calculateSkip } from '../../common/dto/pagination.dto';
 import { createValidationBuilder } from '../../common/utils/validation.util';
+import { TenantType } from '@gym-monorepo/shared';
 
 @Injectable()
 export class TenantsService {
@@ -58,7 +59,7 @@ export class TenantsService {
 
   async create(
     userId: string,
-    data: { name: string; slug: string },
+    data: { name: string; slug: string; type?: TenantType; isTaxable?: boolean },
   ): Promise<TenantEntity> {
     const validator = createValidationBuilder();
 
@@ -82,6 +83,8 @@ export class TenantsService {
       name: data.name,
       slug: data.slug,
       status: 'DISABLED',
+      type: data.type ?? TenantType.GYM,
+      isTaxable: data.isTaxable ?? false,
     });
     await this.tenantRepository.save(tenant);
 
@@ -104,13 +107,18 @@ export class TenantsService {
     return tenant;
   }
 
-  async findAll(page: number = 1, limit: number = 10): Promise<PaginatedResponse<TenantEntity>> {
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+    status: 'ACTIVE' | 'DISABLED' = 'ACTIVE',
+  ): Promise<PaginatedResponse<TenantEntity>> {
     const [items, total] = await this.tenantRepository.findAndCount({
       skip: calculateSkip(page, limit),
       take: limit,
       order: {
         createdAt: 'DESC',
       },
+      where: { status },
     });
 
     return paginate(items, total, page, limit);

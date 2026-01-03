@@ -3,8 +3,8 @@
 import { PageHeader } from "@/components/common/PageHeader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { tenantsService, Tenant } from "@/services/tenants";
-import { Plus, Ban, Power, Percent } from "lucide-react";
+import { tenantsService, Tenant, TenantStatus } from "@/services/tenants";
+import { Plus, Archive, RotateCcw, Percent } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -15,18 +15,21 @@ import { usePagination } from "@/hooks/use-pagination";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { ActionButtons } from "@/components/common/ActionButtons";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function TenantsPage() {
     const [tenants, setTenants] = useState<Tenant[]>([]);
     const [loading, setLoading] = useState(true);
     const pagination = usePagination();
 
-    const [tenantToDisable, setTenantToDisable] = useState<string | null>(null);
+    const [tenantToArchive, setTenantToArchive] = useState<string | null>(null);
     const { toast } = useToast();
     const { isSuperAdmin } = usePermissions();
     const { refreshAuth } = useAuth();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const isArchivedView = searchParams.get("status") === "archived";
+    const statusFilter: TenantStatus = isArchivedView ? "DISABLED" : "ACTIVE";
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
 
     useEffect(() => {
@@ -35,12 +38,20 @@ export default function TenantsPage() {
         } else {
             setLoading(false);
         }
-    }, [isSuperAdmin, pagination.page]);
+    }, [isSuperAdmin, pagination.page, pagination.limit, statusFilter]);
+
+    useEffect(() => {
+        pagination.resetPagination();
+    }, [statusFilter]);
 
     const fetchTenants = async () => {
         setLoading(true);
         try {
-            const data: any = await tenantsService.getAll(pagination.page, pagination.limit);
+            const data: any = await tenantsService.getAll(
+                pagination.page,
+                pagination.limit,
+                statusFilter
+            );
             if (data.items) {
                 setTenants(data.items);
                 pagination.setTotal(data.total);
@@ -59,46 +70,41 @@ export default function TenantsPage() {
         }
     };
 
-    const toggleStatus = async (tenant: Tenant) => {
-        try {
-            if (tenant.status === 'ACTIVE') {
-                setTenantToDisable(tenant.id);
-                return;
-            }
+    const confirmArchive = async () => {
+        if (!tenantToArchive) return;
 
-            await tenantsService.update(tenant.id, { status: 'ACTIVE' });
+        try {
+            await tenantsService.archive(tenantToArchive);
             toast({
-                title: "Tenant activated",
+                title: "Tenant archived",
+                description: "The tenant has been archived.",
+            });
+            fetchTenants();
+        } catch (error) {
+            toast({
+                title: "Error archiving tenant",
+                description: "Failed to archive the tenant.",
+                variant: "destructive",
+            });
+        } finally {
+            setTenantToArchive(null);
+        }
+    };
+
+    const restoreTenant = async (tenant: Tenant) => {
+        try {
+            await tenantsService.update(tenant.id, { status: "ACTIVE" });
+            toast({
+                title: "Tenant restored",
                 description: "The tenant is now active.",
             });
             fetchTenants();
         } catch (error) {
             toast({
-                title: "Error updating tenant",
-                description: "Failed to update tenant status.",
+                title: "Error restoring tenant",
+                description: "Failed to restore the tenant.",
                 variant: "destructive",
             });
-        }
-    };
-
-    const confirmDisable = async () => {
-        if (!tenantToDisable) return;
-
-        try {
-            await tenantsService.disable(tenantToDisable);
-            toast({
-                title: "Tenant disabled",
-                description: "The tenant has been disabled.",
-            });
-            fetchTenants();
-        } catch (error) {
-            toast({
-                title: "Error disabling tenant",
-                description: "Failed to disable the tenant.",
-                variant: "destructive",
-            });
-        } finally {
-            setTenantToDisable(null);
         }
     };
 
@@ -147,7 +153,12 @@ export default function TenantsPage() {
         },
         {
             header: "Status",
-            cell: (tenant) => <StatusBadge status={tenant.status} />,
+            cell: (tenant) => (
+                <StatusBadge
+                    status={tenant.status === "DISABLED" ? "Archived" : "Active"}
+                    variantMap={{ Archived: "secondary" }}
+                />
+            ),
         },
         {
             header: "Actions",
@@ -158,38 +169,50 @@ export default function TenantsPage() {
                     editUrl={`/settings/tenants/${tenant.id}/edit`}
                     customActions={
                         <>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleConfigureTaxes(tenant);
-                                }}
-                                title="Configure taxes"
-                            >
-                                <Percent className="h-4 w-4" />
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    toggleStatus(tenant);
-                                }}
-                                title={tenant.status === 'ACTIVE' ? "Disable" : "Activate"}
-                            >
-                                {tenant.status === 'ACTIVE' ? (
-                                    <Ban className="h-4 w-4 text-destructive" />
-                                ) : (
-                                    <Power className="h-4 w-4 text-green-600" />
-                                )}
-                            </Button>
+                            {tenant.status === "ACTIVE" && (
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleConfigureTaxes(tenant);
+                                    }}
+                                    title="Configure taxes"
+                                >
+                                    <Percent className="h-4 w-4" />
+                                </Button>
+                            )}
+                            {tenant.status === "ACTIVE" ? (
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setTenantToArchive(tenant.id);
+                                    }}
+                                    title="Archive tenant"
+                                >
+                                    <Archive className="h-4 w-4 text-destructive" />
+                                </Button>
+                            ) : (
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        restoreTenant(tenant);
+                                    }}
+                                    title="Restore tenant"
+                                >
+                                    <RotateCcw className="h-4 w-4 text-green-600" />
+                                </Button>
+                            )}
                         </>
                     }
                 />
             ),
         },
-    ], []);
+    ], [handleConfigureTaxes, restoreTenant]);
 
     if (!isSuperAdmin) {
         return (
@@ -203,15 +226,26 @@ export default function TenantsPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <PageHeader
-                    title="Tenants Management"
-                    description="Manage all tenants."
+                    title={isArchivedView ? "Archived Tenants" : "Tenants Management"}
+                    description={
+                        isArchivedView
+                            ? "Review archived tenants."
+                            : "Manage all tenants."
+                    }
                 />
-                <Button asChild>
-                    <Link href="/settings/tenants/create">
-                        <Plus className="mr-2 h-4 w-4" />
-                        Create Tenant
-                    </Link>
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button variant="link" asChild>
+                        <Link href={isArchivedView ? "/settings/tenants" : "/settings/tenants?status=archived"}>
+                            {isArchivedView ? "Back to active" : "See archived"}
+                        </Link>
+                    </Button>
+                    <Button asChild>
+                        <Link href="/settings/tenants/create">
+                            <Plus className="mr-2 h-4 w-4" />
+                            Create Tenant
+                        </Link>
+                    </Button>
+                </div>
             </div>
 
             <DataTable
@@ -219,16 +253,16 @@ export default function TenantsPage() {
                 columns={columns}
                 loading={loading}
                 pagination={pagination}
-                emptyMessage="No tenants found."
+                emptyMessage={isArchivedView ? "No archived tenants found." : "No tenants found."}
             />
 
             <ConfirmDialog
-                open={!!tenantToDisable}
-                onOpenChange={(open) => !open && setTenantToDisable(null)}
-                title="Disable Tenant?"
-                description="This will disable the tenant. Users belonging to this tenant may lose access. You can reactivate it later."
-                onConfirm={confirmDisable}
-                confirmLabel="Disable"
+                open={!!tenantToArchive}
+                onOpenChange={(open) => !open && setTenantToArchive(null)}
+                title="Archive Tenant?"
+                description="This will archive the tenant. Users belonging to this tenant may lose access. You can restore it later."
+                onConfirm={confirmArchive}
+                confirmLabel="Archive"
                 variant="destructive"
             />
         </div>

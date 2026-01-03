@@ -2,7 +2,7 @@
 
 ## EPIC C2-0: Tenant Capabilities + Taxes Foundation
 
-Goal: Add isTaxable/isEatery, platform tax master data, tenant tax settings UI/API, all guarded and auditable.
+Goal: Add isTaxable + tenant type, platform tax master data, tenant tax settings UI/API, all guarded and auditable.
 
 ## Backend Tickets (apps/api)
 
@@ -11,9 +11,10 @@ Goal: Add isTaxable/isEatery, platform tax master data, tenant tax settings UI/A
 Scope:
 - Add columns to `tenants`:
   - `is_taxable` boolean default false
-  - `is_eatery` boolean default false
+  - `type` enum: `GYM` | `EATERY` | `COMPUTER_STORE` | `GROCERY` (default `GYM`)
+- Tenant type labels/slugs are defined in code and mapped to the enum.
 - Update the Tenant entity mapping.
-- Ensure tenant DTOs include these flags in:
+- Ensure tenant DTOs include these fields in:
   - `GET /me/tenants`
   - `GET /me/tenants/active`
   - `GET /tenants/:id` (platform view)
@@ -129,7 +130,7 @@ DoD:
 Scope:
 - Update tenant types to include:
   - `isTaxable`
-  - `isEatery`
+  - `type`
 - Ensure `/me/tenants` and `/me/tenants/active` service calls map these fields.
 - Ensure tenant switch refresh rehydrates flags.
 
