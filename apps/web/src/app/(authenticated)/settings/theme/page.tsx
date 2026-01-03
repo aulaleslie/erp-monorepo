@@ -6,18 +6,13 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Check } from "lucide-react";
-import { usePermissions } from "@/hooks/use-permissions";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "@/contexts/ThemeContext";
 import { THEME_PRESETS } from "@gym-monorepo/shared";
 
 export default function ThemeSettingsPage() {
-  const { isSuperAdmin, can, canAny } = usePermissions();
   const { toast } = useToast();
   const { theme, isLoading, updateTheme } = useTheme();
-
-  const canView = isSuperAdmin || canAny(["settings.theme.read", "settings.theme.update"]);
-  const canEdit = isSuperAdmin || can("settings.theme.update");
 
   const [saving, setSaving] = useState(false);
   const [selectedPresetId, setSelectedPresetId] = useState<string>("");
@@ -31,26 +26,7 @@ export default function ThemeSettingsPage() {
     }
   }, [theme?.presetId]);
 
-  if (!canView) {
-    return (
-      <Alert variant="destructive">
-        <AlertDescription>
-          You do not have permission to view theme settings.
-        </AlertDescription>
-      </Alert>
-    );
-  }
-
   const handleThemeSelect = async (presetId: string) => {
-    if (!canEdit) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "You do not have permission to edit theme settings.",
-      });
-      return;
-    }
-
     setSaving(true);
     try {
       await updateTheme(presetId);
@@ -208,36 +184,26 @@ export default function ThemeSettingsPage() {
                     </div>
                   </CardContent>
 
-                  {canEdit && (
-                    <div className="px-6 pb-4">
-                      <Button
-                        variant={isSelected ? "default" : "outline"}
-                        className="w-full"
-                        disabled={isSelected || saving}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleThemeSelect(presetId);
-                        }}
-                      >
-                        {saving && isSelected && (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        )}
-                        {isSelected ? "Applied" : "Apply"}
-                      </Button>
-                    </div>
-                  )}
+                  <div className="px-6 pb-4">
+                    <Button
+                      variant={isSelected ? "default" : "outline"}
+                      className="w-full"
+                      disabled={isSelected || saving}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleThemeSelect(presetId);
+                      }}
+                    >
+                      {saving && isSelected && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      {isSelected ? "Applied" : "Apply"}
+                    </Button>
+                  </div>
                 </Card>
               );
             })}
           </div>
-
-          {!canEdit && (
-            <Alert>
-              <AlertDescription>
-                You do not have permission to modify theme settings.
-              </AlertDescription>
-            </Alert>
-          )}
         </>
       )}
     </div>

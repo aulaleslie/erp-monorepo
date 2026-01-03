@@ -11,8 +11,15 @@ export class PermissionsService {
   ) {}
 
   async findAll(): Promise<PermissionEntity[]> {
-    return this.permissionRepository.find({
+    const permissions = await this.permissionRepository.find({
       order: { group: 'ASC', name: 'ASC' },
     });
+
+    // Filter out theme permissions that were removed
+    return permissions.filter(
+      (permission) =>
+        permission.code !== 'settings.theme.read' &&
+        permission.code !== 'settings.theme.update',
+    );
   }
 }

@@ -6,6 +6,7 @@ import { TenantUserEntity } from '../../database/entities/tenant-user.entity';
 import { RoleEntity } from '../../database/entities/role.entity';
 import { TaxEntity } from '../../database/entities/tax.entity';
 import { TenantTaxEntity } from '../../database/entities/tenant-tax.entity';
+import { TenantThemeEntity } from '../../database/entities/tenant-theme.entity';
 import { Repository, ObjectLiteral } from 'typeorm';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { TenantType } from '@gym-monorepo/shared';
@@ -21,6 +22,7 @@ describe('TenantsService', () => {
   let roleRepository: MockRepository<RoleEntity>;
   let taxRepository: MockRepository<TaxEntity>;
   let tenantTaxRepository: MockRepository<TenantTaxEntity>;
+  let tenantThemeRepository: MockRepository<TenantThemeEntity>;
 
   beforeEach(async () => {
     tenantRepository = {
@@ -49,6 +51,11 @@ describe('TenantsService', () => {
       count: jest.fn(),
       delete: jest.fn(),
     };
+    tenantThemeRepository = {
+      create: jest.fn(),
+      save: jest.fn(),
+      findOne: jest.fn(),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -72,6 +79,10 @@ describe('TenantsService', () => {
         {
           provide: getRepositoryToken(TenantTaxEntity),
           useValue: tenantTaxRepository,
+        },
+        {
+          provide: getRepositoryToken(TenantThemeEntity),
+          useValue: tenantThemeRepository,
         },
       ],
     }).compile();
@@ -100,7 +111,7 @@ describe('TenantsService', () => {
       const result = await service.getMyTenants('user-1');
       expect(result).toEqual(tenants);
       expect(tenantRepository.find).toHaveBeenCalledWith({
-        where: { id: expect.anything(), status: 'ACTIVE' },
+        where: { id: expect.any(String) as string, status: 'ACTIVE' },
       });
     });
   });

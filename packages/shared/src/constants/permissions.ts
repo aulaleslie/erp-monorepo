@@ -22,10 +22,6 @@ export const PERMISSIONS = {
       READ: 'settings.tenant.read',
       UPDATE: 'settings.tenant.update',
     },
-    THEME: {
-      READ: 'settings.theme.read',
-      UPDATE: 'settings.theme.update',
-    },
   },
 } as const;
 
@@ -33,8 +29,7 @@ export const PERMISSIONS = {
 export type PermissionCode = 
   | typeof PERMISSIONS.ROLES[keyof typeof PERMISSIONS.ROLES]
   | typeof PERMISSIONS.USERS[keyof typeof PERMISSIONS.USERS]
-  | typeof PERMISSIONS.SETTINGS.TENANT[keyof typeof PERMISSIONS.SETTINGS.TENANT]
-  | typeof PERMISSIONS.SETTINGS.THEME[keyof typeof PERMISSIONS.SETTINGS.THEME];
+  | typeof PERMISSIONS.SETTINGS.TENANT[keyof typeof PERMISSIONS.SETTINGS.TENANT];
 
 // All permission codes as a flat array (useful for validation)
 export const ALL_PERMISSION_CODES: PermissionCode[] = [
@@ -49,6 +44,4 @@ export const ALL_PERMISSION_CODES: PermissionCode[] = [
   PERMISSIONS.USERS.DELETE,
   PERMISSIONS.SETTINGS.TENANT.READ,
   PERMISSIONS.SETTINGS.TENANT.UPDATE,
-  PERMISSIONS.SETTINGS.THEME.READ,
-  PERMISSIONS.SETTINGS.THEME.UPDATE,
 ];

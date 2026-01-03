@@ -8,7 +8,6 @@ import { TenantMembershipGuard } from '../../tenants/guards/tenant-membership.gu
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentTenant } from '../../../common/decorators/current-tenant.decorator';
 import { PermissionGuard } from '../../users/guards/permission.guard';
-import { RequirePermissions } from '../../../common/decorators/require-permissions.decorator';
 
 @ApiTags('theme')
 @ApiCookieAuth('access_token')
@@ -23,7 +22,6 @@ export class TenantThemeSettingsController {
   constructor(private readonly service: TenantThemeSettingsService) {}
 
   @Get()
-  @RequirePermissions('settings.theme.read')
   async getSettings(
     @CurrentTenant() tenantId: string,
   ): Promise<TenantThemeSettingsResponseDto> {
@@ -31,7 +29,6 @@ export class TenantThemeSettingsController {
   }
 
   @Put()
-  @RequirePermissions('settings.theme.update')
   async updateSettings(
     @CurrentTenant() tenantId: string,
     @Body() dto: UpdateTenantThemeSettingsDto,
