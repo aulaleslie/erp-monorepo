@@ -4,6 +4,7 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
+  BadRequestException,
 } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
 import { BaseResponse } from '@gym-monorepo/shared';
