@@ -188,7 +188,10 @@ describe('profileService', () => {
   describe('getMyTenants', () => {
     it('fetches user tenants', async () => {
       const mockTenants = [
-        { tenant: { id: 't1', name: 'Tenant 1' }, role: { id: 'r1', name: 'Admin' } },
+        {
+          tenant: { id: 't1', name: 'Tenant 1', slug: 'tenant-1' },
+          role: { id: 'r1', name: 'Admin', isSuperAdmin: false },
+        },
       ];
       mockApi.get.mockResolvedValue({ data: mockTenants });
 
@@ -196,6 +199,20 @@ describe('profileService', () => {
 
       expect(mockApi.get).toHaveBeenCalledWith('/me/tenants');
       expect(result).toEqual(mockTenants);
+    });
+
+    it('normalizes tenant list responses', async () => {
+      const tenantList = [{ id: 't1', name: 'Tenant 1', slug: 'tenant-1' }];
+      mockApi.get.mockResolvedValue({ data: tenantList });
+
+      const result = await profileService.getMyTenants();
+
+      expect(result).toEqual([
+        {
+          tenant: { id: 't1', name: 'Tenant 1', slug: 'tenant-1' },
+          role: null,
+        },
+      ]);
     });
   });
 });

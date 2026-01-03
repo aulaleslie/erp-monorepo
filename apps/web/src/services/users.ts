@@ -37,17 +37,19 @@ export interface UpdateUserDto {
   roleId?: string | null;
 }
 
+export interface TenantSummary {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 export interface UserTenant {
-  tenant: {
-    id: string;
-    name: string;
-    slug: string;
-  };
+  tenant: TenantSummary;
   role: {
     id: string;
     name: string;
     isSuperAdmin: boolean;
-  };
+  } | null;
 }
 
 export const usersService = {
@@ -123,7 +125,32 @@ export const profileService = {
   },
 
   getMyTenants: async () => {
-    const response = await api.get<UserTenant[]>('/me/tenants');
-    return response.data;
+    const response = await api.get<Array<UserTenant | TenantSummary>>('/me/tenants');
+    const data = Array.isArray(response.data) ? response.data : [];
+
+    return data
+      .map((item) => {
+        if (item && typeof item === 'object' && 'tenant' in item && item.tenant) {
+          return {
+            tenant: item.tenant,
+            role: item.role ?? null,
+          };
+        }
+
+        const tenant = item as TenantSummary;
+        if (tenant?.id) {
+          return {
+            tenant: {
+              id: tenant.id,
+              name: tenant.name,
+              slug: tenant.slug,
+            },
+            role: null,
+          };
+        }
+
+        return null;
+      })
+      .filter((item): item is UserTenant => item !== null);
   },
 };
