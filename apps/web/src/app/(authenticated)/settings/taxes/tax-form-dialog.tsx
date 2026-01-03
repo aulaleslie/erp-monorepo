@@ -196,7 +196,7 @@ export function TaxFormDialog({ open, onOpenChange, tax, onSuccess }: TaxFormDia
                                     value={field.value}
                                     onValueChange={field.onChange}
                                 >
-                                    <SelectTrigger>
+                                    <SelectTrigger className={errors.type ? "border-red-500" : ""}>
                                         <SelectValue placeholder="Select type" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -206,6 +206,7 @@ export function TaxFormDialog({ open, onOpenChange, tax, onSuccess }: TaxFormDia
                                 </Select>
                             )}
                         />
+                        {errors.type && <p className="text-sm text-red-500">{errors.type.message}</p>}
                     </div>
 
                     {selectedType === TaxType.PERCENTAGE && (

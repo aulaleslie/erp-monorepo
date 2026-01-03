@@ -100,11 +100,12 @@ Scope:
   - `TenantMembershipGuard`
   - `PermissionGuard` with `settings.tenant.read`/`settings.tenant.update`
 - Rules:
-  - If `tenant.isTaxable=false`, PUT returns 409 (or 400) `TENANT_NOT_TAXABLE`.
-  - Only `ACTIVE` taxes can be selected.
-  - If `defaultTaxId` is provided it must be included in `taxIds`.
-  - If no `defaultTaxId` is provided, the first `taxId` becomes default.
-  - Update is transactional (replace set).
+- If `tenant.isTaxable=false`, PUT returns 409 (or 400) `TENANT_NOT_TAXABLE`.
+- Only `ACTIVE` taxes can be selected.
+- If `defaultTaxId` is provided it must be included in `taxIds`.
+- If no `defaultTaxId` is provided, the first `taxId` becomes default.
+- Tenant creation may accept `taxIds` when `isTaxable=true`; validate `ACTIVE` taxes and default to the first `taxId`.
+- Update is transactional (replace set).
 
 DoD:
 - GET works for taxable and non-taxable tenants.
@@ -176,26 +177,22 @@ DoD:
 - Disabled taxes show as `INACTIVE`.
 - Toasts + inline server errors show correctly.
 
-### C2-FE-04 - Tenant tax settings section (multi-select + default)
+### C2-FE-04 - Tenant tax selection on settings/tenant
 
 Scope:
 - Route: `/settings/tenant`
-- Super Admins can jump to tax configuration from `/settings/tenants` via a "Configure taxes" action that sets the active tenant and routes to `/settings/tenant`.
 - Behavior:
   - If user lacks `settings.tenant.read`/`settings.tenant.update`:
     - show a 403/EmptyState and block access
-  - If `activeTenant.isTaxable=false`:
-    - show informational EmptyState/StatusBadge
-  - Else:
-    - show "Applicable taxes" multi-select
-    - use SearchableSelect (debounced) hitting `/platform/taxes?status=ACTIVE&search=...`
-    - show "Default tax" select limited to selected taxes
-    - Save button guarded by `settings.tenant.update`
+  - Tenant profile form mirrors edit-tenant fields (name, slug, type, taxable flag).
+  - When `isTaxable=true`, show a required tax selection dropdown and submit `taxIds`.
+  - Save button guarded by `settings.tenant.update`.
+- On `/settings/tenants/create`, when `isTaxable` is enabled, show a required tax selection dropdown and submit `taxIds`.
 - Show inline server validation errors.
 
 DoD:
 - Works for taxable and non-taxable tenants on `/settings/tenant`.
-- Saves selected taxes + default.
+- Saves selected tax selection.
 - Reload reflects saved settings.
 
 ### C2-FE-05 - Add client-side validation (Zod) for tax forms
@@ -221,8 +218,7 @@ Scope:
 - Document steps:
   - Super admin creates tax (ACTIVE).
   - Super admin sets tenant `isTaxable` true (via tenant edit).
-  - Tenant tax settings selects taxes + default on `/settings/tenant`.
-  - From `/settings/tenants`, use "Configure taxes" to switch the active tenant and update tax settings.
+  - Tenant settings selects tax on `/settings/tenant`.
   - Disable a tax; verify it no longer selectable but remains visible if already selected.
 
 DoD:

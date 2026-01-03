@@ -1,12 +1,29 @@
 import { api } from '../api';
 import { TenantType } from '@gym-monorepo/shared';
-import { PlatformTax } from './taxes';
+import { TaxType } from './taxes';
+
+export interface TenantTaxSettingItem {
+  id: string;
+  name: string;
+  code?: string;
+  rate?: number;
+  amount?: number;
+  type: TaxType;
+  isSelected: boolean;
+  isDefault: boolean;
+}
 
 export interface TenantTaxSettings {
   isTaxable: boolean;
   selectedTaxIds: string[];
   defaultTaxId: string | null;
-  taxes?: PlatformTax[]; // Optional detailed objects for display
+  taxes?: TenantTaxSettingItem[]; // Optional detailed objects for display
+}
+
+export interface TenantTaxMapping {
+  id: string;
+  taxId: string;
+  isDefault: boolean;
 }
 
 export interface TenantProfileSettings {
@@ -16,6 +33,7 @@ export interface TenantProfileSettings {
   status: 'ACTIVE' | 'DISABLED';
   type: TenantType;
   isTaxable: boolean;
+  taxes?: TenantTaxMapping[];
   createdAt: string;
   updatedAt: string;
 }
@@ -28,6 +46,9 @@ export interface UpdateTenantTaxSettingsDto {
 export interface UpdateTenantProfileSettingsDto {
   name?: string;
   slug?: string;
+  type?: TenantType;
+  isTaxable?: boolean;
+  taxIds?: string[];
 }
 
 export const getTenantProfileSettings = async () => {

@@ -7,6 +7,8 @@ import { Repository, In, Not } from 'typeorm';
 import { TenantEntity } from '../../database/entities/tenant.entity';
 import { TenantUserEntity } from '../../database/entities/tenant-user.entity';
 import { RoleEntity } from '../../database/entities/role.entity';
+import { Tax, TaxStatus } from '../../database/entities/tax.entity';
+import { TenantTaxEntity } from '../../database/entities/tenant-tax.entity';
 import { PaginatedResponse, paginate, calculateSkip } from '../../common/dto/pagination.dto';
 import { createValidationBuilder } from '../../common/utils/validation.util';
 import { TenantType } from '@gym-monorepo/shared';
@@ -20,6 +22,10 @@ export class TenantsService {
     private readonly tenantUserRepository: Repository<TenantUserEntity>,
     @InjectRepository(RoleEntity)
     private readonly roleRepository: Repository<RoleEntity>,
+    @InjectRepository(Tax)
+    private readonly taxRepository: Repository<Tax>,
+    @InjectRepository(TenantTaxEntity)
+    private readonly tenantTaxRepository: Repository<TenantTaxEntity>,
   ) {}
 
   async getMyTenants(userId: string): Promise<TenantEntity[]> {
@@ -50,6 +56,7 @@ export class TenantsService {
   async getTenantById(tenantId: string): Promise<TenantEntity> {
     const tenant = await this.tenantRepository.findOne({
       where: { id: tenantId },
+      relations: ['taxes'],
     });
     if (!tenant) {
       throw new NotFoundException('Tenant not found');
@@ -59,9 +66,12 @@ export class TenantsService {
 
   async create(
     userId: string,
-    data: { name: string; slug: string; type?: TenantType; isTaxable?: boolean },
+    data: { name: string; slug: string; type?: TenantType; isTaxable?: boolean; taxIds?: string[] },
   ): Promise<TenantEntity> {
     const validator = createValidationBuilder();
+    const taxIds = data.taxIds ?? [];
+    const isTaxable = data.isTaxable ?? false;
+    const uniqueTaxIds = Array.from(new Set(taxIds));
 
     const existingSlug = await this.tenantRepository.findOne({
       where: { slug: data.slug },
@@ -77,6 +87,28 @@ export class TenantsService {
       validator.addError('name', 'Name is already taken');
     }
 
+    if (taxIds.length > 0 && !isTaxable) {
+      validator.addError('taxIds', 'Taxes can only be set for taxable tenants');
+    }
+
+    if (isTaxable && taxIds.length === 0) {
+      validator.addError('taxIds', 'Tax selection is required for taxable tenants');
+    }
+
+    if (taxIds.length > 0) {
+      if (uniqueTaxIds.length !== taxIds.length) {
+        validator.addError('taxIds', 'Duplicate tax IDs are not allowed');
+      }
+
+      const taxes = await this.taxRepository.find({
+        where: { id: In(uniqueTaxIds), status: TaxStatus.ACTIVE },
+      });
+
+      if (taxes.length !== uniqueTaxIds.length) {
+        validator.addError('taxIds', 'One or more tax IDs are invalid or inactive');
+      }
+    }
+
     validator.throwIfErrors();
 
     const tenant = this.tenantRepository.create({
@@ -84,7 +116,7 @@ export class TenantsService {
       slug: data.slug,
       status: 'DISABLED',
       type: data.type ?? TenantType.GYM,
-      isTaxable: data.isTaxable ?? false,
+      isTaxable,
     });
     await this.tenantRepository.save(tenant);
 
@@ -103,6 +135,18 @@ export class TenantsService {
       roleId: superAdminRole.id,
     });
     await this.tenantUserRepository.save(membership);
+
+    if (uniqueTaxIds.length > 0) {
+      const defaultTaxId = uniqueTaxIds[0];
+      const tenantTaxes = uniqueTaxIds.map((taxId) =>
+        this.tenantTaxRepository.create({
+          tenantId: tenant.id,
+          taxId,
+          isDefault: taxId === defaultTaxId,
+        }),
+      );
+      await this.tenantTaxRepository.save(tenantTaxes);
+    }
 
     return tenant;
   }
@@ -124,9 +168,16 @@ export class TenantsService {
     return paginate(items, total, page, limit);
   }
 
-  async update(id: string, data: Partial<TenantEntity>): Promise<TenantEntity> {
+  async update(
+    id: string,
+    data: Partial<TenantEntity> & { taxIds?: string[] },
+  ): Promise<TenantEntity> {
     const tenant = await this.getTenantById(id);
     const validator = createValidationBuilder();
+    const hasTaxIds = Object.prototype.hasOwnProperty.call(data, 'taxIds');
+    const taxIds = data.taxIds ?? [];
+    const uniqueTaxIds = Array.from(new Set(taxIds));
+    const nextIsTaxable = data.isTaxable ?? tenant.isTaxable;
 
     if (data.slug) {
       const existingSlug = await this.tenantRepository.findOne({
@@ -146,10 +197,63 @@ export class TenantsService {
       }
     }
 
+    if (hasTaxIds && uniqueTaxIds.length > 0 && !nextIsTaxable) {
+      validator.addError('taxIds', 'Taxes can only be set for taxable tenants');
+    }
+
+    if (hasTaxIds && nextIsTaxable && uniqueTaxIds.length === 0) {
+      validator.addError('taxIds', 'Tax selection is required for taxable tenants');
+    }
+
+    if (hasTaxIds && uniqueTaxIds.length > 0) {
+      if (uniqueTaxIds.length !== taxIds.length) {
+        validator.addError('taxIds', 'Duplicate tax IDs are not allowed');
+      }
+
+      const taxes = await this.taxRepository.find({
+        where: { id: In(uniqueTaxIds), status: TaxStatus.ACTIVE },
+      });
+
+      if (taxes.length !== uniqueTaxIds.length) {
+        validator.addError('taxIds', 'One or more tax IDs are invalid or inactive');
+      }
+    }
+
+    if (!hasTaxIds && nextIsTaxable) {
+      const existingTaxCount = await this.tenantTaxRepository.count({
+        where: { tenantId: id },
+      });
+      if (existingTaxCount === 0) {
+        validator.addError('taxIds', 'Tax selection is required for taxable tenants');
+      }
+    }
+
     validator.throwIfErrors();
 
-    Object.assign(tenant, data);
-    return this.tenantRepository.save(tenant);
+    const { taxIds: _taxIds, ...tenantUpdate } = data;
+    Object.assign(tenant, tenantUpdate);
+    const savedTenant = await this.tenantRepository.save(tenant);
+
+    if (data.isTaxable === false) {
+      await this.tenantTaxRepository.delete({ tenantId: id });
+    }
+
+    if (hasTaxIds) {
+      await this.tenantTaxRepository.delete({ tenantId: id });
+      if (uniqueTaxIds.length > 0) {
+        const defaultTaxId = uniqueTaxIds[0];
+        const tenantTaxes = uniqueTaxIds.map((taxId) =>
+          this.tenantTaxRepository.create({
+            tenantId: id,
+            taxId,
+            isDefault: taxId === defaultTaxId,
+          }),
+        );
+        await this.tenantTaxRepository.save(tenantTaxes);
+      }
+    }
+
+    return savedTenant;
   }
 
   async delete(id: string): Promise<void> {

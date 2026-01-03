@@ -1,6 +1,7 @@
 "use client";
 
 import { PageHeader } from "@/components/common/PageHeader";
+import { SearchableSelect } from "@/components/common/SearchableSelect";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { tenantsService, CreateTenantDto } from "@/services/tenants";
+import { taxesService, Tax, TaxStatus } from "@/services/taxes";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -35,6 +37,7 @@ export default function EditTenantPage() {
         slug: "",
         type: TenantType.GYM,
         isTaxable: false,
+        taxIds: [],
     });
     const [errors, setErrors] = useState<Record<string, string | string[]>>({});
 
@@ -43,11 +46,15 @@ export default function EditTenantPage() {
             if (!tenantId) return;
             try {
                 const data = await tenantsService.getOne(tenantId);
+                const defaultTaxId = data.isTaxable
+                    ? data.taxes?.find((tax) => tax.isDefault)?.taxId || data.taxes?.[0]?.taxId || ""
+                    : "";
                 setFormData({
                     name: data.name,
                     slug: data.slug,
                     type: data.type,
                     isTaxable: data.isTaxable,
+                    taxIds: defaultTaxId ? [defaultTaxId] : [],
                 });
             } catch (error) {
                 toast({
@@ -67,11 +74,36 @@ export default function EditTenantPage() {
         }
     }, [tenantId, isSuperAdmin]);
 
+    const fetchTaxes = async ({ search, page, limit }: { search: string; page: number; limit: number }) => {
+        const response = await taxesService.getAll({
+            search,
+            page,
+            limit,
+            status: TaxStatus.ACTIVE,
+        });
+
+        return {
+            items: response.items,
+            total: response.total,
+            hasMore: response.page < response.totalPages,
+        };
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setSaving(true);
         setErrors({});
 
+        const validationErrors: Record<string, string | string[]> = {};
+        if (formData.isTaxable && (!formData.taxIds || formData.taxIds.length === 0)) {
+            validationErrors.taxIds = "Tax selection is required for taxable tenants.";
+        }
+
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
+        setSaving(true);
         try {
             await tenantsService.update(tenantId, formData);
             toast({
@@ -191,10 +223,50 @@ export default function EditTenantPage() {
                         <Checkbox
                             id="isTaxable"
                             checked={formData.isTaxable}
-                            onCheckedChange={(checked) => setFormData({ ...formData, isTaxable: checked as boolean })}
+                            onCheckedChange={(checked) => {
+                                const isTaxable = checked as boolean;
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    isTaxable,
+                                    taxIds: isTaxable ? prev.taxIds : [],
+                                }));
+                                if (!isTaxable && errors.taxIds) {
+                                    setErrors({ ...errors, taxIds: "" });
+                                }
+                            }}
                         />
                         <Label htmlFor="isTaxable">Taxable Tenant</Label>
                     </div>
+
+                    {formData.isTaxable && (
+                        <div className="space-y-2">
+                            <Label>
+                                Tax Selection <span className="text-destructive">*</span>
+                            </Label>
+                            <SearchableSelect<Tax>
+                                value={formData.taxIds?.[0] || ""}
+                                onValueChange={(value) => {
+                                    setFormData({ ...formData, taxIds: value ? [value] : [] });
+                                    if (errors.taxIds) setErrors({ ...errors, taxIds: "" });
+                                }}
+                                placeholder="Select a tax"
+                                searchPlaceholder="Search taxes..."
+                                fetchItems={fetchTaxes}
+                                getItemValue={(tax) => tax.id}
+                                getItemLabel={(tax) => tax.code ? `${tax.name} (${tax.code})` : tax.name}
+                                getItemDescription={(tax) => tax.type}
+                                disabled={saving}
+                            />
+                            {errors.taxIds && (
+                                <p className="text-sm text-red-500 mt-1">
+                                    {Array.isArray(errors.taxIds) ? errors.taxIds[0] : errors.taxIds}
+                                </p>
+                            )}
+                            <p className="text-xs text-muted-foreground">
+                                Select the default tax that will apply to this tenant.
+                            </p>
+                        </div>
+                    )}
                 </div>
 
                 {errors.form && (

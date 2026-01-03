@@ -4,6 +4,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { TenantEntity } from '../../database/entities/tenant.entity';
 import { TenantUserEntity } from '../../database/entities/tenant-user.entity';
 import { RoleEntity } from '../../database/entities/role.entity';
+import { Tax } from '../../database/entities/tax.entity';
+import { TenantTaxEntity } from '../../database/entities/tenant-tax.entity';
 import { Repository, ObjectLiteral } from 'typeorm';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { TenantType } from '@gym-monorepo/shared';
@@ -17,6 +19,8 @@ describe('TenantsService', () => {
   let tenantRepository: MockRepository<TenantEntity>;
   let tenantUserRepository: MockRepository<TenantUserEntity>;
   let roleRepository: MockRepository<RoleEntity>;
+  let taxRepository: MockRepository<Tax>;
+  let tenantTaxRepository: MockRepository<TenantTaxEntity>;
 
   beforeEach(async () => {
     tenantRepository = {
@@ -36,6 +40,15 @@ describe('TenantsService', () => {
       create: jest.fn(),
       save: jest.fn(),
     };
+    taxRepository = {
+      find: jest.fn(),
+    };
+    tenantTaxRepository = {
+      create: jest.fn(),
+      save: jest.fn(),
+      count: jest.fn(),
+      delete: jest.fn(),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -51,6 +64,14 @@ describe('TenantsService', () => {
         {
           provide: getRepositoryToken(RoleEntity),
           useValue: roleRepository,
+        },
+        {
+          provide: getRepositoryToken(Tax),
+          useValue: taxRepository,
+        },
+        {
+          provide: getRepositoryToken(TenantTaxEntity),
+          useValue: tenantTaxRepository,
         },
       ],
     }).compile();
@@ -141,6 +162,20 @@ describe('TenantsService', () => {
         name: 'Super Admin',
         isSuperAdmin: true,
       });
+    });
+
+    it('should require taxIds when tenant is taxable', async () => {
+      tenantRepository.findOne!.mockResolvedValue(null);
+
+      await expect(
+        service.create('user-1', {
+          name: 'Taxable Tenant',
+          slug: 'taxable-tenant',
+          type: TenantType.GYM,
+          isTaxable: true,
+          taxIds: [],
+        }),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw BadRequestException if slug already exists', async () => {

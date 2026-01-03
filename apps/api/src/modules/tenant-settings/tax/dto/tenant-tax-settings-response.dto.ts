@@ -13,5 +13,7 @@ export class TenantTaxSettingItemDto {
 
 export class TenantTaxSettingsResponseDto {
   isTaxable: boolean;
+  selectedTaxIds: string[];
+  defaultTaxId?: string | null;
   taxes: TenantTaxSettingItemDto[];
 }

@@ -87,6 +87,8 @@ describe('TenantTaxSettingsService', () => {
       const result = await service.getSettings(tenantId);
 
       expect(result.isTaxable).toBe(true);
+      expect(result.selectedTaxIds).toEqual(['tax-1']);
+      expect(result.defaultTaxId).toBe('tax-1');
       expect(result.taxes).toHaveLength(2);
       expect(result.taxes[0].id).toBe('tax-1');
       expect(result.taxes[0].isSelected).toBe(true);

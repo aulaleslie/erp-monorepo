@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsOptional, IsEnum, IsBoolean } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsEnum, IsBoolean, IsArray, ArrayNotEmpty, IsUUID, ValidateIf } from 'class-validator';
 import { TenantType } from '@gym-monorepo/shared';
 
 export class CreateTenantDto {
@@ -17,6 +17,12 @@ export class CreateTenantDto {
   @IsOptional()
   @IsBoolean()
   isTaxable?: boolean;
+
+  @ValidateIf((obj) => obj.isTaxable === true)
+  @IsArray({ message: 'Tax selection is required for taxable tenants' })
+  @ArrayNotEmpty({ message: 'Tax selection is required for taxable tenants' })
+  @IsUUID('4', { each: true, message: 'Each tax must be a valid UUID' })
+  taxIds?: string[];
 }
 
 export class UpdateTenantDto {
@@ -41,4 +47,9 @@ export class UpdateTenantDto {
   @IsOptional()
   @IsBoolean()
   isTaxable?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @IsUUID('4', { each: true })
+  taxIds?: string[];
 }

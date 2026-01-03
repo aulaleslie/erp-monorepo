@@ -4,6 +4,12 @@ import { PaginatedResponse } from './types';
 
 export type TenantStatus = 'ACTIVE' | 'DISABLED';
 
+export interface TenantTaxMapping {
+  id: string;
+  taxId: string;
+  isDefault: boolean;
+}
+
 export interface Tenant {
   id: string;
   name: string;
@@ -11,6 +17,7 @@ export interface Tenant {
   status: TenantStatus;
   type: TenantType;
   isTaxable: boolean;
+  taxes?: TenantTaxMapping[];
   createdAt: string;
   updatedAt: string;
 }
@@ -20,6 +27,7 @@ export interface CreateTenantDto {
   slug: string;
   type: TenantType;
   isTaxable?: boolean;
+  taxIds?: string[];
 }
 
 export interface UpdateTenantDto {
@@ -28,6 +36,7 @@ export interface UpdateTenantDto {
   status?: TenantStatus;
   type?: TenantType;
   isTaxable?: boolean;
+  taxIds?: string[];
 }
 
 export const tenantsService = {

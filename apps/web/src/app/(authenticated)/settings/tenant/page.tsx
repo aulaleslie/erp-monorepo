@@ -2,22 +2,29 @@
 
 import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/common/PageHeader";
+import { SearchableSelect } from "@/components/common/SearchableSelect";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import { Separator } from "@/components/ui/separator";
 import { Loader2 } from "lucide-react";
 import { usePermissions } from "@/hooks/use-permissions";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { TenantTaxForm } from "@/components/features/settings/tenant-tax-form";
-import { Badge } from "@/components/ui/badge";
-import { TENANT_TYPE_OPTIONS } from "@gym-monorepo/shared";
+import { TENANT_TYPE_OPTIONS, TenantType } from "@gym-monorepo/shared";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import {
     getTenantProfileSettings,
+    getTenantTaxSettings,
+    TenantTaxSettingItem,
     updateTenantProfileSettings,
     TenantProfileSettings,
 } from "@/lib/api/tenant-settings";
@@ -33,9 +40,13 @@ export default function TenantSettingsPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [tenant, setTenant] = useState<TenantProfileSettings | null>(null);
+    const [availableTaxes, setAvailableTaxes] = useState<TenantTaxSettingItem[]>([]);
     const [formData, setFormData] = useState({
         name: "",
         slug: "",
+        type: TenantType.GYM,
+        isTaxable: false,
+        taxIds: [] as string[],
     });
     const [errors, setErrors] = useState<Record<string, string | string[]>>({});
 
@@ -48,12 +59,23 @@ export default function TenantSettingsPage() {
 
             setLoading(true);
             try {
-                const response = await getTenantProfileSettings();
-                const data = response.data;
+                const [tenantResponse, taxesResponse] = await Promise.all([
+                    getTenantProfileSettings(),
+                    getTenantTaxSettings(),
+                ]);
+                const data = tenantResponse.data;
+                const taxSettings = taxesResponse.data;
                 setTenant(data);
+                setAvailableTaxes(taxSettings.taxes || []);
+                const defaultTaxId = data.isTaxable
+                    ? taxSettings.defaultTaxId || taxSettings.selectedTaxIds?.[0] || ""
+                    : "";
                 setFormData({
                     name: data.name,
                     slug: data.slug,
+                    type: data.type,
+                    isTaxable: data.isTaxable,
+                    taxIds: defaultTaxId ? [defaultTaxId] : [],
                 });
             } catch (error) {
                 toast({
@@ -69,22 +91,53 @@ export default function TenantSettingsPage() {
         fetchTenant();
     }, [canView, toast]);
 
+    const fetchTaxes = async ({ search, page, limit }: { search: string; page: number; limit: number }) => {
+        const normalizedSearch = search.toLowerCase();
+        const filtered = availableTaxes.filter((tax) => {
+            const haystack = `${tax.name} ${tax.code || ""}`.toLowerCase();
+            return haystack.includes(normalizedSearch);
+        });
+        const start = (page - 1) * limit;
+        const items = filtered.slice(start, start + limit);
+        return {
+            items,
+            total: filtered.length,
+            hasMore: start + limit < filtered.length,
+        };
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!canEdit) return;
 
-        setSaving(true);
         setErrors({});
 
+        const validationErrors: Record<string, string | string[]> = {};
+        if (formData.isTaxable && (!formData.taxIds || formData.taxIds.length === 0)) {
+            validationErrors.taxIds = "Tax selection is required for taxable tenants.";
+        }
+
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
+        setSaving(true);
         try {
             const response = await updateTenantProfileSettings({
                 name: formData.name,
                 slug: formData.slug,
+                type: formData.type,
+                isTaxable: formData.isTaxable,
+                taxIds: formData.taxIds,
             });
             setTenant(response.data);
             setFormData({
                 name: response.data.name,
                 slug: response.data.slug,
+                type: response.data.type,
+                isTaxable: response.data.isTaxable,
+                taxIds: formData.taxIds,
             });
             toast({
                 title: "Success",
@@ -136,8 +189,6 @@ export default function TenantSettingsPage() {
     }
 
     const statusLabel = tenant.status === "DISABLED" ? "Archived" : "Active";
-    const tenantTypeLabel =
-        TENANT_TYPE_OPTIONS.find((option) => option.value === tenant.type)?.label ?? tenant.type;
 
     return (
         <div className="space-y-6 max-w-2xl">
@@ -187,17 +238,83 @@ export default function TenantSettingsPage() {
                         )}
                     </div>
 
-                    <div className="flex items-center space-x-2">
-                        <Checkbox id="isTaxable" checked={tenant.isTaxable} disabled />
-                        <Label htmlFor="isTaxable" className="text-muted-foreground">
-                            Taxable Tenant
-                        </Label>
+                    <div className="space-y-2">
+                        <Label>Tenant Type</Label>
+                        <Select
+                            value={formData.type}
+                            onValueChange={(value) => {
+                                setFormData({ ...formData, type: value as TenantType });
+                                if (errors.type) setErrors({ ...errors, type: "" });
+                            }}
+                            disabled={!canEdit}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a tenant type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {TENANT_TYPE_OPTIONS.map((option) => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        {errors.type && (
+                            <p className="text-sm text-red-500 mt-1">
+                                {Array.isArray(errors.type) ? errors.type[0] : errors.type}
+                            </p>
+                        )}
                     </div>
 
-                    <div className="flex items-center gap-3">
-                        <Label className="text-muted-foreground">Tenant Type</Label>
-                        <Badge variant="secondary">{tenantTypeLabel}</Badge>
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="isTaxable"
+                            checked={formData.isTaxable}
+                            disabled={!canEdit}
+                            onCheckedChange={(checked) => {
+                                const isTaxable = checked as boolean;
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    isTaxable,
+                                    taxIds: isTaxable ? prev.taxIds : [],
+                                }));
+                                if (!isTaxable && errors.taxIds) {
+                                    setErrors({ ...errors, taxIds: "" });
+                                }
+                            }}
+                        />
+                        <Label htmlFor="isTaxable">Taxable Tenant</Label>
                     </div>
+
+                    {formData.isTaxable && (
+                        <div className="space-y-2">
+                            <Label>
+                                Tax Selection <span className="text-destructive">*</span>
+                            </Label>
+                            <SearchableSelect<TenantTaxSettingItem>
+                                value={formData.taxIds?.[0] || ""}
+                                onValueChange={(value) => {
+                                    setFormData({ ...formData, taxIds: value ? [value] : [] });
+                                    if (errors.taxIds) setErrors({ ...errors, taxIds: "" });
+                                }}
+                                placeholder="Select a tax"
+                                searchPlaceholder="Search taxes..."
+                                fetchItems={fetchTaxes}
+                                getItemValue={(tax) => tax.id}
+                                getItemLabel={(tax) => tax.code ? `${tax.name} (${tax.code})` : tax.name}
+                                getItemDescription={(tax) => tax.type}
+                                disabled={!canEdit || saving}
+                            />
+                            {errors.taxIds && (
+                                <p className="text-sm text-red-500 mt-1">
+                                    {Array.isArray(errors.taxIds) ? errors.taxIds[0] : errors.taxIds}
+                                </p>
+                            )}
+                            <p className="text-xs text-muted-foreground">
+                                Select the default tax that will apply to this tenant.
+                            </p>
+                        </div>
+                    )}
                 </div>
 
                 {errors.form && (
@@ -213,10 +330,6 @@ export default function TenantSettingsPage() {
                     </Button>
                 </div>
             </form>
-
-            <Separator />
-
-            <TenantTaxForm />
         </div>
     );
 }

@@ -22,14 +22,23 @@ import { MultiSearchableSelect } from "@/components/common/MultiSearchableSelect
 import { EmptyState } from "@/components/common/EmptyState";
 import {
     getPlatformTaxes,
-    PlatformTax,
-    TaxStatus
+    TaxStatus,
+    TaxType
 } from "@/lib/api/taxes";
 import {
     getTenantTaxSettings,
     updateTenantTaxSettings,
     TenantTaxSettings
 } from "@/lib/api/tenant-settings";
+
+type TaxOption = {
+    id: string;
+    name: string;
+    code?: string;
+    type: TaxType;
+    rate?: number;
+    amount?: number;
+};
 
 const formSchema = z.object({
     taxIds: z.array(z.string()).refine((val) => val.length > 0, {
@@ -58,7 +67,7 @@ export function TenantTaxForm() {
     const [settings, setSettings] = useState<TenantTaxSettings | null>(null);
     // We keep a cache of full tax objects to display labels for selected IDs
     // Initialized with taxes from settings if available
-    const [availableTaxes, setAvailableTaxes] = useState<PlatformTax[]>([]);
+    const [availableTaxes, setAvailableTaxes] = useState<TaxOption[]>([]);
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -209,7 +218,7 @@ export function TenantTaxForm() {
                             control={control}
                             name="taxIds"
                             render={({ field }) => (
-                                <MultiSearchableSelect<PlatformTax>
+                                <MultiSearchableSelect<TaxOption>
                                     value={field.value}
                                     onValueChange={(val) => {
                                         field.onChange(val);
@@ -252,7 +261,7 @@ export function TenantTaxForm() {
                                         <SelectValue placeholder="Select default tax" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {selectedTaxesList.map((tax) => (
+                                {selectedTaxesList.map((tax) => (
                                             <SelectItem key={tax.id} value={tax.id}>
                                                 {tax.name} ({tax.code})
                                             </SelectItem>

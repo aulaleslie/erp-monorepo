@@ -62,6 +62,8 @@ export class TenantTaxSettingsService {
 
     return {
       isTaxable: tenant.isTaxable,
+      selectedTaxIds: Array.from(selectedTaxIds),
+      defaultTaxId: defaultTaxId ?? null,
       taxes: taxesDto,
     };
   }

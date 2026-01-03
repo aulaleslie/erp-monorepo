@@ -4,18 +4,17 @@ import { PageHeader } from "@/components/common/PageHeader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { tenantsService, Tenant, TenantStatus } from "@/services/tenants";
-import { Plus, Archive, RotateCcw, Percent } from "lucide-react";
+import { Plus, Archive, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { usePermissions } from "@/hooks/use-permissions";
-import { useAuth } from "@/contexts/AuthContext";
 import { DataTable, Column } from "@/components/common/DataTable";
 import { usePagination } from "@/hooks/use-pagination";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { ActionButtons } from "@/components/common/ActionButtons";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 export default function TenantsPage() {
     const [tenants, setTenants] = useState<Tenant[]>([]);
@@ -25,12 +24,9 @@ export default function TenantsPage() {
     const [tenantToArchive, setTenantToArchive] = useState<string | null>(null);
     const { toast } = useToast();
     const { isSuperAdmin } = usePermissions();
-    const { refreshAuth } = useAuth();
-    const router = useRouter();
     const searchParams = useSearchParams();
     const isArchivedView = searchParams.get("status") === "archived";
     const statusFilter: TenantStatus = isArchivedView ? "DISABLED" : "ACTIVE";
-    const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
 
     useEffect(() => {
         if (isSuperAdmin) {
@@ -108,39 +104,6 @@ export default function TenantsPage() {
         }
     };
 
-    const handleConfigureTaxes = async (tenant: Tenant) => {
-        if (tenant.status !== "ACTIVE") {
-            toast({
-                title: "Tenant inactive",
-                description: "Activate this tenant before configuring taxes.",
-                variant: "destructive",
-            });
-            return;
-        }
-
-        try {
-            const res = await fetch(`${API_URL}/me/tenants/active`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ tenantId: tenant.id }),
-                credentials: "include",
-            });
-
-            if (!res.ok) {
-                throw new Error("Failed to set active tenant");
-            }
-
-            await refreshAuth();
-            router.push("/settings/tenant");
-        } catch (error) {
-            toast({
-                title: "Error",
-                description: "Failed to set active tenant.",
-                variant: "destructive",
-            });
-        }
-    };
-
     const columns: Column<Tenant>[] = useMemo(() => [
         {
             header: "Name",
@@ -169,19 +132,6 @@ export default function TenantsPage() {
                     editUrl={`/settings/tenants/${tenant.id}/edit`}
                     customActions={
                         <>
-                            {tenant.status === "ACTIVE" && (
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleConfigureTaxes(tenant);
-                                    }}
-                                    title="Configure taxes"
-                                >
-                                    <Percent className="h-4 w-4" />
-                                </Button>
-                            )}
                             {tenant.status === "ACTIVE" ? (
                                 <Button
                                     variant="ghost"
@@ -212,7 +162,7 @@ export default function TenantsPage() {
                 />
             ),
         },
-    ], [handleConfigureTaxes, restoreTenant]);
+    ], [restoreTenant]);
 
     if (!isSuperAdmin) {
         return (

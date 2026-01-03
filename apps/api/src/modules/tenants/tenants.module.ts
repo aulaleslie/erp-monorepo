@@ -14,6 +14,8 @@ import { UserEntity } from '../../database/entities/user.entity';
 import { RoleEntity } from '../../database/entities/role.entity';
 import { RolePermissionEntity } from '../../database/entities/role-permission.entity';
 import { PermissionEntity } from '../../database/entities/permission.entity';
+import { Tax } from '../../database/entities/tax.entity';
+import { TenantTaxEntity } from '../../database/entities/tenant-tax.entity';
 import { PermissionGuard } from '../users/guards/permission.guard';
 import { UsersModule } from '../users/users.module';
 import { ActiveTenantGuard } from './guards/active-tenant.guard';
@@ -28,6 +30,8 @@ import { TenantMembershipGuard } from './guards/tenant-membership.guard';
       RoleEntity,
       RolePermissionEntity,
       PermissionEntity,
+      Tax,
+      TenantTaxEntity,
     ]),
     forwardRef(() => UsersModule),
   ],
