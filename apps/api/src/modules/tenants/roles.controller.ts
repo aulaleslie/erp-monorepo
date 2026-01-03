@@ -22,6 +22,11 @@ import { PermissionGuard } from '../users/guards/permission.guard';
 import { RequirePermissions } from '../../common/decorators/require-permissions.decorator';
 import { RolesService } from './roles.service';
 
+type RolesRequest = {
+  tenantId: string;
+  user?: { isSuperAdmin?: boolean };
+};
+
 @ApiTags('roles')
 @ApiCookieAuth('access_token')
 @Controller('roles')
@@ -37,16 +42,22 @@ export class RolesController {
   @Get()
   @RequirePermissions('roles.read')
   async findAll(
-    @Req() req: any,
+    @Req() req: RolesRequest,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
   ) {
-    return this.rolesService.findAll(req.tenantId, Number(page), Number(limit));
+    const includeSuperAdminRoles = Boolean(req.user?.isSuperAdmin);
+    return this.rolesService.findAll(
+      req.tenantId,
+      Number(page),
+      Number(limit),
+      { includeSuperAdminRoles },
+    );
   }
 
   @Get(':id')
   @RequirePermissions('roles.read')
-  async findOne(@Req() req: any, @Param('id') id: string) {
+  async findOne(@Req() req: RolesRequest, @Param('id') id: string) {
     const role = await this.rolesService.findOne(req.tenantId, id);
     // Fetch permissions for this role
     const permissions = await this.rolesService.getPermissionsForRole(role.id);
@@ -58,14 +69,14 @@ export class RolesController {
 
   @Get(':id/users')
   @RequirePermissions('roles.read')
-  async getAssignedUsers(@Req() req: any, @Param('id') id: string) {
+  async getAssignedUsers(@Req() req: RolesRequest, @Param('id') id: string) {
     return this.rolesService.getAssignedUsers(req.tenantId, id);
   }
 
   @Post()
   @RequirePermissions('roles.create')
   async create(
-    @Req() req: any,
+    @Req() req: RolesRequest,
     @Body()
     body: { name: string; isSuperAdmin?: boolean; permissions?: string[] },
   ) {
@@ -105,7 +116,7 @@ export class RolesController {
   @Put(':id')
   @RequirePermissions('roles.update')
   async update(
-    @Req() req: any,
+    @Req() req: RolesRequest,
     @Param('id') id: string,
     @Body() body: { name?: string; permissions?: string[] },
   ) {
@@ -127,7 +138,7 @@ export class RolesController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @RequirePermissions('roles.delete')
-  async delete(@Req() req: any, @Param('id') id: string) {
+  async delete(@Req() req: RolesRequest, @Param('id') id: string) {
     await this.rolesService.delete(req.tenantId, id);
   }
 }

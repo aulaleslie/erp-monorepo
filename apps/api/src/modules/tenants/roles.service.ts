@@ -5,7 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { Repository, In, Not, FindOptionsWhere } from 'typeorm';
 import { RoleEntity } from '../../database/entities/role.entity';
 import { RolePermissionEntity } from '../../database/entities/role-permission.entity';
 import { PermissionEntity } from '../../database/entities/permission.entity';
@@ -18,6 +18,8 @@ import {
 } from '../../common/dto/pagination.dto';
 import { createValidationBuilder } from '../../common/utils/validation.util';
 import { ROLE_ERRORS } from '@gym-monorepo/shared';
+
+const SUPER_ADMIN_ROLE_NAME = 'Super Admin';
 
 @Injectable()
 export class RolesService {
@@ -38,9 +40,20 @@ export class RolesService {
     tenantId: string,
     page: number = 1,
     limit: number = 10,
+    options?: { includeSuperAdminRoles?: boolean },
   ): Promise<PaginatedResponse<RoleEntity>> {
+    const includeSuperAdminRoles = options?.includeSuperAdminRoles ?? false;
+    const where: FindOptionsWhere<RoleEntity> = {
+      tenantId,
+      name: Not(SUPER_ADMIN_ROLE_NAME),
+    };
+
+    if (!includeSuperAdminRoles) {
+      where.isSuperAdmin = false;
+    }
+
     const [items, total] = await this.roleRepository.findAndCount({
-      where: { tenantId, isSuperAdmin: false },
+      where,
       order: { name: 'ASC' },
       skip: calculateSkip(page, limit),
       take: limit,

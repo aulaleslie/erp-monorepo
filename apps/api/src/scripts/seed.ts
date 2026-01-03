@@ -69,9 +69,18 @@ async function seed() {
   const tenantThemeRepo = AppDataSource.getRepository(TenantThemeEntity);
 
   for (const tenant of createdTenants) {
-    let adminRole = await roleRepo.findOne({
+    const superAdminRoles = await roleRepo.find({
       where: { tenantId: tenant.id, name: 'Super Admin' },
+      order: { createdAt: 'ASC' },
     });
+
+    const [existingRole, ...duplicates] = superAdminRoles;
+
+    if (duplicates.length > 0) {
+      await roleRepo.remove(duplicates);
+    }
+
+    let adminRole = existingRole;
 
     if (!adminRole) {
       adminRole = await roleRepo.save(
@@ -81,6 +90,9 @@ async function seed() {
           isSuperAdmin: true,
         }),
       );
+    } else if (!adminRole.isSuperAdmin) {
+      adminRole.isSuperAdmin = true;
+      adminRole = await roleRepo.save(adminRole);
     }
 
     // Assign Admin User to this Tenant with this Role

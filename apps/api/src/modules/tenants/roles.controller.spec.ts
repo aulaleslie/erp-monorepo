@@ -55,11 +55,31 @@ describe('RolesController', () => {
       };
       (rolesService.findAll as jest.Mock).mockResolvedValue(paginatedResult);
 
-      const mockReq = { tenantId: 'tenant-1' };
+      const mockReq = { tenantId: 'tenant-1', user: { isSuperAdmin: false } };
       const result = await controller.findAll(mockReq, 1, 10);
 
       expect(result).toEqual(paginatedResult);
-      expect(rolesService.findAll).toHaveBeenCalledWith('tenant-1', 1, 10);
+      expect(rolesService.findAll).toHaveBeenCalledWith('tenant-1', 1, 10, {
+        includeSuperAdminRoles: false,
+      });
+    });
+
+    it('should request super admin roles when user is super admin', async () => {
+      const paginatedResult = {
+        items: [{ id: 'role-1', name: 'Editor' }],
+        total: 1,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+      };
+      (rolesService.findAll as jest.Mock).mockResolvedValue(paginatedResult);
+
+      const mockReq = { tenantId: 'tenant-1', user: { isSuperAdmin: true } };
+      await controller.findAll(mockReq, 1, 10);
+
+      expect(rolesService.findAll).toHaveBeenCalledWith('tenant-1', 1, 10, {
+        includeSuperAdminRoles: true,
+      });
     });
   });
 

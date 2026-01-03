@@ -6,7 +6,7 @@ import { RolePermissionEntity } from '../../database/entities/role-permission.en
 import { PermissionEntity } from '../../database/entities/permission.entity';
 import { TenantUserEntity } from '../../database/entities/tenant-user.entity';
 import { UserEntity } from '../../database/entities/user.entity';
-import { Repository, ObjectLiteral } from 'typeorm';
+import { Repository, ObjectLiteral, FindOperator } from 'typeorm';
 import {
   NotFoundException,
   ForbiddenException,
@@ -79,16 +79,56 @@ describe('RolesService', () => {
       ] as RoleEntity[];
       roleRepository.findAndCount!.mockResolvedValue([roles, 10]);
 
-      const result = await service.findAll('tenant-1', 1, 10);
+      const result = await service.findAll('tenant-1', 1, 10, {
+        includeSuperAdminRoles: false,
+      });
 
       expect(result.items).toEqual(roles);
       expect(result.total).toBe(10);
-      expect(roleRepository.findAndCount).toHaveBeenCalledWith({
-        where: { tenantId: 'tenant-1', isSuperAdmin: false },
-        order: { name: 'ASC' },
-        skip: 0,
-        take: 10,
+
+      const findAndCountMock =
+        roleRepository.findAndCount as jest.MockedFunction<
+          Repository<RoleEntity>['findAndCount']
+        >;
+      const callOptions = findAndCountMock.mock.calls[0]?.[0];
+      if (!callOptions) {
+        throw new Error('Expected findAndCount to be called');
+      }
+      const where = callOptions.where as { [key: string]: unknown };
+
+      expect(where).toMatchObject({
+        tenantId: 'tenant-1',
+        isSuperAdmin: false,
       });
+      expect((where.name as FindOperator<string>).value).toBe('Super Admin');
+      expect(callOptions.order).toEqual({ name: 'ASC' });
+      expect(callOptions.skip).toBe(0);
+      expect(callOptions.take).toBe(10);
+    });
+
+    it('should include super admin roles for admin users while filtering out the protected name', async () => {
+      const roles = [
+        { id: 'role-1', name: 'Manager', isSuperAdmin: true },
+      ] as RoleEntity[];
+      roleRepository.findAndCount!.mockResolvedValue([roles, 5]);
+
+      await service.findAll('tenant-1', 1, 10, {
+        includeSuperAdminRoles: true,
+      });
+
+      const findAndCountMock =
+        roleRepository.findAndCount as jest.MockedFunction<
+          Repository<RoleEntity>['findAndCount']
+        >;
+      const callOptions = findAndCountMock.mock.calls[0]?.[0];
+      if (!callOptions) {
+        throw new Error('Expected findAndCount to be called');
+      }
+      const where = callOptions.where as { [key: string]: unknown };
+
+      expect(where.tenantId).toBe('tenant-1');
+      expect(where.isSuperAdmin).toBeUndefined();
+      expect((where.name as FindOperator<string>).value).toBe('Super Admin');
     });
   });
 
