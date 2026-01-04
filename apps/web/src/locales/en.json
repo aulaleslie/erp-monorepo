@@ -1,0 +1,50 @@
+{
+  "authGuard": {
+    "loading": "Loading..."
+  },
+  "navbar": {
+    "selectWorkspaceButton": "Select Workspace",
+    "noWorkspacesTitle": "No workspaces available",
+    "noWorkspacesDescription": "You don't have access to any workspaces. Please contact your administrator.",
+    "workspaceErrorTitle": "Error",
+    "workspaceErrorDescription": "Failed to check workspace availability.",
+    "profile": "Profile",
+    "logout": "Log out"
+  },
+  "selectTenant": {
+    "title": "Select Workspace",
+    "description": "Choose which organization you want to access",
+    "noWorkspaces": "No workspaces found",
+    "emptyDescription": "Please contact your administrator or try reloading."
+  },
+  "sidebar": {
+    "appName": "Apupu ERP",
+    "dashboard": "Dashboard",
+    "settings": "Settings",
+    "tenant": "Tenant",
+    "tenants": "Tenants",
+    "taxes": "Taxes",
+    "auditLogs": "Audit Logs",
+    "roles": "Roles",
+    "users": "Users"
+  },
+  "labels": {
+    "tenantSettings": {
+      "name": "Tenant Name",
+      "slug": "Tenant Slug",
+      "type": "Tenant Type",
+      "language": "Tenant Language",
+      "taxable": "Taxable Tenant",
+      "taxSelection": "Tax Selection",
+      "taxHint": "Select the default tax that will apply to this tenant.",
+      "theme": "Theme"
+    },
+    "tenants": {
+      "name": "Name",
+      "slug": "Slug",
+      "status": "Status",
+      "language": "Language",
+      "actions": "Actions"
+    }
+  }
+}

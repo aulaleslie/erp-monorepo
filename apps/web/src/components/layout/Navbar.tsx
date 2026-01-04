@@ -16,6 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePathname, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslations } from "next-intl";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
 
@@ -25,6 +26,7 @@ export function Navbar() {
     const pathname = usePathname();
     const { toast } = useToast();
     const [checkingTenants, setCheckingTenants] = useState(false);
+    const t = useTranslations("navbar");
 
     const handleLogout = async () => {
         try {
@@ -56,8 +58,8 @@ export function Navbar() {
                 if (tenants.length === 0) {
                     // No tenants available - show notification
                     toast({
-                        title: "No workspaces available",
-                        description: "You don't have access to any workspaces. Please contact your administrator.",
+                        title: t('noWorkspacesTitle'),
+                        description: t('noWorkspacesDescription'),
                         variant: "destructive",
                     });
                 } else {
@@ -67,16 +69,16 @@ export function Navbar() {
                 }
             } else {
                 toast({
-                    title: "Error",
-                    description: "Failed to check workspace availability.",
+                    title: t('workspaceErrorTitle'),
+                    description: t('workspaceErrorDescription'),
                     variant: "destructive",
                 });
             }
         } catch (error) {
             console.error("Failed to check tenants", error);
             toast({
-                title: "Error",
-                description: "Failed to check workspace availability.",
+                title: t('workspaceErrorTitle'),
+                description: t('workspaceErrorDescription'),
                 variant: "destructive",
             });
         } finally {
@@ -98,7 +100,7 @@ export function Navbar() {
                     ) : (
                         <Building className="mr-2 h-4 w-4" />
                     )}
-                    {activeTenant?.name || "Select Workspace"}
+                    {activeTenant?.name || t('selectWorkspaceButton')}
                 </Button>
             </div>
             <div className="flex items-center gap-4">
@@ -122,15 +124,15 @@ export function Navbar() {
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
-                            <Link href="/profile">
-                                <User className="mr-2 h-4 w-4" />
-                                <span>Profile</span>
-                            </Link>
+                                <Link href="/profile">
+                                    <User className="mr-2 h-4 w-4" />
+                                    <span>{t('profile')}</span>
+                                </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={handleLogout}>
                             <LogOut className="mr-2 h-4 w-4" />
-                            <span>Log out</span>
+                                <span>{t('logout')}</span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

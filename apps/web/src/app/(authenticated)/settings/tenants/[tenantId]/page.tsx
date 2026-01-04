@@ -11,7 +11,9 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { usePermissions } from "@/hooks/use-permissions";
-import { TENANT_TYPE_OPTIONS } from "@gym-monorepo/shared";
+import { TENANT_TYPE_OPTIONS, LOCALE_LABELS } from "@gym-monorepo/shared";
+import { useTranslations } from "next-intl";
+import { LABEL_REGISTRY } from "@/lib/labelRegistry";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -28,6 +30,7 @@ export default function TenantDetailPage() {
     const router = useRouter();
     const { toast } = useToast();
     const { isSuperAdmin } = usePermissions();
+    const t = useTranslations();
     const tenantId = params.tenantId as string;
 
     const [tenant, setTenant] = useState<Tenant | null>(null);
@@ -182,6 +185,9 @@ export default function TenantDetailPage() {
 
                             <span className="text-muted-foreground">Slug</span>
                             <span className="font-mono">{tenant.slug}</span>
+
+                            <span className="text-muted-foreground">{t(LABEL_REGISTRY.tenants.language)}</span>
+                            <span>{LOCALE_LABELS[tenant.language] ?? tenant.language}</span>
 
                             <span className="text-muted-foreground">Taxable</span>
                             <span>

@@ -13,6 +13,7 @@ import {
 export interface SidebarItem {
     label: string;
     icon: ElementType;
+    labelKey?: string;
     href?: string;
     permissions?: string[];
     routePermissions?: string[];
@@ -29,15 +30,18 @@ export interface SidebarAccess {
 export const sidebarConfig: SidebarItem[] = [
     {
         label: "Dashboard",
+        labelKey: "dashboard",
         icon: Home,
         href: "/dashboard",
     },
     {
         label: "Settings",
+        labelKey: "settings",
         icon: Settings,
         children: [
             {
                 label: "Tenant",
+                labelKey: "tenant",
                 icon: Building,
                 href: "/settings/tenant",
                 permissions: ["settings.tenant.read", "settings.tenant.update"],
@@ -45,24 +49,28 @@ export const sidebarConfig: SidebarItem[] = [
             },
             {
                 label: "Tenants",
+                labelKey: "tenants",
                 icon: Building2,
                 href: "/settings/tenants",
                 superAdminOnly: true,
             },
             {
                 label: "Taxes",
+                labelKey: "taxes",
                 icon: Percent,
                 href: "/settings/taxes",
                 superAdminOnly: true,
             },
             {
                 label: "Audit Logs",
+                labelKey: "auditLogs",
                 icon: History,
                 href: "/settings/audit-logs",
                 superAdminOnly: true,
             },
             {
                 label: "Roles",
+                labelKey: "roles",
                 icon: Shield,
                 href: "/settings/roles",
                 permissions: [
@@ -75,6 +83,7 @@ export const sidebarConfig: SidebarItem[] = [
             },
             {
                 label: "Users",
+                labelKey: "users",
                 icon: Users,
                 href: "/settings/users",
                 permissions: [

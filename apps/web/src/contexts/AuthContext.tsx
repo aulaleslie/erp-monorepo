@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
-import { TenantType } from "@gym-monorepo/shared";
+import { TenantType, Locale } from "@gym-monorepo/shared";
 import { apiRaw } from "@/lib/api";
 
 interface User {
@@ -17,6 +17,7 @@ interface Tenant {
     slug: string;
     type: TenantType;
     isTaxable: boolean;
+    language: Locale;
 }
 
 interface Permissions {

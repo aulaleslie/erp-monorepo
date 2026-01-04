@@ -10,6 +10,7 @@ import { LoadingState } from "@/components/common/LoadingState";
 import { EmptyState } from "@/components/common/EmptyState";
 import { usePermissions } from "@/hooks/use-permissions";
 import { getSidebarAccessForPath } from "@/components/layout/sidebar-config";
+import { useTranslations } from "next-intl";
 
 interface Tenant {
     id: string;
@@ -34,6 +35,7 @@ export default function SelectTenantPage() {
     const [pendingRedirect, setPendingRedirect] = useState<string | null>(null);
     const { refreshAuth, isLoading } = useAuth();
     const { isSuperAdmin, canAny } = usePermissions();
+    const t = useTranslations("selectTenant");
     const router = useRouter();
     const searchParams = useSearchParams();
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
@@ -169,15 +171,15 @@ export default function SelectTenantPage() {
         <div className="flex min-h-screen items-center justify-center bg-muted/50 p-4">
             <Card className="w-full max-w-md">
                 <CardHeader className="space-y-1">
-                    <CardTitle className="text-2xl font-bold">Select Workspace</CardTitle>
-                    <CardDescription>Choose which organization you want to access</CardDescription>
+                    <CardTitle className="text-2xl font-bold">{t('title')}</CardTitle>
+                    <CardDescription>{t('description')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     {tenants.length === 0 ? (
                         <EmptyState
                             icon={Building}
-                            title="No workspaces found"
-                            description="Please contact your administrator or try reloading."
+                            title={t('noWorkspaces')}
+                            description={t('emptyDescription')}
                         />
                     ) : (
                         <div className="space-y-2">

@@ -22,7 +22,9 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { usePermissions } from "@/hooks/use-permissions";
-import { TENANT_TYPE_OPTIONS, TenantType } from "@gym-monorepo/shared";
+import { TENANT_TYPE_OPTIONS, TenantType, Locale } from "@gym-monorepo/shared";
+import { useTranslations } from "next-intl";
+import { LABEL_REGISTRY, LANGUAGE_SELECT_OPTIONS } from "@/lib/labelRegistry";
 
 export default function EditTenantPage() {
     const params = useParams();
@@ -30,6 +32,7 @@ export default function EditTenantPage() {
     const router = useRouter();
     const { toast } = useToast();
     const { isSuperAdmin } = usePermissions();
+    const t = useTranslations();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [initialTaxLabel, setInitialTaxLabel] = useState("");
@@ -41,6 +44,7 @@ export default function EditTenantPage() {
         isTaxable: false,
         taxIds: [],
         themePresetId: "corporate-blue",
+        language: Locale.EN,
     });
     const [errors, setErrors] = useState<Record<string, string | string[]>>({});
 
@@ -68,6 +72,7 @@ export default function EditTenantPage() {
                     isTaxable: data.isTaxable,
                     taxIds: defaultTaxId ? [defaultTaxId] : [],
                     themePresetId: currentThemePresetId,
+                    language: data.language ?? Locale.EN,
                 });
                 setInitialTaxLabel(defaultTax ? formatTaxLabel(defaultTax) : "");
             } catch (error) {
@@ -229,6 +234,35 @@ export default function EditTenantPage() {
                         {errors.type && (
                             <p className="text-sm text-red-500 mt-1">
                                 {Array.isArray(errors.type) ? errors.type[0] : errors.type}
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="language">{t(LABEL_REGISTRY.tenantSettings.language)}</Label>
+                        <Select
+                            value={formData.language}
+                            onValueChange={(value) => {
+                                const language = value as Locale;
+                                setFormData({ ...formData, language });
+                                if (errors.language) setErrors({ ...errors, language: "" });
+                            }}
+                            disabled={saving}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder={t(LABEL_REGISTRY.tenantSettings.language)} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {LANGUAGE_SELECT_OPTIONS.map((option) => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        {errors.language && (
+                            <p className="text-sm text-red-500 mt-1">
+                                {Array.isArray(errors.language) ? errors.language[0] : errors.language}
                             </p>
                         )}
                     </div>

@@ -3,6 +3,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 interface AuthGuardProps {
     children: React.ReactNode;
@@ -11,6 +12,7 @@ interface AuthGuardProps {
 
 export const AuthGuard = ({ children, requireTenant = true }: AuthGuardProps) => {
     const { user, activeTenant, hasTenants, isLoading } = useAuth();
+    const t = useTranslations("authGuard");
     const router = useRouter();
     const pathname = usePathname();
 
@@ -36,7 +38,7 @@ export const AuthGuard = ({ children, requireTenant = true }: AuthGuardProps) =>
     if (isLoading) {
         return (
             <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center' }}>
-                Loading...
+                {t('loading')}
             </div>
         );
     }

@@ -1,0 +1,50 @@
+{
+  "authGuard": {
+    "loading": "Memuat..."
+  },
+  "navbar": {
+    "selectWorkspaceButton": "Pilih Ruang Kerja",
+    "noWorkspacesTitle": "Tidak ada ruang kerja tersedia",
+    "noWorkspacesDescription": "Anda tidak memiliki akses ke ruang kerja mana pun. Silakan hubungi administrator Anda.",
+    "workspaceErrorTitle": "Kesalahan",
+    "workspaceErrorDescription": "Gagal memeriksa ketersediaan ruang kerja.",
+    "profile": "Profil",
+    "logout": "Keluar"
+  },
+  "selectTenant": {
+    "title": "Pilih Ruang Kerja",
+    "description": "Pilih organisasi yang ingin Anda akses",
+    "noWorkspaces": "Tidak ada ruang kerja ditemukan",
+    "emptyDescription": "Hubungi administrator Anda atau coba muat ulang."
+  },
+  "sidebar": {
+    "appName": "Apupu ERP",
+    "dashboard": "Dasbor",
+    "settings": "Pengaturan",
+    "tenant": "Tenant",
+    "tenants": "Tenant",
+    "taxes": "Pajak",
+    "auditLogs": "Log Audit",
+    "roles": "Peran",
+    "users": "Pengguna"
+  },
+  "labels": {
+    "tenantSettings": {
+      "name": "Nama Tenant",
+      "slug": "Slug Tenant",
+      "type": "Tipe Tenant",
+      "language": "Bahasa Tenant",
+      "taxable": "Tenant Dikenai Pajak",
+      "taxSelection": "Pilihan Pajak",
+      "taxHint": "Pilih pajak default yang akan diterapkan untuk tenant ini.",
+      "theme": "Tema"
+    },
+    "tenants": {
+      "name": "Nama",
+      "slug": "Slug",
+      "status": "Status",
+      "language": "Bahasa",
+      "actions": "Aksi"
+    }
+  }
+}

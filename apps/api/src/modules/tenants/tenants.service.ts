@@ -13,7 +13,7 @@ import {
   calculateSkip,
 } from '../../common/dto/pagination.dto';
 import { createValidationBuilder } from '../../common/utils/validation.util';
-import { TenantType, THEME_PRESETS } from '@gym-monorepo/shared';
+import { TenantType, THEME_PRESETS, Locale } from '@gym-monorepo/shared';
 
 @Injectable()
 export class TenantsService {
@@ -75,6 +75,7 @@ export class TenantsService {
       slug: string;
       type?: TenantType;
       isTaxable?: boolean;
+      language?: Locale;
       taxIds?: string[];
       themePresetId?: string;
     },
@@ -84,6 +85,7 @@ export class TenantsService {
     const isTaxable = data.isTaxable ?? false;
     const uniqueTaxIds = Array.from(new Set(taxIds));
     const themePresetId = data.themePresetId ?? 'corporate-blue';
+    const language = data.language ?? Locale.EN;
 
     const existingSlug = await this.tenantRepository.findOne({
       where: { slug: data.slug },
@@ -145,6 +147,7 @@ export class TenantsService {
       status: 'ACTIVE',
       type: data.type ?? TenantType.GYM,
       isTaxable,
+      language,
     });
     await this.tenantRepository.save(tenant);
 

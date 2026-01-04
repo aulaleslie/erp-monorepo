@@ -1,5 +1,5 @@
 import { api } from '../api';
-import { TenantType, ThemeVariant } from '@gym-monorepo/shared';
+import { Locale, TenantType, ThemeVariant } from '@gym-monorepo/shared';
 import { TaxType } from './taxes';
 
 export interface TenantTaxSettingItem {
@@ -44,6 +44,7 @@ export interface TenantProfileSettings {
   theme?: TenantThemeMapping[];
   createdAt: string;
   updatedAt: string;
+  language: Locale;
 }
 
 export interface UpdateTenantTaxSettingsDto {
@@ -58,6 +59,7 @@ export interface UpdateTenantProfileSettingsDto {
   isTaxable?: boolean;
   taxIds?: string[];
   themePresetId?: string;
+  language?: Locale;
 }
 
 export const getTenantProfileSettings = async () => {

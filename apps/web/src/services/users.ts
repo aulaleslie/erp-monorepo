@@ -1,5 +1,6 @@
 import { api } from '@/lib/api';
 import { PaginatedResponse } from './types';
+import { Locale } from '@gym-monorepo/shared';
 
 export interface TenantUser {
   tenantId: string;
@@ -41,6 +42,7 @@ export interface TenantSummary {
   id: string;
   name: string;
   slug: string;
+  language?: Locale;
 }
 
 export interface UserTenant {
@@ -144,6 +146,7 @@ export const profileService = {
               id: tenant.id,
               name: tenant.name,
               slug: tenant.slug,
+              language: tenant.language,
             },
             role: null,
           };

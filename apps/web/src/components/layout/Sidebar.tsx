@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/tooltip";
 import { usePermissions } from "@/hooks/use-permissions";
 import { sidebarConfig, type SidebarItem } from "@/components/layout/sidebar-config";
+import { useTranslations } from "next-intl";
 
 interface SidebarGroupProps {
     item: SidebarItem;
@@ -26,6 +27,7 @@ interface SidebarGroupProps {
     pathname: string;
     isItemVisible: (item: SidebarItem) => boolean;
     renderLeafItem: (item: SidebarItem) => React.ReactNode;
+    getLabel: (item: SidebarItem) => string;
 }
 
 function SidebarGroup({
@@ -34,6 +36,7 @@ function SidebarGroup({
     pathname,
     isItemVisible,
     renderLeafItem,
+    getLabel,
 }: SidebarGroupProps) {
     const visibleChildren = item.children?.filter(child => isItemVisible(child)) ?? [];
     const Icon = item.icon;
@@ -56,6 +59,8 @@ function SidebarGroup({
         );
     }
 
+    const label = getLabel(item);
+
     return (
         <Collapsible open={isOpen} onOpenChange={setIsOpen} className="space-y-1">
             <CollapsibleTrigger asChild>
@@ -70,7 +75,7 @@ function SidebarGroup({
                 >
                     <span className="flex items-center gap-2">
                         <Icon className="h-4 w-4" />
-                        <span>{item.label}</span>
+                        <span>{label}</span>
                     </span>
                     <ChevronDown
                         className={cn(
@@ -91,6 +96,9 @@ export function Sidebar() {
     const [isCollapsed, setIsCollapsed] = React.useState(false);
     const pathname = usePathname();
     const { canAny, isSuperAdmin } = usePermissions();
+    const t = useTranslations("sidebar");
+    const getLabel = (item: SidebarItem) =>
+        item.labelKey ? t(item.labelKey) : item.label;
 
     const toggleSidebar = () => {
         setIsCollapsed(!isCollapsed);
@@ -111,9 +119,10 @@ export function Sidebar() {
 
         const isActive = item.href ? pathname === item.href : false;
         const Icon = item.icon;
+        const label = getLabel(item);
 
         return (
-            <TooltipProvider key={item.href || item.label}>
+            <TooltipProvider key={item.href || label}>
                 <Tooltip delayDuration={0}>
                     <TooltipTrigger asChild>
                         <Link
@@ -125,12 +134,12 @@ export function Sidebar() {
                             )}
                         >
                             <Icon className="h-5 w-5" />
-                            {!isCollapsed && <span>{item.label}</span>}
+                            {!isCollapsed && <span>{label}</span>}
                         </Link>
                     </TooltipTrigger>
                     {isCollapsed && (
                         <TooltipContent side="right">
-                            {item.label}
+                            {label}
                         </TooltipContent>
                     )}
                 </Tooltip>
@@ -148,6 +157,7 @@ export function Sidebar() {
                     pathname={pathname}
                     isItemVisible={isItemVisible}
                     renderLeafItem={renderLeafItem}
+                    getLabel={getLabel}
                 />
             );
         }
@@ -162,14 +172,14 @@ export function Sidebar() {
             )}
         >
             <div className="flex h-14 items-center border-b px-3 justify-between">
-                {!isCollapsed && <span className="font-bold text-lg px-2">Apupu ERP</span>}
+                {!isCollapsed && <span className="font-bold text-lg px-2">{t('appName')}</span>}
                 <Button variant="ghost" size="icon" onClick={toggleSidebar} className="ml-auto">
                     {isCollapsed ? <Menu className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
                 </Button>
             </div>
 
             <div className="flex-1 overflow-auto py-2 px-2 space-y-1">
-                {sidebarConfig.map(item => renderItem(item))}
+            {sidebarConfig.map(item => renderItem(item))}
             </div>
         </div>
     );

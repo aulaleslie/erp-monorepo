@@ -16,6 +16,7 @@ import {
   comparePassword,
 } from '../../common/utils/password.util';
 import { calculateSkip } from '../../common/dto/pagination.dto';
+import { Locale } from '@gym-monorepo/shared';
 
 @Injectable()
 export class UsersService {
@@ -147,7 +148,7 @@ export class UsersService {
 
   async getUserTenants(userId: string): Promise<
     Array<{
-      tenant: { id: string; name: string; slug: string };
+      tenant: { id: string; name: string; slug: string; language: Locale };
       role: { id: string; name: string; isSuperAdmin: boolean } | null;
     }>
   > {
@@ -193,8 +194,18 @@ export class UsersService {
 
       return {
         tenant: tenant
-          ? { id: tenant.id, name: tenant.name, slug: tenant.slug }
-          : { id: tu.tenantId, name: 'Unknown', slug: '' },
+          ? {
+              id: tenant.id,
+              name: tenant.name,
+              slug: tenant.slug,
+              language: tenant.language,
+            }
+          : {
+              id: tu.tenantId,
+              name: 'Unknown',
+              slug: '',
+              language: Locale.EN,
+            },
         role: role
           ? { id: role.id, name: role.name, isSuperAdmin: role.isSuperAdmin }
           : null,

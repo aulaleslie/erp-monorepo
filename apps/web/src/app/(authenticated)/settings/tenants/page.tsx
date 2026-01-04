@@ -15,6 +15,9 @@ import { StatusBadge } from "@/components/common/StatusBadge";
 import { ActionButtons } from "@/components/common/ActionButtons";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { useSearchParams } from "next/navigation";
+import { LOCALE_LABELS } from "@gym-monorepo/shared";
+import { useTranslations } from "next-intl";
+import { LABEL_REGISTRY } from "@/lib/labelRegistry";
 
 export default function TenantsPage() {
     const [tenants, setTenants] = useState<Tenant[]>([]);
@@ -24,6 +27,7 @@ export default function TenantsPage() {
     const [tenantToArchive, setTenantToArchive] = useState<string | null>(null);
     const { toast } = useToast();
     const { isSuperAdmin } = usePermissions();
+    const t = useTranslations();
     const searchParams = useSearchParams();
     const isArchivedView = searchParams.get("status") === "archived";
     const statusFilter: TenantStatus = isArchivedView ? "DISABLED" : "ACTIVE";
@@ -104,65 +108,73 @@ export default function TenantsPage() {
         }
     };
 
-    const columns: Column<Tenant>[] = useMemo(() => [
-        {
-            header: "Name",
-            accessorKey: "name",
-            className: "font-medium",
-        },
-        {
-            header: "Slug",
-            accessorKey: "slug",
-        },
-        {
-            header: "Status",
-            cell: (tenant) => (
-                <StatusBadge
-                    status={tenant.status === "DISABLED" ? "Archived" : "Active"}
-                    variantMap={{ Archived: "secondary" }}
-                />
-            ),
-        },
-        {
-            header: "Actions",
-            className: "w-[150px]",
-            cell: (tenant) => (
-                <ActionButtons
-                    viewUrl={`/settings/tenants/${tenant.id}`}
-                    editUrl={`/settings/tenants/${tenant.id}/edit`}
-                    customActions={
-                        <>
-                            {tenant.status === "ACTIVE" ? (
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setTenantToArchive(tenant.id);
-                                    }}
-                                    title="Archive tenant"
-                                >
-                                    <Archive className="h-4 w-4 text-destructive" />
-                                </Button>
-                            ) : (
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        restoreTenant(tenant);
-                                    }}
-                                    title="Restore tenant"
-                                >
-                                    <RotateCcw className="h-4 w-4 text-green-600" />
-                                </Button>
-                            )}
-                        </>
-                    }
-                />
-            ),
-        },
-    ], [restoreTenant]);
+    const columns: Column<Tenant>[] = useMemo(
+        () => [
+            {
+                header: t(LABEL_REGISTRY.tenants.name),
+                accessorKey: "name",
+                className: "font-medium",
+            },
+            {
+                header: t(LABEL_REGISTRY.tenants.slug),
+                accessorKey: "slug",
+            },
+            {
+                header: t(LABEL_REGISTRY.tenants.status),
+                cell: (tenant) => (
+                    <StatusBadge
+                        status={tenant.status === "DISABLED" ? "Archived" : "Active"}
+                        variantMap={{ Archived: "secondary" }}
+                    />
+                ),
+            },
+            {
+                header: t(LABEL_REGISTRY.tenants.language),
+                accessorKey: "language",
+                cell: (tenant) => LOCALE_LABELS[tenant.language] ?? tenant.language,
+            },
+            {
+                header: t(LABEL_REGISTRY.tenants.actions),
+                className: "w-[150px]",
+                cell: (tenant) => (
+                    <ActionButtons
+                        viewUrl={`/settings/tenants/${tenant.id}`}
+                        editUrl={`/settings/tenants/${tenant.id}/edit`}
+                        customActions={
+                            <>
+                                {tenant.status === "ACTIVE" ? (
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setTenantToArchive(tenant.id);
+                                        }}
+                                        title="Archive tenant"
+                                    >
+                                        <Archive className="h-4 w-4 text-destructive" />
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            restoreTenant(tenant);
+                                        }}
+                                        title="Restore tenant"
+                                    >
+                                        <RotateCcw className="h-4 w-4 text-green-600" />
+                                    </Button>
+                                )}
+                            </>
+                        }
+                    />
+                ),
+            },
+        ],
+        [restoreTenant, t]
+    );
 
     if (!isSuperAdmin) {
         return (

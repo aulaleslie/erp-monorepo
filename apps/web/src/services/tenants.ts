@@ -1,5 +1,5 @@
 import { api } from '@/lib/api';
-import { TenantType } from '@gym-monorepo/shared';
+import { TenantType, Locale } from '@gym-monorepo/shared';
 import { PaginatedResponse } from './types';
 
 export type TenantStatus = 'ACTIVE' | 'DISABLED';
@@ -33,6 +33,7 @@ export interface Tenant {
   theme?: TenantTheme[];
   createdAt: string;
   updatedAt: string;
+  language: Locale;
 }
 
 export interface CreateTenantDto {
@@ -40,6 +41,7 @@ export interface CreateTenantDto {
   slug: string;
   type: TenantType;
   isTaxable?: boolean;
+  language?: Locale;
   taxIds?: string[];
   themePresetId?: string;
 }
@@ -50,6 +52,7 @@ export interface UpdateTenantDto {
   status?: TenantStatus;
   type?: TenantType;
   isTaxable?: boolean;
+  language?: Locale;
   taxIds?: string[];
   themePresetId?: string;
 }

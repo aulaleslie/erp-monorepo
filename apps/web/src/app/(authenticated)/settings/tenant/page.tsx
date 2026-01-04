@@ -29,6 +29,9 @@ import {
     updateTenantProfileSettings,
     TenantProfileSettings,
 } from "@/lib/api/tenant-settings";
+import { Locale } from "@gym-monorepo/shared";
+import { useTranslations } from "next-intl";
+import { LABEL_REGISTRY, LANGUAGE_SELECT_OPTIONS } from "@/lib/labelRegistry";
 
 export default function TenantSettingsPage() {
     const { isSuperAdmin, can, canAny } = usePermissions();
@@ -49,8 +52,10 @@ export default function TenantSettingsPage() {
         isTaxable: false,
         taxIds: [] as string[],
         themePresetId: "corporate-blue",
+        language: Locale.EN,
     });
     const [errors, setErrors] = useState<Record<string, string | string[]>>({});
+    const t = useTranslations();
 
     useEffect(() => {
         const fetchTenant = async () => {
@@ -80,6 +85,7 @@ export default function TenantSettingsPage() {
                     isTaxable: data.isTaxable,
                     taxIds: defaultTaxId ? [defaultTaxId] : [],
                     themePresetId: currentThemePresetId,
+                    language: data.language ?? Locale.EN,
                 });
             } catch (error) {
                 toast({
@@ -135,6 +141,7 @@ export default function TenantSettingsPage() {
                 isTaxable: formData.isTaxable,
                 taxIds: formData.taxIds,
                 themePresetId: formData.themePresetId,
+                language: formData.language,
             });
             setTenant(response.data);
             const updatedThemePresetId = response.data.theme?.[0]?.presetId || formData.themePresetId;
@@ -145,6 +152,7 @@ export default function TenantSettingsPage() {
                 isTaxable: response.data.isTaxable,
                 taxIds: formData.taxIds,
                 themePresetId: updatedThemePresetId,
+                language: response.data.language ?? formData.language,
             });
             toast({
                 title: "Success",
@@ -275,6 +283,35 @@ export default function TenantSettingsPage() {
                         {errors.type && (
                             <p className="text-sm text-red-500 mt-1">
                                 {Array.isArray(errors.type) ? errors.type[0] : errors.type}
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="language">{t(LABEL_REGISTRY.tenantSettings.language)}</Label>
+                        <Select
+                            value={formData.language}
+                            onValueChange={(value) => {
+                                const language = value as Locale;
+                                setFormData({ ...formData, language });
+                                if (errors.language) setErrors({ ...errors, language: "" });
+                            }}
+                            disabled={!canEdit || saving}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder={t(LABEL_REGISTRY.tenantSettings.language)} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {LANGUAGE_SELECT_OPTIONS.map((option) => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        {errors.language && (
+                            <p className="text-sm text-red-500 mt-1">
+                                {Array.isArray(errors.language) ? errors.language[0] : errors.language}
                             </p>
                         )}
                     </div>

@@ -9,7 +9,7 @@ import {
   IsUUID,
   ValidateIf,
 } from 'class-validator';
-import { TenantType } from '@gym-monorepo/shared';
+import { TenantType, Locale } from '@gym-monorepo/shared';
 
 export class CreateTenantDto {
   @IsString()
@@ -27,6 +27,12 @@ export class CreateTenantDto {
   @IsOptional()
   @IsBoolean()
   isTaxable?: boolean;
+
+  @IsOptional()
+  @IsEnum(Locale, {
+    message: 'Language must be one of the supported locales',
+  })
+  language?: Locale;
 
   @ValidateIf((obj: { isTaxable?: boolean }) => obj.isTaxable === true)
   @IsArray({ message: 'Tax selection is required for taxable tenants' })
@@ -61,6 +67,12 @@ export class UpdateTenantDto {
   @IsOptional()
   @IsBoolean()
   isTaxable?: boolean;
+
+  @IsOptional()
+  @IsEnum(Locale, {
+    message: 'Language must be one of the supported locales',
+  })
+  language?: Locale;
 
   @IsOptional()
   @IsArray()

@@ -7,7 +7,7 @@ import {
   IsArray,
   IsUUID,
 } from 'class-validator';
-import { TenantType } from '@gym-monorepo/shared';
+import { TenantType, Locale } from '@gym-monorepo/shared';
 
 export class UpdateTenantSettingsDto {
   @IsOptional()
@@ -23,6 +23,10 @@ export class UpdateTenantSettingsDto {
   @IsOptional()
   @IsEnum(TenantType)
   type?: TenantType;
+
+  @IsOptional()
+  @IsEnum(Locale, { message: 'Language must be one of the supported locales' })
+  language?: Locale;
 
   @IsOptional()
   @IsBoolean()

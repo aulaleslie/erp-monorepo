@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { TenantType } from '@gym-monorepo/shared';
+import { TenantType, Locale } from '@gym-monorepo/shared';
 import { TenantTaxEntity } from './tenant-tax.entity';
 import { TenantThemeEntity } from './tenant-theme.entity';
 import { BaseAuditEntity } from '../../common/entities/base-audit.entity';
@@ -28,6 +28,13 @@ export class TenantEntity extends BaseAuditEntity {
     default: TenantType.GYM,
   })
   type: TenantType;
+
+  @Column({
+    type: 'enum',
+    enum: Locale,
+    default: Locale.EN,
+  })
+  language: Locale;
 
   @Column({ name: 'is_taxable', default: false })
   isTaxable: boolean;
