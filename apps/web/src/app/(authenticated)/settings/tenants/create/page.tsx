@@ -30,7 +30,7 @@ export default function CreateTenantPage() {
     const router = useRouter();
     const { toast } = useToast();
     const { isSuperAdmin } = usePermissions();
-    const t = useTranslations();
+    const t = useTranslations("tenants");
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState<CreateTenantDto>({
         name: "",
@@ -64,7 +64,7 @@ export default function CreateTenantPage() {
 
         const validationErrors: Record<string, string | string[]> = {};
         if (formData.isTaxable && (!formData.taxIds || formData.taxIds.length === 0)) {
-            validationErrors.taxIds = "Tax selection is required for taxable tenants.";
+            validationErrors.taxIds = t("create.form.validation.taxRequired");
         }
 
         if (Object.keys(validationErrors).length > 0) {
@@ -76,8 +76,8 @@ export default function CreateTenantPage() {
         try {
             await tenantsService.create(formData);
             toast({
-                title: "Success",
-                description: "Tenant created successfully.",
+                title: t("create.toast.success.title"),
+                description: t("create.toast.success.description"),
             });
             router.push("/settings/tenants");
         } catch (error: any) {
@@ -91,7 +91,7 @@ export default function CreateTenantPage() {
             }
 
             toast({
-                title: "Error",
+                title: t("create.toast.error.title"),
                 description: errorMessage,
                 variant: "destructive",
             });
@@ -103,7 +103,7 @@ export default function CreateTenantPage() {
     if (!isSuperAdmin) {
         return (
             <Alert variant="destructive">
-                <AlertDescription>You do not have permission to create tenants.</AlertDescription>
+                <AlertDescription>{t("create.alerts.noPermission")}</AlertDescription>
             </Alert>
         );
     }
@@ -111,14 +111,14 @@ export default function CreateTenantPage() {
     return (
         <div className="space-y-6 max-w-2xl">
             <PageHeader
-                title="Create Tenant"
-                description="Create a new tenant organization."
+                title={t("create.page.title")}
+                description={t("create.page.description")}
             />
 
             <form onSubmit={handleSubmit} className="space-y-8 border p-6 rounded-md">
                 <div className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="name">Tenant Name</Label>
+                        <Label htmlFor="name">{t("create.form.labels.name")}</Label>
                         <Input
                             id="name"
                             value={formData.name}
@@ -126,7 +126,7 @@ export default function CreateTenantPage() {
                                 setFormData({ ...formData, name: e.target.value });
                                 if (errors.name) setErrors({ ...errors, name: "" });
                             }}
-                            placeholder="e.g. Acme Corp"
+                            placeholder={t("create.form.placeholders.name")}
                             className={errors.name ? "border-red-500 focus-visible:ring-red-500" : ""}
                         />
                         {errors.name && (
@@ -135,7 +135,7 @@ export default function CreateTenantPage() {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="slug">Slug (URL Identifier)</Label>
+                        <Label htmlFor="slug">{t("create.form.labels.slug")}</Label>
                         <Input
                             id="slug"
                             value={formData.slug}
@@ -143,17 +143,17 @@ export default function CreateTenantPage() {
                                 setFormData({ ...formData, slug: e.target.value });
                                 if (errors.slug) setErrors({ ...errors, slug: "" });
                             }}
-                            placeholder="e.g. acme-corp"
+                            placeholder={t("create.form.placeholders.slug")}
                             className={errors.slug ? "border-red-500 focus-visible:ring-red-500" : ""}
                         />
                         {errors.slug && (
                             <p className="text-sm text-red-500 mt-1">{Array.isArray(errors.slug) ? errors.slug[0] : errors.slug}</p>
                         )}
-                        <p className="text-xs text-muted-foreground">Unique identifier for the tenant, used in URLs.</p>
+                        <p className="text-xs text-muted-foreground">{t("create.form.descriptions.slug")}</p>
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Tenant Type</Label>
+                        <Label>{t("create.form.labels.type")}</Label>
                         <Select
                             value={formData.type}
                             onValueChange={(value) => {
@@ -162,7 +162,7 @@ export default function CreateTenantPage() {
                             }}
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder="Select a tenant type" />
+                                <SelectValue placeholder={t("create.form.placeholders.type")} />
                             </SelectTrigger>
                             <SelectContent>
                                 {TENANT_TYPE_OPTIONS.map((option) => (
@@ -223,13 +223,13 @@ export default function CreateTenantPage() {
                                 }
                             }}
                         />
-                        <Label htmlFor="isTaxable">Taxable Tenant</Label>
+                        <Label htmlFor="isTaxable">{t("create.form.labels.taxable")}</Label>
                     </div>
 
                     {formData.isTaxable && (
                         <div className="space-y-2">
                             <Label>
-                                Tax Selection <span className="text-destructive">*</span>
+                                {t("create.form.labels.taxSelection")} <span className="text-destructive">*</span>
                             </Label>
                             <SearchableSelect<Tax>
                                 value={formData.taxIds?.[0] || ""}
@@ -237,8 +237,8 @@ export default function CreateTenantPage() {
                                     setFormData({ ...formData, taxIds: value ? [value] : [] });
                                     if (errors.taxIds) setErrors({ ...errors, taxIds: "" });
                                 }}
-                                placeholder="Select a tax"
-                                searchPlaceholder="Search taxes..."
+                                placeholder={t("create.form.placeholders.taxSelection")}
+                                searchPlaceholder={t("create.form.placeholders.searchTaxes")}
                                 fetchItems={fetchTaxes}
                                 getItemValue={(tax) => tax.id}
                                 getItemLabel={(tax) => tax.code ? `${tax.name} (${tax.code})` : tax.name}
@@ -251,7 +251,7 @@ export default function CreateTenantPage() {
                                 </p>
                             )}
                             <p className="text-xs text-muted-foreground">
-                                Select the default tax that will apply to this tenant.
+                                {t("create.form.descriptions.taxSelection")}
                             </p>
                         </div>
                     )}
@@ -264,8 +264,8 @@ export default function CreateTenantPage() {
                                 setFormData({ ...formData, themePresetId: presetId });
                             }}
                             disabled={loading}
-                            label="Theme"
-                            description="Select a color theme for this tenant. The preview applies immediately."
+                            label={t("create.form.labels.theme")}
+                            description={t("create.form.descriptions.theme")}
                         />
                     </div>
                 </div>
@@ -278,11 +278,11 @@ export default function CreateTenantPage() {
 
                 <div className="flex justify-end gap-4">
                     <Button type="button" variant="outline" onClick={() => router.back()}>
-                        Cancel
+                        {t("create.form.buttons.cancel")}
                     </Button>
                     <Button type="submit" disabled={loading}>
                         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Create Tenant
+                        {t("create.form.buttons.create")}
                     </Button>
                 </div>
             </form>

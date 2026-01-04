@@ -5,6 +5,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -64,6 +65,13 @@ interface TaxFormDialogProps {
 export function TaxFormDialog({ open, onOpenChange, tax, onSuccess }: TaxFormDialogProps) {
     const { toast } = useToast();
     const isEditing = !!tax;
+    const t = useTranslations("taxes");
+    const dialogTitle = isEditing ? t("form.dialog.title.edit") : t("form.dialog.title.create");
+    const dialogDescription = isEditing
+        ? t("form.dialog.description.edit")
+        : t("form.dialog.description.create");
+    const cancelLabel = t("form.buttons.cancel");
+    const saveLabel = t("form.buttons.save");
 
     const form = useForm<PlatformTaxFormValues>({
         resolver: zodResolver(platformTaxSchema),
@@ -103,10 +111,16 @@ export function TaxFormDialog({ open, onOpenChange, tax, onSuccess }: TaxFormDia
 
             if (isEditing && tax) {
                 await taxesService.update(tax.id, payload);
-                toast({ title: "Success", description: "Tax updated successfully" });
+                toast({
+                    title: t("form.toast.success.title"),
+                    description: t("form.toast.success.update"),
+                });
             } else {
                 await taxesService.create(payload);
-                toast({ title: "Success", description: "Tax created successfully" });
+                toast({
+                    title: t("form.toast.success.title"),
+                    description: t("form.toast.success.create"),
+                });
             }
             onSuccess();
             onOpenChange(false);
@@ -122,8 +136,8 @@ export function TaxFormDialog({ open, onOpenChange, tax, onSuccess }: TaxFormDia
             }
 
             toast({
-                title: "Error",
-                description: message,
+                title: t("form.toast.error.title"),
+                description: message || t("form.toast.error.description"),
                 variant: "destructive",
             });
 
@@ -142,17 +156,13 @@ export function TaxFormDialog({ open, onOpenChange, tax, onSuccess }: TaxFormDia
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>{isEditing ? "Edit Tax" : "Create Tax"}</DialogTitle>
-                    <DialogDescription>
-                        {isEditing
-                            ? "Update the tax details. Changes will apply to future transactions."
-                            : "Add a new tax to the platform."}
-                    </DialogDescription>
+                    <DialogTitle>{dialogTitle}</DialogTitle>
+                    <DialogDescription>{dialogDescription}</DialogDescription>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="name">Name</Label>
+                        <Label htmlFor="name">{t("form.labels.name")}</Label>
                         <Controller
                             control={control}
                             name="name"
@@ -160,7 +170,7 @@ export function TaxFormDialog({ open, onOpenChange, tax, onSuccess }: TaxFormDia
                                 <Input
                                     {...field}
                                     id="name"
-                                    placeholder="e.g. VAT, Service Charge"
+                                    placeholder={t("form.placeholders.name")}
                                     className={errors.name ? "border-red-500" : ""}
                                 />
                             )}
@@ -169,7 +179,7 @@ export function TaxFormDialog({ open, onOpenChange, tax, onSuccess }: TaxFormDia
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="code">Code (Optional)</Label>
+                        <Label htmlFor="code">{t("form.labels.codeOptional")}</Label>
                         <Controller
                             control={control}
                             name="code"
@@ -178,7 +188,7 @@ export function TaxFormDialog({ open, onOpenChange, tax, onSuccess }: TaxFormDia
                                     {...field}
                                     value={field.value || ""}
                                     id="code"
-                                    placeholder="e.g. VAT-11"
+                                    placeholder={t("form.placeholders.code")}
                                     className={errors.code ? "border-red-500" : ""}
                                 />
                             )}
@@ -187,7 +197,7 @@ export function TaxFormDialog({ open, onOpenChange, tax, onSuccess }: TaxFormDia
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Type</Label>
+                        <Label>{t("form.labels.type")}</Label>
                         <Controller
                             control={control}
                             name="type"
@@ -197,11 +207,11 @@ export function TaxFormDialog({ open, onOpenChange, tax, onSuccess }: TaxFormDia
                                     onValueChange={field.onChange}
                                 >
                                     <SelectTrigger className={errors.type ? "border-red-500" : ""}>
-                                        <SelectValue placeholder="Select type" />
+                                        <SelectValue placeholder={t("form.placeholders.selectType")} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value={TaxType.PERCENTAGE}>Percentage</SelectItem>
-                                        <SelectItem value={TaxType.FIXED}>Fixed Amount</SelectItem>
+                                        <SelectItem value={TaxType.PERCENTAGE}>{t("form.typeOptions.percentage")}</SelectItem>
+                                        <SelectItem value={TaxType.FIXED}>{t("form.typeOptions.fixed")}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             )}
@@ -211,7 +221,7 @@ export function TaxFormDialog({ open, onOpenChange, tax, onSuccess }: TaxFormDia
 
                     {selectedType === TaxType.PERCENTAGE && (
                         <div className="space-y-2">
-                            <Label htmlFor="rate">Rate (0 - 1)</Label>
+                            <Label htmlFor="rate">{t("form.labels.rate")}</Label>
                             <Controller
                                 control={control}
                                 name="rate"
@@ -221,7 +231,7 @@ export function TaxFormDialog({ open, onOpenChange, tax, onSuccess }: TaxFormDia
                                         id="rate"
                                         type="number"
                                         step="0.0001"
-                                        placeholder="0.11"
+                                        placeholder={t("form.placeholders.rate")}
                                         className={errors.rate ? "border-red-500" : ""}
                                     />
                                 )}
@@ -232,7 +242,7 @@ export function TaxFormDialog({ open, onOpenChange, tax, onSuccess }: TaxFormDia
 
                     {selectedType === TaxType.FIXED && (
                         <div className="space-y-2">
-                            <Label htmlFor="amount">Amount</Label>
+                            <Label htmlFor="amount">{t("form.labels.amount")}</Label>
                             <Controller
                                 control={control}
                                 name="amount"
@@ -242,7 +252,7 @@ export function TaxFormDialog({ open, onOpenChange, tax, onSuccess }: TaxFormDia
                                         id="amount"
                                         type="number"
                                         step="0.01"
-                                        placeholder="0.00"
+                                        placeholder={t("form.placeholders.amount")}
                                         className={errors.amount ? "border-red-500" : ""}
                                     />
                                 )}
@@ -257,11 +267,11 @@ export function TaxFormDialog({ open, onOpenChange, tax, onSuccess }: TaxFormDia
                             variant="outline"
                             onClick={() => onOpenChange(false)}
                         >
-                            Cancel
+                            {cancelLabel}
                         </Button>
                         <Button type="submit" disabled={isSubmitting}>
                             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Save
+                            {saveLabel}
                         </Button>
                     </DialogFooter>
                 </form>

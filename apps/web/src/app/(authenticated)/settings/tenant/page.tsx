@@ -55,7 +55,7 @@ export default function TenantSettingsPage() {
         language: Locale.EN,
     });
     const [errors, setErrors] = useState<Record<string, string | string[]>>({});
-    const t = useTranslations();
+    const t = useTranslations("tenant");
 
     useEffect(() => {
         const fetchTenant = async () => {
@@ -89,8 +89,8 @@ export default function TenantSettingsPage() {
                 });
             } catch (error) {
                 toast({
-                    title: "Error",
-                    description: "Failed to load tenant settings.",
+                    title: t("toast.loadError.title"),
+                    description: t("toast.loadError.description"),
                     variant: "destructive",
                 });
             } finally {
@@ -124,7 +124,7 @@ export default function TenantSettingsPage() {
 
         const validationErrors: Record<string, string | string[]> = {};
         if (formData.isTaxable && (!formData.taxIds || formData.taxIds.length === 0)) {
-            validationErrors.taxIds = "Tax selection is required for taxable tenants.";
+            validationErrors.taxIds = t("form.validation.taxRequired");
         }
 
         if (Object.keys(validationErrors).length > 0) {
@@ -155,8 +155,8 @@ export default function TenantSettingsPage() {
                 language: response.data.language ?? formData.language,
             });
             toast({
-                title: "Success",
-                description: "Tenant settings updated.",
+                title: t("toast.saveSuccess.title"),
+                description: t("toast.saveSuccess.description"),
             });
             await refreshPermissions();
         } catch (error: any) {
@@ -170,8 +170,8 @@ export default function TenantSettingsPage() {
             }
 
             toast({
-                title: "Error",
-                description: errorMessage,
+                title: t("toast.error.title"),
+                description: errorMessage || t("toast.error.description"),
                 variant: "destructive",
             });
         } finally {
@@ -182,7 +182,7 @@ export default function TenantSettingsPage() {
     if (!canView) {
         return (
             <Alert variant="destructive">
-                <AlertDescription>You do not have permission to view tenant settings.</AlertDescription>
+                <AlertDescription>{t("alerts.noPermission")}</AlertDescription>
             </Alert>
         );
     }
@@ -198,7 +198,7 @@ export default function TenantSettingsPage() {
     if (!tenant) {
         return (
             <Alert variant="destructive">
-                <AlertDescription>Tenant not found.</AlertDescription>
+                <AlertDescription>{t("alerts.notFound")}</AlertDescription>
             </Alert>
         );
     }
@@ -214,19 +214,19 @@ export default function TenantSettingsPage() {
     return (
         <div className="space-y-6 max-w-2xl">
             <PageHeader
-                title="Tenant Settings"
-                description="View and update the active tenant profile and tax settings."
+                title={t("page.title")}
+                description={t("page.description")}
             />
 
             <form onSubmit={handleSubmit} className="space-y-8 border p-6 rounded-md">
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
-                        <span className="text-sm text-muted-foreground">Status</span>
+                        <span className="text-sm text-muted-foreground">{t("form.labels.status")}</span>
                         <StatusBadge status={statusLabel} variantMap={{ Archived: "secondary" }} />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="name">Tenant Name</Label>
+                        <Label htmlFor="name">{t("form.labels.tenantName")}</Label>
                         <Input
                             id="name"
                             value={formData.name}
@@ -243,7 +243,7 @@ export default function TenantSettingsPage() {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="slug">Slug</Label>
+                        <Label htmlFor="slug">{t("form.labels.slug")}</Label>
                         <Input
                             id="slug"
                             value={formData.slug}
@@ -260,7 +260,7 @@ export default function TenantSettingsPage() {
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Tenant Type</Label>
+                        <Label>{t("form.labels.tenantType")}</Label>
                         <Select
                             value={formData.type}
                             onValueChange={(value) => {
@@ -270,7 +270,7 @@ export default function TenantSettingsPage() {
                             disabled={!canEdit}
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder="Select a tenant type" />
+                                <SelectValue placeholder={t("form.placeholders.tenantType")} />
                             </SelectTrigger>
                             <SelectContent>
                                 {TENANT_TYPE_OPTIONS.map((option) => (
@@ -333,13 +333,13 @@ export default function TenantSettingsPage() {
                                 }
                             }}
                         />
-                        <Label htmlFor="isTaxable">Taxable Tenant</Label>
+                        <Label htmlFor="isTaxable">{t("form.labels.taxable")}</Label>
                     </div>
 
                     {formData.isTaxable && (
                         <div className="space-y-2">
                             <Label>
-                                Tax Selection <span className="text-destructive">*</span>
+                                {t("form.labels.taxSelection")} <span className="text-destructive">*</span>
                             </Label>
                             <SearchableSelect<TenantTaxSettingItem>
                                 value={formData.taxIds?.[0] || ""}
@@ -347,8 +347,8 @@ export default function TenantSettingsPage() {
                                     setFormData({ ...formData, taxIds: value ? [value] : [] });
                                     if (errors.taxIds) setErrors({ ...errors, taxIds: "" });
                                 }}
-                                placeholder="Select a tax"
-                                searchPlaceholder="Search taxes..."
+                                placeholder={t("form.placeholders.taxSelection")}
+                                searchPlaceholder={t("form.placeholders.searchTaxes")}
                                 initialLabel={selectedTaxLabel || undefined}
                                 fetchItems={fetchTaxes}
                                 getItemValue={(tax) => tax.id}
@@ -362,7 +362,7 @@ export default function TenantSettingsPage() {
                                 </p>
                             )}
                             <p className="text-xs text-muted-foreground">
-                                Select the default tax that will apply to this tenant.
+                                {t("form.descriptions.taxSelection")}
                             </p>
                         </div>
                     )}
@@ -375,8 +375,8 @@ export default function TenantSettingsPage() {
                                 setFormData({ ...formData, themePresetId: presetId });
                             }}
                             disabled={!canEdit || saving}
-                            label="Theme"
-                            description="Select a color theme for your organization. The preview applies immediately."
+                            label={t("form.labels.theme")}
+                            description={t("form.descriptions.theme")}
                         />
                     </div>
                 </div>
@@ -390,7 +390,7 @@ export default function TenantSettingsPage() {
                 <div className="flex justify-end">
                     <Button type="submit" disabled={!canEdit || saving}>
                         {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Save Changes
+                        {t("form.buttons.save")}
                     </Button>
                 </div>
             </form>

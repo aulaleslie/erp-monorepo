@@ -27,7 +27,7 @@ export default function TenantsPage() {
     const [tenantToArchive, setTenantToArchive] = useState<string | null>(null);
     const { toast } = useToast();
     const { isSuperAdmin } = usePermissions();
-    const t = useTranslations();
+    const t = useTranslations("tenants");
     const searchParams = useSearchParams();
     const isArchivedView = searchParams.get("status") === "archived";
     const statusFilter: TenantStatus = isArchivedView ? "DISABLED" : "ACTIVE";
@@ -61,8 +61,8 @@ export default function TenantsPage() {
             }
         } catch (error) {
             toast({
-                title: "Error fetching tenants",
-                description: "Failed to load tenants list.",
+                title: t("toast.fetchError.title"),
+                description: t("toast.fetchError.description"),
                 variant: "destructive",
             });
         } finally {
@@ -76,14 +76,14 @@ export default function TenantsPage() {
         try {
             await tenantsService.archive(tenantToArchive);
             toast({
-                title: "Tenant archived",
-                description: "The tenant has been archived.",
+                title: t("toast.archiveSuccess.title"),
+                description: t("toast.archiveSuccess.description"),
             });
             fetchTenants();
         } catch (error) {
             toast({
-                title: "Error archiving tenant",
-                description: "Failed to archive the tenant.",
+                title: t("toast.archiveError.title"),
+                description: t("toast.archiveError.description"),
                 variant: "destructive",
             });
         } finally {
@@ -95,14 +95,14 @@ export default function TenantsPage() {
         try {
             await tenantsService.update(tenant.id, { status: "ACTIVE" });
             toast({
-                title: "Tenant restored",
-                description: "The tenant is now active.",
+                title: t("toast.restoreSuccess.title"),
+                description: t("toast.restoreSuccess.description"),
             });
             fetchTenants();
         } catch (error) {
             toast({
-                title: "Error restoring tenant",
-                description: "Failed to restore the tenant.",
+                title: t("toast.restoreError.title"),
+                description: t("toast.restoreError.description"),
                 variant: "destructive",
             });
         }
@@ -150,7 +150,7 @@ export default function TenantsPage() {
                                             e.stopPropagation();
                                             setTenantToArchive(tenant.id);
                                         }}
-                                        title="Archive tenant"
+                                        title={t("actions.archive.title")}
                                     >
                                         <Archive className="h-4 w-4 text-destructive" />
                                     </Button>
@@ -162,7 +162,7 @@ export default function TenantsPage() {
                                             e.stopPropagation();
                                             restoreTenant(tenant);
                                         }}
-                                        title="Restore tenant"
+                                        title={t("actions.restore.title")}
                                     >
                                         <RotateCcw className="h-4 w-4 text-green-600" />
                                     </Button>
@@ -179,7 +179,7 @@ export default function TenantsPage() {
     if (!isSuperAdmin) {
         return (
             <Alert variant="destructive">
-                <AlertDescription>You do not have permission to view tenants.</AlertDescription>
+                <AlertDescription>{t("alerts.noPermission")}</AlertDescription>
             </Alert>
         );
     }
@@ -188,23 +188,23 @@ export default function TenantsPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <PageHeader
-                    title={isArchivedView ? "Archived Tenants" : "Tenants Management"}
+                    title={isArchivedView ? t("page.archivedTitle") : t("page.title")}
                     description={
                         isArchivedView
-                            ? "Review archived tenants."
-                            : "Manage all tenants."
+                            ? t("page.archivedDescription")
+                            : t("page.description")
                     }
                 />
                 <div className="flex items-center gap-2">
                     <Button variant="link" asChild>
                         <Link href={isArchivedView ? "/settings/tenants" : "/settings/tenants?status=archived"}>
-                            {isArchivedView ? "Back to active" : "See archived"}
+                            {isArchivedView ? t("buttons.backToActive") : t("buttons.seeArchived")}
                         </Link>
                     </Button>
                     <Button asChild>
                         <Link href="/settings/tenants/create">
                             <Plus className="mr-2 h-4 w-4" />
-                            Create Tenant
+                            {t("buttons.create")}
                         </Link>
                     </Button>
                 </div>
@@ -215,16 +215,16 @@ export default function TenantsPage() {
                 columns={columns}
                 loading={loading}
                 pagination={pagination}
-                emptyMessage={isArchivedView ? "No archived tenants found." : "No tenants found."}
+                emptyMessage={isArchivedView ? t("empty.archived") : t("empty.active")}
             />
 
             <ConfirmDialog
                 open={!!tenantToArchive}
                 onOpenChange={(open) => !open && setTenantToArchive(null)}
-                title="Archive Tenant?"
-                description="This will archive the tenant. Users belonging to this tenant may lose access. You can restore it later."
+                title={t("confirm.archive.title")}
+                description={t("confirm.archive.description")}
                 onConfirm={confirmArchive}
-                confirmLabel="Archive"
+                confirmLabel={t("confirm.archive.confirmLabel")}
                 variant="destructive"
             />
         </div>

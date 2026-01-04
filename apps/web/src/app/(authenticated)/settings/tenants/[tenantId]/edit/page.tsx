@@ -32,7 +32,7 @@ export default function EditTenantPage() {
     const router = useRouter();
     const { toast } = useToast();
     const { isSuperAdmin } = usePermissions();
-    const t = useTranslations();
+    const t = useTranslations("tenants");
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [initialTaxLabel, setInitialTaxLabel] = useState("");
@@ -77,8 +77,8 @@ export default function EditTenantPage() {
                 setInitialTaxLabel(defaultTax ? formatTaxLabel(defaultTax) : "");
             } catch (error) {
                 toast({
-                    title: "Error",
-                    description: "Failed to load tenant.",
+                    title: t("edit.toast.fetchError.title"),
+                    description: t("edit.toast.fetchError.description"),
                     variant: "destructive",
                 });
             } finally {
@@ -114,7 +114,7 @@ export default function EditTenantPage() {
 
         const validationErrors: Record<string, string | string[]> = {};
         if (formData.isTaxable && (!formData.taxIds || formData.taxIds.length === 0)) {
-            validationErrors.taxIds = "Tax selection is required for taxable tenants.";
+            validationErrors.taxIds = t("create.form.validation.taxRequired");
         }
 
         if (Object.keys(validationErrors).length > 0) {
@@ -126,8 +126,8 @@ export default function EditTenantPage() {
         try {
             await tenantsService.update(tenantId, formData);
             toast({
-                title: "Success",
-                description: "Tenant updated successfully.",
+                title: t("edit.toast.success.title"),
+                description: t("edit.toast.success.description"),
             });
             router.push("/settings/tenants");
         } catch (error: any) {
@@ -141,7 +141,7 @@ export default function EditTenantPage() {
             }
 
             toast({
-                title: "Error",
+                title: t("edit.toast.error.title"),
                 description: errorMessage,
                 variant: "destructive",
             });
@@ -153,7 +153,7 @@ export default function EditTenantPage() {
     if (!isSuperAdmin) {
         return (
             <Alert variant="destructive">
-                <AlertDescription>You do not have permission to edit tenants.</AlertDescription>
+                <AlertDescription>{t("edit.alerts.noPermission")}</AlertDescription>
             </Alert>
         );
     }
@@ -169,18 +169,18 @@ export default function EditTenantPage() {
     return (
         <div className="space-y-6 max-w-2xl">
             <Button variant="ghost" className="pl-0" onClick={() => router.back()}>
-                <ArrowLeft className="mr-2 h-4 w-4" /> Back to Tenants
+                <ArrowLeft className="mr-2 h-4 w-4" /> {t("detail.buttons.back")}
             </Button>
 
             <PageHeader
-                title="Edit Tenant"
-                description="Update tenant details."
+                title={t("edit.page.title")}
+                description={t("edit.page.description")}
             />
 
             <form onSubmit={handleSubmit} className="space-y-8 border p-6 rounded-md">
                 <div className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="name">Tenant Name</Label>
+                        <Label htmlFor="name">{t("create.form.labels.name")}</Label>
                         <Input
                             id="name"
                             value={formData.name}
@@ -196,7 +196,7 @@ export default function EditTenantPage() {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="slug">Slug</Label>
+                        <Label htmlFor="slug">{t("create.form.labels.slug")}</Label>
                         <Input
                             id="slug"
                             value={formData.slug}
@@ -212,7 +212,7 @@ export default function EditTenantPage() {
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Tenant Type</Label>
+                        <Label>{t("create.form.labels.type")}</Label>
                         <Select
                             value={formData.type}
                             onValueChange={(value) => {
@@ -221,7 +221,7 @@ export default function EditTenantPage() {
                             }}
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder="Select a tenant type" />
+                                <SelectValue placeholder={t("create.form.placeholders.type")} />
                             </SelectTrigger>
                             <SelectContent>
                                 {TENANT_TYPE_OPTIONS.map((option) => (
@@ -283,13 +283,13 @@ export default function EditTenantPage() {
                                 }
                             }}
                         />
-                        <Label htmlFor="isTaxable">Taxable Tenant</Label>
+                        <Label htmlFor="isTaxable">{t("create.form.labels.taxable")}</Label>
                     </div>
 
                     {formData.isTaxable && (
                         <div className="space-y-2">
                             <Label>
-                                Tax Selection <span className="text-destructive">*</span>
+                                {t("create.form.labels.taxSelection")} <span className="text-destructive">*</span>
                             </Label>
                             <SearchableSelect<Tax>
                                 value={formData.taxIds?.[0] || ""}
@@ -297,8 +297,8 @@ export default function EditTenantPage() {
                                     setFormData({ ...formData, taxIds: value ? [value] : [] });
                                     if (errors.taxIds) setErrors({ ...errors, taxIds: "" });
                                 }}
-                                placeholder="Select a tax"
-                                searchPlaceholder="Search taxes..."
+                                placeholder={t("create.form.placeholders.taxSelection")}
+                                searchPlaceholder={t("create.form.placeholders.searchTaxes")}
                                 initialLabel={initialTaxLabel || undefined}
                                 fetchItems={fetchTaxes}
                                 getItemValue={(tax) => tax.id}
@@ -312,7 +312,7 @@ export default function EditTenantPage() {
                                 </p>
                             )}
                             <p className="text-xs text-muted-foreground">
-                                Select the default tax that will apply to this tenant.
+                                {t("create.form.descriptions.taxSelection")}
                             </p>
                         </div>
                     )}
@@ -325,8 +325,8 @@ export default function EditTenantPage() {
                                 setFormData({ ...formData, themePresetId: presetId });
                             }}
                             disabled={saving}
-                            label="Theme"
-                            description="Select a color theme for this tenant. The preview applies immediately."
+                            label={t("create.form.labels.theme")}
+                            description={t("create.form.descriptions.theme")}
                         />
                     </div>
                 </div>
@@ -339,11 +339,11 @@ export default function EditTenantPage() {
 
                 <div className="flex justify-end gap-4">
                     <Button type="button" variant="outline" onClick={() => router.back()}>
-                        Cancel
+                        {t("create.form.buttons.cancel")}
                     </Button>
                     <Button type="submit" disabled={saving}>
                         {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Save Changes
+                        {t("edit.form.buttons.save")}
                     </Button>
                 </div>
             </form>

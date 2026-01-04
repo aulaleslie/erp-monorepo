@@ -30,7 +30,7 @@ export default function TenantDetailPage() {
     const router = useRouter();
     const { toast } = useToast();
     const { isSuperAdmin } = usePermissions();
-    const t = useTranslations();
+    const t = useTranslations("tenants");
     const tenantId = params.tenantId as string;
 
     const [tenant, setTenant] = useState<Tenant | null>(null);
@@ -46,8 +46,8 @@ export default function TenantDetailPage() {
                 setTenant(tenantData);
             } catch (error) {
                 toast({
-                    title: "Error fetching details",
-                    description: "Failed to load tenant details.",
+                    title: t("detail.toast.fetchError.title"),
+                    description: t("detail.toast.fetchError.description"),
                     variant: "destructive",
                 });
             } finally {
@@ -70,13 +70,13 @@ export default function TenantDetailPage() {
             const updated = await tenantsService.update(tenant.id, { status: 'ACTIVE' });
             setTenant(updated);
             toast({
-                title: "Tenant restored",
-                description: "The tenant is now active.",
+                title: t("detail.toast.restoreSuccess.title"),
+                description: t("detail.toast.restoreSuccess.description"),
             });
         } catch (error) {
             toast({
-                title: "Error restoring tenant",
-                description: "Failed to restore the tenant.",
+                title: t("detail.toast.restoreError.title"),
+                description: t("detail.toast.restoreError.description"),
                 variant: "destructive",
             });
         }
@@ -89,13 +89,13 @@ export default function TenantDetailPage() {
             await tenantsService.archive(tenant.id);
             setTenant({ ...tenant, status: 'DISABLED' });
             toast({
-                title: "Tenant archived",
-                description: "The tenant has been archived.",
+                title: t("detail.toast.archiveSuccess.title"),
+                description: t("detail.toast.archiveSuccess.description"),
             });
         } catch (error) {
             toast({
-                title: "Error archiving tenant",
-                description: "Failed to archive the tenant.",
+                title: t("detail.toast.archiveError.title"),
+                description: t("detail.toast.archiveError.description"),
                 variant: "destructive",
             });
         } finally {
@@ -106,7 +106,7 @@ export default function TenantDetailPage() {
     if (!isSuperAdmin) {
         return (
             <Alert variant="destructive">
-                <AlertDescription>You do not have permission to view this tenant.</AlertDescription>
+                <AlertDescription>{t("detail.alerts.noPermission")}</AlertDescription>
             </Alert>
         );
     }
@@ -122,12 +122,12 @@ export default function TenantDetailPage() {
     if (!tenant) {
         return (
             <Alert variant="destructive">
-                <AlertDescription>Tenant not found.</AlertDescription>
+                <AlertDescription>{t("detail.alerts.notFound")}</AlertDescription>
             </Alert>
         );
     }
 
-    const statusLabel = tenant.status === 'DISABLED' ? 'Archived' : 'Active';
+    const statusLabel = tenant.status === 'DISABLED' ? t("detail.status.archived") : t("detail.status.active");
     const tenantTypeLabel =
         TENANT_TYPE_OPTIONS.find((option) => option.value === tenant.type)?.label ?? tenant.type;
     const tenantTaxes = tenant.taxes ?? [];
@@ -144,7 +144,7 @@ export default function TenantDetailPage() {
     return (
         <div className="space-y-8">
             <Button variant="ghost" className="pl-0" onClick={() => router.back()}>
-                <ArrowLeft className="mr-2 h-4 w-4" /> Back to Tenants
+                <ArrowLeft className="mr-2 h-4 w-4" /> {t("detail.buttons.back")}
             </Button>
 
             <div className="flex items-center justify-between">
@@ -154,22 +154,22 @@ export default function TenantDetailPage() {
                         <Badge variant={tenant.status === 'ACTIVE' ? 'default' : 'secondary'}>
                             {statusLabel}
                         </Badge>
-                        <span className="text-muted-foreground text-sm">Created on {new Date(tenant.createdAt).toLocaleDateString()}</span>
+                        <span className="text-muted-foreground text-sm">{t("detail.labels.createdOn")} {new Date(tenant.createdAt).toLocaleDateString()}</span>
                     </div>
                 </div>
                 <div className="flex gap-2">
                     <Button asChild>
                         <Link href={`/settings/tenants/${tenantId}/edit`}>
-                            <Pencil className="mr-2 h-4 w-4" /> Edit
+                            <Pencil className="mr-2 h-4 w-4" /> {t("detail.buttons.edit")}
                         </Link>
                     </Button>
                     {tenant.status === 'ACTIVE' ? (
                         <Button variant="destructive" onClick={() => setTenantToArchive(true)}>
-                            <Archive className="mr-2 h-4 w-4" /> Archive
+                            <Archive className="mr-2 h-4 w-4" /> {t("detail.buttons.archive")}
                         </Button>
                     ) : (
                         <Button onClick={restoreTenant}>
-                            <RotateCcw className="mr-2 h-4 w-4" /> Restore
+                            <RotateCcw className="mr-2 h-4 w-4" /> {t("detail.buttons.restore")}
                         </Button>
                     )}
                 </div>
@@ -178,36 +178,36 @@ export default function TenantDetailPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-6">
                     <div className="border rounded-md p-4 space-y-4">
-                        <h3 className="font-semibold text-lg">Details</h3>
+                        <h3 className="font-semibold text-lg">{t("detail.sections.details")}</h3>
                         <div className="grid grid-cols-[100px_1fr] gap-4 text-sm">
-                            <span className="text-muted-foreground">ID</span>
+                            <span className="text-muted-foreground">{t("detail.labels.id")}</span>
                             <span className="font-mono">{tenant.id}</span>
 
-                            <span className="text-muted-foreground">Slug</span>
+                            <span className="text-muted-foreground">{t("detail.labels.slug")}</span>
                             <span className="font-mono">{tenant.slug}</span>
 
                             <span className="text-muted-foreground">{t(LABEL_REGISTRY.tenants.language)}</span>
                             <span>{LOCALE_LABELS[tenant.language] ?? tenant.language}</span>
 
-                            <span className="text-muted-foreground">Taxable</span>
+                            <span className="text-muted-foreground">{t("detail.labels.taxable")}</span>
                             <span>
                                 {tenant.isTaxable ? (
-                                    <Badge variant="default" className="bg-green-600 hover:bg-green-700">Yes</Badge>
+                                    <Badge variant="default" className="bg-green-600 hover:bg-green-700">{t("detail.labels.yes")}</Badge>
                                 ) : (
-                                    <Badge variant="outline">No</Badge>
+                                    <Badge variant="outline">{t("detail.labels.no")}</Badge>
                                 )}
                             </span>
 
-                            <span className="text-muted-foreground">Tax</span>
+                            <span className="text-muted-foreground">{t("detail.labels.tax")}</span>
                             <span>
                                 {tenant.isTaxable && selectedTax ? (
                                     formatTaxLabel(selectedTax)
                                 ) : (
-                                    <span className="text-muted-foreground">None</span>
+                                    <span className="text-muted-foreground">{t("detail.labels.none")}</span>
                                 )}
                             </span>
 
-                            <span className="text-muted-foreground">Tenant Type</span>
+                            <span className="text-muted-foreground">{t("detail.labels.tenantType")}</span>
                             <span>
                                 <Badge variant="secondary">{tenantTypeLabel}</Badge>
                             </span>
@@ -219,16 +219,15 @@ export default function TenantDetailPage() {
             <AlertDialog open={tenantToArchive} onOpenChange={setTenantToArchive}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Archive Tenant?</AlertDialogTitle>
+                        <AlertDialogTitle>{t("detail.confirm.archive.title")}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This will archive the tenant. Users belonging to this tenant may lose access.
-                            You can restore it later.
+                            {t("detail.confirm.archive.description")}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>{t("detail.confirm.archive.cancel")}</AlertDialogCancel>
                         <AlertDialogAction onClick={confirmArchive} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                            Archive
+                            {t("detail.confirm.archive.confirm")}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

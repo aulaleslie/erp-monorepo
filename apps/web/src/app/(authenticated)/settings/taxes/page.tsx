@@ -28,12 +28,14 @@ import { Tax, TaxStatus, TaxType, taxesService } from "@/services/taxes";
 import { format } from "date-fns";
 import { Plus, Search, Pencil, Trash2 } from "lucide-react";
 import { useEffect, useState, type ReactElement } from "react";
+import { useTranslations } from "next-intl";
 import { TaxFormDialog } from "./tax-form-dialog";
 
 export default function TaxesPage() {
     const { isSuperAdmin } = usePermissions();
     const { toast } = useToast();
     const pagination = usePagination();
+    const t = useTranslations("taxes");
     const [data, setData] = useState<Tax[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
@@ -44,8 +46,7 @@ export default function TaxesPage() {
     const [editingTax, setEditingTax] = useState<Tax | null>(null);
     const [deletingTax, setDeletingTax] = useState<Tax | null>(null);
 
-    const lockedActionMessage =
-        "This tax is already selected by a tenant. Remove it from tenant tax settings to edit or disable.";
+    const lockedActionMessage = t("filters.lockedAction");
 
     const fetchData = async () => {
         setLoading(true);
@@ -60,8 +61,8 @@ export default function TaxesPage() {
             pagination.setTotal(response.total);
         } catch {
             toast({
-                title: "Error",
-                description: "Failed to load taxes",
+                title: t("toast.loadError.title"),
+                description: t("toast.loadError.description"),
                 variant: "destructive",
             });
         } finally {
@@ -83,14 +84,14 @@ export default function TaxesPage() {
         try {
             await taxesService.delete(deletingTax.id);
             toast({
-                title: "Success",
-                description: "Tax disabled successfully",
+                title: t("toast.disableSuccess.title"),
+                description: t("toast.disableSuccess.description"),
             });
             fetchData();
         } catch {
             toast({
-                title: "Error",
-                description: "Failed to disable tax",
+                title: t("toast.disableError.title"),
+                description: t("toast.disableError.description"),
                 variant: "destructive",
             });
         } finally {
@@ -101,22 +102,24 @@ export default function TaxesPage() {
     const columns = [
         {
             accessorKey: "name" as keyof Tax,
-            header: "Name",
+            header: t("table.name"),
         },
         {
             accessorKey: "code" as keyof Tax,
-            header: "Code",
+            header: t("table.code"),
             cell: (tax: Tax) => tax.code || "-",
         },
         {
             accessorKey: "type" as keyof Tax,
-            header: "Type",
+            header: t("table.type"),
             cell: (tax: Tax) =>
-                tax.type === TaxType.PERCENTAGE ? "Percentage" : "Fixed",
+                tax.type === TaxType.PERCENTAGE
+                    ? t("table.typeValues.percentage")
+                    : t("table.typeValues.fixed"),
         },
         {
             id: "value",
-            header: "Rate / Amount",
+            header: t("table.value"),
             cell: (tax: Tax) => {
                 if (tax.type === TaxType.PERCENTAGE) {
                     return `${((tax.rate || 0) * 100).toFixed(2)}%`;
@@ -129,16 +132,16 @@ export default function TaxesPage() {
         },
         {
             accessorKey: "status" as keyof Tax,
-            header: "Status",
+            header: t("table.status"),
             cell: (tax: Tax) => <StatusBadge status={tax.status} />,
         },
         {
             accessorKey: "updatedAt" as keyof Tax,
-            header: "Last Updated",
+            header: t("table.lastUpdated"),
             cell: (tax: Tax) => format(new Date(tax.updatedAt), "dd MMM yyyy HH:mm"),
         },
         {
-            header: "Actions",
+            header: t("table.actions"),
             cell: (tax: Tax) => {
                 const isLocked = (tax.tenantUsageCount ?? 0) > 0;
 
@@ -201,7 +204,7 @@ export default function TaxesPage() {
     if (!isSuperAdmin) {
         return (
             <Alert variant="destructive">
-                <AlertDescription>Only Super Admins can manage taxes.</AlertDescription>
+                <AlertDescription>{t("guards.superAdminOnly")}</AlertDescription>
             </Alert>
         );
     }
@@ -209,12 +212,12 @@ export default function TaxesPage() {
     return (
         <div className="space-y-6">
             <PageHeader
-                title="Taxes"
-                description="Manage platform taxes."
+                title={t("page.title")}
+                description={t("page.description")}
             >
                 <Button onClick={() => setIsCreateOpen(true)}>
                     <Plus className="mr-2 h-4 w-4" />
-                    Add Tax
+                    {t("buttons.add")}
                 </Button>
             </PageHeader>
 
@@ -222,7 +225,7 @@ export default function TaxesPage() {
                 <div className="relative flex-1 max-w-sm">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
-                        placeholder="Search taxes..."
+                        placeholder={t("filters.searchPlaceholder")}
                         className="pl-8"
                         value={search}
                         onChange={(e) => {
@@ -239,12 +242,12 @@ export default function TaxesPage() {
                     }}
                 >
                     <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Filter Status" />
+                        <SelectValue placeholder={t("filters.statusPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="ALL">All Status</SelectItem>
-                        <SelectItem value={TaxStatus.ACTIVE}>Active</SelectItem>
-                        <SelectItem value={TaxStatus.INACTIVE}>Inactive</SelectItem>
+                        <SelectItem value="ALL">{t("filters.status.all")}</SelectItem>
+                        <SelectItem value={TaxStatus.ACTIVE}>{t("filters.status.active")}</SelectItem>
+                        <SelectItem value={TaxStatus.INACTIVE}>{t("filters.status.inactive")}</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
@@ -269,10 +272,10 @@ export default function TaxesPage() {
             <ConfirmDialog
                 open={!!deletingTax}
                 onOpenChange={(open) => !open && setDeletingTax(null)}
-                title="Disable Tax"
-                description={`Are you sure you want to disable "${deletingTax?.name}"? It will no longer be selectable for new settings.`}
+                title={t("dialogs.disable.title")}
+                description={t("dialogs.disable.description", { name: deletingTax?.name ?? "" })}
                 onConfirm={handleDelete}
-                confirmLabel="Disable"
+                confirmLabel={t("dialogs.disable.confirmLabel")}
                 variant="destructive"
             />
         </div>

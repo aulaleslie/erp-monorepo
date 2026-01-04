@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { usersService, TenantUser } from "@/services/users";
 import { Plus, UserPlus } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useEffect, useState, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -27,6 +28,7 @@ export default function UsersPage() {
     const [userToDelete, setUserToDelete] = useState<string | null>(null);
     const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
     const { toast } = useToast();
+    const t = useTranslations("users");
 
     useEffect(() => {
         fetchUsers();
@@ -44,8 +46,8 @@ export default function UsersPage() {
             pagination.setTotal(data.total);
         } catch (error) {
             toast({
-                title: "Error fetching users",
-                description: "Failed to load users list.",
+                title: t("toast.fetchError.title"),
+                description: t("toast.fetchError.description"),
                 variant: "destructive",
             });
         } finally {
@@ -59,14 +61,14 @@ export default function UsersPage() {
         try {
             await usersService.remove(userToDelete);
             toast({
-                title: "User removed",
-                description: "The user has been removed from this tenant.",
+                title: t("toast.removeSuccess.title"),
+                description: t("toast.removeSuccess.description"),
             });
             fetchUsers();
         } catch (error) {
             toast({
-                title: "Error removing user",
-                description: "Failed to remove the user.",
+                title: t("toast.removeError.title"),
+                description: t("toast.removeError.description"),
                 variant: "destructive",
             });
         } finally {
@@ -76,16 +78,16 @@ export default function UsersPage() {
 
     const columns: Column<TenantUser>[] = useMemo(() => [
         {
-            header: "Email",
+            header: t("table.headers.email"),
             accessorKey: "userId", // Use userId as key but render email manually since it's nested
             cell: (row) => <span className="font-medium">{row.user?.email || "N/A"}</span>,
         },
         {
-            header: "Full Name",
+            header: t("table.headers.fullName"),
             cell: (row) => row.user?.fullName || "-",
         },
         {
-            header: "Role",
+            header: t("table.headers.role"),
             cell: (row) => row.role ? (
                 <Badge variant={row.role.isSuperAdmin ? "default" : "secondary"}>
                     {row.role.name}
@@ -93,11 +95,11 @@ export default function UsersPage() {
             ) : "-",
         },
         {
-            header: "Status",
+            header: t("table.headers.status"),
             cell: (row) => <StatusBadge status={row.user?.status || "Unknown"} />,
         },
         {
-            header: "Actions",
+            header: t("table.headers.actions"),
             className: "w-[150px]",
             cell: (row) => (
                 <ActionButtons
@@ -111,33 +113,33 @@ export default function UsersPage() {
                 />
             ),
         },
-    ], []);
+    ], [t]);
 
     return (
         <PermissionGuard
             requiredPermissions={['users.read']}
             fallback={
                 <Alert variant="destructive">
-                    <AlertDescription>You do not have permission to view users.</AlertDescription>
+                    <AlertDescription>{t("alerts.noPermission")}</AlertDescription>
                 </Alert>
             }
         >
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <PageHeader
-                        title="User Management"
-                        description="Manage users and assign roles here."
+                        title={t("page.title")}
+                        description={t("page.description")}
                     />
                     <div className="flex gap-2">
                         <PermissionGuard requiredPermissions={['users.create']}>
                             <Button variant="outline" onClick={() => setInviteDialogOpen(true)}>
                                 <UserPlus className="mr-2 h-4 w-4" />
-                                Invite User
+                                {t("buttons.invite")}
                             </Button>
                             <Button asChild>
                                 <Link href="/settings/users/create">
                                     <Plus className="mr-2 h-4 w-4" />
-                                    Create User
+                                    {t("buttons.create")}
                                 </Link>
                             </Button>
                         </PermissionGuard>
@@ -149,17 +151,17 @@ export default function UsersPage() {
                     columns={columns}
                     loading={loading}
                     pagination={pagination}
-                    emptyMessage="No users found."
+                    emptyMessage={t("empty.message")}
                     rowKey={(user) => user.userId}
                 />
 
                 <ConfirmDialog
                     open={!!userToDelete}
                     onOpenChange={(open) => !open && setUserToDelete(null)}
-                    title="Remove user from tenant?"
-                    description="This will remove the user from this tenant. The user account will still exist and can be invited back later."
+                    title={t("confirm.remove.title")}
+                    description={t("confirm.remove.description")}
                     onConfirm={confirmDelete}
-                    confirmLabel="Remove"
+                    confirmLabel={t("confirm.remove.confirmLabel")}
                     variant="destructive"
                 />
 

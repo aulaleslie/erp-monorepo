@@ -146,6 +146,157 @@
     },
     "systemLabel": "Sistem"
   },
+  "taxes": {
+    "page": {
+      "title": "Pajak",
+      "description": "Kelola pajak platform."
+    },
+    "buttons": {
+      "add": "Tambah Pajak"
+    },
+    "filters": {
+      "searchPlaceholder": "Cari pajak...",
+      "statusPlaceholder": "Pilih Status",
+      "status": {
+        "all": "Semua Status",
+        "active": "Aktif",
+        "inactive": "Nonaktif"
+      },
+      "lockedAction": "Pajak ini sudah dipilih oleh tenant. Hapus dari pengaturan pajak tenant untuk mengubah atau menonaktifkannya."
+    },
+    "table": {
+      "name": "Nama",
+      "code": "Kode",
+      "type": "Tipe",
+      "typeValues": {
+        "percentage": "Persentase",
+        "fixed": "Tetap"
+      },
+      "value": "Tarif / Jumlah",
+      "status": "Status",
+      "lastUpdated": "Terakhir Diperbarui",
+      "actions": "Aksi"
+    },
+    "dialogs": {
+      "disable": {
+        "title": "Nonaktifkan Pajak",
+        "description": "Apakah Anda yakin ingin menonaktifkan \"{name}\"? Pajak ini tidak akan dapat dipilih untuk pengaturan baru.",
+        "confirmLabel": "Nonaktifkan"
+      }
+    },
+    "guards": {
+      "superAdminOnly": "Hanya Super Admin yang dapat mengelola pajak."
+    },
+    "toast": {
+      "loadError": {
+        "title": "Kesalahan",
+        "description": "Gagal memuat pajak"
+      },
+      "disableSuccess": {
+        "title": "Berhasil",
+        "description": "Pajak berhasil dinonaktifkan"
+      },
+      "disableError": {
+        "title": "Kesalahan",
+        "description": "Gagal menonaktifkan pajak"
+      }
+    },
+    "form": {
+      "dialog": {
+        "title": {
+          "create": "Buat Pajak",
+          "edit": "Ubah Pajak"
+        },
+        "description": {
+          "create": "Tambahkan pajak baru ke platform.",
+          "edit": "Perbarui detail pajak. Perubahan akan berlaku untuk transaksi berikutnya."
+        }
+      },
+      "labels": {
+        "name": "Nama",
+        "codeOptional": "Kode (Opsional)",
+        "type": "Tipe",
+        "rate": "Tarif (0 - 1)",
+        "amount": "Jumlah"
+      },
+      "placeholders": {
+        "name": "misal PPN, Biaya Servis",
+        "code": "misal VAT-11",
+        "selectType": "Pilih tipe",
+        "rate": "0.11",
+        "amount": "0.00"
+      },
+      "typeOptions": {
+        "percentage": "Persentase",
+        "fixed": "Jumlah Tetap"
+      },
+      "buttons": {
+        "cancel": "Batal",
+        "save": "Simpan"
+      },
+      "toast": {
+        "success": {
+          "title": "Berhasil",
+          "create": "Pajak berhasil dibuat",
+          "update": "Pajak berhasil diperbarui"
+        },
+        "error": {
+          "title": "Kesalahan",
+          "description": "Terjadi kesalahan saat menyimpan pajak."
+        }
+      }
+    }
+  },
+  "tenant": {
+    "page": {
+      "title": "Pengaturan Tenant",
+      "description": "Lihat dan perbarui profil tenant aktif serta pengaturan pajaknya."
+    },
+    "alerts": {
+      "noPermission": "Anda tidak memiliki izin untuk melihat pengaturan tenant.",
+      "notFound": "Tenant tidak ditemukan."
+    },
+    "toast": {
+      "loadError": {
+        "title": "Kesalahan",
+        "description": "Gagal memuat pengaturan tenant."
+      },
+      "saveSuccess": {
+        "title": "Berhasil",
+        "description": "Pengaturan tenant berhasil diperbarui."
+      },
+      "error": {
+        "title": "Kesalahan",
+        "description": "Gagal memperbarui pengaturan tenant."
+      }
+    },
+    "form": {
+      "labels": {
+        "status": "Status",
+        "tenantName": "Nama Tenant",
+        "slug": "Slug",
+        "tenantType": "Tipe Tenant",
+        "taxable": "Tenant Dikenai Pajak",
+        "taxSelection": "Pemilihan Pajak",
+        "theme": "Tema"
+      },
+      "placeholders": {
+        "tenantType": "Pilih tipe tenant",
+        "taxSelection": "Pilih pajak",
+        "searchTaxes": "Cari pajak..."
+      },
+      "descriptions": {
+        "taxSelection": "Pilih pajak default yang akan diterapkan ke tenant ini.",
+        "theme": "Pilih tema warna untuk organisasi Anda. Pratinjau berlaku segera."
+      },
+      "buttons": {
+        "save": "Simpan Perubahan"
+      },
+      "validation": {
+        "taxRequired": "Pemilihan pajak wajib untuk tenant yang dikenai pajak."
+      }
+    }
+  },
   "roles": {
     "pageTitle": "Manajemen Peran",
     "pageDescription": "Kelola peran dan izin yang terkait di sini.",
@@ -270,6 +421,245 @@
       "title": "Apakah Anda yakin?",
       "description": "Tindakan ini tidak dapat dibatalkan. Ini akan menghapus peran secara permanen dan menghapus izin dari pengguna yang ditugaskan.",
       "confirmLabel": "Hapus"
+    }
+  },
+  "tenants": {
+    "alerts": {
+      "noPermission": "Anda tidak memiliki izin untuk melihat tenant."
+    },
+    "page": {
+      "title": "Manajemen Tenant",
+      "description": "Kelola semua tenant.",
+      "archivedTitle": "Tenant yang Diarsipkan",
+      "archivedDescription": "Tinjau tenant yang diarsipkan."
+    },
+    "buttons": {
+      "backToActive": "Kembali ke aktif",
+      "seeArchived": "Lihat yang diarsipkan",
+      "create": "Buat Tenant"
+    },
+    "empty": {
+      "active": "Tidak ada tenant ditemukan.",
+      "archived": "Tidak ada tenant yang diarsipkan ditemukan."
+    },
+    "toast": {
+      "fetchError": {
+        "title": "Kesalahan mengambil tenant",
+        "description": "Gagal memuat daftar tenant."
+      },
+      "archiveSuccess": {
+        "title": "Tenant diarsipkan",
+        "description": "Tenant telah diarsipkan."
+      },
+      "archiveError": {
+        "title": "Kesalahan mengarsipkan tenant",
+        "description": "Gagal mengarsipkan tenant."
+      },
+      "restoreSuccess": {
+        "title": "Tenant dipulihkan",
+        "description": "Tenant sekarang aktif."
+      },
+      "restoreError": {
+        "title": "Kesalahan memulihkan tenant",
+        "description": "Gagal memulihkan tenant."
+      }
+    },
+    "confirm": {
+      "archive": {
+        "title": "Arsipkan Tenant?",
+        "description": "Ini akan mengarsipkan tenant. Pengguna yang termasuk dalam tenant ini mungkin kehilangan akses. Anda dapat memulihkannya nanti.",
+        "confirmLabel": "Arsipkan"
+      }
+    },
+    "actions": {
+      "archive": {
+        "title": "Arsipkan tenant"
+      },
+      "restore": {
+        "title": "Pulihkan tenant"
+      }
+    }
+  },
+  "create": {
+    "alerts": {
+      "noPermission": "Anda tidak memiliki izin untuk membuat tenant."
+    },
+    "page": {
+      "title": "Buat Tenant",
+      "description": "Buat organisasi tenant baru."
+    },
+    "form": {
+      "labels": {
+        "name": "Nama Tenant",
+        "slug": "Slug (Pengenal URL)",
+        "type": "Tipe Tenant",
+        "taxable": "Tenant Kena Pajak",
+        "taxSelection": "Pemilihan Pajak",
+        "theme": "Tema"
+      },
+      "placeholders": {
+        "name": "mis. Acme Corp",
+        "slug": "mis. acme-corp",
+        "type": "Pilih tipe tenant",
+        "taxSelection": "Pilih pajak",
+        "searchTaxes": "Cari pajak..."
+      },
+      "descriptions": {
+        "slug": "Pengenal unik untuk tenant, digunakan dalam URL.",
+        "taxSelection": "Pilih pajak default yang akan berlaku untuk tenant ini.",
+        "theme": "Pilih tema warna untuk tenant ini. Pratinjau diterapkan segera."
+      },
+      "validation": {
+        "taxRequired": "Pemilihan pajak diperlukan untuk tenant kena pajak."
+      },
+      "buttons": {
+        "cancel": "Batal",
+        "create": "Buat Tenant"
+      }
+    },
+    "toast": {
+      "success": {
+        "title": "Berhasil",
+        "description": "Tenant berhasil dibuat."
+      },
+      "error": {
+        "title": "Kesalahan",
+        "description": "Gagal membuat tenant."
+      }
+    }
+  },
+  "detail": {
+    "alerts": {
+      "noPermission": "Anda tidak memiliki izin untuk melihat tenant ini.",
+      "notFound": "Tenant tidak ditemukan."
+    },
+    "buttons": {
+      "back": "Kembali ke Tenant",
+      "edit": "Edit",
+      "archive": "Arsipkan",
+      "restore": "Pulihkan"
+    },
+    "status": {
+      "active": "Aktif",
+      "archived": "Diarsipkan"
+    },
+    "labels": {
+      "createdOn": "Dibuat pada",
+      "id": "ID",
+      "slug": "Slug",
+      "taxable": "Kena Pajak",
+      "yes": "Ya",
+      "no": "Tidak",
+      "tax": "Pajak",
+      "none": "Tidak ada",
+      "tenantType": "Tipe Tenant"
+    },
+    "sections": {
+      "details": "Detail"
+    },
+    "toast": {
+      "fetchError": {
+        "title": "Kesalahan mengambil detail",
+        "description": "Gagal memuat detail tenant."
+      },
+      "restoreSuccess": {
+        "title": "Tenant dipulihkan",
+        "description": "Tenant sekarang aktif."
+      },
+      "restoreError": {
+        "title": "Kesalahan memulihkan tenant",
+        "description": "Gagal memulihkan tenant."
+      },
+      "archiveSuccess": {
+        "title": "Tenant diarsipkan",
+        "description": "Tenant telah diarsipkan."
+      },
+      "archiveError": {
+        "title": "Kesalahan mengarsipkan tenant",
+        "description": "Gagal mengarsipkan tenant."
+      }
+    },
+    "confirm": {
+      "archive": {
+        "title": "Arsipkan Tenant?",
+        "description": "Ini akan mengarsipkan tenant. Pengguna yang termasuk dalam tenant ini mungkin kehilangan akses. Anda dapat memulihkannya nanti.",
+        "cancel": "Batal",
+        "confirm": "Arsipkan"
+      }
+    }
+  },
+  "edit": {
+    "alerts": {
+      "noPermission": "Anda tidak memiliki izin untuk mengedit tenant."
+    },
+    "page": {
+      "title": "Edit Tenant",
+      "description": "Perbarui detail tenant."
+    },
+    "form": {
+      "buttons": {
+        "save": "Simpan Perubahan"
+      }
+    },
+    "toast": {
+      "fetchError": {
+        "title": "Kesalahan",
+        "description": "Gagal memuat tenant."
+      },
+      "success": {
+        "title": "Berhasil",
+        "description": "Tenant berhasil diperbarui."
+      },
+      "error": {
+        "title": "Kesalahan",
+        "description": "Gagal memperbarui tenant."
+      }
+    }
+  },
+  "users": {
+    "alerts": {
+      "noPermission": "Anda tidak memiliki izin untuk melihat pengguna."
+    },
+    "page": {
+      "title": "Manajemen Pengguna",
+      "description": "Kelola pengguna dan tetapkan peran di sini."
+    },
+    "buttons": {
+      "invite": "Undang Pengguna",
+      "create": "Buat Pengguna"
+    },
+    "empty": {
+      "message": "Tidak ada pengguna ditemukan."
+    },
+    "table": {
+      "headers": {
+        "email": "Email",
+        "fullName": "Nama Lengkap",
+        "role": "Peran",
+        "status": "Status",
+        "actions": "Tindakan"
+      }
+    },
+    "toast": {
+      "fetchError": {
+        "title": "Kesalahan mengambil pengguna",
+        "description": "Gagal memuat daftar pengguna."
+      },
+      "removeSuccess": {
+        "title": "Pengguna dihapus",
+        "description": "Pengguna telah dihapus dari tenant ini."
+      },
+      "removeError": {
+        "title": "Kesalahan menghapus pengguna",
+        "description": "Gagal menghapus pengguna."
+      }
+    },
+    "confirm": {
+      "remove": {
+        "title": "Hapus pengguna dari tenant?",
+        "description": "Ini akan menghapus pengguna dari tenant ini. Akun pengguna masih akan ada dan dapat diundang kembali nanti.",
+        "confirmLabel": "Hapus"
+      }
     }
   }
 }
