@@ -52,5 +52,46 @@
     "description": "Overview of your activity.",
     "myStatsTitle": "My Stats",
     "pendingTasks": "Pending tasks"
+  },
+  "profile": {
+    "pageTitle": "My Profile",
+    "pageDescription": "View and manage your account details.",
+    "sections": {
+      "personal": "Personal Information",
+      "security": "Security",
+      "organizations": "My Organizations"
+    },
+    "labels": {
+      "fullName": "Full Name",
+      "email": "Email",
+      "accountType": "Account Type",
+      "password": "Password"
+    },
+    "placeholders": {
+      "fullName": "Enter your name"
+    },
+    "securityDescription": "Change your password to keep your account secure.",
+    "buttons": {
+      "changePassword": "Change Password"
+    },
+    "accountTypes": {
+      "superAdmin": "Super Admin",
+      "user": "User"
+    },
+    "tenants": {
+      "currentBadge": "Current",
+      "noRole": "No Role",
+      "emptyState": "You are not a member of any organization."
+    },
+    "toast": {
+      "profileUpdated": {
+        "title": "Profile updated",
+        "description": "Your name has been updated successfully."
+      },
+      "profileUpdateError": {
+        "title": "Error",
+        "description": "Failed to update name"
+      }
+    }
   }
 }

@@ -52,5 +52,46 @@
     "description": "Ikhtisar aktivitas Anda.",
     "myStatsTitle": "Statistik Saya",
     "pendingTasks": "Tugas menunggu"
+  },
+  "profile": {
+    "pageTitle": "Profil Saya",
+    "pageDescription": "Lihat dan kelola detail akun Anda.",
+    "sections": {
+      "personal": "Informasi Pribadi",
+      "security": "Keamanan",
+      "organizations": "Organisasi Saya"
+    },
+    "labels": {
+      "fullName": "Nama Lengkap",
+      "email": "Surel",
+      "accountType": "Tipe Akun",
+      "password": "Kata Sandi"
+    },
+    "placeholders": {
+      "fullName": "Masukkan nama Anda"
+    },
+    "securityDescription": "Ubah kata sandi Anda untuk menjaga keamanan akun.",
+    "buttons": {
+      "changePassword": "Ubah Kata Sandi"
+    },
+    "accountTypes": {
+      "superAdmin": "Super Admin",
+      "user": "Pengguna"
+    },
+    "tenants": {
+      "currentBadge": "Aktif",
+      "noRole": "Tidak Ada Peran",
+      "emptyState": "Anda tidak tergabung dalam organisasi apa pun."
+    },
+    "toast": {
+      "profileUpdated": {
+        "title": "Profil diperbarui",
+        "description": "Nama Anda berhasil diperbarui."
+      },
+      "profileUpdateError": {
+        "title": "Kesalahan",
+        "description": "Gagal memperbarui nama"
+      }
+    }
   }
 }

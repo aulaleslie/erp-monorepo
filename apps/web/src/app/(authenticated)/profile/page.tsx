@@ -12,10 +12,12 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Key, Building2 } from "lucide-react";
 import { profileService, UserTenant } from "@/services/users";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslations } from "next-intl";
 
 export default function ProfilePage() {
     const { user, activeTenant, refreshAuth } = useAuth();
     const { toast } = useToast();
+    const t = useTranslations("profile");
     const [tenants, setTenants] = useState<UserTenant[]>([]);
     const [loadingTenants, setLoadingTenants] = useState(true);
 
@@ -38,15 +40,16 @@ export default function ProfilePage() {
         try {
             await profileService.updateFullName(newName);
             toast({
-                title: "Profile updated",
-                description: "Your name has been updated successfully.",
+                title: t("toast.profileUpdated.title"),
+                description: t("toast.profileUpdated.description"),
             });
             // Refresh auth to update user info in context
             refreshAuth();
         } catch (error: any) {
             toast({
-                title: "Error",
-                description: error.response?.data?.message || "Failed to update name",
+                title: t("toast.profileUpdateError.title"),
+                description:
+                    error.response?.data?.message ?? t("toast.profileUpdateError.description"),
                 variant: "destructive",
             });
             throw error; // Rethrow to keep edit mode open
@@ -55,34 +58,34 @@ export default function ProfilePage() {
 
     return (
         <div className="space-y-6">
-            <PageHeader title="My Profile" description="View and manage your account details." />
+            <PageHeader title={t("pageTitle")} description={t("pageDescription")} />
 
             <div className="grid gap-6 md:grid-cols-2">
                 {/* Personal Information */}
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">Personal Information</CardTitle>
+                        <CardTitle className="text-lg">{t("sections.personal")}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="space-y-1">
-                            <Label>Full Name</Label>
+                            <Label>{t("labels.fullName")}</Label>
                             <InlineEditField
                                 value={user?.fullName || ""}
                                 onSave={handleUpdateFullName}
-                                placeholder="Enter your name"
+                                placeholder={t("placeholders.fullName")}
                             />
                         </div>
                         <div className="space-y-1">
-                            <Label>Email</Label>
+                            <Label>{t("labels.email")}</Label>
                             <div className="text-sm font-medium">{user?.email}</div>
                         </div>
                         <div className="space-y-1">
-                            <Label>Account Type</Label>
+                            <Label>{t("labels.accountType")}</Label>
                             <div className="flex items-center gap-2">
                                 {user?.isSuperAdmin ? (
-                                    <Badge variant="default">Super Admin</Badge>
+                                    <Badge variant="default">{t("accountTypes.superAdmin")}</Badge>
                                 ) : (
-                                    <Badge variant="secondary">User</Badge>
+                                    <Badge variant="secondary">{t("accountTypes.user")}</Badge>
                                 )}
                             </div>
                         </div>
@@ -92,19 +95,19 @@ export default function ProfilePage() {
                 {/* Security */}
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">Security</CardTitle>
+                        <CardTitle className="text-lg">{t("sections.security")}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="space-y-2">
-                            <Label>Password</Label>
+                            <Label>{t("labels.password")}</Label>
                             <p className="text-sm text-muted-foreground">
-                                Change your password to keep your account secure.
+                                {t("securityDescription")}
                             </p>
                             <ChangePasswordDialog
                                 trigger={
                                     <Button variant="outline" className="mt-2">
                                         <Key className="mr-2 h-4 w-4" />
-                                        Change Password
+                                        {t("buttons.changePassword")}
                                     </Button>
                                 }
                             />
@@ -118,7 +121,7 @@ export default function ProfilePage() {
                 <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
                         <Building2 className="h-5 w-5" />
-                        My Organizations
+                        {t("sections.organizations")}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -128,24 +131,25 @@ export default function ProfilePage() {
                         </div>
                     ) : tenants.length === 0 ? (
                         <p className="text-sm text-muted-foreground text-center py-6">
-                            You are not a member of any organization.
+                            {t("tenants.emptyState")}
                         </p>
                     ) : (
                         <div className="space-y-3">
                             {tenants.map((membership) => (
                                 <div
                                     key={membership.tenant.id}
-                                    className={`flex items-center justify-between p-3 rounded-lg border ${activeTenant?.id === membership.tenant.id
-                                        ? "border-primary bg-primary/5"
-                                        : "border-border"
-                                        }`}
+                                    className={`flex items-center justify-between p-3 rounded-lg border ${
+                                        activeTenant?.id === membership.tenant.id
+                                            ? "border-primary bg-primary/5"
+                                            : "border-border"
+                                    }`}
                                 >
                                     <div>
                                         <div className="font-medium flex items-center gap-2">
                                             {membership.tenant.name}
                                             {activeTenant?.id === membership.tenant.id && (
                                                 <Badge variant="default" className="text-xs">
-                                                    Current
+                                                    {t("tenants.currentBadge")}
                                                 </Badge>
                                             )}
                                         </div>
@@ -154,11 +158,13 @@ export default function ProfilePage() {
                                         </div>
                                     </div>
                                     {membership.role ? (
-                                        <Badge variant={membership.role.isSuperAdmin ? "default" : "secondary"}>
+                                        <Badge
+                                            variant={membership.role.isSuperAdmin ? "default" : "secondary"}
+                                        >
                                             {membership.role.name}
                                         </Badge>
                                     ) : (
-                                        <Badge variant="outline">No Role</Badge>
+                                        <Badge variant="outline">{t("tenants.noRole")}</Badge>
                                     )}
                                 </div>
                             ))}
