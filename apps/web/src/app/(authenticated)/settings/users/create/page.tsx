@@ -13,11 +13,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { usersService } from "@/services/users";
 import { rolesService, Role } from "@/services/roles";
+import { useTranslations } from "next-intl";
 import { useToast } from "@/hooks/use-toast";
 
 export default function CreateUserPage() {
     const router = useRouter();
     const { toast } = useToast();
+    const t = useTranslations("users");
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         email: "",
@@ -32,21 +34,21 @@ export default function CreateUserPage() {
         const newErrors: Record<string, string> = {};
 
         if (!formData.email) {
-            newErrors.email = "Email is required";
+            newErrors.email = t("createUser.form.validation.emailRequired");
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-            newErrors.email = "Please enter a valid email";
+            newErrors.email = t("createUser.form.validation.emailInvalid");
         }
 
         if (!formData.password) {
-            newErrors.password = "Password is required";
+            newErrors.password = t("createUser.form.validation.passwordRequired");
         } else if (formData.password.length < 6) {
-            newErrors.password = "Password must be at least 6 characters";
+            newErrors.password = t("createUser.form.validation.passwordMinLength");
         }
 
         if (!formData.confirmPassword) {
-            newErrors.confirmPassword = "Please confirm the password";
+            newErrors.confirmPassword = t("createUser.form.validation.confirmPasswordRequired");
         } else if (formData.password !== formData.confirmPassword) {
-            newErrors.confirmPassword = "Passwords do not match";
+            newErrors.confirmPassword = t("createUser.form.validation.passwordsMismatch");
         }
 
         setErrors(newErrors);
@@ -67,15 +69,15 @@ export default function CreateUserPage() {
                 roleId: formData.roleId || undefined,
             });
             toast({
-                title: "User created",
-                description: "The user has been created successfully.",
+                title: t("createUser.toast.success.title"),
+                description: t("createUser.toast.success.description"),
             });
             router.push("/settings/users");
         } catch (error: any) {
             const message =
                 error.response?.data?.message || "Failed to create user";
             toast({
-                title: "Error",
+                title: t("createUser.toast.error.title"),
                 description: message,
                 variant: "destructive",
             });
@@ -115,25 +117,25 @@ export default function CreateUserPage() {
             requiredPermissions={['users.create']}
             fallback={
                 <Alert variant="destructive">
-                    <AlertDescription>You do not have permission to create users.</AlertDescription>
+                    <AlertDescription>{t("createUser.alerts.noPermission")}</AlertDescription>
                 </Alert>
             }
         >
             <div className="space-y-6 max-w-2xl">
                 <PageHeader
-                    title="Create User"
-                    description="Create a new user and optionally assign a role."
+                    title={t("createUser.page.title")}
+                    description={t("createUser.page.description")}
                 />
 
                 <Card>
                     <CardContent className="pt-6">
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-2">
-                                <Label htmlFor="email">Email Address *</Label>
+                                <Label htmlFor="email">{t("createUser.form.labels.email")}</Label>
                                 <Input
                                     id="email"
                                     type="email"
-                                    placeholder="user@example.com"
+                                    placeholder={t("createUser.form.placeholders.email")}
                                     value={formData.email}
                                     onChange={(e) => {
                                         setFormData({ ...formData, email: e.target.value });
@@ -148,10 +150,10 @@ export default function CreateUserPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="fullName">Full Name</Label>
+                                <Label htmlFor="fullName">{t("createUser.form.labels.fullName")}</Label>
                                 <Input
                                     id="fullName"
-                                    placeholder="John Doe"
+                                    placeholder={t("createUser.form.placeholders.fullName")}
                                     value={formData.fullName}
                                     onChange={(e) =>
                                         setFormData({ ...formData, fullName: e.target.value })
@@ -161,11 +163,11 @@ export default function CreateUserPage() {
 
                             <div className="grid gap-4 md:grid-cols-2">
                                 <div className="space-y-2">
-                                    <Label htmlFor="password">Password *</Label>
+                                    <Label htmlFor="password">{t("createUser.form.labels.password")}</Label>
                                     <Input
                                         id="password"
                                         type="password"
-                                        placeholder="••••••••"
+                                        placeholder={t("createUser.form.placeholders.password")}
                                         value={formData.password}
                                         onChange={(e) => {
                                             setFormData({ ...formData, password: e.target.value });
@@ -180,7 +182,7 @@ export default function CreateUserPage() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="confirmPassword">Confirm Password *</Label>
+                                    <Label htmlFor="confirmPassword">{t("createUser.form.labels.confirmPassword")}</Label>
                                     <Input
                                         id="confirmPassword"
                                         type="password"
@@ -199,23 +201,23 @@ export default function CreateUserPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label>Role (Optional)</Label>
+                                <Label>{t("createUser.form.labels.role")}</Label>
                                 <SearchableSelect<Role>
                                     value={formData.roleId}
                                     onValueChange={(value) =>
                                         setFormData({ ...formData, roleId: value })
                                     }
-                                    placeholder="Select a role (optional)"
-                                    searchPlaceholder="Search roles..."
+                                    placeholder={t("createUser.form.placeholders.role")}
+                                    searchPlaceholder={t("createUser.form.placeholders.searchRoles")}
                                     fetchItems={fetchRoles}
                                     getItemValue={(role) => role.id}
                                     getItemLabel={(role) => role.name}
                                     getItemDescription={(role) =>
-                                        role.isSuperAdmin ? "Tenant Super Admin" : undefined
+                                        role.isSuperAdmin ? t("createUser.form.descriptions.superAdminRole") : undefined
                                     }
                                 />
                                 <p className="text-sm text-muted-foreground">
-                                    The user will be added to this workspace. Role can be assigned later.
+                                    {t("createUser.form.descriptions.roleHelp")}
                                 </p>
                             </div>
 
@@ -226,11 +228,11 @@ export default function CreateUserPage() {
                                     onClick={() => router.back()}
                                     disabled={loading}
                                 >
-                                    Cancel
+                                    {t("createUser.form.buttons.cancel")}
                                 </Button>
                                 <Button type="submit" disabled={loading}>
                                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    Create User
+                                    {t("createUser.form.buttons.create")}
                                 </Button>
                             </div>
                         </form>

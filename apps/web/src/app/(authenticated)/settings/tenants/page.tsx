@@ -28,6 +28,7 @@ export default function TenantsPage() {
     const { toast } = useToast();
     const { isSuperAdmin } = usePermissions();
     const t = useTranslations("tenants");
+    const tLabels = useTranslations();
     const searchParams = useSearchParams();
     const isArchivedView = searchParams.get("status") === "archived";
     const statusFilter: TenantStatus = isArchivedView ? "DISABLED" : "ACTIVE";
@@ -111,16 +112,16 @@ export default function TenantsPage() {
     const columns: Column<Tenant>[] = useMemo(
         () => [
             {
-                header: t(LABEL_REGISTRY.tenants.name),
+                header: tLabels(LABEL_REGISTRY.tenants.name),
                 accessorKey: "name",
                 className: "font-medium",
             },
             {
-                header: t(LABEL_REGISTRY.tenants.slug),
+                header: tLabels(LABEL_REGISTRY.tenants.slug),
                 accessorKey: "slug",
             },
             {
-                header: t(LABEL_REGISTRY.tenants.status),
+                header: tLabels(LABEL_REGISTRY.tenants.status),
                 cell: (tenant) => (
                     <StatusBadge
                         status={tenant.status === "DISABLED" ? "Archived" : "Active"}
@@ -129,12 +130,12 @@ export default function TenantsPage() {
                 ),
             },
             {
-                header: t(LABEL_REGISTRY.tenants.language),
+                header: tLabels(LABEL_REGISTRY.tenants.language),
                 accessorKey: "language",
                 cell: (tenant) => LOCALE_LABELS[tenant.language] ?? tenant.language,
             },
             {
-                header: t(LABEL_REGISTRY.tenants.actions),
+                header: tLabels(LABEL_REGISTRY.tenants.actions),
                 className: "w-[150px]",
                 cell: (tenant) => (
                     <ActionButtons

@@ -31,6 +31,7 @@ export default function CreateTenantPage() {
     const { toast } = useToast();
     const { isSuperAdmin } = usePermissions();
     const t = useTranslations("tenants");
+    const tLabels = useTranslations();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState<CreateTenantDto>({
         name: "",
@@ -180,7 +181,7 @@ export default function CreateTenantPage() {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="language">{t(LABEL_REGISTRY.tenantSettings.language)}</Label>
+                        <Label htmlFor="language">{tLabels(LABEL_REGISTRY.tenantSettings.language)}</Label>
                         <Select
                             value={formData.language}
                             onValueChange={(value) => {
@@ -190,7 +191,7 @@ export default function CreateTenantPage() {
                             }}
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder={t(LABEL_REGISTRY.tenantSettings.language)} />
+                                <SelectValue placeholder={tLabels(LABEL_REGISTRY.tenantSettings.language)} />
                             </SelectTrigger>
                             <SelectContent>
                                 {LANGUAGE_SELECT_OPTIONS.map((option) => (

@@ -31,6 +31,7 @@ export default function TenantDetailPage() {
     const { toast } = useToast();
     const { isSuperAdmin } = usePermissions();
     const t = useTranslations("tenants");
+    const tLabels = useTranslations();
     const tenantId = params.tenantId as string;
 
     const [tenant, setTenant] = useState<Tenant | null>(null);
@@ -186,7 +187,7 @@ export default function TenantDetailPage() {
                             <span className="text-muted-foreground">{t("detail.labels.slug")}</span>
                             <span className="font-mono">{tenant.slug}</span>
 
-                            <span className="text-muted-foreground">{t(LABEL_REGISTRY.tenants.language)}</span>
+                            <span className="text-muted-foreground">{tLabels(LABEL_REGISTRY.tenants.language)}</span>
                             <span>{LOCALE_LABELS[tenant.language] ?? tenant.language}</span>
 
                             <span className="text-muted-foreground">{t("detail.labels.taxable")}</span>

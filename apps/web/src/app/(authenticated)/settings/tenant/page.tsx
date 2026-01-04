@@ -56,6 +56,7 @@ export default function TenantSettingsPage() {
     });
     const [errors, setErrors] = useState<Record<string, string | string[]>>({});
     const t = useTranslations("tenant");
+    const tLabels = useTranslations();
 
     useEffect(() => {
         const fetchTenant = async () => {
@@ -288,7 +289,7 @@ export default function TenantSettingsPage() {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="language">{t(LABEL_REGISTRY.tenantSettings.language)}</Label>
+                        <Label htmlFor="language">{tLabels(LABEL_REGISTRY.tenantSettings.language)}</Label>
                         <Select
                             value={formData.language}
                             onValueChange={(value) => {
@@ -299,7 +300,7 @@ export default function TenantSettingsPage() {
                             disabled={!canEdit || saving}
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder={t(LABEL_REGISTRY.tenantSettings.language)} />
+                                <SelectValue placeholder={tLabels(LABEL_REGISTRY.tenantSettings.language)} />
                             </SelectTrigger>
                             <SelectContent>
                                 {LANGUAGE_SELECT_OPTIONS.map((option) => (

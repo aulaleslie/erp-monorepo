@@ -89,7 +89,7 @@ export default function RoleDetailPage() {
     if (!role) {
         return (
             <Alert variant="destructive">
-                <AlertDescription>{t("detailPage.alerts.notFound")}</AlertDescription>
+                <AlertDescription>{t("detailPage.alert.notFound")}</AlertDescription>
             </Alert>
         );
     }

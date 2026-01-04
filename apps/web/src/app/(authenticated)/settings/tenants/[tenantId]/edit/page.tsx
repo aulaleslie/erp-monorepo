@@ -33,6 +33,7 @@ export default function EditTenantPage() {
     const { toast } = useToast();
     const { isSuperAdmin } = usePermissions();
     const t = useTranslations("tenants");
+    const tLabels = useTranslations();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [initialTaxLabel, setInitialTaxLabel] = useState("");
@@ -239,7 +240,7 @@ export default function EditTenantPage() {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="language">{t(LABEL_REGISTRY.tenantSettings.language)}</Label>
+                        <Label htmlFor="language">{tLabels(LABEL_REGISTRY.tenantSettings.language)}</Label>
                         <Select
                             value={formData.language}
                             onValueChange={(value) => {
@@ -250,7 +251,7 @@ export default function EditTenantPage() {
                             disabled={saving}
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder={t(LABEL_REGISTRY.tenantSettings.language)} />
+                                <SelectValue placeholder={tLabels(LABEL_REGISTRY.tenantSettings.language)} />
                             </SelectTrigger>
                             <SelectContent>
                                 {LANGUAGE_SELECT_OPTIONS.map((option) => (
