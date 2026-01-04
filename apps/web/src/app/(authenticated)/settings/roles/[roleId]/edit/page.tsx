@@ -11,6 +11,7 @@ import { rolesService, Permission } from "@/services/roles";
 import { Loader2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -20,6 +21,7 @@ export default function EditRolePage() {
     const { toast } = useToast();
     const { user } = useAuth();
     const roleId = params.roleId as string;
+    const t = useTranslations("roles");
 
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -49,8 +51,8 @@ export default function EditRolePage() {
                 setIsSuperAdmin(roleData.isSuperAdmin);
             } catch (error) {
                 toast({
-                    title: "Error",
-                    description: "Failed to load role data.",
+                    title: t("editPage.toast.loadError.title"),
+                    description: t("editPage.toast.loadError.description"),
                     variant: "destructive",
                 });
             } finally {
@@ -77,8 +79,8 @@ export default function EditRolePage() {
         try {
             await rolesService.update(roleId, formData);
             toast({
-                title: "Success",
-                description: "Role updated successfully.",
+                title: t("editPage.toast.success.title"),
+                description: t("editPage.toast.success.description"),
             });
             router.push("/settings/roles");
         } catch (error: any) {
@@ -89,8 +91,8 @@ export default function EditRolePage() {
             }
 
             toast({
-                title: "Error",
-                description: errorMessage,
+                title: t("editPage.toast.error.title"),
+                description: errorMessage || t("editPage.toast.error.description"),
                 variant: "destructive",
             });
         } finally {
@@ -155,19 +157,19 @@ export default function EditRolePage() {
             requiredPermissions={['roles.update']}
             fallback={
                 <Alert variant="destructive">
-                    <AlertDescription>You do not have permission to edit roles.</AlertDescription>
+                    <AlertDescription>{t("editPage.alert.noPermission")}</AlertDescription>
                 </Alert>
             }
         >
             <div className="space-y-6 max-w-4xl">
                 <PageHeader
-                    title="Edit Role"
-                    description={`Edit role: ${formData.name}`}
+                    title={t("editPage.title")}
+                    description={t("editPage.description", { name: formData.name })}
                 />
 
                 <form onSubmit={handleSubmit} className="space-y-8 border p-6 rounded-md">
                     <div className="space-y-2">
-                        <Label htmlFor="name">Role Name</Label>
+                        <Label htmlFor="name">{t("form.roleName")}</Label>
                         <Input
                             id="name"
                             value={formData.name}
@@ -175,7 +177,7 @@ export default function EditRolePage() {
                                 setFormData({ ...formData, name: e.target.value });
                                 if (errors.name) setErrors({ ...errors, name: "" });
                             }}
-                            placeholder="e.g. Manager"
+                            placeholder={t("form.roleNamePlaceholder")}
                             required
                             className={errors.name ? "border-red-500 focus-visible:ring-red-500" : ""}
                         />
@@ -191,20 +193,20 @@ export default function EditRolePage() {
                                 checked={isSuperAdmin}
                                 disabled={true} // Cannot change isSuperAdmin status on edit
                             />
-                            <Label htmlFor="isSuperAdmin" className="text-muted-foreground">Is Super Admin? (Cannot be changed)</Label>
+                            <Label htmlFor="isSuperAdmin" className="text-muted-foreground">{t("editPage.labels.superAdminHint")}</Label>
                         </div>
                     )}
 
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-medium">Permissions</h3>
+                            <h3 className="text-lg font-medium">{t("detailPage.titles.permissions")}</h3>
                             <div className="flex items-center space-x-2">
                                 <Checkbox
                                     id="select-all"
                                     checked={isAllSelected()}
                                     onCheckedChange={toggleAll}
                                 />
-                                <Label htmlFor="select-all" className="cursor-pointer">Select All</Label>
+                                    <Label htmlFor="select-all" className="cursor-pointer">{t("form.selectAll")}</Label>
                             </div>
                         </div>
 
@@ -238,11 +240,11 @@ export default function EditRolePage() {
 
                     <div className="flex justify-end gap-4">
                         <Button type="button" variant="outline" onClick={() => router.back()}>
-                            Cancel
+                            {t("buttons.cancel")}
                         </Button>
                         <Button type="submit" disabled={saving}>
                             {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Save Changes
+                            {t("editPage.buttons.save")}
                         </Button>
                     </div>
                 </form>

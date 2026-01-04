@@ -13,11 +13,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTranslations } from "next-intl";
 
 export default function CreateRolePage() {
     const router = useRouter();
     const { toast } = useToast();
     const { user } = useAuth();
+    const t = useTranslations("roles");
     const [loading, setLoading] = useState(false);
     const [permissions, setPermissions] = useState<Permission[]>([]);
     const [formData, setFormData] = useState({
@@ -34,8 +36,8 @@ export default function CreateRolePage() {
                 setPermissions(data);
             } catch (error) {
                 toast({
-                    title: "Error",
-                    description: "Failed to load permissions.",
+                    title: t("toast.loadPermissionsError.title"),
+                    description: t("toast.loadPermissionsError.description"),
                     variant: "destructive",
                 });
             }
@@ -58,7 +60,7 @@ export default function CreateRolePage() {
         setErrors({});
 
         if (formData.permissions.length === 0 && !formData.isSuperAdmin) {
-            setErrors({ permissions: "Please select at least one permission." });
+            setErrors({ permissions: t("form.permissionRequired") });
             setLoading(false);
             return;
         }
@@ -66,8 +68,8 @@ export default function CreateRolePage() {
         try {
             await rolesService.create(formData);
             toast({
-                title: "Success",
-                description: "Role created successfully.",
+                title: t("toast.createSuccess.title"),
+                description: t("toast.createSuccess.description"),
             });
             router.push("/settings/roles");
         } catch (error: any) {
@@ -81,8 +83,8 @@ export default function CreateRolePage() {
             }
 
             toast({
-                title: "Error",
-                description: errorMessage,
+                title: t("toast.createError.title"),
+                description: errorMessage ?? t("toast.createError.description"),
                 variant: "destructive",
             });
         } finally {
@@ -139,19 +141,19 @@ export default function CreateRolePage() {
             requiredPermissions={['roles.create']}
             fallback={
                 <Alert variant="destructive">
-                    <AlertDescription>You do not have permission to create roles.</AlertDescription>
+                    <AlertDescription>{t('createPage.alert.noPermission')}</AlertDescription>
                 </Alert>
             }
         >
             <div className="space-y-6 max-w-4xl">
                 <PageHeader
-                    title="Create Role"
-                    description="Create a new role and assign permissions."
+                    title={t('createPage.title')}
+                    description={t('createPage.description')}
                 />
 
                 <form onSubmit={handleSubmit} className="space-y-8 border p-6 rounded-md">
                     <div className="space-y-2">
-                        <Label htmlFor="name">Role Name</Label>
+                        <Label htmlFor="name">{t('form.roleName')}</Label>
                         <Input
                             id="name"
                             value={formData.name}
@@ -159,7 +161,7 @@ export default function CreateRolePage() {
                                 setFormData({ ...formData, name: e.target.value });
                                 if (errors.name) setErrors({ ...errors, name: "" });
                             }}
-                            placeholder="e.g. Manager"
+                            placeholder={t('form.roleNamePlaceholder')}
                             required
                             className={errors.name ? "border-red-500 focus-visible:ring-red-500" : ""}
                         />
@@ -177,20 +179,20 @@ export default function CreateRolePage() {
                                     setFormData({ ...formData, isSuperAdmin: checked === true })
                                 }
                             />
-                            <Label htmlFor="isSuperAdmin">Is Super Admin?</Label>
+                            <Label htmlFor="isSuperAdmin">{t('form.isSuperAdmin')}</Label>
                         </div>
                     )}
 
                     <div className={`space-y-4 ${errors.permissions ? "border border-red-500 rounded-md p-4" : ""}`}>
                         <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-medium">Permissions</h3>
+                            <h3 className="text-lg font-medium">{t('form.permissions')}</h3>
                             <div className="flex items-center space-x-2">
                                 <Checkbox
                                     id="select-all"
                                     checked={isAllSelected()}
                                     onCheckedChange={toggleAll}
                                 />
-                                <Label htmlFor="select-all" className="cursor-pointer">Select All</Label>
+                                <Label htmlFor="select-all" className="cursor-pointer">{t('form.selectAll')}</Label>
                             </div>
                         </div>
 
@@ -230,11 +232,11 @@ export default function CreateRolePage() {
 
                     <div className="flex justify-end gap-4">
                         <Button type="button" variant="outline" onClick={() => router.back()}>
-                            Cancel
+                            {t('buttons.cancel')}
                         </Button>
                         <Button type="submit" disabled={loading}>
                             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Create Role
+                            {t('buttons.create')}
                         </Button>
                     </div>
                 </form>

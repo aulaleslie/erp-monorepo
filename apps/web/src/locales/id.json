@@ -145,5 +145,131 @@
       "emptyState": "Tidak ada log audit yang ditemukan."
     },
     "systemLabel": "Sistem"
+  },
+  "roles": {
+    "pageTitle": "Manajemen Peran",
+    "pageDescription": "Kelola peran dan izin yang terkait di sini.",
+    "alert": {
+      "noPermission": "Anda tidak memiliki izin untuk melihat peran."
+    },
+    "createPage": {
+      "title": "Buat Peran",
+      "description": "Buat peran baru dan tetapkan izin.",
+      "alert": {
+        "noPermission": "Anda tidak memiliki izin untuk membuat peran."
+      }
+    },
+    "detailPage": {
+      "alert": {
+        "notFound": "Peran tidak ditemukan."
+      },
+      "buttons": {
+        "back": "Kembali ke Peran",
+        "edit": "Ubah",
+        "delete": "Hapus"
+      },
+      "titles": {
+        "permissions": "Izin",
+        "assignedUsers": "Pengguna yang Ditugaskan"
+      },
+      "labels": {
+        "superAdmin": "Peran Super Admin",
+        "notSuperAdmin": "Bukan Super Admin",
+        "noPermissions": "Tidak ada izin yang ditetapkan.",
+        "noUsers": "Tidak ada pengguna yang ditugaskan ke peran ini."
+      },
+      "table": {
+        "email": "Surel"
+      },
+      "confirm": {
+        "message": "Apakah Anda yakin ingin menghapus peran ini?"
+      },
+      "toast": {
+        "fetchDetailsError": {
+          "title": "Kesalahan saat memuat peran",
+          "description": "Gagal memuat detail peran."
+        }
+      }
+    },
+    "editPage": {
+      "title": "Ubah Peran",
+      "description": "Ubah peran: {name}",
+      "alert": {
+        "noPermission": "Anda tidak memiliki izin untuk mengubah peran."
+      },
+      "labels": {
+        "superAdminHint": "Apakah Super Admin? (Tidak dapat diubah)"
+      },
+      "buttons": {
+        "save": "Simpan Perubahan"
+      },
+      "toast": {
+        "loadError": {
+          "title": "Kesalahan",
+          "description": "Gagal memuat data peran."
+        },
+        "success": {
+          "title": "Berhasil",
+          "description": "Peran berhasil diperbarui."
+        },
+        "error": {
+          "title": "Kesalahan",
+          "description": "Gagal memperbarui peran."
+        }
+      }
+    },
+    "buttons": {
+      "create": "Buat Peran",
+      "cancel": "Batal"
+    },
+    "form": {
+      "roleName": "Nama Peran",
+      "roleNamePlaceholder": "misal Manager",
+      "permissions": "Izin",
+      "selectAll": "Pilih Semua",
+      "isSuperAdmin": "Apakah Super Admin?",
+      "permissionRequired": "Silakan pilih setidaknya satu izin."
+    },
+    "table": {
+      "name": "Nama",
+      "superAdmin": "Super Admin",
+      "actions": "Aksi"
+    },
+    "labels": {
+      "yes": "Ya",
+      "no": "Tidak"
+    },
+    "emptyState": "Tidak ada peran yang ditemukan.",
+    "toast": {
+      "fetchError": {
+        "title": "Kesalahan saat memuat peran",
+        "description": "Gagal memuat daftar peran."
+      },
+      "deleteSuccess": {
+        "title": "Peran dihapus",
+        "description": "Peran berhasil dihapus."
+      },
+      "deleteError": {
+        "title": "Kesalahan saat menghapus peran",
+        "description": "Gagal menghapus peran."
+      },
+      "loadPermissionsError": {
+        "title": "Kesalahan",
+        "description": "Gagal memuat izin."
+      },
+      "createSuccess": {
+        "title": "Berhasil",
+        "description": "Peran berhasil dibuat."
+      },
+      "createError": {
+        "title": "Kesalahan",
+        "description": "Gagal membuat peran."
+      }
+    },
+    "confirm": {
+      "title": "Apakah Anda yakin?",
+      "description": "Tindakan ini tidak dapat dibatalkan. Ini akan menghapus peran secara permanen dan menghapus izin dari pengguna yang ditugaskan.",
+      "confirmLabel": "Hapus"
+    }
   }
 }

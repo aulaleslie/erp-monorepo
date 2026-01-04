@@ -13,6 +13,7 @@ import { DataTable, Column } from "@/components/common/DataTable";
 import { usePagination } from "@/hooks/use-pagination";
 import { ActionButtons } from "@/components/common/ActionButtons";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
+import { useTranslations } from "next-intl";
 
 export default function RolesPage() {
     const [roles, setRoles] = useState<Role[]>([]);
@@ -21,6 +22,7 @@ export default function RolesPage() {
 
     const [roleToDelete, setRoleToDelete] = useState<string | null>(null);
     const { toast } = useToast();
+    const t = useTranslations("roles");
 
     useEffect(() => {
         fetchRoles();
@@ -39,8 +41,8 @@ export default function RolesPage() {
             }
         } catch (error) {
             toast({
-                title: "Error fetching roles",
-                description: "Failed to load roles list.",
+                title: t("toast.fetchError.title"),
+                description: t("toast.fetchError.description"),
                 variant: "destructive",
             });
         } finally {
@@ -54,14 +56,14 @@ export default function RolesPage() {
         try {
             await rolesService.delete(roleToDelete);
             toast({
-                title: "Role deleted",
-                description: "The role has been successfully deleted.",
+                title: t("toast.deleteSuccess.title"),
+                description: t("toast.deleteSuccess.description"),
             });
             fetchRoles();
         } catch (error) {
             toast({
-                title: "Error deleting role",
-                description: "Failed to delete the role.",
+                title: t("toast.deleteError.title"),
+                description: t("toast.deleteError.description"),
                 variant: "destructive",
             });
         } finally {
@@ -71,24 +73,24 @@ export default function RolesPage() {
 
     const columns: Column<Role>[] = useMemo(() => [
         {
-            header: "Name",
+            header: t("table.name"),
             accessorKey: "name",
             className: "font-medium",
         },
         {
-            header: "Super Admin",
+            header: t("table.superAdmin"),
             cell: (role) => role.isSuperAdmin ? (
                 <div className="flex items-center text-green-600">
-                    <Check className="h-4 w-4 mr-1" /> Yes
+                    <Check className="h-4 w-4 mr-1" /> {t('labels.yes')}
                 </div>
             ) : (
                 <div className="flex items-center text-muted-foreground">
-                    <X className="h-4 w-4 mr-1" /> No
+                    <X className="h-4 w-4 mr-1" /> {t('labels.no')}
                 </div>
             ),
         },
         {
-            header: "Actions",
+            header: t("table.actions"),
             className: "w-[150px]",
             cell: (role) => (
                 <ActionButtons
@@ -102,28 +104,28 @@ export default function RolesPage() {
                 />
             ),
         },
-    ], []);
+    ], [t]);
 
     return (
         <PermissionGuard
             requiredPermissions={['roles.read']}
             fallback={
                 <Alert variant="destructive">
-                    <AlertDescription>You do not have permission to view roles.</AlertDescription>
+                    <AlertDescription>{t('alert.noPermission')}</AlertDescription>
                 </Alert>
             }
         >
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <PageHeader
-                        title="Roles Management"
-                        description="Manage roles and their permissions here."
+                        title={t('pageTitle')}
+                        description={t('pageDescription')}
                     />
                     <PermissionGuard requiredPermissions={['roles.create']}>
                         <Button asChild>
                             <Link href="/settings/roles/create">
                                 <Plus className="mr-2 h-4 w-4" />
-                                Create Role
+                                {t('buttons.create')}
                             </Link>
                         </Button>
                     </PermissionGuard>
@@ -134,16 +136,16 @@ export default function RolesPage() {
                     columns={columns}
                     loading={loading}
                     pagination={pagination}
-                    emptyMessage="No roles found."
+                    emptyMessage={t('emptyState')}
                 />
 
                 <ConfirmDialog
                     open={!!roleToDelete}
                     onOpenChange={(open) => !open && setRoleToDelete(null)}
-                    title="Are you absolutely sure?"
-                    description="This action cannot be undone. This will permanently delete the role and remove permissions from any users assigned to it."
+                    title={t('confirm.title')}
+                    description={t('confirm.description')}
                     onConfirm={confirmDelete}
-                    confirmLabel="Delete"
+                    confirmLabel={t('confirm.confirmLabel')}
                     variant="destructive"
                 />
             </div>
