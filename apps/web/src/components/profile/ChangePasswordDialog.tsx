@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { profileService } from "@/services/users";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslations } from "next-intl";
 
 interface ChangePasswordDialogProps {
     trigger?: React.ReactNode;
@@ -31,6 +32,7 @@ export function ChangePasswordDialog({ trigger }: ChangePasswordDialogProps) {
     });
     const [errors, setErrors] = React.useState<Record<string, string>>({});
     const { toast } = useToast();
+    const t = useTranslations('profile');
 
     const resetForm = () => {
         setFormData({
@@ -45,19 +47,19 @@ export function ChangePasswordDialog({ trigger }: ChangePasswordDialogProps) {
         const newErrors: Record<string, string> = {};
 
         if (!formData.currentPassword) {
-            newErrors.currentPassword = "Current password is required";
+            newErrors.currentPassword = t('changePassword.form.validation.currentPasswordRequired');
         }
 
         if (!formData.newPassword) {
-            newErrors.newPassword = "New password is required";
+            newErrors.newPassword = t('changePassword.form.validation.newPasswordRequired');
         } else if (formData.newPassword.length < 6) {
-            newErrors.newPassword = "Password must be at least 6 characters";
+            newErrors.newPassword = t('changePassword.form.validation.newPasswordMinLength');
         }
 
         if (!formData.confirmPassword) {
-            newErrors.confirmPassword = "Please confirm your new password";
+            newErrors.confirmPassword = t('changePassword.form.validation.confirmPasswordRequired');
         } else if (formData.newPassword !== formData.confirmPassword) {
-            newErrors.confirmPassword = "Passwords do not match";
+            newErrors.confirmPassword = t('changePassword.form.validation.passwordsMismatch');
         }
 
         setErrors(newErrors);
@@ -77,21 +79,21 @@ export function ChangePasswordDialog({ trigger }: ChangePasswordDialogProps) {
                 formData.confirmPassword
             );
             toast({
-                title: "Password updated",
-                description: "Your password has been changed successfully.",
+                title: t('changePassword.toast.success.title'),
+                description: t('changePassword.toast.success.description'),
             });
             setOpen(false);
             resetForm();
         } catch (error: any) {
             const message =
-                error.response?.data?.message || "Failed to update password";
+                error.response?.data?.message || t('changePassword.toast.error.description');
             toast({
-                title: "Error",
+                title: t('changePassword.toast.error.title'),
                 description: message,
                 variant: "destructive",
             });
             if (message.toLowerCase().includes("current")) {
-                setErrors({ currentPassword: message });
+                setErrors({ currentPassword: t('changePassword.form.validation.currentPasswordInvalid') });
             }
         } finally {
             setLoading(false);
@@ -108,15 +110,15 @@ export function ChangePasswordDialog({ trigger }: ChangePasswordDialogProps) {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Change Password</DialogTitle>
+                    <DialogTitle>{t('changePassword.dialog.title')}</DialogTitle>
                     <DialogDescription>
-                        Enter your current password and choose a new password.
+                        {t('changePassword.dialog.description')}
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit}>
                     <div className="grid gap-4 py-4">
                         <div className="space-y-2">
-                            <Label htmlFor="currentPassword">Current Password</Label>
+                            <Label htmlFor="currentPassword">{t('changePassword.form.labels.currentPassword')}</Label>
                             <Input
                                 id="currentPassword"
                                 type="password"
@@ -134,7 +136,7 @@ export function ChangePasswordDialog({ trigger }: ChangePasswordDialogProps) {
                             )}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="newPassword">New Password</Label>
+                            <Label htmlFor="newPassword">{t('changePassword.form.labels.newPassword')}</Label>
                             <Input
                                 id="newPassword"
                                 type="password"
@@ -152,7 +154,7 @@ export function ChangePasswordDialog({ trigger }: ChangePasswordDialogProps) {
                             )}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                            <Label htmlFor="confirmPassword">{t('changePassword.form.labels.confirmPassword')}</Label>
                             <Input
                                 id="confirmPassword"
                                 type="password"
@@ -177,11 +179,11 @@ export function ChangePasswordDialog({ trigger }: ChangePasswordDialogProps) {
                             onClick={() => setOpen(false)}
                             disabled={loading}
                         >
-                            Cancel
+                            {t('changePassword.form.buttons.cancel')}
                         </Button>
                         <Button type="submit" disabled={loading}>
                             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Update Password
+                            {t('changePassword.form.buttons.update')}
                         </Button>
                     </DialogFooter>
                 </form>

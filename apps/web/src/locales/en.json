@@ -92,6 +92,41 @@
         "title": "Error",
         "description": "Failed to update name"
       }
+    },
+    "changePassword": {
+      "dialog": {
+        "title": "Change Password",
+        "description": "Enter your current password and choose a new password."
+      },
+      "form": {
+        "labels": {
+          "currentPassword": "Current Password",
+          "newPassword": "New Password",
+          "confirmPassword": "Confirm New Password"
+        },
+        "validation": {
+          "currentPasswordRequired": "Current password is required",
+          "newPasswordRequired": "New password is required",
+          "newPasswordMinLength": "Password must be at least 6 characters",
+          "confirmPasswordRequired": "Please confirm your new password",
+          "passwordsMismatch": "Passwords do not match",
+          "currentPasswordInvalid": "Current password is incorrect"
+        },
+        "buttons": {
+          "cancel": "Cancel",
+          "update": "Update Password"
+        }
+      },
+      "toast": {
+        "success": {
+          "title": "Password updated",
+          "description": "Your password has been changed successfully."
+        },
+        "error": {
+          "title": "Error",
+          "description": "Failed to update password"
+        }
+      }
     }
   },
   "auditLogs": {
@@ -144,7 +179,14 @@
       "details": "Details",
       "emptyState": "No audit logs found."
     },
-    "systemLabel": "System"
+    "systemLabel": "System",
+    "detailsDialog": {
+      "title": "Change Details - {action} {entityName}",
+      "description": "Detailed information about the changes made to this record.",
+      "previousValues": "Previous Values:",
+      "newValues": "New Values:",
+      "noChanges": "No detailed changes available for this action."
+    }
   },
   "taxes": {
     "page": {
@@ -294,6 +336,51 @@
       },
       "validation": {
         "taxRequired": "Tax selection is required for taxable tenants."
+      }
+    },
+    "taxForm": {
+      "emptyState": {
+        "title": "Taxation Not Enabled",
+        "description": "This tenant is not configured for taxation. Please contact a Super Admin if this is incorrect."
+      },
+      "card": {
+        "title": "Tax Settings",
+        "description": "Configure applicable taxes and default tax selection for this tenant."
+      },
+      "form": {
+        "labels": {
+          "applicableTaxes": "Applicable Taxes",
+          "defaultTax": "Default Tax"
+        },
+        "placeholders": {
+          "selectTaxes": "Select taxes...",
+          "selectDefaultTax": "Select default tax"
+        },
+        "descriptions": {
+          "taxesHelp": "Select all taxes that apply to products or services in this tenant.",
+          "defaultTaxHelp": "This tax will be applied by default to new products."
+        },
+        "buttons": {
+          "save": "Save Changes"
+        }
+      },
+      "validation": {
+        "atLeastOneTax": "At least one tax must be selected.",
+        "defaultMustBeSelected": "Default tax must be one of the selected taxes"
+      },
+      "toast": {
+        "loadError": {
+          "title": "Error",
+          "description": "Failed to load tax settings. Please try again."
+        },
+        "success": {
+          "title": "Success",
+          "description": "Tax settings updated successfully."
+        },
+        "error": {
+          "title": "Error",
+          "description": "Failed to save tax settings."
+        }
       }
     }
   },
@@ -710,6 +797,46 @@
         "error": {
           "title": "Error",
           "description": "Failed to create user."
+        }
+      }
+    },
+    "invite": {
+      "dialog": {
+        "title": "Invite Existing User",
+        "description": "Add an existing user to this tenant. Only users who are not super admins and not already members of this tenant are shown."
+      },
+      "form": {
+        "labels": {
+          "user": "User",
+          "role": "Role"
+        },
+        "placeholders": {
+          "user": "Search for a user...",
+          "searchUser": "Type email or name...",
+          "role": "Select a role",
+          "searchRoles": "Search roles..."
+        },
+        "validation": {
+          "userRequired": "Please select a user",
+          "roleRequired": "Role is required for invitation",
+          "userAlreadyMember": "User is already a member of this tenant"
+        },
+        "descriptions": {
+          "superAdminRole": "Tenant Super Admin"
+        },
+        "buttons": {
+          "cancel": "Cancel",
+          "invite": "Invite User"
+        }
+      },
+      "toast": {
+        "success": {
+          "title": "User invited",
+          "description": "The user has been added to this tenant."
+        },
+        "error": {
+          "title": "Error",
+          "description": "Failed to invite user"
         }
       }
     }

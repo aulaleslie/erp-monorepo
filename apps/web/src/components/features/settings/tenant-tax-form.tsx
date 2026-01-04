@@ -30,6 +30,7 @@ import {
     updateTenantTaxSettings,
     TenantTaxSettings
 } from "@/lib/api/tenant-settings";
+import { useTranslations } from "next-intl";
 
 type TaxOption = {
     id: string;
@@ -40,9 +41,9 @@ type TaxOption = {
     amount?: number;
 };
 
-const formSchema = z.object({
+const createFormSchema = (t: (key: string) => string) => z.object({
     taxIds: z.array(z.string()).refine((val) => val.length > 0, {
-        message: "At least one tax must be selected.",
+        message: t('taxForm.validation.atLeastOneTax'),
     }),
     defaultTaxId: z.string().optional(),
 }).refine((data) => {
@@ -51,16 +52,17 @@ const formSchema = z.object({
     }
     return true;
 }, {
-    message: "Default tax must be one of the selected taxes",
+    message: t('taxForm.validation.defaultMustBeSelected'),
     path: ["defaultTaxId"],
 });
 
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.infer<ReturnType<typeof createFormSchema>>;
 
 export function TenantTaxForm() {
     const activeTenant = useActiveTenant();
     const { isSuperAdmin, can } = usePermissions();
     const { toast } = useToast();
+    const t = useTranslations('tenant');
 
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -70,7 +72,7 @@ export function TenantTaxForm() {
     const [availableTaxes, setAvailableTaxes] = useState<TaxOption[]>([]);
 
     const form = useForm<FormValues>({
-        resolver: zodResolver(formSchema),
+        resolver: zodResolver(createFormSchema(t)),
         defaultValues: {
             taxIds: [],
             defaultTaxId: "",
@@ -117,8 +119,8 @@ export function TenantTaxForm() {
             } catch (error) {
                 console.error("Failed to load tax settings", error);
                 toast({
-                    title: "Error",
-                    description: "Failed to load tax settings. Please try again.",
+                    title: t('taxForm.toast.loadError.title'),
+                    description: t('taxForm.toast.loadError.description'),
                     variant: "destructive",
                 });
             } finally {
@@ -162,16 +164,16 @@ export function TenantTaxForm() {
             });
 
             toast({
-                title: "Success",
-                description: "Tax settings updated successfully.",
+                title: t('taxForm.toast.success.title'),
+                description: t('taxForm.toast.success.description'),
             });
 
             // Refresh local state if needed?
         } catch (error) {
             console.error("Failed to save settings", error);
             toast({
-                title: "Error",
-                description: "Failed to save tax settings.",
+                title: t('taxForm.toast.error.title'),
+                description: t('taxForm.toast.error.description'),
                 variant: "destructive",
             });
         } finally {
@@ -191,8 +193,8 @@ export function TenantTaxForm() {
         return (
             <EmptyState
                 icon={Ban}
-                title="Taxation Not Enabled"
-                description="This tenant is not configured for taxation. Please contact a Super Admin if this is incorrect."
+                title={t('taxForm.emptyState.title')}
+                description={t('taxForm.emptyState.description')}
             />
         );
     }
@@ -205,15 +207,15 @@ export function TenantTaxForm() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Tax Settings</CardTitle>
+                <CardTitle>{t('taxForm.card.title')}</CardTitle>
                 <CardDescription>
-                    Configure applicable taxes and default tax selection for this tenant.
+                    {t('taxForm.card.description')}
                 </CardDescription>
             </CardHeader>
             <CardContent>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                     <div className="space-y-2">
-                        <Label>Applicable Taxes</Label>
+                        <Label>{t('taxForm.form.labels.applicableTaxes')}</Label>
                         <Controller
                             control={control}
                             name="taxIds"
@@ -232,7 +234,7 @@ export function TenantTaxForm() {
                                     getItemValue={(item) => item.id}
                                     getItemLabel={(item) => `${item.name} (${item.code || '-'}) - ${item.type === 'PERCENTAGE' ? (item.rate ? item.rate + '%' : '0%') : (item.amount || 0)}`}
                                     getItemDescription={(item) => item.type}
-                                    placeholder="Select taxes..."
+                                    placeholder={t('taxForm.form.placeholders.selectTaxes')}
                                     initialSelectedItems={availableTaxes.filter(t => field.value.includes(t.id))}
                                     disabled={!canEdit || saving}
                                 />
@@ -242,12 +244,12 @@ export function TenantTaxForm() {
                             <p className="text-sm font-medium text-destructive">{errors.taxIds.message}</p>
                         )}
                         <p className="text-sm text-muted-foreground">
-                            Select all taxes that apply to products or services in this tenant.
+                            {t('taxForm.form.descriptions.taxesHelp')}
                         </p>
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Default Tax</Label>
+                        <Label>{t('taxForm.form.labels.defaultTax')}</Label>
                         <Controller
                             control={control}
                             name="defaultTaxId"
@@ -258,7 +260,7 @@ export function TenantTaxForm() {
                                     disabled={!canEdit || saving || selectedTaxIds.length === 0}
                                 >
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Select default tax" />
+                                        <SelectValue placeholder={t('taxForm.form.placeholders.selectDefaultTax')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                 {selectedTaxesList.map((tax) => (
@@ -274,14 +276,14 @@ export function TenantTaxForm() {
                             <p className="text-sm font-medium text-destructive">{errors.defaultTaxId.message}</p>
                         )}
                         <p className="text-sm text-muted-foreground">
-                            This tax will be applied by default to new products.
+                            {t('taxForm.form.descriptions.defaultTaxHelp')}
                         </p>
                     </div>
 
                     <div className="flex justify-end">
                         <Button type="submit" disabled={!canEdit || saving}>
                             {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Save Changes
+                            {t('taxForm.form.buttons.save')}
                         </Button>
                     </div>
                 </form>

@@ -16,6 +16,7 @@ import { SearchableSelect } from "@/components/common/SearchableSelect";
 import { usersService } from "@/services/users";
 import { rolesService, Role } from "@/services/roles";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslations } from "next-intl";
 
 interface InvitableUser {
     id: string;
@@ -34,6 +35,7 @@ export function InviteUserDialog({
     onOpenChange,
     onSuccess,
 }: InviteUserDialogProps) {
+    const t = useTranslations('users');
     const [loading, setLoading] = React.useState(false);
     const [formData, setFormData] = React.useState({
         userId: "",
@@ -56,11 +58,11 @@ export function InviteUserDialog({
         const newErrors: Record<string, string> = {};
 
         if (!formData.userId) {
-            newErrors.userId = "Please select a user";
+            newErrors.userId = t('invite.form.validation.userRequired');
         }
 
         if (!formData.roleId) {
-            newErrors.roleId = "Role is required for invitation";
+            newErrors.roleId = t('invite.form.validation.roleRequired');
         }
 
         setErrors(newErrors);
@@ -79,22 +81,22 @@ export function InviteUserDialog({
                 roleId: formData.roleId,
             });
             toast({
-                title: "User invited",
-                description: "The user has been added to this tenant.",
+                title: t('invite.toast.success.title'),
+                description: t('invite.toast.success.description'),
             });
             onOpenChange(false);
             resetForm();
             onSuccess?.();
         } catch (error: any) {
             const message =
-                error.response?.data?.message || "Failed to invite user";
+                error.response?.data?.message || t('invite.toast.error.description');
             toast({
-                title: "Error",
+                title: t('invite.toast.error.title'),
                 description: message,
                 variant: "destructive",
             });
             if (message.toLowerCase().includes("already")) {
-                setErrors({ userId: "User is already a member of this tenant" });
+                setErrors({ userId: t('invite.form.validation.userAlreadyMember') });
             }
         } finally {
             setLoading(false);
@@ -149,16 +151,15 @@ export function InviteUserDialog({
         >
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Invite Existing User</DialogTitle>
+                    <DialogTitle>{t('invite.dialog.title')}</DialogTitle>
                     <DialogDescription>
-                        Add an existing user to this tenant. Only users who are not super admins
-                        and not already members of this tenant are shown.
+                        {t('invite.dialog.description')}
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit}>
                     <div className="grid gap-4 py-4">
                         <div className="space-y-2">
-                            <Label>User</Label>
+                            <Label>{t('invite.form.labels.user')}</Label>
                             <SearchableSelect<InvitableUser>
                                 value={formData.userId}
                                 onValueChange={(value) => {
@@ -168,8 +169,8 @@ export function InviteUserDialog({
                                         setErrors({ ...errors, userId: "" });
                                     }
                                 }}
-                                placeholder="Search for a user..."
-                                searchPlaceholder="Type email or name..."
+                                placeholder={t('invite.form.placeholders.user')}
+                                searchPlaceholder={t('invite.form.placeholders.searchUser')}
                                 fetchItems={async (params) => {
                                     const result = await fetchInvitableUsers(params);
                                     // Store the email when selecting
@@ -184,7 +185,7 @@ export function InviteUserDialog({
                             )}
                         </div>
                         <div className="space-y-2">
-                            <Label>Role</Label>
+                            <Label>{t('invite.form.labels.role')}</Label>
                             <SearchableSelect<Role>
                                 value={formData.roleId}
                                 onValueChange={(value) => {
@@ -193,13 +194,13 @@ export function InviteUserDialog({
                                         setErrors({ ...errors, roleId: "" });
                                     }
                                 }}
-                                placeholder="Select a role"
-                                searchPlaceholder="Search roles..."
+                                placeholder={t('invite.form.placeholders.role')}
+                                searchPlaceholder={t('invite.form.placeholders.searchRoles')}
                                 fetchItems={fetchRoles}
                                 getItemValue={(role) => role.id}
                                 getItemLabel={(role) => role.name}
                                 getItemDescription={(role) =>
-                                    role.isSuperAdmin ? "Tenant Super Admin" : undefined
+                                    role.isSuperAdmin ? t('invite.form.descriptions.superAdminRole') : undefined
                                 }
                             />
                             {errors.roleId && (
@@ -214,11 +215,11 @@ export function InviteUserDialog({
                             onClick={() => onOpenChange(false)}
                             disabled={loading}
                         >
-                            Cancel
+                            {t('invite.form.buttons.cancel')}
                         </Button>
                         <Button type="submit" disabled={loading}>
                             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Invite User
+                            {t('invite.form.buttons.invite')}
                         </Button>
                     </DialogFooter>
                 </form>
