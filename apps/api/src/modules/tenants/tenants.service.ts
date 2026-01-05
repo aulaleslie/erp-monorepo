@@ -1,12 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, Not } from 'typeorm';
-import { TenantEntity } from '../../database/entities/tenant.entity';
-import { TenantUserEntity } from '../../database/entities/tenant-user.entity';
-import { RoleEntity } from '../../database/entities/role.entity';
-import { TaxEntity, TaxStatus } from '../../database/entities/tax.entity';
-import { TenantTaxEntity } from '../../database/entities/tenant-tax.entity';
-import { TenantThemeEntity } from '../../database/entities/tenant-theme.entity';
+import {
+  RoleEntity,
+  TaxEntity,
+  TenantEntity,
+  TenantTaxEntity,
+  TenantThemeEntity,
+  TenantUserEntity,
+} from '../../database/entities';
+import { TaxStatus } from '../../database/entities/tax.entity';
 import {
   PaginatedResponse,
   paginate,

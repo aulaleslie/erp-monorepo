@@ -8,15 +8,17 @@ import { PermissionsController } from './permissions.controller';
 import { PermissionsService } from './permissions.service';
 import { TenantUsersController } from './tenant-users.controller';
 import { TenantUsersService } from './tenant-users.service';
-import { TenantEntity } from '../../database/entities/tenant.entity';
-import { TenantUserEntity } from '../../database/entities/tenant-user.entity';
-import { TenantThemeEntity } from '../../database/entities/tenant-theme.entity';
-import { UserEntity } from '../../database/entities/user.entity';
-import { RoleEntity } from '../../database/entities/role.entity';
-import { RolePermissionEntity } from '../../database/entities/role-permission.entity';
-import { PermissionEntity } from '../../database/entities/permission.entity';
-import { TaxEntity } from '../../database/entities/tax.entity';
-import { TenantTaxEntity } from '../../database/entities/tenant-tax.entity';
+import {
+  PermissionEntity,
+  RoleEntity,
+  RolePermissionEntity,
+  TaxEntity,
+  TenantEntity,
+  TenantTaxEntity,
+  TenantThemeEntity,
+  TenantUserEntity,
+  UserEntity,
+} from '../../database/entities';
 import { UsersModule } from '../users/users.module';
 import { ActiveTenantGuard } from './guards/active-tenant.guard';
 import { TenantMembershipGuard } from './guards/tenant-membership.guard';

@@ -20,16 +20,9 @@ export class TenantCounters1767609342397 implements MigrationInterface {
         CONSTRAINT "PK_tenant_counters_id" PRIMARY KEY ("id")
       )
     `);
-
-    await queryRunner.query(
-      `ALTER TABLE "tenant_counters" ADD CONSTRAINT "FK_tenant_counters_tenantId" FOREIGN KEY ("tenantId") REFERENCES "tenants"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
-    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(
-      `ALTER TABLE "tenant_counters" DROP CONSTRAINT "FK_tenant_counters_tenantId"`,
-    );
     await queryRunner.query(`DROP TABLE "tenant_counters"`);
   }
 }

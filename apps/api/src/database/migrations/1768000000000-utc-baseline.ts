@@ -206,9 +206,21 @@ export class UtcBaseline1768000000000 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "tenant_themes" ADD CONSTRAINT "FK_tenant_themes_tenantId" FOREIGN KEY ("tenantId") REFERENCES "tenants"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
+    await queryRunner.query(
+      `ALTER TABLE "people" ADD CONSTRAINT "FK_b2badb1311b9456337a9cff8fc1" FOREIGN KEY ("tenantId") REFERENCES "tenants"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "tenant_counters" ADD CONSTRAINT "FK_tenant_counters_tenantId" FOREIGN KEY ("tenantId") REFERENCES "tenants"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(
+      `ALTER TABLE "tenant_counters" DROP CONSTRAINT "FK_tenant_counters_tenantId"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "people" DROP CONSTRAINT "FK_b2badb1311b9456337a9cff8fc1"`,
+    );
     await queryRunner.query(
       `ALTER TABLE "tenant_themes" DROP CONSTRAINT "FK_tenant_themes_tenantId"`,
     );

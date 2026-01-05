@@ -1,12 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TenantsService } from './tenants.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { TenantEntity } from '../../database/entities/tenant.entity';
-import { TenantUserEntity } from '../../database/entities/tenant-user.entity';
-import { RoleEntity } from '../../database/entities/role.entity';
-import { TaxEntity } from '../../database/entities/tax.entity';
-import { TenantTaxEntity } from '../../database/entities/tenant-tax.entity';
-import { TenantThemeEntity } from '../../database/entities/tenant-theme.entity';
+import {
+  RoleEntity,
+  TaxEntity,
+  TenantEntity,
+  TenantTaxEntity,
+  TenantThemeEntity,
+  TenantUserEntity,
+} from '../../database/entities';
 import { Repository, ObjectLiteral } from 'typeorm';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { TenantType } from '@gym-monorepo/shared';

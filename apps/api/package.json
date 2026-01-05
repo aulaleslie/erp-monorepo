@@ -23,7 +23,14 @@
     "migration:generate": "typeorm-ts-node-commonjs migration:generate -d typeorm-datasource.ts",
     "migration:run": "typeorm-ts-node-commonjs migration:run -d typeorm-datasource.ts",
     "migration:revert": "typeorm-ts-node-commonjs migration:revert -d typeorm-datasource.ts",
-    "db:fresh": "pnpm typeorm schema:drop -d typeorm-datasource.ts && pnpm migration:run && pnpm exec ts-node src/scripts/seed.ts"
+    "seed": "pnpm exec ts-node src/scripts/seed.ts",
+    "seed:list": "pnpm exec ts-node src/scripts/seed.ts --list",
+    "seed:permissions": "pnpm exec ts-node src/scripts/seed.ts --only permissions",
+    "seed:tenants": "pnpm exec ts-node src/scripts/seed.ts --only tenants",
+    "seed:admin": "pnpm exec ts-node src/scripts/seed.ts --only admin",
+    "seed:roles": "pnpm exec ts-node src/scripts/seed.ts --only roles",
+    "seed:walk-in": "pnpm exec ts-node src/scripts/seed.ts --only walk-in",
+    "db:fresh": "pnpm typeorm schema:drop -d typeorm-datasource.ts && pnpm migration:run && pnpm seed"
   },
   "dependencies": {
     "@fastify/cookie": "^11.0.2",

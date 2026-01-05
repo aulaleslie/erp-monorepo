@@ -1,23 +1,34 @@
 import * as bcrypt from 'bcrypt';
+import { DataSource, Raw } from 'typeorm';
 import { AppDataSource } from '../../typeorm-datasource';
-import { PermissionEntity } from '../database/entities/permission.entity';
-import { RoleEntity } from '../database/entities/role.entity';
-import { TenantUserEntity } from '../database/entities/tenant-user.entity';
-import { TenantEntity } from '../database/entities/tenant.entity';
-import { TenantThemeEntity } from '../database/entities/tenant-theme.entity';
-import { UserEntity } from '../database/entities/user.entity';
+import {
+  PeopleEntity,
+  PermissionEntity,
+  RoleEntity,
+  TenantEntity,
+  TenantThemeEntity,
+  TenantUserEntity,
+  UserEntity,
+} from '../database/entities';
 import { permissionsData } from './seeds/permissions';
-import { TenantType } from '@gym-monorepo/shared';
+import { PeopleType, TenantType } from '@gym-monorepo/shared';
+import { TenantCountersService } from '../modules/tenant-counters/tenant-counters.service';
 
-async function seed() {
-  console.log('Initializing Data Source...');
-  await AppDataSource.initialize();
-  console.log('Data Source initialized.');
+const DEFAULT_TENANTS = [
+  { name: 'Gym', slug: 'gym', type: TenantType.GYM },
+  { name: 'Cafeteria', slug: 'cafeteria', type: TenantType.EATERY },
+];
+const ADMIN_EMAIL = 'admin@gym.com';
+const ADMIN_PASSWORD = 'password123';
 
-  // 1. Seed Permissions
+type Seeder = {
+  name: string;
+  run: (dataSource: DataSource) => Promise<void>;
+};
+
+const seedPermissions = async (dataSource: DataSource): Promise<void> => {
   console.log('Seeding Permissions...');
-
-  const permissionRepo = AppDataSource.getRepository(PermissionEntity);
+  const permissionRepo = dataSource.getRepository(PermissionEntity);
 
   for (const perm of permissionsData) {
     const permission = await permissionRepo.findOneBy({ code: perm.code });
@@ -25,35 +36,30 @@ async function seed() {
       await permissionRepo.save(permissionRepo.create(perm));
     }
   }
+};
 
-  // 2. Seed Tenants
+const seedTenants = async (dataSource: DataSource): Promise<void> => {
   console.log('Seeding Tenants...');
-  const tenantsData = [
-    { name: 'Gym', slug: 'gym', type: TenantType.GYM },
-    { name: 'Cafeteria', slug: 'cafeteria', type: TenantType.EATERY },
-  ];
-  const tenantRepo = AppDataSource.getRepository(TenantEntity);
-  const createdTenants: TenantEntity[] = [];
+  const tenantRepo = dataSource.getRepository(TenantEntity);
 
-  for (const t of tenantsData) {
-    let tenant = await tenantRepo.findOneBy({ slug: t.slug });
+  for (const tenantData of DEFAULT_TENANTS) {
+    let tenant = await tenantRepo.findOneBy({ slug: tenantData.slug });
     if (!tenant) {
-      tenant = await tenantRepo.save(tenantRepo.create(t));
+      tenant = await tenantRepo.save(tenantRepo.create(tenantData));
     }
-    createdTenants.push(tenant);
   }
+};
 
-  // 3. Seed Super Admin User
+const seedAdminUser = async (dataSource: DataSource): Promise<void> => {
   console.log('Seeding Super Admin User...');
-  const userRepo = AppDataSource.getRepository(UserEntity);
-  const adminEmail = 'admin@gym.com';
-  let adminUser = await userRepo.findOneBy({ email: adminEmail });
+  const userRepo = dataSource.getRepository(UserEntity);
+  let adminUser = await userRepo.findOneBy({ email: ADMIN_EMAIL });
 
   if (!adminUser) {
-    const passwordHash = await bcrypt.hash('password123', 10);
+    const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 10);
     adminUser = await userRepo.save(
       userRepo.create({
-        email: adminEmail,
+        email: ADMIN_EMAIL,
         passwordHash,
         fullName: 'Admin',
         isSuperAdmin: true,
@@ -61,25 +67,39 @@ async function seed() {
       }),
     );
   }
+};
 
-  // 4. Seed Roles and Assign to Admin
+const seedRolesAndAssignments = async (
+  dataSource: DataSource,
+): Promise<void> => {
   console.log('Seeding Roles and Assigning to Admin...');
-  const roleRepo = AppDataSource.getRepository(RoleEntity);
-  const tenantUserRepo = AppDataSource.getRepository(TenantUserEntity);
-  const tenantThemeRepo = AppDataSource.getRepository(TenantThemeEntity);
+  const tenantRepo = dataSource.getRepository(TenantEntity);
+  const tenants = await tenantRepo.find();
 
-  for (const tenant of createdTenants) {
+  if (tenants.length === 0) {
+    console.log('No tenants found. Skipping role assignment.');
+    return;
+  }
+
+  const userRepo = dataSource.getRepository(UserEntity);
+  const adminUser = await userRepo.findOneBy({ email: ADMIN_EMAIL });
+
+  if (!adminUser) {
+    console.log('Super Admin user not found. Skipping role assignment.');
+    return;
+  }
+
+  const roleRepo = dataSource.getRepository(RoleEntity);
+  const tenantUserRepo = dataSource.getRepository(TenantUserEntity);
+  const tenantThemeRepo = dataSource.getRepository(TenantThemeEntity);
+
+  for (const tenant of tenants) {
     const superAdminRoles = await roleRepo.find({
       where: { tenantId: tenant.id, name: 'Super Admin' },
       order: { createdAt: 'ASC' },
     });
 
-    const [existingRole, ...duplicates] = superAdminRoles;
-
-    if (duplicates.length > 0) {
-      await roleRepo.remove(duplicates);
-    }
-
+    const [existingRole] = superAdminRoles;
     let adminRole = existingRole;
 
     if (!adminRole) {
@@ -90,12 +110,8 @@ async function seed() {
           isSuperAdmin: true,
         }),
       );
-    } else if (!adminRole.isSuperAdmin) {
-      adminRole.isSuperAdmin = true;
-      adminRole = await roleRepo.save(adminRole);
     }
 
-    // Assign Admin User to this Tenant with this Role
     const tenantUser = await tenantUserRepo.findOneBy({
       tenantId: tenant.id,
       userId: adminUser.id,
@@ -111,7 +127,6 @@ async function seed() {
       );
     }
 
-    // Create default theme for the tenant
     const existingTheme = await tenantThemeRepo.findOneBy({
       tenantId: tenant.id,
     });
@@ -124,9 +139,141 @@ async function seed() {
       );
     }
   }
+};
 
-  console.log('Seeding complete.');
-  await AppDataSource.destroy();
+const seedWalkInCustomers = async (dataSource: DataSource): Promise<void> => {
+  console.log('Seeding Walk-in Customers...');
+  const tenantRepo = dataSource.getRepository(TenantEntity);
+  const tenants = await tenantRepo.find();
+
+  if (tenants.length === 0) {
+    console.log('No tenants found. Skipping walk-in customers.');
+    return;
+  }
+
+  const peopleRepo = dataSource.getRepository(PeopleEntity);
+  const tenantCountersService = new TenantCountersService(dataSource);
+
+  for (const tenant of tenants) {
+    const existingWalkIn = await peopleRepo.findOne({
+      where: {
+        tenantId: tenant.id,
+        type: PeopleType.CUSTOMER,
+        tags: Raw((alias) => `${alias} @> '["walk-in"]'`),
+      },
+    });
+
+    if (existingWalkIn) {
+      continue;
+    }
+
+    const code = await tenantCountersService.getNextPeopleCode(
+      tenant.id,
+      PeopleType.CUSTOMER,
+    );
+    await peopleRepo.save(
+      peopleRepo.create({
+        tenantId: tenant.id,
+        type: PeopleType.CUSTOMER,
+        code,
+        fullName: 'Walk in',
+        tags: ['walk-in'],
+      }),
+    );
+  }
+};
+
+const SEEDERS: Seeder[] = [
+  { name: 'permissions', run: seedPermissions },
+  { name: 'tenants', run: seedTenants },
+  { name: 'admin', run: seedAdminUser },
+  { name: 'roles', run: seedRolesAndAssignments },
+  { name: 'walk-in', run: seedWalkInCustomers },
+];
+
+const parseList = (value?: string): string[] => {
+  if (!value) {
+    return [];
+  }
+
+  return value
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+};
+
+const getArgValue = (args: string[], flag: string): string | undefined => {
+  const index = args.indexOf(flag);
+  if (index === -1) {
+    return undefined;
+  }
+  return args[index + 1];
+};
+
+const pickSeeders = (
+  args: string[],
+  available: Seeder[],
+): { selected: Seeder[]; stop: boolean } => {
+  const only = parseList(getArgValue(args, '--only'));
+  const skip = parseList(getArgValue(args, '--skip'));
+  const list = args.includes('--list');
+
+  if (list) {
+    console.log(
+      `Available seeders: ${available.map((s) => s.name).join(', ')}`,
+    );
+    return { selected: [], stop: true };
+  }
+
+  const availableNames = new Set(available.map((s) => s.name));
+  const unknownOnly = only.filter((name) => !availableNames.has(name));
+  const unknownSkip = skip.filter((name) => !availableNames.has(name));
+  const unknown = [...unknownOnly, ...unknownSkip];
+
+  if (unknown.length > 0) {
+    console.error(
+      `Unknown seeders: ${unknown.join(', ')}. Use --list to see valid names.`,
+    );
+    return { selected: [], stop: true };
+  }
+
+  let selected = available;
+  if (only.length > 0) {
+    selected = available.filter((seeder) => only.includes(seeder.name));
+  }
+  if (skip.length > 0) {
+    selected = selected.filter((seeder) => !skip.includes(seeder.name));
+  }
+
+  return { selected, stop: false };
+};
+
+async function seed() {
+  const args = process.argv.slice(2);
+  const { selected, stop } = pickSeeders(args, SEEDERS);
+
+  if (stop) {
+    return;
+  }
+
+  if (selected.length === 0) {
+    console.log('No seeders selected.');
+    return;
+  }
+
+  console.log('Initializing Data Source...');
+  await AppDataSource.initialize();
+  console.log('Data Source initialized.');
+
+  try {
+    for (const seeder of selected) {
+      await seeder.run(AppDataSource);
+    }
+
+    console.log('Seeding complete.');
+  } finally {
+    await AppDataSource.destroy();
+  }
 }
 
 seed().catch((err) => {

@@ -19,15 +19,9 @@ export class People1767608386189 implements MigrationInterface {
     await queryRunner.query(
       `CREATE UNIQUE INDEX "UQ_people_tenant_email" ON "people" ("tenantId", "email") WHERE "email" IS NOT NULL`,
     );
-    await queryRunner.query(
-      `ALTER TABLE "people" ADD CONSTRAINT "FK_b2badb1311b9456337a9cff8fc1" FOREIGN KEY ("tenantId") REFERENCES "tenants"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
-    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(
-      `ALTER TABLE "people" DROP CONSTRAINT "FK_b2badb1311b9456337a9cff8fc1"`,
-    );
     await queryRunner.query(`DROP INDEX "public"."UQ_people_tenant_email"`);
     await queryRunner.query(`DROP INDEX "public"."UQ_people_tenant_phone"`);
     await queryRunner.query(`DROP TABLE "people"`);
