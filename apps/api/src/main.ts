@@ -49,7 +49,8 @@ async function bootstrap() {
   );
   app.useGlobalFilters(new HttpExceptionFilter());
 
-  await app.register(import('@fastify/cookie') as any);
+  const cookiePlugin = (await import('@fastify/cookie')).default;
+  await app.register(cookiePlugin);
 
   // Swagger API Documentation
   const config = new DocumentBuilder()
@@ -65,6 +66,7 @@ async function bootstrap() {
     .addTag('users', 'User management endpoints')
     .addTag('tenants', 'Tenant management endpoints')
     .addTag('roles', 'Role management endpoints')
+    .addTag('people', 'People management endpoints')
     .addTag('taxes', 'Tax configuration endpoints')
     .addTag('platform', 'Platform administration endpoints')
     .build();
@@ -82,4 +84,4 @@ async function bootstrap() {
     `Swagger documentation available at: ${await app.getUrl()}/api/docs`,
   );
 }
-bootstrap();
+void bootstrap();

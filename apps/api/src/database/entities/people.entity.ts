@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { PeopleStatus, PeopleType } from '@gym-monorepo/shared';
 import { BaseAuditEntity } from '../../common/entities/base-audit.entity';
-import { TenantEntity } from '../../database/entities';
+import { TenantEntity, UserEntity } from '../../database/entities';
 
 @Entity('people')
 @Unique('UQ_people_tenant_code', ['tenantId', 'code'])
@@ -20,6 +20,14 @@ import { TenantEntity } from '../../database/entities';
 @Index('UQ_people_tenant_phone', ['tenantId', 'phone'], {
   unique: true,
   where: '"phone" IS NOT NULL',
+})
+@Index('UQ_people_tenant_user', ['tenantId', 'userId'], {
+  unique: true,
+  where: '"userId" IS NOT NULL',
+})
+@Index('UQ_people_staff_user', ['userId'], {
+  unique: true,
+  where: `"userId" IS NOT NULL AND "type" = 'STAFF'`,
 })
 export class PeopleEntity extends BaseAuditEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -46,6 +54,12 @@ export class PeopleEntity extends BaseAuditEntity {
   @Column({ type: 'varchar', nullable: true })
   phone: string | null;
 
+  @Column({ type: 'varchar', nullable: true })
+  department: string | null;
+
+  @Column({ type: 'uuid', nullable: true })
+  userId: string | null;
+
   @Column({
     type: 'enum',
     enum: PeopleStatus,
@@ -59,4 +73,8 @@ export class PeopleEntity extends BaseAuditEntity {
   @ManyToOne(() => TenantEntity)
   @JoinColumn({ name: 'tenantId' })
   tenant: TenantEntity;
+
+  @ManyToOne(() => UserEntity)
+  @JoinColumn({ name: 'userId' })
+  user: UserEntity | null;
 }

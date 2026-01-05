@@ -184,6 +184,29 @@ export const TAX_ERRORS = {
 } as const;
 
 // ============================================================================
+// People Errors
+// ============================================================================
+
+export const PEOPLE_ERRORS = {
+  DUPLICATE_EMAIL: {
+    code: 'PEOPLE_DUPLICATE_EMAIL',
+    message: 'Email is already in use for this tenant',
+  },
+  DUPLICATE_PHONE: {
+    code: 'PEOPLE_DUPLICATE_PHONE',
+    message: 'Phone is already in use for this tenant',
+  },
+  INVALID_PHONE: {
+    code: 'PEOPLE_INVALID_PHONE',
+    message: 'Invalid phone number format',
+  },
+  NOT_FOUND: {
+    code: 'PEOPLE_NOT_FOUND',
+    message: 'Person not found',
+  },
+} as const;
+
+// ============================================================================
 // Theme Errors
 // ============================================================================
 
@@ -239,6 +262,7 @@ export const ERROR_CODES = {
   USER: USER_ERRORS,
   ROLE: ROLE_ERRORS,
   TAX: TAX_ERRORS,
+  PEOPLE: PEOPLE_ERRORS,
   THEME: THEME_ERRORS,
   VALIDATION: VALIDATION_ERRORS,
 } as const;
@@ -252,6 +276,7 @@ export type TenantErrorCode = typeof TENANT_ERRORS[keyof typeof TENANT_ERRORS];
 export type UserErrorCode = typeof USER_ERRORS[keyof typeof USER_ERRORS];
 export type RoleErrorCode = typeof ROLE_ERRORS[keyof typeof ROLE_ERRORS];
 export type TaxErrorCode = typeof TAX_ERRORS[keyof typeof TAX_ERRORS];
+export type PeopleErrorCode = typeof PEOPLE_ERRORS[keyof typeof PEOPLE_ERRORS];
 export type ThemeErrorCode = typeof THEME_ERRORS[keyof typeof THEME_ERRORS];
 export type ValidationErrorCode = typeof VALIDATION_ERRORS[keyof typeof VALIDATION_ERRORS];
 
@@ -260,6 +285,7 @@ export type AnyErrorCode =
   | TenantErrorCode 
   | UserErrorCode 
   | RoleErrorCode 
-  | TaxErrorCode 
+  | TaxErrorCode
+  | PeopleErrorCode
   | ThemeErrorCode 
   | ValidationErrorCode;
