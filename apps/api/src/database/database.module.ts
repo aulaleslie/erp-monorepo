@@ -5,6 +5,7 @@ import { PermissionEntity } from './entities/permission.entity';
 import { PeopleEntity } from './entities/people.entity';
 import { RolePermissionEntity } from './entities/role-permission.entity';
 import { RoleEntity } from './entities/role.entity';
+import { TenantCounterEntity } from './entities/tenant-counter.entity';
 import { TenantUserEntity } from './entities/tenant-user.entity';
 import { TenantEntity } from './entities/tenant.entity';
 import { UserEntity } from './entities/user.entity';
@@ -37,6 +38,7 @@ import { TenantTaxEntity } from './entities/tenant-tax.entity';
           PeopleEntity,
           RoleEntity,
           RolePermissionEntity,
+          TenantCounterEntity,
           TenantUserEntity,
           AuditLogEntity,
           TaxEntity,

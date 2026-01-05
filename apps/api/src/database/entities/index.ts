@@ -8,6 +8,7 @@ export { PeopleEntity } from './people.entity';
 export { RolePermissionEntity } from './role-permission.entity';
 export { RoleEntity } from './role.entity';
 export { TaxEntity } from './tax.entity';
+export { TenantCounterEntity } from './tenant-counter.entity';
 export { TenantTaxEntity } from './tenant-tax.entity';
 export { TenantThemeEntity } from './tenant-theme.entity';
 export { TenantUserEntity } from './tenant-user.entity';

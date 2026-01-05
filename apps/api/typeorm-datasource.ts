@@ -8,6 +8,7 @@ import { RolePermissionEntity } from './src/database/entities/role-permission.en
 import { TenantUserEntity } from './src/database/entities/tenant-user.entity';
 import { AuditLogEntity } from './src/database/entities/audit-log.entity';
 import { TaxEntity } from './src/database/entities/tax.entity';
+import { TenantCounterEntity } from './src/database/entities/tenant-counter.entity';
 import { TenantTaxEntity } from './src/database/entities/tenant-tax.entity';
 import { TenantThemeEntity } from './src/database/entities/tenant-theme.entity';
 import { PeopleEntity } from './src/database/entities/people.entity';
@@ -34,6 +35,7 @@ export const AppDataSource = new DataSource({
     TenantUserEntity,
     AuditLogEntity,
     TaxEntity,
+    TenantCounterEntity,
     TenantTaxEntity,
     TenantThemeEntity,
     PeopleEntity,
