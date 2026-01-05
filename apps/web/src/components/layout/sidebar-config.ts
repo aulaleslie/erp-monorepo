@@ -4,6 +4,7 @@ import {
     Settings,
     Shield,
     Users,
+    User,
     Building,
     Building2,
     Percent,
@@ -33,6 +34,24 @@ export const sidebarConfig: SidebarItem[] = [
         labelKey: "dashboard",
         icon: Home,
         href: "/dashboard",
+    },
+    {
+        label: "People",
+        labelKey: "people",
+        icon: User,
+        href: "/people",
+        permissions: [
+            "people.read",
+            "people.create",
+            "people.update",
+            "people.delete",
+        ],
+        routePermissions: [
+            "people.read",
+            "people.create",
+            "people.update",
+            "people.delete",
+        ],
     },
     {
         label: "Settings",

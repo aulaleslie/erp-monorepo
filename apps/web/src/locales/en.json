@@ -20,6 +20,7 @@
   "sidebar": {
     "appName": "Apupu ERP",
     "dashboard": "Dashboard",
+    "people": "People",
     "settings": "Settings",
     "tenant": "Tenant",
     "tenants": "Tenants",
@@ -52,6 +53,36 @@
     "description": "Overview of your activity.",
     "myStatsTitle": "My Stats",
     "pendingTasks": "Pending tasks"
+  },
+  "people": {
+    "alerts": {
+      "noAccess": "You do not have permission to access people.",
+      "noListPermission": "You do not have permission to view people.",
+      "noCreatePermission": "You do not have permission to create people.",
+      "noEditPermission": "You do not have permission to update people."
+    },
+    "page": {
+      "title": "People",
+      "description": "Manage customers, suppliers, and staff."
+    },
+    "create": {
+      "page": {
+        "title": "New Person",
+        "description": "Add a new person to this workspace."
+      }
+    },
+    "edit": {
+      "page": {
+        "title": "Edit Person",
+        "description": "Update person details."
+      }
+    },
+    "placeholders": {
+      "listTitle": "People list coming soon",
+      "listDescription": "This page will include filters, search, and actions for people.",
+      "formTitle": "People form coming soon",
+      "formDescription": "This page will handle create and edit flows for people."
+    }
   },
   "profile": {
     "pageTitle": "My Profile",

@@ -20,6 +20,7 @@
   "sidebar": {
     "appName": "Apupu ERP",
     "dashboard": "Dasbor",
+    "people": "Orang",
     "settings": "Pengaturan",
     "tenant": "Tenant",
     "tenants": "Tenant",
@@ -52,6 +53,36 @@
     "description": "Ikhtisar aktivitas Anda.",
     "myStatsTitle": "Statistik Saya",
     "pendingTasks": "Tugas menunggu"
+  },
+  "people": {
+    "alerts": {
+      "noAccess": "Anda tidak memiliki izin untuk mengakses data orang.",
+      "noListPermission": "Anda tidak memiliki izin untuk melihat data orang.",
+      "noCreatePermission": "Anda tidak memiliki izin untuk menambah orang.",
+      "noEditPermission": "Anda tidak memiliki izin untuk memperbarui orang."
+    },
+    "page": {
+      "title": "Orang",
+      "description": "Kelola pelanggan, pemasok, dan staf."
+    },
+    "create": {
+      "page": {
+        "title": "Tambah Orang",
+        "description": "Tambahkan orang baru ke ruang kerja ini."
+      }
+    },
+    "edit": {
+      "page": {
+        "title": "Ubah Orang",
+        "description": "Perbarui detail orang."
+      }
+    },
+    "placeholders": {
+      "listTitle": "Daftar orang segera hadir",
+      "listDescription": "Halaman ini akan memuat filter, pencarian, dan aksi untuk orang.",
+      "formTitle": "Form orang segera hadir",
+      "formDescription": "Halaman ini akan menangani alur buat dan ubah data orang."
+    }
   },
   "profile": {
     "pageTitle": "Profil Saya",
