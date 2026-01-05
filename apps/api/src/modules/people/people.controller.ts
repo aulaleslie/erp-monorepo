@@ -22,6 +22,8 @@ import { PeopleService } from './people.service';
 import { CreatePeopleDto } from './dto/create-people.dto';
 import { UpdatePeopleDto } from './dto/update-people.dto';
 import { PeopleQueryDto } from './dto/people-query.dto';
+import { InvitablePeopleQueryDto } from './dto/invitable-people-query.dto';
+import { InvitePeopleDto } from './dto/invite-people.dto';
 
 @ApiTags('people')
 @ApiCookieAuth('access_token')
@@ -44,10 +46,28 @@ export class PeopleController {
     return this.peopleService.findAll(tenantId, query);
   }
 
+  @Get('invitable')
+  @RequirePermissions('people.create')
+  async getInvitable(
+    @CurrentTenant() tenantId: string,
+    @Query() query: InvitablePeopleQueryDto,
+  ) {
+    return this.peopleService.searchInvitablePeople(tenantId, query);
+  }
+
   @Get(':id')
   @RequirePermissions('people.read')
   async findOne(@CurrentTenant() tenantId: string, @Param('id') id: string) {
     return this.peopleService.findOne(tenantId, id);
+  }
+
+  @Post('invite')
+  @RequirePermissions('people.create')
+  async invite(
+    @CurrentTenant() tenantId: string,
+    @Body() dto: InvitePeopleDto,
+  ) {
+    return this.peopleService.inviteExisting(tenantId, dto);
   }
 
   @Post()

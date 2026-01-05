@@ -13,6 +13,7 @@ import { PEOPLE_ERRORS, PeopleStatus, PeopleType } from '@gym-monorepo/shared';
 import { PeopleQueryDto } from './dto/people-query.dto';
 import { CreatePeopleDto } from './dto/create-people.dto';
 import { UpdatePeopleDto } from './dto/update-people.dto';
+import { InvitablePeopleQueryDto } from './dto/invitable-people-query.dto';
 import * as pagination from '../../common/dto/pagination.dto';
 
 type MockRepository<T extends ObjectLiteral = any> = Partial<
@@ -26,6 +27,7 @@ const buildQueryBuilder = () => ({
   skip: jest.fn().mockReturnThis(),
   take: jest.fn().mockReturnThis(),
   getManyAndCount: jest.fn(),
+  getMany: jest.fn(),
 });
 
 describe('PeopleService', () => {
@@ -144,6 +146,109 @@ describe('PeopleService', () => {
           PEOPLE_ERRORS.NOT_FOUND.message,
         );
       }
+    });
+  });
+
+  describe('searchInvitablePeople', () => {
+    it('filters across tenants, dedupes by contact key, and paginates', async () => {
+      const qb = buildQueryBuilder();
+      const matches = [
+        {
+          id: 'person-1',
+          tenantId: 'tenant-2',
+          type: PeopleType.CUSTOMER,
+          fullName: 'Alpha',
+          email: 'alpha@example.com',
+          phone: null,
+          tags: ['vip'],
+          status: PeopleStatus.ACTIVE,
+        },
+        {
+          id: 'person-2',
+          tenantId: 'tenant-3',
+          type: PeopleType.CUSTOMER,
+          fullName: 'Alpha Clone',
+          email: 'alpha@example.com',
+          phone: '+628123',
+          tags: ['dup'],
+          status: PeopleStatus.ACTIVE,
+        },
+        {
+          id: 'person-3',
+          tenantId: 'tenant-4',
+          type: PeopleType.SUPPLIER,
+          fullName: 'Beta',
+          email: null,
+          phone: '+628124',
+          tags: [],
+          status: PeopleStatus.ACTIVE,
+        },
+        {
+          id: 'person-4',
+          tenantId: 'tenant-5',
+          type: PeopleType.SUPPLIER,
+          fullName: 'No Contact',
+          email: null,
+          phone: null,
+          tags: [],
+          status: PeopleStatus.ACTIVE,
+        },
+      ] as PeopleEntity[];
+      qb.getMany.mockResolvedValue(matches);
+      peopleRepository.createQueryBuilder!.mockReturnValue(qb);
+
+      const calculateSkipSpy = jest.spyOn(pagination, 'calculateSkip');
+
+      const result = await service.searchInvitablePeople('tenant-1', {
+        search: '  alpha  ',
+        page: 1,
+        limit: 1,
+      });
+
+      expect(peopleRepository.createQueryBuilder).toHaveBeenCalledWith(
+        'people',
+      );
+      expect(qb.where).toHaveBeenCalledWith('people.tenantId != :tenantId', {
+        tenantId: 'tenant-1',
+      });
+      expect(qb.andWhere).toHaveBeenCalledWith(
+        '(people.email IS NOT NULL OR people.phone IS NOT NULL)',
+      );
+      expect(qb.andWhere).toHaveBeenCalledWith('people.status = :status', {
+        status: PeopleStatus.ACTIVE,
+      });
+      expect(qb.andWhere).toHaveBeenCalledWith(
+        '(people.code ILIKE :search OR people.fullName ILIKE :search OR people.email ILIKE :search OR people.phone ILIKE :search)',
+        { search: '%alpha%' },
+      );
+      expect(qb.orderBy).toHaveBeenCalledWith('people.createdAt', 'DESC');
+      expect(calculateSkipSpy).toHaveBeenCalledWith(1, 1);
+      expect(result.total).toBe(2);
+      expect(result.items).toEqual([
+        {
+          id: 'person-1',
+          type: PeopleType.CUSTOMER,
+          fullName: 'Alpha',
+          email: 'alpha@example.com',
+          phone: null,
+          tags: ['vip'],
+        },
+      ]);
+      expect(result.hasMore).toBe(true);
+    });
+
+    it('applies type filter when provided', async () => {
+      const qb = buildQueryBuilder();
+      qb.getMany.mockResolvedValue([]);
+      peopleRepository.createQueryBuilder!.mockReturnValue(qb);
+
+      await service.searchInvitablePeople('tenant-1', {
+        type: PeopleType.STAFF,
+      } as InvitablePeopleQueryDto);
+
+      expect(qb.andWhere).toHaveBeenCalledWith('people.type = :type', {
+        type: PeopleType.STAFF,
+      });
     });
   });
 
@@ -355,6 +460,94 @@ describe('PeopleService', () => {
       } as UpdatePeopleDto);
 
       expect(result.department).toBeNull();
+    });
+  });
+
+  describe('inviteExisting', () => {
+    it('clones person into active tenant with new code', async () => {
+      const person = {
+        id: 'person-1',
+        tenantId: 'tenant-2',
+        type: PeopleType.STAFF,
+        fullName: 'Staff Member',
+        email: 'staff@example.com',
+        phone: '+628123',
+        status: PeopleStatus.ACTIVE,
+        tags: ['trainer'],
+        department: 'Ops',
+        userId: 'user-1',
+      } as PeopleEntity;
+      const created = { id: 'new-person' } as PeopleEntity;
+
+      peopleRepository
+        .findOne!.mockResolvedValueOnce(person)
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(null);
+      tenantCountersService.getNextPeopleCode.mockResolvedValue('STF-000010');
+      peopleRepository.create!.mockReturnValue(created);
+      peopleRepository.save!.mockResolvedValue(created);
+
+      const result = await service.inviteExisting('tenant-1', {
+        personId: 'person-1',
+      });
+
+      expect(tenantCountersService.getNextPeopleCode).toHaveBeenCalledWith(
+        'tenant-1',
+        PeopleType.STAFF,
+      );
+      expect(peopleRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          tenantId: 'tenant-1',
+          type: PeopleType.STAFF,
+          code: 'STF-000010',
+          fullName: 'Staff Member',
+          email: 'staff@example.com',
+          phone: '+628123',
+          status: PeopleStatus.ACTIVE,
+          tags: ['trainer'],
+          department: 'Ops',
+          userId: null,
+        }),
+      );
+      expect(result).toBe(created);
+    });
+
+    it('throws NotFoundException when person is missing or already in tenant', async () => {
+      peopleRepository.findOne!.mockResolvedValueOnce(null);
+
+      await expect(
+        service.inviteExisting('tenant-1', { personId: 'missing' }),
+      ).rejects.toThrow(NotFoundException);
+
+      peopleRepository.findOne!.mockResolvedValueOnce({
+        id: 'person-2',
+        tenantId: 'tenant-1',
+      } as PeopleEntity);
+
+      await expect(
+        service.inviteExisting('tenant-1', { personId: 'person-2' }),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('throws ConflictException on duplicate email', async () => {
+      const person = {
+        id: 'person-3',
+        tenantId: 'tenant-2',
+        type: PeopleType.CUSTOMER,
+        fullName: 'Duplicate',
+        email: 'dup@example.com',
+        phone: null,
+        status: PeopleStatus.ACTIVE,
+        tags: [],
+      } as unknown as PeopleEntity;
+
+      peopleRepository
+        .findOne!.mockResolvedValueOnce(person)
+        .mockResolvedValueOnce({ id: 'existing' });
+
+      await expect(
+        service.inviteExisting('tenant-1', { personId: 'person-3' }),
+      ).rejects.toThrow(ConflictException);
     });
   });
 

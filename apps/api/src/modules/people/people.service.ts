@@ -18,6 +18,8 @@ import { createValidationBuilder } from '../../common/utils/validation.util';
 import { CreatePeopleDto } from './dto/create-people.dto';
 import { UpdatePeopleDto } from './dto/update-people.dto';
 import { PeopleQueryDto } from './dto/people-query.dto';
+import { InvitablePeopleQueryDto } from './dto/invitable-people-query.dto';
+import { InvitePeopleDto } from './dto/invite-people.dto';
 
 @Injectable()
 export class PeopleService {
@@ -61,6 +63,78 @@ export class PeopleService {
     const [items, total] = await qb.getManyAndCount();
 
     return paginate(items, total, page, limit);
+  }
+
+  async searchInvitablePeople(
+    tenantId: string,
+    query: InvitablePeopleQueryDto,
+  ): Promise<{
+    items: Array<{
+      id: string;
+      type: PeopleType;
+      fullName: string;
+      email: string | null;
+      phone: string | null;
+      tags: string[];
+    }>;
+    total: number;
+    page: number;
+    limit: number;
+    hasMore: boolean;
+  }> {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 10;
+    const search = query.search?.trim();
+
+    const qb = this.peopleRepository.createQueryBuilder('people');
+    qb.where('people.tenantId != :tenantId', { tenantId })
+      .andWhere('(people.email IS NOT NULL OR people.phone IS NOT NULL)')
+      .andWhere('people.status = :status', { status: PeopleStatus.ACTIVE });
+
+    if (query.type) {
+      qb.andWhere('people.type = :type', { type: query.type });
+    }
+
+    if (search) {
+      qb.andWhere(
+        '(people.code ILIKE :search OR people.fullName ILIKE :search OR people.email ILIKE :search OR people.phone ILIKE :search)',
+        { search: `%${search}%` },
+      );
+    }
+
+    qb.orderBy('people.createdAt', 'DESC');
+
+    const matches = await qb.getMany();
+    const deduped: PeopleEntity[] = [];
+    const seenKeys = new Set<string>();
+
+    for (const person of matches) {
+      const key = this.getInvitableKey(person);
+      if (!key || seenKeys.has(key)) {
+        continue;
+      }
+      seenKeys.add(key);
+      deduped.push(person);
+    }
+
+    const total = deduped.length;
+    const start = calculateSkip(page, limit);
+    const items = deduped.slice(start, start + limit).map((person) => ({
+      id: person.id,
+      type: person.type,
+      fullName: person.fullName,
+      email: person.email,
+      phone: person.phone,
+      tags: person.tags ?? [],
+    }));
+
+    return {
+      items,
+      total,
+      page,
+      limit,
+      hasMore: page * limit < total,
+    };
   }
 
   async findOne(tenantId: string, id: string): Promise<PeopleEntity> {
@@ -143,6 +217,43 @@ export class PeopleService {
     return this.peopleRepository.save(person);
   }
 
+  async inviteExisting(
+    tenantId: string,
+    dto: InvitePeopleDto,
+  ): Promise<PeopleEntity> {
+    const person = await this.peopleRepository.findOne({
+      where: { id: dto.personId },
+    });
+
+    if (!person || person.tenantId === tenantId) {
+      throw new NotFoundException(PEOPLE_ERRORS.NOT_FOUND.message);
+    }
+
+    await this.assertEmailUnique(tenantId, person.email);
+    await this.assertPhoneUnique(tenantId, person.phone);
+
+    const code = await this.tenantCountersService.getNextPeopleCode(
+      tenantId,
+      person.type,
+    );
+
+    const clone = this.peopleRepository.create({
+      tenantId,
+      type: person.type,
+      code,
+      fullName: person.fullName,
+      email: person.email,
+      phone: person.phone,
+      status: person.status,
+      tags: person.tags ?? [],
+      department:
+        person.type === PeopleType.STAFF ? (person.department ?? null) : null,
+      userId: null,
+    });
+
+    return this.peopleRepository.save(clone);
+  }
+
   async remove(tenantId: string, id: string): Promise<void> {
     const person = await this.findOne(tenantId, id);
 
@@ -152,6 +263,16 @@ export class PeopleService {
 
     person.status = PeopleStatus.INACTIVE;
     await this.peopleRepository.save(person);
+  }
+
+  private getInvitableKey(person: PeopleEntity): string | null {
+    const key = person.email ?? person.phone;
+    if (!key) {
+      return null;
+    }
+
+    const trimmed = key.trim();
+    return trimmed ? trimmed.toLowerCase() : null;
   }
 
   private normalizeEmail(value?: string | null): string | null {
