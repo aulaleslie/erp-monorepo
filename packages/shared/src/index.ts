@@ -48,6 +48,21 @@ export const TENANT_TYPE_OPTIONS = [
 ] as const;
 
 // ============================================================================
+// People Types
+// ============================================================================
+
+export enum PeopleType {
+  CUSTOMER = 'CUSTOMER',
+  SUPPLIER = 'SUPPLIER',
+  STAFF = 'STAFF',
+}
+
+export enum PeopleStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+}
+
+// ============================================================================
 // Audit Types
 // ============================================================================
 

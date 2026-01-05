@@ -10,6 +10,7 @@ import { AuditLogEntity } from './src/database/entities/audit-log.entity';
 import { TaxEntity } from './src/database/entities/tax.entity';
 import { TenantTaxEntity } from './src/database/entities/tenant-tax.entity';
 import { TenantThemeEntity } from './src/database/entities/tenant-theme.entity';
+import { PeopleEntity } from './src/database/entities/people.entity';
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ export const AppDataSource = new DataSource({
     TaxEntity,
     TenantTaxEntity,
     TenantThemeEntity,
+    PeopleEntity,
   ],
   migrations: ['src/database/migrations/*.ts'],
   synchronize: false,

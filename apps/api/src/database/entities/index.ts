@@ -4,6 +4,7 @@
 
 export { AuditLogEntity } from './audit-log.entity';
 export { PermissionEntity } from './permission.entity';
+export { PeopleEntity } from './people.entity';
 export { RolePermissionEntity } from './role-permission.entity';
 export { RoleEntity } from './role.entity';
 export { TaxEntity } from './tax.entity';

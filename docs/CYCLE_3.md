@@ -84,6 +84,8 @@ Scope:
   - `POST /people`
   - `PUT /people/:id`
   - `DELETE /people/:id` (soft, sets `status=INACTIVE`)
+- Code is always generated server-side; ignore any client-supplied `code`.
+- If deleting a STAFF record with a linked user, auto-unlink `user_id` before setting `status=INACTIVE`.
 - Search matches: `code`, `full_name`, `email`, `phone`.
 - Duplicate checks return 409:
   - `DUPLICATE_EMAIL` when email conflict in same tenant
@@ -162,6 +164,7 @@ Scope:
 - Required: Full name.
 - Optional: Type, Phone, Email, Tags.
 - Status editable on edit only.
+- Code is read-only (display-only on edit, not part of create form).
 
 DoD:
 - Create and edit flows work end-to-end.
