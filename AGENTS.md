@@ -7,6 +7,8 @@ Future agents have to deliver work that feels like a natural continuation of the
 - `docs/CYCLE_0.md` (locked decisions, pnpm setup, Docker-compose baseline, shared DTO expectations).
 - `docs/CYCLE_1.md` (Cycle 1 domain model, migrations order, seed data, authentication and permission endpoints).
 - `docs/CYCLE_2.md` (tenant flags, platform taxes, tenant tax settings, and related permissions/guards).
+- `docs/CYCLE_3.md` (people master data, staff user linking, and related permissions/endpoints).
+- `docs/summary.md` (current implementation map across cycles and addenda).
 - UI migration guidance now lives in Cycle 1/2 (Tailwind + shadcn UI guide, app shell expectations, menu permissions, component list, and cycle-1 page targets).
 
 Always cite the relevant section of these docs when you describe your plan or justify an implementation in your response.

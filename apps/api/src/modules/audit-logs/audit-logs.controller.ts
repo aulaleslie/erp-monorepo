@@ -45,9 +45,18 @@ export class AuditLogsController {
 }
 
 function parseDateParam(label: string, value: string): Date {
+  if (!hasTimezoneOffset(value)) {
+    throw new BadRequestException(
+      `${label} must include a timezone offset (e.g. 2024-01-01T10:00:00Z).`,
+    );
+  }
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) {
     throw new BadRequestException(`${label} must be a valid date-time.`);
   }
   return parsed;
+}
+
+function hasTimezoneOffset(value: string): boolean {
+  return /([zZ]|[+-]\d{2}:\d{2})$/.test(value);
 }

@@ -26,6 +26,9 @@ import { TenantTaxEntity } from './entities/tenant-tax.entity';
         password: configService.getOrThrow<string>('DB_PASSWORD'),
         database: configService.getOrThrow<string>('DB_NAME'),
         ssl: configService.get<string>('DB_SSL') === 'true',
+        extra: {
+          options: '-c timezone=UTC',
+        },
         entities: [
           UserEntity,
           TenantEntity,

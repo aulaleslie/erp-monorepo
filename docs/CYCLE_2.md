@@ -243,3 +243,16 @@ DoD:
 2. C2-BE-04 -> C2-BE-05 -> C2-BE-06
 3. C2-FE-01 -> C2-FE-02 -> C2-FE-03 -> C2-FE-04 -> C2-FE-05
 4. C2-QA-01 -> C2-REL-01
+
+## C2 Addendum - Implemented Extras (already in code)
+
+### Backend addenda (apps/api)
+- Audit logs: audit_logs table + subscriber for BaseAuditEntity changes, GET /audit-logs (super admin) with entity/action/performer/date filters.
+- Tenant themes: tenant_themes table + backfill migration, GET/PUT /tenant-settings/theme, themePresetId supported on tenant create/update.
+- Tenant language: tenants.language enum (en, id) included in /me/tenants and /me/tenants/active, updateable via tenant settings.
+
+### Frontend addenda (apps/web)
+- Theme system: ThemeProvider applies CSS variables from shared presets, /settings/theme UI, theme selector inside /settings/tenant.
+- Localization: NextIntl provider uses active tenant language, en/id message catalogs, language selector in tenant settings.
+- Audit logs UI: /settings/audit-logs with filters and details dialog (super admin only).
+

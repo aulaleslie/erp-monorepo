@@ -21,6 +21,9 @@ export const AppDataSource = new DataSource({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   ssl: process.env.DB_SSL === 'true',
+  extra: {
+    options: '-c timezone=UTC',
+  },
   entities: [
     UserEntity,
     TenantEntity,
