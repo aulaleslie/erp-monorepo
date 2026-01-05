@@ -9,7 +9,7 @@ import {
   TenantThemeEntity,
   TenantUserEntity,
 } from '../../database/entities';
-import { Repository, ObjectLiteral } from 'typeorm';
+import { Repository, ObjectLiteral, FindOperator } from 'typeorm';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { TenantType } from '@gym-monorepo/shared';
 
@@ -112,9 +112,19 @@ describe('TenantsService', () => {
 
       const result = await service.getMyTenants('user-1');
       expect(result).toEqual(tenants);
-      expect(tenantRepository.find).toHaveBeenCalledWith({
-        where: { id: expect.any(String) as string, status: 'ACTIVE' },
-      });
+      const findMock = tenantRepository.find as jest.MockedFunction<
+        Repository<TenantEntity>['find']
+      >;
+      const callOptions = findMock.mock.calls[0]?.[0];
+      if (!callOptions) {
+        throw new Error('Expected find to be called');
+      }
+      const where = callOptions.where as {
+        id: FindOperator<string>;
+        status: string;
+      };
+      expect(where.status).toBe('ACTIVE');
+      expect(where.id.value).toEqual(['tenant-1', 'tenant-2']);
     });
   });
 
