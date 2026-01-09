@@ -82,6 +82,97 @@
       "listDescription": "This page will include filters, search, and actions for people.",
       "formTitle": "People form coming soon",
       "formDescription": "This page will handle create and edit flows for people."
+    },
+    "buttons": {
+      "new": "New Person",
+      "invite": "Invite Existing"
+    },
+    "list": {
+      "filters": {
+        "search": "Search",
+        "searchPlaceholder": "Search by code, name, email, or phone",
+        "type": "Type",
+        "status": "Status"
+      },
+      "table": {
+        "headers": {
+          "code": "Code",
+          "name": "Name",
+          "type": "Type",
+          "phone": "Phone",
+          "email": "Email",
+          "tags": "Tags",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "empty": "No people found"
+      }
+    },
+    "types": {
+      "all": "All types",
+      "customer": "Customer",
+      "supplier": "Supplier",
+      "staff": "Staff"
+    },
+    "statuses": {
+      "any": "Any status",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "toast": {
+      "fetchError": {
+        "title": "Unable to load people",
+        "description": "We couldn’t fetch people right now. Try again shortly."
+      },
+      "deactivateSuccess": {
+        "title": "Person deactivated",
+        "description": "Person is now inactive."
+      },
+      "deactivateError": {
+        "title": "Could not deactivate",
+        "description": "Something went wrong while updating this person."
+      }
+    },
+    "confirm": {
+      "deactivate": {
+        "title": "Deactivate person?",
+        "description": "This will mark the person as inactive while preserving their history.",
+        "confirmLabel": "Deactivate"
+      }
+    },
+    "invite": {
+      "dialog": {
+        "title": "Invite existing person",
+        "description": "Add a person from another workspace into this tenant."
+      },
+      "form": {
+        "labels": {
+          "type": "Type",
+          "person": "Person"
+        },
+        "placeholders": {
+          "type": "Select a type",
+          "person": "Search for a person",
+          "search": "Search by name, code, email, or phone"
+        },
+        "buttons": {
+          "cancel": "Cancel",
+          "invite": "Invite"
+        },
+        "validation": {
+          "personRequired": "Choose a person to invite"
+        }
+      },
+      "toast": {
+        "success": {
+          "title": "Person invited",
+          "description": "The person was copied into this workspace."
+        },
+        "error": {
+          "title": "Invite failed",
+          "description": "We could not invite that person."
+        }
+      }
     }
   },
   "profile": {

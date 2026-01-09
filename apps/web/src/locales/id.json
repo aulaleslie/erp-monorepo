@@ -82,6 +82,97 @@
       "listDescription": "Halaman ini akan memuat filter, pencarian, dan aksi untuk orang.",
       "formTitle": "Form orang segera hadir",
       "formDescription": "Halaman ini akan menangani alur buat dan ubah data orang."
+    },
+    "buttons": {
+      "new": "Orang Baru",
+      "invite": "Undang yang sudah ada"
+    },
+    "list": {
+      "filters": {
+        "search": "Cari",
+        "searchPlaceholder": "Cari berdasarkan kode, nama, email, atau telepon",
+        "type": "Tipe",
+        "status": "Status"
+      },
+      "table": {
+        "headers": {
+          "code": "Kode",
+          "name": "Nama",
+          "type": "Tipe",
+          "phone": "Telepon",
+          "email": "Email",
+          "tags": "Tag",
+          "status": "Status",
+          "actions": "Aksi"
+        },
+        "empty": "Tidak ada orang ditemukan"
+      }
+    },
+    "types": {
+      "all": "Semua tipe",
+      "customer": "Pelanggan",
+      "supplier": "Pemasok",
+      "staff": "Staf"
+    },
+    "statuses": {
+      "any": "Semua status",
+      "active": "Aktif",
+      "inactive": "Tidak aktif"
+    },
+    "toast": {
+      "fetchError": {
+        "title": "Tidak dapat memuat orang",
+        "description": "Kami tidak dapat memuat orang sekarang. Coba lagi nanti."
+      },
+      "deactivateSuccess": {
+        "title": "Orang dinonaktifkan",
+        "description": "Orang telah ditandai tidak aktif."
+      },
+      "deactivateError": {
+        "title": "Gagal menonaktifkan",
+        "description": "Ada masalah saat memperbarui orang ini."
+      }
+    },
+    "confirm": {
+      "deactivate": {
+        "title": "Nonaktifkan orang?",
+        "description": "Ini akan menandai orang sebagai tidak aktif tetapi menyimpan riwayat.",
+        "confirmLabel": "Nonaktifkan"
+      }
+    },
+    "invite": {
+      "dialog": {
+        "title": "Undang orang yang sudah ada",
+        "description": "Tambahkan orang dari ruang kerja lain ke tenant ini."
+      },
+      "form": {
+        "labels": {
+          "type": "Tipe",
+          "person": "Orang"
+        },
+        "placeholders": {
+          "type": "Pilih tipe",
+          "person": "Cari orang",
+          "search": "Cari berdasarkan nama, kode, email, atau telepon"
+        },
+        "buttons": {
+          "cancel": "Batal",
+          "invite": "Undang"
+        },
+        "validation": {
+          "personRequired": "Pilih orang untuk diundang"
+        }
+      },
+      "toast": {
+        "success": {
+          "title": "Orang diundang",
+          "description": "Orang berhasil ditambahkan ke ruang kerja ini."
+        },
+        "error": {
+          "title": "Undangan gagal",
+          "description": "Kami tidak dapat mengundang orang tersebut."
+        }
+      }
     }
   },
   "profile": {
