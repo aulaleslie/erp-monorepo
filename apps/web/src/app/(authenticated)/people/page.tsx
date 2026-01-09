@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { usePagination } from "@/hooks/use-pagination";
@@ -27,7 +28,7 @@ export default function PeoplePage() {
     const pagination = usePagination({ initialLimit: 10 });
     const [searchTerm, setSearchTerm] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
-    const [typeFilter, setTypeFilter] = useState<PeopleType | "">("");
+    const [typeFilter, setTypeFilter] = useState<PeopleType | "">(PeopleType.CUSTOMER);
     const [statusFilter, setStatusFilter] = useState<PeopleStatus | "">("");
     const [personToDeactivate, setPersonToDeactivate] = useState<string | null>(null);
     const [inviteOpen, setInviteOpen] = useState(false);
@@ -96,16 +97,6 @@ export default function PeoplePage() {
             setPersonToDeactivate(null);
         }
     };
-
-    const typeOptions = useMemo(
-        () => [
-            { value: "", label: t("types.all") },
-            { value: PeopleType.CUSTOMER, label: t("types.customer") },
-            { value: PeopleType.SUPPLIER, label: t("types.supplier") },
-            { value: PeopleType.STAFF, label: t("types.staff") },
-        ],
-        [t]
-    );
 
     const statusOptions = useMemo(
         () => [
@@ -213,6 +204,33 @@ export default function PeoplePage() {
                     </div>
                 </div>
 
+                <Tabs
+                    value={typeFilter}
+                    onValueChange={(value) => setTypeFilter(value as PeopleType)}
+                    className="w-full"
+                >
+                    <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0">
+                        <TabsTrigger
+                            value={PeopleType.CUSTOMER}
+                            className="rounded-t-md border-b-2 border-transparent bg-transparent px-4 py-3 font-medium text-muted-foreground shadow-none hover:text-primary hover:border-primary data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:shadow-none data-[state=active]:bg-transparent"
+                        >
+                            {t("types.customer")}
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value={PeopleType.SUPPLIER}
+                            className="rounded-t-md border-b-2 border-transparent bg-transparent px-4 py-3 font-medium text-muted-foreground shadow-none hover:text-primary hover:border-primary data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:shadow-none data-[state=active]:bg-transparent"
+                        >
+                            {t("types.supplier")}
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value={PeopleType.STAFF}
+                            className="rounded-t-md border-b-2 border-transparent bg-transparent px-4 py-3 font-medium text-muted-foreground shadow-none hover:text-primary hover:border-primary data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:shadow-none data-[state=active]:bg-transparent"
+                        >
+                            {t("types.staff")}
+                        </TabsTrigger>
+                    </TabsList>
+                </Tabs>
+
                 <div className="rounded-md border border-border bg-card p-4">
                     <div className="grid gap-4 md:grid-cols-4">
                         <div>
@@ -224,24 +242,6 @@ export default function PeoplePage() {
                                 value={searchTerm}
                                 onChange={(event) => setSearchTerm(event.target.value)}
                             />
-                        </div>
-                        <div>
-                            <label className="text-sm font-semibold text-muted-foreground">
-                                {t("list.filters.type")}
-                            </label>
-                            <select
-                                className="w-full rounded border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                                value={typeFilter}
-                                onChange={(event) =>
-                                    setTypeFilter(event.target.value as PeopleType | "")
-                                }
-                            >
-                                {typeOptions.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </select>
                         </div>
                         <div>
                             <label className="text-sm font-semibold text-muted-foreground">
