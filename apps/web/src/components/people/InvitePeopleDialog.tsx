@@ -110,7 +110,7 @@ export function InvitePeopleDialog({
 
     const typeOptions = React.useMemo(
         () => [
-            { value: "", label: t("types.all") },
+            { value: "ALL", label: t("types.all") },
             {
                 value: PeopleType.CUSTOMER,
                 label: t("types.customer"),
@@ -149,8 +149,10 @@ export function InvitePeopleDialog({
                         <div className="space-y-2">
                             <Label>{t("invite.form.labels.type")}</Label>
                             <Select
-                                value={selectedType}
-                                onValueChange={(value) => setSelectedType(value as PeopleType | "")}
+                                value={selectedType || "ALL"}
+                                onValueChange={(value) =>
+                                    setSelectedType(value === "ALL" ? "" : (value as PeopleType))
+                                }
                             >
                                 <SelectTrigger>
                                     <SelectValue
