@@ -9,7 +9,9 @@ import {
 } from 'typeorm';
 import { PeopleStatus, PeopleType } from '@gym-monorepo/shared';
 import { BaseAuditEntity } from '../../common/entities/base-audit.entity';
-import { TenantEntity, UserEntity } from '../../database/entities';
+import { TenantEntity } from './tenant.entity';
+import { UserEntity } from './user.entity';
+import { DepartmentEntity } from './department.entity';
 
 @Entity('people')
 @Unique('UQ_people_tenant_code', ['tenantId', 'code'])
@@ -54,8 +56,8 @@ export class PeopleEntity extends BaseAuditEntity {
   @Column({ type: 'varchar', nullable: true })
   phone: string | null;
 
-  @Column({ type: 'varchar', nullable: true })
-  department: string | null;
+  @Column({ type: 'uuid', nullable: true })
+  departmentId: string | null;
 
   @Column({ type: 'uuid', nullable: true })
   userId: string | null;
@@ -73,6 +75,10 @@ export class PeopleEntity extends BaseAuditEntity {
   @ManyToOne(() => TenantEntity)
   @JoinColumn({ name: 'tenantId' })
   tenant: TenantEntity;
+
+  @ManyToOne(() => DepartmentEntity, { nullable: true })
+  @JoinColumn({ name: 'departmentId' })
+  department: DepartmentEntity | null;
 
   @ManyToOne(() => UserEntity)
   @JoinColumn({ name: 'userId' })

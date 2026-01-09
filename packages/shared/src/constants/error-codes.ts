@@ -207,6 +207,21 @@ export const PEOPLE_ERRORS = {
 } as const;
 
 // ============================================================================
+// Department Errors
+// ============================================================================
+
+export const DEPARTMENT_ERRORS = {
+  NOT_FOUND: {
+    code: 'DEPARTMENT_NOT_FOUND',
+    message: 'Department not found',
+  },
+  DUPLICATE_NAME: {
+    code: 'DEPARTMENT_DUPLICATE_NAME',
+    message: 'Department with this name already exists',
+  },
+} as const;
+
+// ============================================================================
 // Theme Errors
 // ============================================================================
 
@@ -263,6 +278,7 @@ export const ERROR_CODES = {
   ROLE: ROLE_ERRORS,
   TAX: TAX_ERRORS,
   PEOPLE: PEOPLE_ERRORS,
+  DEPARTMENT: DEPARTMENT_ERRORS,
   THEME: THEME_ERRORS,
   VALIDATION: VALIDATION_ERRORS,
 } as const;
@@ -277,6 +293,7 @@ export type UserErrorCode = typeof USER_ERRORS[keyof typeof USER_ERRORS];
 export type RoleErrorCode = typeof ROLE_ERRORS[keyof typeof ROLE_ERRORS];
 export type TaxErrorCode = typeof TAX_ERRORS[keyof typeof TAX_ERRORS];
 export type PeopleErrorCode = typeof PEOPLE_ERRORS[keyof typeof PEOPLE_ERRORS];
+export type DepartmentErrorCode = typeof DEPARTMENT_ERRORS[keyof typeof DEPARTMENT_ERRORS];
 export type ThemeErrorCode = typeof THEME_ERRORS[keyof typeof THEME_ERRORS];
 export type ValidationErrorCode = typeof VALIDATION_ERRORS[keyof typeof VALIDATION_ERRORS];
 
@@ -287,5 +304,6 @@ export type AnyErrorCode =
   | RoleErrorCode 
   | TaxErrorCode
   | PeopleErrorCode
+  | DepartmentErrorCode
   | ThemeErrorCode 
   | ValidationErrorCode;

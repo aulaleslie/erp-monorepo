@@ -16,6 +16,12 @@ export const PERMISSIONS = {
     UPDATE: 'people.update',
     DELETE: 'people.delete',
   },
+  DEPARTMENTS: {
+    READ: 'departments.read',
+    CREATE: 'departments.create',
+    UPDATE: 'departments.update',
+    DELETE: 'departments.delete',
+  },
   USERS: {
     READ: 'users.read',
     CREATE: 'users.create',
@@ -35,6 +41,7 @@ export const PERMISSIONS = {
 export type PermissionCode = 
   | typeof PERMISSIONS.ROLES[keyof typeof PERMISSIONS.ROLES]
   | typeof PERMISSIONS.PEOPLE[keyof typeof PERMISSIONS.PEOPLE]
+  | typeof PERMISSIONS.DEPARTMENTS[keyof typeof PERMISSIONS.DEPARTMENTS]
   | typeof PERMISSIONS.USERS[keyof typeof PERMISSIONS.USERS]
   | typeof PERMISSIONS.SETTINGS.TENANT[keyof typeof PERMISSIONS.SETTINGS.TENANT];
 
@@ -48,6 +55,10 @@ export const ALL_PERMISSION_CODES: PermissionCode[] = [
   PERMISSIONS.PEOPLE.CREATE,
   PERMISSIONS.PEOPLE.UPDATE,
   PERMISSIONS.PEOPLE.DELETE,
+  PERMISSIONS.DEPARTMENTS.READ,
+  PERMISSIONS.DEPARTMENTS.CREATE,
+  PERMISSIONS.DEPARTMENTS.UPDATE,
+  PERMISSIONS.DEPARTMENTS.DELETE,
   PERMISSIONS.USERS.READ,
   PERMISSIONS.USERS.CREATE,
   PERMISSIONS.USERS.UPDATE,

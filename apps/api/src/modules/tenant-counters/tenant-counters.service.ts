@@ -9,6 +9,8 @@ const PEOPLE_COUNTERS: Record<PeopleType, { key: string; prefix: string }> = {
   [PeopleType.STAFF]: { key: 'people.staff', prefix: 'STF-' },
 };
 
+const DEPARTMENT_COUNTER = { key: 'departments', prefix: 'DEP-' };
+
 @Injectable()
 export class TenantCountersService {
   constructor(private readonly dataSource: DataSource) {}
@@ -26,6 +28,16 @@ export class TenantCountersService {
     );
 
     return this.formatCode(counterConfig.prefix, nextValue);
+  }
+
+  async getNextDepartmentCode(tenantId: string): Promise<string> {
+    const nextValue = await this.nextValue(
+      tenantId,
+      DEPARTMENT_COUNTER.key,
+      DEPARTMENT_COUNTER.prefix,
+    );
+
+    return this.formatCode(DEPARTMENT_COUNTER.prefix, nextValue);
   }
 
   private async nextValue(

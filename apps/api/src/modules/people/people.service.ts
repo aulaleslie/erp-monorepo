@@ -172,7 +172,8 @@ export class PeopleService {
       phone,
       status: PeopleStatus.ACTIVE,
       tags: dto.tags ?? [],
-      department: type === PeopleType.STAFF ? (dto.department ?? null) : null,
+      departmentId:
+        type === PeopleType.STAFF ? (dto.departmentId ?? null) : null,
     });
 
     return this.peopleRepository.save(person);
@@ -209,9 +210,9 @@ export class PeopleService {
       person.tags = dto.tags ?? [];
     }
 
-    if (dto.department !== undefined) {
-      person.department =
-        person.type === PeopleType.STAFF ? (dto.department ?? null) : null;
+    if (dto.departmentId !== undefined) {
+      person.departmentId =
+        person.type === PeopleType.STAFF ? (dto.departmentId ?? null) : null;
     }
 
     return this.peopleRepository.save(person);
@@ -246,8 +247,7 @@ export class PeopleService {
       phone: person.phone,
       status: person.status,
       tags: person.tags ?? [],
-      department:
-        person.type === PeopleType.STAFF ? (person.department ?? null) : null,
+      departmentId: null, // Don't copy departmentId across tenants
       userId: null,
     });
 

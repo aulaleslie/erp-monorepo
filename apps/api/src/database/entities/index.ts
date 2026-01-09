@@ -3,6 +3,7 @@
  */
 
 export { AuditLogEntity } from './audit-log.entity';
+export { DepartmentEntity } from './department.entity';
 export { PermissionEntity } from './permission.entity';
 export { PeopleEntity } from './people.entity';
 export { RolePermissionEntity } from './role-permission.entity';

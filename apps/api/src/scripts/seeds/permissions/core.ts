@@ -9,6 +9,22 @@ export const corePermissions: SeedPermission[] = [
   { code: 'people.create', name: 'Create People', group: 'People' },
   { code: 'people.update', name: 'Update People', group: 'People' },
   { code: 'people.delete', name: 'Delete People', group: 'People' },
+  { code: 'departments.read', name: 'Read Departments', group: 'Departments' },
+  {
+    code: 'departments.create',
+    name: 'Create Departments',
+    group: 'Departments',
+  },
+  {
+    code: 'departments.update',
+    name: 'Update Departments',
+    group: 'Departments',
+  },
+  {
+    code: 'departments.delete',
+    name: 'Delete Departments',
+    group: 'Departments',
+  },
   { code: 'users.read', name: 'Read Users', group: 'Users' },
   { code: 'users.create', name: 'Create Users', group: 'Users' },
   { code: 'users.update', name: 'Update Users', group: 'Users' },

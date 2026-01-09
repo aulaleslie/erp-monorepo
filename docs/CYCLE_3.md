@@ -187,7 +187,7 @@ Goal: Allow staff to exist without login, and optionally link/create user accoun
 
 Scope:
 - Add STAFF-only fields to `people`:
-  - `department` string nullable
+  - `department` string nullable (temporary; will be migrated to `departmentId` FK in C3C-BE-04)
   - `user_id` uuid nullable FK -> users
 - Constraints:
   - unique (`tenant_id`, `user_id`) where `user_id` is not null
@@ -255,16 +255,126 @@ Scope:
 DoD:
 - Creates user, attaches to tenant, links to staff.
 
+## EPIC C3-2: Departments Module
+
+Goal: Provide a tenant-scoped Departments master table with CRUD, permissions, and link to Staff records.
+
+### C3C-BE-01 - Department entity + migration
+
+Scope:
+- Create `departments` table with tenant scoping.
+- Fields:
+  - `id` uuid PK
+  - `tenant_id` uuid FK -> tenants
+  - `name` string (required)
+  - `code` string, auto-generated per tenant
+  - `status` enum: `ACTIVE | INACTIVE` (default `ACTIVE`)
+  - audit columns + timestamps
+- Constraints:
+  - unique (`tenant_id`, `code`)
+  - unique (`tenant_id`, `name`)
+- Code generation: `DEP-{value:06d}` using tenant counters key `departments`
+
+DoD:
+- Migration runs successfully.
+- Entity uses BaseAuditEntity and barrel imports.
+
+### C3C-BE-02 - Departments CRUD API
+
+Scope:
+- Base module path: `apps/api/src/modules/departments`.
+- Guards: AuthGuard -> ActiveTenantGuard -> TenantMembershipGuard -> PermissionGuard.
+- Endpoints:
+  - `GET /departments?search=&status=&page=&limit=`
+  - `GET /departments/:id`
+  - `POST /departments`
+  - `PUT /departments/:id`
+  - `DELETE /departments/:id` (soft, sets `status=INACTIVE`)
+- Code is always generated server-side; ignore any client-supplied `code`.
+- Search matches: `code`, `name`.
+- Duplicate check returns 409 `DUPLICATE_NAME`.
+
+DoD:
+- List endpoint paginates and filters correctly.
+- Soft delete flips status and keeps row.
+
+### C3C-BE-03 - Permissions for departments
+
+Scope:
+- Add permission codes:
+  - `departments.read`, `departments.create`, `departments.update`, `departments.delete`
+- Seed into permissions list.
+- Apply `@RequirePermissions()` per endpoint.
+
+DoD:
+- Guards enforce access for all department endpoints.
+
+### C3C-BE-04 - Update people entity (department FK)
+
+Scope:
+- Add migration to:
+  1. Add `departmentId` uuid nullable FK -> departments
+  2. Migrate existing `department` string values to department records (or null)
+  3. Drop `department` string column
+- Update entity:
+  - Replace `department: string | null` with `departmentId: string | null`
+  - Add relation to DepartmentEntity
+- Update DTOs and service to handle `departmentId`.
+
+DoD:
+- People entity uses FK instead of string.
+- Existing data is migrated.
+
+### C3C-FE-01 - Departments sidebar + routes
+
+Scope:
+- Add Departments section in sidebar (under Settings or standalone):
+  - `/departments` (requires any `departments.*` permission)
+- Routes:
+  - `/departments` (list)
+  - `/departments/new`
+  - `/departments/[id]/edit`
+
+DoD:
+- Menu and route guards respect permissions.
+
+### C3C-FE-02 - Departments list + form pages
+
+Scope:
+- List page:
+  - Columns: Code, Name, Status badge, Actions.
+  - Actions: edit, deactivate.
+  - "New Department" button gated by `departments.create`.
+- Form page:
+  - Required: Name.
+  - Status editable on edit only.
+  - Code is read-only (display-only on edit).
+
+DoD:
+- CRUD flows work end-to-end.
+
+### C3B-FE-01 update - Staff form uses department dropdown
+
+Note: Update C3B-FE-01 to:
+- Replace department text input with a dropdown.
+- Dropdown fetches from `GET /departments?status=ACTIVE`.
+- Allow clearing (null departmentId).
+
 ## Shared updates
 
 - Add people types and error codes to `packages/shared`:
   - `PEOPLE_ERRORS.DUPLICATE_EMAIL`, `PEOPLE_ERRORS.DUPLICATE_PHONE`, `PEOPLE_ERRORS.INVALID_PHONE`, `PEOPLE_ERRORS.NOT_FOUND`.
-- Add permissions constants for `people.*`.
+- Add department error codes:
+  - `DEPARTMENT_ERRORS.DUPLICATE_NAME`, `DEPARTMENT_ERRORS.NOT_FOUND`.
+- Add permissions constants for `people.*` and `departments.*`.
 
 ## Suggested execution order
 
 1. C3A-BE-01 -> C3A-BE-02 -> C3A-BE-03
 2. C3A-BE-04 -> C3A-BE-06
 3. C3A-FE-01 -> C3A-FE-04
-4. C3B-BE-01 -> C3B-BE-03
-5. C3B-FE-01 -> C3B-FE-02
+4. C3C-BE-01 -> C3C-BE-02 -> C3C-BE-03 (Departments backend)
+5. C3C-BE-04 (Update people.department -> departmentId)
+6. C3C-FE-01 -> C3C-FE-02 (Departments frontend)
+7. C3B-BE-01 -> C3B-BE-03 (Staff user linking)
+8. C3B-FE-01 -> C3B-FE-02 (Staff form with department dropdown)

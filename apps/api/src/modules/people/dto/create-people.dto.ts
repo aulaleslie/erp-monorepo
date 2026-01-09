@@ -4,6 +4,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUUID,
 } from 'class-validator';
 import { PeopleType } from '@gym-monorepo/shared';
 
@@ -30,6 +31,6 @@ export class CreatePeopleDto {
   tags?: string[];
 
   @IsOptional()
-  @IsString()
-  department?: string | null;
+  @IsUUID()
+  departmentId?: string | null;
 }

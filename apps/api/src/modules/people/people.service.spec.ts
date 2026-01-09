@@ -282,7 +282,7 @@ describe('PeopleService', () => {
           phone: '+62812345678',
           status: PeopleStatus.ACTIVE,
           tags: [],
-          department: null,
+          departmentId: null,
         }),
       );
       expect(result).toBe(created);
@@ -383,7 +383,7 @@ describe('PeopleService', () => {
         phone: '+628111',
         status: PeopleStatus.ACTIVE,
         tags: ['vip'],
-        department: null,
+        departmentId: null,
       } as PeopleEntity;
 
       peopleRepository
@@ -422,7 +422,7 @@ describe('PeopleService', () => {
         phone: null,
         status: PeopleStatus.ACTIVE,
         tags: ['existing'],
-        department: 'Front Desk',
+        departmentId: 'dept-1',
       } as PeopleEntity;
 
       peopleRepository.findOne!.mockResolvedValueOnce(person);
@@ -431,12 +431,12 @@ describe('PeopleService', () => {
       const result = await service.update('tenant-1', 'person-2', {
         status: PeopleStatus.INACTIVE,
         tags: null,
-        department: 'Ops',
+        departmentId: 'dept-2',
       } as unknown as UpdatePeopleDto);
 
       expect(result.status).toBe(PeopleStatus.INACTIVE);
       expect(result.tags).toEqual([]);
-      expect(result.department).toBe('Ops');
+      expect(result.departmentId).toBe('dept-2');
     });
 
     it('clears department updates for non-staff records', async () => {
@@ -449,17 +449,17 @@ describe('PeopleService', () => {
         phone: null,
         status: PeopleStatus.ACTIVE,
         tags: [],
-        department: 'Legacy',
+        departmentId: 'dept-legacy',
       } as unknown as PeopleEntity;
 
       peopleRepository.findOne!.mockResolvedValueOnce(person);
       peopleRepository.save!.mockResolvedValue(person);
 
       const result = await service.update('tenant-1', 'person-3', {
-        department: 'Sales',
+        departmentId: 'dept-sales',
       } as UpdatePeopleDto);
 
-      expect(result.department).toBeNull();
+      expect(result.departmentId).toBeNull();
     });
   });
 
@@ -474,7 +474,7 @@ describe('PeopleService', () => {
         phone: '+628123',
         status: PeopleStatus.ACTIVE,
         tags: ['trainer'],
-        department: 'Ops',
+        departmentId: 'dept-ops',
         userId: 'user-1',
       } as PeopleEntity;
       const created = { id: 'new-person' } as PeopleEntity;
@@ -505,7 +505,7 @@ describe('PeopleService', () => {
           phone: '+628123',
           status: PeopleStatus.ACTIVE,
           tags: ['trainer'],
-          department: 'Ops',
+          departmentId: null, // Don't copy departmentId across tenants
           userId: null,
         }),
       );

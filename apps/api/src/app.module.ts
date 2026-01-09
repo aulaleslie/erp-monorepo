@@ -14,6 +14,7 @@ import { TaxesModule } from './modules/taxes/taxes.module';
 import { PlatformTaxesModule } from './platform/taxes/platform-taxes.module';
 import { TenantSettingsModule } from './modules/tenant-settings/tenant-settings.module';
 import { PeopleModule } from './modules/people/people.module';
+import { DepartmentsModule } from './modules/departments/departments.module';
 
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { UserContextInterceptor } from './common/interceptors/user-context.interceptor';
@@ -36,6 +37,7 @@ import { UserContextInterceptor } from './common/interceptors/user-context.inter
     PlatformTaxesModule,
     TenantSettingsModule,
     PeopleModule,
+    DepartmentsModule,
   ],
   controllers: [AppController],
   providers: [
