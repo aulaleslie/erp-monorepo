@@ -37,7 +37,38 @@ interface InvitableParams {
   type?: PeopleType | '';
 }
 
+export interface CreatePersonData {
+  fullName: string;
+  type: PeopleType;
+  email?: string | null;
+  phone?: string | null;
+  tags?: string[];
+}
+
+export interface UpdatePersonData {
+  fullName?: string;
+  email?: string | null;
+  phone?: string | null;
+  status?: PeopleStatus;
+  tags?: string[];
+}
+
 export const peopleService = {
+  async get(id: string) {
+    const response = await api.get<PersonListItem>(`/people/${id}`);
+    return response.data;
+  },
+
+  async create(data: CreatePersonData) {
+    const response = await api.post<PersonListItem>('/people', data);
+    return response.data;
+  },
+
+  async update(id: string, data: UpdatePersonData) {
+    const response = await api.put<PersonListItem>(`/people/${id}`, data);
+    return response.data;
+  },
+
   async list(params: PeopleListParams) {
     const query: Record<string, unknown> = {
       page: params.page,

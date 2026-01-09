@@ -119,6 +119,34 @@
       "active": "Active",
       "inactive": "Inactive"
     },
+    "form": {
+      "labels": {
+        "fullName": "Full Name",
+        "type": "Type",
+        "email": "Email",
+        "phone": "Phone",
+        "tags": "Tags",
+        "status": "Status",
+        "code": "Code"
+      },
+      "placeholders": {
+        "fullName": "Enter full name",
+        "email": "email@example.com",
+        "phone": "+62812...",
+        "tags": "Enter tags separated by commas",
+        "type": "Select type",
+        "status": "Select status"
+      },
+      "validation": {
+        "fullNameRequired": "Full name is required",
+        "invalidEmail": "Please enter a valid email address"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "create": "Create Person",
+        "save": "Save Changes"
+      }
+    },
     "toast": {
       "fetchError": {
         "title": "Unable to load people",
@@ -131,7 +159,29 @@
       "deactivateError": {
         "title": "Could not deactivate",
         "description": "Something went wrong while updating this person."
-      }
+      },
+      "createSuccess": {
+        "title": "Person created",
+        "description": "The person has been added successfully."
+      },
+      "createError": {
+        "title": "Failed to create person",
+        "description": "Something went wrong. Please try again."
+      },
+      "updateSuccess": {
+        "title": "Person updated",
+        "description": "Changes have been saved successfully."
+      },
+      "updateError": {
+        "title": "Failed to update person",
+        "description": "Something went wrong. Please try again."
+      },
+      "loadError": {
+        "title": "Failed to load person",
+        "description": "Could not fetch person details."
+      },
+      "duplicateEmail": "This email is already in use.",
+      "duplicatePhone": "This phone number is already in use."
     },
     "confirm": {
       "deactivate": {

@@ -1,7 +1,7 @@
 "use client";
 
 import { PageHeader } from "@/components/common/PageHeader";
-import { EmptyState } from "@/components/common/EmptyState";
+import { PersonForm } from "@/components/people/PersonForm";
 import { PermissionGuard } from "@/components/guards/PermissionGuard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useTranslations } from "next-intl";
@@ -23,10 +23,7 @@ export default function NewPersonPage() {
                     title={t("create.page.title")}
                     description={t("create.page.description")}
                 />
-                <EmptyState
-                    title={t("placeholders.formTitle")}
-                    description={t("placeholders.formDescription")}
-                />
+                <PersonForm mode="create" />
             </div>
         </PermissionGuard>
     );

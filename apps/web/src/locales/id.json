@@ -119,6 +119,34 @@
       "active": "Aktif",
       "inactive": "Tidak aktif"
     },
+    "form": {
+      "labels": {
+        "fullName": "Nama Lengkap",
+        "type": "Tipe",
+        "email": "Email",
+        "phone": "Telepon",
+        "tags": "Tag",
+        "status": "Status",
+        "code": "Kode"
+      },
+      "placeholders": {
+        "fullName": "Masukkan nama lengkap",
+        "email": "email@contoh.com",
+        "phone": "+62812...",
+        "tags": "Masukkan tag dipisahkan dengan koma",
+        "type": "Pilih tipe",
+        "status": "Pilih status"
+      },
+      "validation": {
+        "fullNameRequired": "Nama lengkap wajib diisi",
+        "invalidEmail": "Silakan masukkan alamat email yang valid"
+      },
+      "buttons": {
+        "cancel": "Batal",
+        "create": "Buat Orang",
+        "save": "Simpan Perubahan"
+      }
+    },
     "toast": {
       "fetchError": {
         "title": "Tidak dapat memuat orang",
@@ -131,7 +159,29 @@
       "deactivateError": {
         "title": "Gagal menonaktifkan",
         "description": "Ada masalah saat memperbarui orang ini."
-      }
+      },
+      "createSuccess": {
+        "title": "Orang dibuat",
+        "description": "Orang telah berhasil ditambahkan."
+      },
+      "createError": {
+        "title": "Gagal membuat orang",
+        "description": "Terjadi kesalahan. Silakan coba lagi."
+      },
+      "updateSuccess": {
+        "title": "Orang diperbarui",
+        "description": "Perubahan telah berhasil disimpan."
+      },
+      "updateError": {
+        "title": "Gagal memperbarui orang",
+        "description": "Terjadi kesalahan. Silakan coba lagi."
+      },
+      "loadError": {
+        "title": "Gagal memuat orang",
+        "description": "Tidak dapat mengambil detail orang."
+      },
+      "duplicateEmail": "Email ini sudah digunakan.",
+      "duplicatePhone": "Nomor telepon ini sudah digunakan."
     },
     "confirm": {
       "deactivate": {

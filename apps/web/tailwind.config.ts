@@ -4,7 +4,7 @@ const config = {
   darkMode: ["class"],
   content: [
     './src/**/*.{ts,tsx}',
-    '../../packages/shared/**/*.{ts,tsx}',
+    '../../packages/shared/src/**/*.{ts,tsx}',
   ],
   prefix: "",
   theme: {
