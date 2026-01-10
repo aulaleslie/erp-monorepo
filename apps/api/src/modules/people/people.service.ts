@@ -6,8 +6,13 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { PeopleEntity } from '../../database/entities';
-import { PEOPLE_ERRORS, PeopleStatus, PeopleType } from '@gym-monorepo/shared';
+import { PeopleEntity, UserEntity } from '../../database/entities';
+import {
+  PEOPLE_ERRORS,
+  PeopleStatus,
+  PeopleType,
+  USER_ERRORS,
+} from '@gym-monorepo/shared';
 import {
   PaginatedResponse,
   calculateSkip,
@@ -20,12 +25,16 @@ import { UpdatePeopleDto } from './dto/update-people.dto';
 import { PeopleQueryDto } from './dto/people-query.dto';
 import { InvitablePeopleQueryDto } from './dto/invitable-people-query.dto';
 import { InvitePeopleDto } from './dto/invite-people.dto';
+import { InvitableUsersQueryDto } from './dto/invitable-users-query.dto';
+import { LinkUserDto } from './dto/link-user.dto';
 
 @Injectable()
 export class PeopleService {
   constructor(
     @InjectRepository(PeopleEntity)
     private readonly peopleRepository: Repository<PeopleEntity>,
+    @InjectRepository(UserEntity)
+    private readonly usersRepository: Repository<UserEntity>,
     private readonly tenantCountersService: TenantCountersService,
   ) {}
 
@@ -367,5 +376,116 @@ export class PeopleService {
     if (existing && existing.id !== excludeId) {
       throw new ConflictException(PEOPLE_ERRORS.DUPLICATE_PHONE.message);
     }
+  }
+
+  async searchInvitableUsersForStaff(query: InvitableUsersQueryDto): Promise<{
+    items: Array<{ id: string; email: string; fullName?: string }>;
+    total: number;
+    page: number;
+    limit: number;
+    hasMore: boolean;
+  }> {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 10;
+    const search = query.search?.trim();
+
+    // Get users already linked to any staff record (across all tenants)
+    const linkedUserIds = await this.peopleRepository
+      .createQueryBuilder('people')
+      .select('people.userId')
+      .where('people.userId IS NOT NULL')
+      .andWhere('people.type = :type', { type: PeopleType.STAFF })
+      .getMany()
+      .then((results) => results.map((p) => p.userId).filter(Boolean));
+
+    // Build query for users not linked and not super admins
+    const queryBuilder = this.usersRepository
+      .createQueryBuilder('user')
+      .where('user.isSuperAdmin = :isSuperAdmin', { isSuperAdmin: false })
+      .andWhere('user.status = :status', { status: 'ACTIVE' });
+
+    // Exclude users already linked to staff
+    if (linkedUserIds.length > 0) {
+      queryBuilder.andWhere('user.id NOT IN (:...linkedUserIds)', {
+        linkedUserIds,
+      });
+    }
+
+    // Apply search filter
+    if (search) {
+      queryBuilder.andWhere(
+        '(user.email ILIKE :search OR user.fullName ILIKE :search)',
+        { search: `%${search}%` },
+      );
+    }
+
+    // Get total count
+    const total = await queryBuilder.getCount();
+
+    // Apply pagination
+    const users = await queryBuilder
+      .select(['user.id', 'user.email', 'user.fullName'])
+      .orderBy('user.email', 'ASC')
+      .skip(calculateSkip(page, limit))
+      .take(limit)
+      .getMany();
+
+    return {
+      items: users.map((u) => ({
+        id: u.id,
+        email: u.email,
+        fullName: u.fullName,
+      })),
+      total,
+      page,
+      limit,
+      hasMore: page * limit < total,
+    };
+  }
+
+  async linkUser(
+    tenantId: string,
+    personId: string,
+    dto: LinkUserDto,
+  ): Promise<PeopleEntity> {
+    const person = await this.findOne(tenantId, personId);
+
+    // Validate person is type STAFF
+    if (person.type !== PeopleType.STAFF) {
+      throw new BadRequestException(PEOPLE_ERRORS.NOT_STAFF_RECORD.message);
+    }
+
+    // Check user exists and is not super admin
+    const user = await this.usersRepository.findOne({
+      where: { id: dto.userId },
+    });
+
+    if (!user || user.isSuperAdmin) {
+      throw new NotFoundException(USER_ERRORS.NOT_FOUND.message);
+    }
+
+    // Check user is not already linked to any staff record
+    const existingLink = await this.peopleRepository.findOne({
+      where: { userId: dto.userId, type: PeopleType.STAFF },
+    });
+
+    if (existingLink && existingLink.id !== personId) {
+      throw new ConflictException(PEOPLE_ERRORS.USER_ALREADY_LINKED.message);
+    }
+
+    person.userId = dto.userId;
+    return this.peopleRepository.save(person);
+  }
+
+  async unlinkUser(tenantId: string, personId: string): Promise<PeopleEntity> {
+    const person = await this.findOne(tenantId, personId);
+
+    // Validate person is type STAFF
+    if (person.type !== PeopleType.STAFF) {
+      throw new BadRequestException(PEOPLE_ERRORS.NOT_STAFF_RECORD.message);
+    }
+
+    person.userId = null;
+    return this.peopleRepository.save(person);
   }
 }

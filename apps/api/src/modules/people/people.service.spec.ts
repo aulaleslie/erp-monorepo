@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Repository, ObjectLiteral } from 'typeorm';
 import { PeopleService } from './people.service';
-import { PeopleEntity } from '../../database/entities';
+import { PeopleEntity, UserEntity } from '../../database/entities';
 import { TenantCountersService } from '../tenant-counters/tenant-counters.service';
 import { PEOPLE_ERRORS, PeopleStatus, PeopleType } from '@gym-monorepo/shared';
 import { PeopleQueryDto } from './dto/people-query.dto';
@@ -26,6 +26,7 @@ const buildQueryBuilder = () => ({
   orderBy: jest.fn().mockReturnThis(),
   skip: jest.fn().mockReturnThis(),
   take: jest.fn().mockReturnThis(),
+  select: jest.fn().mockReturnThis(),
   getManyAndCount: jest.fn(),
   getMany: jest.fn(),
 });
@@ -33,6 +34,7 @@ const buildQueryBuilder = () => ({
 describe('PeopleService', () => {
   let service: PeopleService;
   let peopleRepository: MockRepository<PeopleEntity>;
+  let usersRepository: MockRepository<UserEntity>;
   let tenantCountersService: { getNextPeopleCode: jest.Mock };
 
   beforeEach(async () => {
@@ -40,6 +42,10 @@ describe('PeopleService', () => {
       findOne: jest.fn(),
       create: jest.fn(),
       save: jest.fn(),
+      createQueryBuilder: jest.fn(),
+    };
+    usersRepository = {
+      findOne: jest.fn(),
       createQueryBuilder: jest.fn(),
     };
     tenantCountersService = {
@@ -52,6 +58,10 @@ describe('PeopleService', () => {
         {
           provide: getRepositoryToken(PeopleEntity),
           useValue: peopleRepository,
+        },
+        {
+          provide: getRepositoryToken(UserEntity),
+          useValue: usersRepository,
         },
         {
           provide: TenantCountersService,
@@ -568,6 +578,238 @@ describe('PeopleService', () => {
 
       expect(person.userId).toBeNull();
       expect(person.status).toBe(PeopleStatus.INACTIVE);
+      expect(peopleRepository.save).toHaveBeenCalledWith(person);
+    });
+  });
+
+  describe('searchInvitableUsersForStaff', () => {
+    it('excludes users already linked to staff and super admins', async () => {
+      const peopleQb = buildQueryBuilder();
+      peopleQb.getMany.mockResolvedValue([
+        { userId: 'user-linked-1' },
+        { userId: 'user-linked-2' },
+      ]);
+      peopleRepository.createQueryBuilder!.mockReturnValue(peopleQb);
+
+      const usersQb = {
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getCount: jest.fn().mockResolvedValue(2),
+        getMany: jest.fn().mockResolvedValue([
+          { id: 'user-1', email: 'user1@test.com', fullName: 'User One' },
+          { id: 'user-2', email: 'user2@test.com', fullName: null },
+        ]),
+      };
+      usersRepository.createQueryBuilder!.mockReturnValue(usersQb);
+
+      jest.spyOn(pagination, 'calculateSkip').mockReturnValue(0);
+
+      const result = await service.searchInvitableUsersForStaff({
+        search: 'user',
+        page: 1,
+        limit: 10,
+      });
+
+      expect(usersQb.where).toHaveBeenCalledWith(
+        'user.isSuperAdmin = :isSuperAdmin',
+        { isSuperAdmin: false },
+      );
+      expect(usersQb.andWhere).toHaveBeenCalledWith(
+        'user.id NOT IN (:...linkedUserIds)',
+        { linkedUserIds: ['user-linked-1', 'user-linked-2'] },
+      );
+      expect(usersQb.andWhere).toHaveBeenCalledWith(
+        '(user.email ILIKE :search OR user.fullName ILIKE :search)',
+        { search: '%user%' },
+      );
+      expect(result.items).toHaveLength(2);
+      expect(result.total).toBe(2);
+    });
+
+    it('returns all active non-super-admin users when no staff links exist', async () => {
+      const peopleQb = buildQueryBuilder();
+      peopleQb.getMany.mockResolvedValue([]);
+      peopleRepository.createQueryBuilder!.mockReturnValue(peopleQb);
+
+      const usersQb = {
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getCount: jest.fn().mockResolvedValue(1),
+        getMany: jest
+          .fn()
+          .mockResolvedValue([
+            { id: 'user-3', email: 'user3@test.com', fullName: 'User Three' },
+          ]),
+      };
+      usersRepository.createQueryBuilder!.mockReturnValue(usersQb);
+
+      jest.spyOn(pagination, 'calculateSkip').mockReturnValue(0);
+
+      const result = await service.searchInvitableUsersForStaff({});
+
+      // Should not call andWhere with NOT IN when no linked users
+      expect(usersQb.andWhere).not.toHaveBeenCalledWith(
+        expect.stringContaining('NOT IN'),
+        expect.anything(),
+      );
+      expect(result.items).toHaveLength(1);
+    });
+  });
+
+  describe('linkUser', () => {
+    it('throws BadRequestException for non-STAFF type', async () => {
+      const person = {
+        id: 'person-1',
+        tenantId: 'tenant-1',
+        type: PeopleType.CUSTOMER,
+      } as PeopleEntity;
+
+      peopleRepository.findOne!.mockResolvedValueOnce(person);
+
+      await expect(
+        service.linkUser('tenant-1', 'person-1', { userId: 'user-1' }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('throws NotFoundException for non-existent user', async () => {
+      const person = {
+        id: 'person-1',
+        tenantId: 'tenant-1',
+        type: PeopleType.STAFF,
+      } as PeopleEntity;
+
+      peopleRepository.findOne!.mockResolvedValueOnce(person);
+      usersRepository.findOne!.mockResolvedValueOnce(null);
+
+      await expect(
+        service.linkUser('tenant-1', 'person-1', { userId: 'user-missing' }),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('throws NotFoundException for super admin user', async () => {
+      const person = {
+        id: 'person-1',
+        tenantId: 'tenant-1',
+        type: PeopleType.STAFF,
+      } as PeopleEntity;
+
+      peopleRepository.findOne!.mockResolvedValueOnce(person);
+      usersRepository.findOne!.mockResolvedValueOnce({
+        id: 'super-admin',
+        isSuperAdmin: true,
+      });
+
+      await expect(
+        service.linkUser('tenant-1', 'person-1', { userId: 'super-admin' }),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('throws ConflictException when user already linked to another staff', async () => {
+      const person = {
+        id: 'person-1',
+        tenantId: 'tenant-1',
+        type: PeopleType.STAFF,
+      } as PeopleEntity;
+
+      peopleRepository.findOne!.mockResolvedValueOnce(person);
+      usersRepository.findOne!.mockResolvedValueOnce({
+        id: 'user-1',
+        isSuperAdmin: false,
+      });
+      peopleRepository.findOne!.mockResolvedValueOnce({
+        id: 'person-other',
+        userId: 'user-1',
+        type: PeopleType.STAFF,
+      });
+
+      await expect(
+        service.linkUser('tenant-1', 'person-1', { userId: 'user-1' }),
+      ).rejects.toThrow(ConflictException);
+    });
+
+    it('successfully links user to staff record', async () => {
+      const person = {
+        id: 'person-1',
+        tenantId: 'tenant-1',
+        type: PeopleType.STAFF,
+        userId: null,
+      } as PeopleEntity;
+
+      peopleRepository.findOne!.mockResolvedValueOnce(person);
+      usersRepository.findOne!.mockResolvedValueOnce({
+        id: 'user-1',
+        isSuperAdmin: false,
+      });
+      peopleRepository.findOne!.mockResolvedValueOnce(null); // No existing link
+      peopleRepository.save!.mockResolvedValue({ ...person, userId: 'user-1' });
+
+      await service.linkUser('tenant-1', 'person-1', {
+        userId: 'user-1',
+      });
+
+      expect(person.userId).toBe('user-1');
+      expect(peopleRepository.save).toHaveBeenCalledWith(person);
+    });
+
+    it('allows re-linking the same user to the same staff', async () => {
+      const person = {
+        id: 'person-1',
+        tenantId: 'tenant-1',
+        type: PeopleType.STAFF,
+        userId: 'user-1',
+      } as PeopleEntity;
+
+      peopleRepository.findOne!.mockResolvedValueOnce(person);
+      usersRepository.findOne!.mockResolvedValueOnce({
+        id: 'user-1',
+        isSuperAdmin: false,
+      });
+      peopleRepository.findOne!.mockResolvedValueOnce(person); // Same person
+      peopleRepository.save!.mockResolvedValue(person);
+
+      await expect(
+        service.linkUser('tenant-1', 'person-1', { userId: 'user-1' }),
+      ).resolves.not.toThrow();
+    });
+  });
+
+  describe('unlinkUser', () => {
+    it('throws BadRequestException for non-STAFF type', async () => {
+      const person = {
+        id: 'person-1',
+        tenantId: 'tenant-1',
+        type: PeopleType.SUPPLIER,
+      } as PeopleEntity;
+
+      peopleRepository.findOne!.mockResolvedValueOnce(person);
+
+      await expect(service.unlinkUser('tenant-1', 'person-1')).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('successfully unlinks user from staff record', async () => {
+      const person = {
+        id: 'person-1',
+        tenantId: 'tenant-1',
+        type: PeopleType.STAFF,
+        userId: 'user-1',
+      } as PeopleEntity;
+
+      peopleRepository.findOne!.mockResolvedValueOnce(person);
+      peopleRepository.save!.mockResolvedValue({ ...person, userId: null });
+
+      await service.unlinkUser('tenant-1', 'person-1');
+
+      expect(person.userId).toBeNull();
       expect(peopleRepository.save).toHaveBeenCalledWith(person);
     });
   });

@@ -204,6 +204,14 @@ export const PEOPLE_ERRORS = {
     code: 'PEOPLE_NOT_FOUND',
     message: 'Person not found',
   },
+  NOT_STAFF_RECORD: {
+    code: 'PEOPLE_NOT_STAFF_RECORD',
+    message: 'Person must be type STAFF to link/unlink user',
+  },
+  USER_ALREADY_LINKED: {
+    code: 'PEOPLE_USER_ALREADY_LINKED',
+    message: 'User is already linked to a staff record',
+  },
 } as const;
 
 // ============================================================================

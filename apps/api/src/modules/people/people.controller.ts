@@ -24,6 +24,8 @@ import { UpdatePeopleDto } from './dto/update-people.dto';
 import { PeopleQueryDto } from './dto/people-query.dto';
 import { InvitablePeopleQueryDto } from './dto/invitable-people-query.dto';
 import { InvitePeopleDto } from './dto/invite-people.dto';
+import { InvitableUsersQueryDto } from './dto/invitable-users-query.dto';
+import { LinkUserDto } from './dto/link-user.dto';
 
 @ApiTags('people')
 @ApiCookieAuth('access_token')
@@ -53,6 +55,12 @@ export class PeopleController {
     @Query() query: InvitablePeopleQueryDto,
   ) {
     return this.peopleService.searchInvitablePeople(tenantId, query);
+  }
+
+  @Get('staff/invitable-users')
+  @RequirePermissions('people.update')
+  async getInvitableUsersForStaff(@Query() query: InvitableUsersQueryDto) {
+    return this.peopleService.searchInvitableUsersForStaff(query);
   }
 
   @Get(':id')
@@ -87,6 +95,22 @@ export class PeopleController {
     @Body() dto: UpdatePeopleDto,
   ) {
     return this.peopleService.update(tenantId, id, dto);
+  }
+
+  @Put(':id/link-user')
+  @RequirePermissions('people.update')
+  async linkUser(
+    @CurrentTenant() tenantId: string,
+    @Param('id') id: string,
+    @Body() dto: LinkUserDto,
+  ) {
+    return this.peopleService.linkUser(tenantId, id, dto);
+  }
+
+  @Put(':id/unlink-user')
+  @RequirePermissions('people.update')
+  async unlinkUser(@CurrentTenant() tenantId: string, @Param('id') id: string) {
+    return this.peopleService.unlinkUser(tenantId, id);
   }
 
   @Delete(':id')
