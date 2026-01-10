@@ -7,7 +7,12 @@ import {
 } from '@nestjs/common';
 import { Repository, ObjectLiteral } from 'typeorm';
 import { PeopleService } from './people.service';
-import { PeopleEntity, UserEntity } from '../../database/entities';
+import {
+  PeopleEntity,
+  UserEntity,
+  TenantUserEntity,
+  RoleEntity,
+} from '../../database/entities';
 import { TenantCountersService } from '../tenant-counters/tenant-counters.service';
 import { PEOPLE_ERRORS, PeopleStatus, PeopleType } from '@gym-monorepo/shared';
 import { PeopleQueryDto } from './dto/people-query.dto';
@@ -35,6 +40,8 @@ describe('PeopleService', () => {
   let service: PeopleService;
   let peopleRepository: MockRepository<PeopleEntity>;
   let usersRepository: MockRepository<UserEntity>;
+  let tenantUserRepository: MockRepository<TenantUserEntity>;
+  let roleRepository: MockRepository<RoleEntity>;
   let tenantCountersService: { getNextPeopleCode: jest.Mock };
 
   beforeEach(async () => {
@@ -47,6 +54,15 @@ describe('PeopleService', () => {
     usersRepository = {
       findOne: jest.fn(),
       createQueryBuilder: jest.fn(),
+      create: jest.fn(),
+      save: jest.fn(),
+    };
+    tenantUserRepository = {
+      create: jest.fn(),
+      save: jest.fn(),
+    };
+    roleRepository = {
+      findOne: jest.fn(),
     };
     tenantCountersService = {
       getNextPeopleCode: jest.fn(),
@@ -62,6 +78,14 @@ describe('PeopleService', () => {
         {
           provide: getRepositoryToken(UserEntity),
           useValue: usersRepository,
+        },
+        {
+          provide: getRepositoryToken(TenantUserEntity),
+          useValue: tenantUserRepository,
+        },
+        {
+          provide: getRepositoryToken(RoleEntity),
+          useValue: roleRepository,
         },
         {
           provide: TenantCountersService,
@@ -811,6 +835,150 @@ describe('PeopleService', () => {
 
       expect(person.userId).toBeNull();
       expect(peopleRepository.save).toHaveBeenCalledWith(person);
+    });
+  });
+
+  describe('createUserForStaff', () => {
+    it('throws BadRequestException for non-STAFF type', async () => {
+      const person = {
+        id: 'person-1',
+        tenantId: 'tenant-1',
+        type: PeopleType.CUSTOMER,
+      } as PeopleEntity;
+
+      peopleRepository.findOne!.mockResolvedValueOnce(person);
+
+      await expect(
+        service.createUserForStaff('tenant-1', 'person-1', {
+          email: 'test@example.com',
+          tempPassword: 'password123',
+          roleId: 'role-1',
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('throws ConflictException when email already exists', async () => {
+      const person = {
+        id: 'person-1',
+        tenantId: 'tenant-1',
+        type: PeopleType.STAFF,
+      } as PeopleEntity;
+
+      peopleRepository.findOne!.mockResolvedValueOnce(person);
+      usersRepository.findOne!.mockResolvedValueOnce({ id: 'existing-user' });
+
+      await expect(
+        service.createUserForStaff('tenant-1', 'person-1', {
+          email: 'existing@example.com',
+          tempPassword: 'password123',
+          roleId: 'role-1',
+        }),
+      ).rejects.toThrow(ConflictException);
+    });
+
+    it('throws NotFoundException when role not found', async () => {
+      const person = {
+        id: 'person-1',
+        tenantId: 'tenant-1',
+        type: PeopleType.STAFF,
+      } as PeopleEntity;
+
+      peopleRepository.findOne!.mockResolvedValueOnce(person);
+      usersRepository.findOne!.mockResolvedValueOnce(null);
+      roleRepository.findOne!.mockResolvedValueOnce(null);
+
+      await expect(
+        service.createUserForStaff('tenant-1', 'person-1', {
+          email: 'new@example.com',
+          tempPassword: 'password123',
+          roleId: 'nonexistent-role',
+        }),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('creates user and attaches to tenant when attachToTenant is true', async () => {
+      const person = {
+        id: 'person-1',
+        tenantId: 'tenant-1',
+        type: PeopleType.STAFF,
+        userId: null,
+      } as PeopleEntity;
+      const createdUser = { id: 'new-user-id' };
+      const membership = { tenantId: 'tenant-1', userId: 'new-user-id' };
+
+      peopleRepository.findOne!.mockResolvedValueOnce(person);
+      usersRepository.findOne!.mockResolvedValueOnce(null);
+      roleRepository.findOne!.mockResolvedValueOnce({
+        id: 'role-1',
+        tenantId: 'tenant-1',
+      });
+      usersRepository.create = jest.fn().mockReturnValue(createdUser);
+      usersRepository.save = jest.fn().mockResolvedValue(createdUser);
+      tenantUserRepository.create!.mockReturnValue(membership);
+      tenantUserRepository.save!.mockResolvedValue(membership);
+      peopleRepository.save!.mockResolvedValue({
+        ...person,
+        userId: 'new-user-id',
+      });
+
+      await service.createUserForStaff('tenant-1', 'person-1', {
+        email: 'new@example.com',
+        fullName: 'New User',
+        tempPassword: 'password123',
+        attachToTenant: true,
+        roleId: 'role-1',
+      });
+
+      expect(usersRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          email: 'new@example.com',
+          fullName: 'New User',
+          status: 'ACTIVE',
+        }),
+      );
+      expect(tenantUserRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          tenantId: 'tenant-1',
+          userId: 'new-user-id',
+          roleId: 'role-1',
+        }),
+      );
+      expect(tenantUserRepository.save).toHaveBeenCalled();
+      expect(peopleRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({ userId: 'new-user-id' }),
+      );
+    });
+
+    it('creates user without tenant attachment when attachToTenant is false', async () => {
+      const person = {
+        id: 'person-1',
+        tenantId: 'tenant-1',
+        type: PeopleType.STAFF,
+        userId: null,
+      } as PeopleEntity;
+      const createdUser = { id: 'new-user-id' };
+
+      peopleRepository.findOne!.mockResolvedValueOnce(person);
+      usersRepository.findOne!.mockResolvedValueOnce(null);
+      usersRepository.create = jest.fn().mockReturnValue(createdUser);
+      usersRepository.save = jest.fn().mockResolvedValue(createdUser);
+      peopleRepository.save!.mockResolvedValue({
+        ...person,
+        userId: 'new-user-id',
+      });
+
+      await service.createUserForStaff('tenant-1', 'person-1', {
+        email: 'new@example.com',
+        tempPassword: 'password123',
+        attachToTenant: false,
+      });
+
+      expect(usersRepository.create).toHaveBeenCalled();
+      expect(usersRepository.save).toHaveBeenCalled();
+      expect(tenantUserRepository.save).not.toHaveBeenCalled();
+      expect(peopleRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({ userId: 'new-user-id' }),
+      );
     });
   });
 });

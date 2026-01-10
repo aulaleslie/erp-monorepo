@@ -6,12 +6,18 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { PeopleEntity, UserEntity } from '../../database/entities';
+import {
+  PeopleEntity,
+  UserEntity,
+  TenantUserEntity,
+  RoleEntity,
+} from '../../database/entities';
 import {
   PEOPLE_ERRORS,
   PeopleStatus,
   PeopleType,
   USER_ERRORS,
+  ROLE_ERRORS,
 } from '@gym-monorepo/shared';
 import {
   PaginatedResponse,
@@ -27,6 +33,8 @@ import { InvitablePeopleQueryDto } from './dto/invitable-people-query.dto';
 import { InvitePeopleDto } from './dto/invite-people.dto';
 import { InvitableUsersQueryDto } from './dto/invitable-users-query.dto';
 import { LinkUserDto } from './dto/link-user.dto';
+import { CreateUserForStaffDto } from './dto/create-user-for-staff.dto';
+import { hashPassword } from '../../common/utils/password.util';
 
 @Injectable()
 export class PeopleService {
@@ -35,6 +43,10 @@ export class PeopleService {
     private readonly peopleRepository: Repository<PeopleEntity>,
     @InjectRepository(UserEntity)
     private readonly usersRepository: Repository<UserEntity>,
+    @InjectRepository(TenantUserEntity)
+    private readonly tenantUserRepository: Repository<TenantUserEntity>,
+    @InjectRepository(RoleEntity)
+    private readonly roleRepository: Repository<RoleEntity>,
     private readonly tenantCountersService: TenantCountersService,
   ) {}
 
@@ -486,6 +498,65 @@ export class PeopleService {
     }
 
     person.userId = null;
+    return this.peopleRepository.save(person);
+  }
+
+  async createUserForStaff(
+    tenantId: string,
+    personId: string,
+    dto: CreateUserForStaffDto,
+  ): Promise<PeopleEntity> {
+    const person = await this.findOne(tenantId, personId);
+
+    // Validate person is type STAFF
+    if (person.type !== PeopleType.STAFF) {
+      throw new BadRequestException(PEOPLE_ERRORS.NOT_STAFF_RECORD.message);
+    }
+
+    // Check if email already exists
+    const existingUser = await this.usersRepository.findOne({
+      where: { email: dto.email },
+    });
+
+    if (existingUser) {
+      throw new ConflictException(USER_ERRORS.EMAIL_EXISTS.message);
+    }
+
+    const attachToTenant = dto.attachToTenant !== false;
+
+    // Validate role if attaching to tenant
+    let role: RoleEntity | null = null;
+    if (attachToTenant && dto.roleId) {
+      role = await this.roleRepository.findOne({
+        where: { id: dto.roleId, tenantId },
+      });
+      if (!role) {
+        throw new NotFoundException(ROLE_ERRORS.NOT_FOUND_IN_TENANT.message);
+      }
+    }
+
+    // Create new user
+    const hashedPassword = await hashPassword(dto.tempPassword);
+    const user = this.usersRepository.create({
+      email: dto.email,
+      fullName: dto.fullName,
+      passwordHash: hashedPassword,
+      status: 'ACTIVE',
+    });
+    await this.usersRepository.save(user);
+
+    // Attach to tenant if requested
+    if (attachToTenant) {
+      const membership = this.tenantUserRepository.create({
+        tenantId,
+        userId: user.id,
+        roleId: dto.roleId || undefined,
+      });
+      await this.tenantUserRepository.save(membership);
+    }
+
+    // Link user to staff record
+    person.userId = user.id;
     return this.peopleRepository.save(person);
   }
 }

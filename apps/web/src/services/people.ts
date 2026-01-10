@@ -2,6 +2,12 @@ import { api } from '@/lib/api';
 import { PaginatedResponse } from '@/services/types';
 import { PeopleStatus, PeopleType } from '@gym-monorepo/shared';
 
+export interface PersonLinkedUser {
+  id: string;
+  email: string;
+  fullName?: string;
+}
+
 export interface PersonListItem {
   id: string;
   code: string;
@@ -11,6 +17,9 @@ export interface PersonListItem {
   phone: string | null;
   status: PeopleStatus;
   tags: string[];
+  departmentId: string | null;
+  userId: string | null;
+  user: PersonLinkedUser | null;
 }
 
 export interface InvitablePerson {
@@ -20,6 +29,12 @@ export interface InvitablePerson {
   email: string | null;
   phone: string | null;
   tags: string[];
+}
+
+export interface InvitableUser {
+  id: string;
+  email: string;
+  fullName?: string;
 }
 
 interface PeopleListParams {
@@ -37,12 +52,19 @@ interface InvitableParams {
   type?: PeopleType | '';
 }
 
+interface InvitableUsersParams {
+  page: number;
+  limit: number;
+  search?: string;
+}
+
 export interface CreatePersonData {
   fullName: string;
   type: PeopleType;
   email?: string | null;
   phone?: string | null;
   tags?: string[];
+  departmentId?: string | null;
 }
 
 export interface UpdatePersonData {
@@ -51,6 +73,15 @@ export interface UpdatePersonData {
   phone?: string | null;
   status?: PeopleStatus;
   tags?: string[];
+  departmentId?: string | null;
+}
+
+export interface CreateUserForStaffData {
+  email: string;
+  fullName?: string;
+  tempPassword: string;
+  attachToTenant?: boolean;
+  roleId?: string;
 }
 
 export const peopleService = {
@@ -131,6 +162,52 @@ export const peopleService = {
       params: query,
     });
 
+    return response.data;
+  },
+
+  async getInvitableUsersForStaff(params: InvitableUsersParams) {
+    const query: Record<string, unknown> = {
+      page: params.page,
+      limit: params.limit,
+    };
+
+    if (params.search) {
+      query.search = params.search;
+    }
+
+    const response = await api.get<{
+      items: InvitableUser[];
+      total: number;
+      page: number;
+      limit: number;
+      hasMore: boolean;
+    }>('/people/staff/invitable-users', {
+      params: query,
+    });
+
+    return response.data;
+  },
+
+  async linkUser(personId: string, userId: string) {
+    const response = await api.put<PersonListItem>(
+      `/people/${personId}/link-user`,
+      { userId }
+    );
+    return response.data;
+  },
+
+  async unlinkUser(personId: string) {
+    const response = await api.put<PersonListItem>(
+      `/people/${personId}/unlink-user`
+    );
+    return response.data;
+  },
+
+  async createUserForStaff(personId: string, data: CreateUserForStaffData) {
+    const response = await api.post<PersonListItem>(
+      `/people/${personId}/create-user`,
+      data
+    );
     return response.data;
   },
 };

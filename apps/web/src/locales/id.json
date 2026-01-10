@@ -223,6 +223,88 @@
           "description": "Kami tidak dapat mengundang orang tersebut."
         }
       }
+    },
+    "staff": {
+      "section": "Pengaturan Staf",
+      "noDepartment": "Tanpa departemen",
+      "labels": {
+        "department": "Departemen",
+        "userLink": "Akun Pengguna Terhubung"
+      },
+      "placeholders": {
+        "department": "Pilih departemen",
+        "searchUser": "Cari pengguna berdasarkan email..."
+      },
+      "userCard": {
+        "linkedAs": "Terhubung ke",
+        "notLinked": "Tidak ada akun pengguna yang terhubung ke staf ini.",
+        "linkButton": "Hubungkan",
+        "unlinkButton": "Putuskan",
+        "createButton": "Buat Pengguna Baru",
+        "toast": {
+          "linkSuccess": {
+            "title": "Pengguna terhubung",
+            "description": "Pengguna telah dihubungkan ke staf ini."
+          },
+          "linkError": {
+            "title": "Gagal menghubungkan",
+            "description": "Tidak dapat menghubungkan pengguna. Silakan coba lagi."
+          },
+          "unlinkSuccess": {
+            "title": "Pengguna diputuskan",
+            "description": "Pengguna telah diputuskan dari staf ini."
+          },
+          "unlinkError": {
+            "title": "Gagal memutuskan",
+            "description": "Tidak dapat memutuskan pengguna. Silakan coba lagi."
+          }
+        }
+      },
+      "toast": {
+        "departmentsError": {
+          "title": "Gagal memuat departemen",
+          "description": "Tidak dapat mengambil daftar departemen."
+        }
+      }
+    },
+    "createUser": {
+      "dialog": {
+        "title": "Buat Pengguna untuk Staf",
+        "description": "Buat akun pengguna baru dan hubungkan ke staf ini."
+      },
+      "form": {
+        "labels": {
+          "email": "Email",
+          "fullName": "Nama Lengkap (opsional)",
+          "tempPassword": "Kata Sandi Sementara",
+          "role": "Peran",
+          "attachToTenant": "Tambahkan ke ruang kerja ini"
+        },
+        "placeholders": {
+          "role": "Pilih peran",
+          "searchRole": "Cari peran..."
+        },
+        "validation": {
+          "emailRequired": "Email wajib diisi",
+          "passwordRequired": "Kata sandi sementara wajib diisi",
+          "passwordMinLength": "Kata sandi harus minimal 6 karakter",
+          "roleRequired": "Peran wajib saat menambahkan ke ruang kerja"
+        },
+        "buttons": {
+          "cancel": "Batal",
+          "create": "Buat Pengguna"
+        }
+      },
+      "toast": {
+        "success": {
+          "title": "Pengguna dibuat",
+          "description": "Pengguna telah dibuat dan dihubungkan ke staf ini."
+        },
+        "error": {
+          "title": "Gagal membuat pengguna",
+          "description": "Terjadi kesalahan. Silakan coba lagi."
+        }
+      }
     }
   },
   "profile": {

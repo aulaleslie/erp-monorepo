@@ -223,6 +223,88 @@
           "description": "We could not invite that person."
         }
       }
+    },
+    "staff": {
+      "section": "Staff Settings",
+      "noDepartment": "No department",
+      "labels": {
+        "department": "Department",
+        "userLink": "Linked User Account"
+      },
+      "placeholders": {
+        "department": "Select department",
+        "searchUser": "Search user by email..."
+      },
+      "userCard": {
+        "linkedAs": "Linked to",
+        "notLinked": "No user account linked to this staff member.",
+        "linkButton": "Link",
+        "unlinkButton": "Unlink",
+        "createButton": "Create New User",
+        "toast": {
+          "linkSuccess": {
+            "title": "User linked",
+            "description": "User has been linked to this staff member."
+          },
+          "linkError": {
+            "title": "Link failed",
+            "description": "Could not link user. Please try again."
+          },
+          "unlinkSuccess": {
+            "title": "User unlinked",
+            "description": "User has been unlinked from this staff member."
+          },
+          "unlinkError": {
+            "title": "Unlink failed",
+            "description": "Could not unlink user. Please try again."
+          }
+        }
+      },
+      "toast": {
+        "departmentsError": {
+          "title": "Failed to load departments",
+          "description": "Could not fetch departments list."
+        }
+      }
+    },
+    "createUser": {
+      "dialog": {
+        "title": "Create User for Staff",
+        "description": "Create a new user account and link it to this staff member."
+      },
+      "form": {
+        "labels": {
+          "email": "Email",
+          "fullName": "Full Name (optional)",
+          "tempPassword": "Temporary Password",
+          "role": "Role",
+          "attachToTenant": "Add to this workspace"
+        },
+        "placeholders": {
+          "role": "Select a role",
+          "searchRole": "Search roles..."
+        },
+        "validation": {
+          "emailRequired": "Email is required",
+          "passwordRequired": "Temporary password is required",
+          "passwordMinLength": "Password must be at least 6 characters",
+          "roleRequired": "Role is required when adding to workspace"
+        },
+        "buttons": {
+          "cancel": "Cancel",
+          "create": "Create User"
+        }
+      },
+      "toast": {
+        "success": {
+          "title": "User created",
+          "description": "User has been created and linked to this staff member."
+        },
+        "error": {
+          "title": "Failed to create user",
+          "description": "Something went wrong. Please try again."
+        }
+      }
     }
   },
   "profile": {

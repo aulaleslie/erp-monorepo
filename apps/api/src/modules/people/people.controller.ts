@@ -26,6 +26,7 @@ import { InvitablePeopleQueryDto } from './dto/invitable-people-query.dto';
 import { InvitePeopleDto } from './dto/invite-people.dto';
 import { InvitableUsersQueryDto } from './dto/invitable-users-query.dto';
 import { LinkUserDto } from './dto/link-user.dto';
+import { CreateUserForStaffDto } from './dto/create-user-for-staff.dto';
 
 @ApiTags('people')
 @ApiCookieAuth('access_token')
@@ -118,5 +119,15 @@ export class PeopleController {
   @RequirePermissions('people.delete')
   async remove(@CurrentTenant() tenantId: string, @Param('id') id: string) {
     await this.peopleService.remove(tenantId, id);
+  }
+
+  @Post(':id/create-user')
+  @RequirePermissions('users.create', 'users.assignRole', 'people.update')
+  async createUserForStaff(
+    @CurrentTenant() tenantId: string,
+    @Param('id') id: string,
+    @Body() dto: CreateUserForStaffDto,
+  ) {
+    return this.peopleService.createUserForStaff(tenantId, id, dto);
   }
 }

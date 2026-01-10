@@ -23,7 +23,10 @@ import {
     peopleService,
     CreatePersonData,
     UpdatePersonData,
+    PersonLinkedUser,
 } from "@/services/people";
+import { departmentsService, DepartmentListItem } from "@/services/departments";
+import { StaffUserLinkCard } from "./StaffUserLinkCard";
 
 interface PersonFormData {
     fullName: string;
@@ -33,6 +36,7 @@ interface PersonFormData {
     tags: string;
     status: PeopleStatus;
     code?: string;
+    departmentId: string;
 }
 
 interface PersonFormProps {
@@ -46,9 +50,14 @@ interface PersonFormProps {
         tags: string[];
         status: PeopleStatus;
         code: string;
+        departmentId: string | null;
+        userId: string | null;
+        user: PersonLinkedUser | null;
     };
     onSuccess?: () => void;
 }
+
+const NONE_DEPARTMENT = "_NONE_";
 
 const isPersonFormField = (
     field: string,
@@ -60,6 +69,11 @@ export function PersonForm({ mode, initialData, onSuccess }: PersonFormProps) {
     const router = useRouter();
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
+    const [departments, setDepartments] = useState<DepartmentListItem[]>([]);
+    const [departmentsLoading, setDepartmentsLoading] = useState(false);
+    const [linkedUser, setLinkedUser] = useState<PersonLinkedUser | null>(
+        initialData?.user ?? null
+    );
 
     const [formData, setFormData] = useState<PersonFormData>({
         fullName: initialData?.fullName ?? "",
@@ -69,6 +83,7 @@ export function PersonForm({ mode, initialData, onSuccess }: PersonFormProps) {
         tags: initialData?.tags?.join(", ") ?? "",
         status: initialData?.status ?? PeopleStatus.ACTIVE,
         code: initialData?.code,
+        departmentId: initialData?.departmentId ?? "",
     });
 
     const {
@@ -82,6 +97,24 @@ export function PersonForm({ mode, initialData, onSuccess }: PersonFormProps) {
         email: [validators.email(t("form.validation.invalidEmail"))],
     });
 
+    // Load departments when type is STAFF
+    useEffect(() => {
+        if (formData.type === PeopleType.STAFF) {
+            setDepartmentsLoading(true);
+            departmentsService
+                .getActive()
+                .then(setDepartments)
+                .catch(() => {
+                    toast({
+                        title: t("staff.toast.departmentsError.title"),
+                        description: t("staff.toast.departmentsError.description"),
+                        variant: "destructive",
+                    });
+                })
+                .finally(() => setDepartmentsLoading(false));
+        }
+    }, [formData.type, t, toast]);
+
     useEffect(() => {
         if (initialData) {
             setFormData({
@@ -92,7 +125,9 @@ export function PersonForm({ mode, initialData, onSuccess }: PersonFormProps) {
                 tags: initialData.tags.join(", "),
                 status: initialData.status,
                 code: initialData.code,
+                departmentId: initialData.departmentId ?? "",
             });
+            setLinkedUser(initialData.user);
         }
     }, [initialData]);
 
@@ -103,6 +138,10 @@ export function PersonForm({ mode, initialData, onSuccess }: PersonFormProps) {
         const newData: PersonFormData = { ...formData, [field]: value };
         setFormData(newData);
         validateField(field, newData);
+    };
+
+    const handleUserLinked = (user: PersonLinkedUser | null) => {
+        setLinkedUser(user);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -128,6 +167,10 @@ export function PersonForm({ mode, initialData, onSuccess }: PersonFormProps) {
                     email: formData.email || null,
                     phone: formData.phone || null,
                     tags,
+                    departmentId:
+                        formData.type === PeopleType.STAFF && formData.departmentId
+                            ? formData.departmentId
+                            : null,
                 };
                 await peopleService.create(createData);
                 toast({
@@ -143,6 +186,10 @@ export function PersonForm({ mode, initialData, onSuccess }: PersonFormProps) {
                     phone: formData.phone || null,
                     status: formData.status,
                     tags,
+                    departmentId:
+                        formData.type === PeopleType.STAFF && formData.departmentId
+                            ? formData.departmentId
+                            : null,
                 };
                 await peopleService.update(initialData.id, updateData);
                 toast({
@@ -194,6 +241,8 @@ export function PersonForm({ mode, initialData, onSuccess }: PersonFormProps) {
             setLoading(false);
         }
     };
+
+    const isStaff = formData.type === PeopleType.STAFF;
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl border p-6 rounded-lg bg-card text-card-foreground shadow-sm">
@@ -294,6 +343,47 @@ export function PersonForm({ mode, initialData, onSuccess }: PersonFormProps) {
                     Separated by comma, e.g. &quot;vip, wholesale&quot;
                 </p>
             </div>
+
+            {/* Staff-only section */}
+            {isStaff && (
+                <div className="border-t pt-6 mt-6 space-y-4">
+                    <h3 className="text-lg font-medium">{t("staff.section")}</h3>
+
+                    <div className="grid w-full items-center gap-1.5">
+                        <Label htmlFor="department">{t("staff.labels.department")}</Label>
+                        <Select
+                            value={formData.departmentId || NONE_DEPARTMENT}
+                            onValueChange={(value) =>
+                                handleChange("departmentId", value === NONE_DEPARTMENT ? "" : value)
+                            }
+                            disabled={departmentsLoading}
+                        >
+                            <SelectTrigger id="department">
+                                <SelectValue placeholder={t("staff.placeholders.department")} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value={NONE_DEPARTMENT}>
+                                    {t("staff.noDepartment")}
+                                </SelectItem>
+                                {departments.map((dept) => (
+                                    <SelectItem key={dept.id} value={dept.id}>
+                                        {dept.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    {/* User link card - only in edit mode */}
+                    {mode === "edit" && initialData?.id && (
+                        <StaffUserLinkCard
+                            personId={initialData.id}
+                            linkedUser={linkedUser}
+                            onUserChange={handleUserLinked}
+                        />
+                    )}
+                </div>
+            )}
 
             <div className="flex justify-end gap-4 pt-4">
                 <Button
