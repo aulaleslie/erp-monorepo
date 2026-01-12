@@ -123,4 +123,60 @@ describe('TenantCountersService', () => {
     expect(insertBuilder.execute).toHaveBeenCalled();
     expect(code).toBe('STF-000001');
   });
+
+  it('should generate the next category code', async () => {
+    const tenantId = 'tenant-3';
+    const counter = {
+      id: 'counter-3',
+      tenantId,
+      key: 'categories',
+      value: 0,
+    } as TenantCounterEntity;
+    const selectBuilder = buildSelectBuilder([counter]);
+
+    repository.createQueryBuilder.mockReturnValue(selectBuilder);
+    repository.save.mockResolvedValue({ ...counter, value: 1 });
+
+    dataSource.transaction.mockImplementation((cb: TransactionCallback) =>
+      cb({
+        getRepository: () =>
+          repository as unknown as Repository<TenantCounterEntity>,
+      }),
+    );
+
+    const code = await service.getNextCategoryCode(tenantId);
+
+    expect(code).toBe('CAT-000001');
+    expect(repository.save).toHaveBeenCalledWith(
+      expect.objectContaining({ value: 1 }),
+    );
+  });
+
+  it('should generate the next item code', async () => {
+    const tenantId = 'tenant-4';
+    const counter = {
+      id: 'counter-4',
+      tenantId,
+      key: 'items',
+      value: 12,
+    } as TenantCounterEntity;
+    const selectBuilder = buildSelectBuilder([counter]);
+
+    repository.createQueryBuilder.mockReturnValue(selectBuilder);
+    repository.save.mockResolvedValue({ ...counter, value: 13 });
+
+    dataSource.transaction.mockImplementation((cb: TransactionCallback) =>
+      cb({
+        getRepository: () =>
+          repository as unknown as Repository<TenantCounterEntity>,
+      }),
+    );
+
+    const code = await service.getNextItemCode(tenantId);
+
+    expect(code).toBe('SKU-000013');
+    expect(repository.save).toHaveBeenCalledWith(
+      expect.objectContaining({ value: 13 }),
+    );
+  });
 });
