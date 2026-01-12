@@ -27,6 +27,11 @@
 - Walk-in customer default per tenant.
 - Staff user linking and create-user flow.
 
+## Cycle 4 - Planned (Catalog)
+- Catalog items (product/service) with SKU generation and membership/PT session support.
+- Categories with 2-level tree and optional item assignment.
+- Item media via MinIO and CSV/XLSX import/export.
+
 ## Implemented Addenda (post-spec)
 - Audit logs: audit_logs table + subscriber, super-admin list API, audit logs UI with filters and detail dialog.
 - Theme system: tenant_themes table + theme presets, tenant theme settings API, ThemeProvider + /settings/theme UI.

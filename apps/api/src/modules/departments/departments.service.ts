@@ -60,6 +60,7 @@ export class DepartmentsService {
   async findOne(tenantId: string, id: string): Promise<DepartmentEntity> {
     const department = await this.departmentRepository.findOne({
       where: { id, tenantId },
+      relations: ['people', 'people.user'],
     });
 
     if (!department) {

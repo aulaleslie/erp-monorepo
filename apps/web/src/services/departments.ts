@@ -7,6 +7,7 @@ export interface DepartmentListItem {
   code: string;
   name: string;
   status: DepartmentStatus;
+  people?: any[]; // Using any[] for now to avoid circular dependency or extensive importing, ideally should be PeopleListItem[]
 }
 
 interface DepartmentListParams {

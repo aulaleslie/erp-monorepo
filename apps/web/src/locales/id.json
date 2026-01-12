@@ -1105,7 +1105,7 @@
     "list": {
       "filters": {
         "search": "Cari",
-        "searchPlaceholder": "Cari berdasarkan kode atau nama",
+        "searchPlaceholder": "Cari departemen...",
         "status": "Status"
       },
       "table": {
@@ -1113,13 +1113,26 @@
           "code": "Kode",
           "name": "Nama",
           "status": "Status",
-          "actions": "Tindakan"
+          "actions": "Aksi"
         },
-        "empty": "Tidak ada departemen ditemukan"
+        "empty": "Tidak ada departemen ditemukan."
+      }
+    },
+    "details": {
+      "info": "Informasi Departemen",
+      "people": {
+        "title": "Anggota Staf",
+        "empty": "Tidak ada anggota staf di departemen ini.",
+        "code": "Kode",
+        "name": "Nama",
+        "email": "Email",
+        "phone": "Telepon",
+        "status": "Status"
       }
     },
     "buttons": {
-      "new": "Departemen Baru"
+      "new": "Departemen Baru",
+      "edit": "Ubah"
     },
     "toast": {
       "fetchError": {

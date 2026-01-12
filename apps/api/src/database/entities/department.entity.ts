@@ -4,12 +4,13 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
 import { DepartmentStatus } from '@gym-monorepo/shared';
 import { BaseAuditEntity } from '../../common/entities/base-audit.entity';
-import { TenantEntity } from '../../database/entities';
+import { TenantEntity, PeopleEntity } from '../../database/entities';
 
 @Entity('departments')
 @Unique('UQ_departments_tenant_code', ['tenantId', 'code'])
@@ -40,4 +41,7 @@ export class DepartmentEntity extends BaseAuditEntity {
   @ManyToOne(() => TenantEntity)
   @JoinColumn({ name: 'tenantId' })
   tenant: TenantEntity;
+
+  @OneToMany(() => PeopleEntity, (people) => people.department)
+  people: PeopleEntity[];
 }

@@ -3,7 +3,9 @@
  */
 
 export { AuditLogEntity } from './audit-log.entity';
+export { CategoryEntity } from './category.entity';
 export { DepartmentEntity } from './department.entity';
+export { ItemEntity } from './item.entity';
 export { PermissionEntity } from './permission.entity';
 export { PeopleEntity } from './people.entity';
 export { RolePermissionEntity } from './role-permission.entity';

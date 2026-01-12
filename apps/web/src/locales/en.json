@@ -1105,7 +1105,7 @@
     "list": {
       "filters": {
         "search": "Search",
-        "searchPlaceholder": "Search by code or name",
+        "searchPlaceholder": "Search departments...",
         "status": "Status"
       },
       "table": {
@@ -1115,11 +1115,24 @@
           "status": "Status",
           "actions": "Actions"
         },
-        "empty": "No departments found"
+        "empty": "No departments found."
+      }
+    },
+    "details": {
+      "info": "Department Information",
+      "people": {
+        "title": "Staff Members",
+        "empty": "No staff members in this department.",
+        "code": "Code",
+        "name": "Name",
+        "email": "Email",
+        "phone": "Phone",
+        "status": "Status"
       }
     },
     "buttons": {
-      "new": "New Department"
+      "new": "New Department",
+      "edit": "Edit"
     },
     "toast": {
       "fetchError": {

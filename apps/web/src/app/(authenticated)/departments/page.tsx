@@ -120,7 +120,8 @@ export default function DepartmentsPage() {
                 className: "w-[150px]",
                 cell: (item) => (
                     <ActionButtons
-                        editUrl={`/departments/${item.id}`}
+                        viewUrl={`/departments/${item.id}`}
+                        editUrl={`/departments/${item.id}/edit`}
                         onDelete={() => setDepartmentToDelete(item.id)}
                         permissions={{
                             edit: ["departments.update"],
