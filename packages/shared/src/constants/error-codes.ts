@@ -230,6 +230,29 @@ export const DEPARTMENT_ERRORS = {
 } as const;
 
 // ============================================================================
+// Item Errors
+// ============================================================================
+
+export const ITEM_ERRORS = {
+  NOT_FOUND: {
+    code: 'ITEM_NOT_FOUND',
+    message: 'Item not found',
+  },
+  DUPLICATE_BARCODE: {
+    code: 'ITEM_DUPLICATE_BARCODE',
+    message: 'Barcode is already in use for this tenant',
+  },
+  INVALID_SERVICE_FIELDS: {
+    code: 'ITEM_INVALID_SERVICE_FIELDS',
+    message: 'Invalid service fields for this item type',
+  },
+  DUPLICATE_NAME: {
+    code: 'ITEM_DUPLICATE_NAME',
+    message: 'Item with this name, type, and category already exists',
+  },
+} as const;
+
+// ============================================================================
 // Theme Errors
 // ============================================================================
 
@@ -287,6 +310,7 @@ export const ERROR_CODES = {
   TAX: TAX_ERRORS,
   PEOPLE: PEOPLE_ERRORS,
   DEPARTMENT: DEPARTMENT_ERRORS,
+  ITEM: ITEM_ERRORS,
   THEME: THEME_ERRORS,
   VALIDATION: VALIDATION_ERRORS,
 } as const;
@@ -302,6 +326,7 @@ export type RoleErrorCode = typeof ROLE_ERRORS[keyof typeof ROLE_ERRORS];
 export type TaxErrorCode = typeof TAX_ERRORS[keyof typeof TAX_ERRORS];
 export type PeopleErrorCode = typeof PEOPLE_ERRORS[keyof typeof PEOPLE_ERRORS];
 export type DepartmentErrorCode = typeof DEPARTMENT_ERRORS[keyof typeof DEPARTMENT_ERRORS];
+export type ItemErrorCode = typeof ITEM_ERRORS[keyof typeof ITEM_ERRORS];
 export type ThemeErrorCode = typeof THEME_ERRORS[keyof typeof THEME_ERRORS];
 export type ValidationErrorCode = typeof VALIDATION_ERRORS[keyof typeof VALIDATION_ERRORS];
 
@@ -313,5 +338,6 @@ export type AnyErrorCode =
   | TaxErrorCode
   | PeopleErrorCode
   | DepartmentErrorCode
+  | ItemErrorCode
   | ThemeErrorCode 
   | ValidationErrorCode;
