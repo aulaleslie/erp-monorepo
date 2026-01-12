@@ -9,6 +9,7 @@ import { Not, Repository } from 'typeorm';
 import { ITEM_ERRORS } from '@gym-monorepo/shared';
 
 import { TenantCountersService } from '../../tenant-counters/tenant-counters.service';
+import { StorageService } from '../../storage/storage.service';
 import {
   ItemEntity,
   ItemStatus,
@@ -29,6 +30,7 @@ export class ItemsService {
     @InjectRepository(CategoryEntity)
     private readonly categoryRepository: Repository<CategoryEntity>,
     private readonly tenantCountersService: TenantCountersService,
+    private readonly storageService: StorageService,
   ) {}
 
   async create(createItemDto: CreateItemDto, tenantId: string) {
@@ -182,7 +184,49 @@ export class ItemsService {
     return this.itemRepository.save(item);
   }
 
-  private validateServiceFields(dto: CreateItemDto): void {
+  async uploadImage(
+    id: string,
+    tenantId: string,
+    file: { buffer: Buffer; mimetype: string; filename: string; size: number },
+  ): Promise<ItemEntity> {
+    const item = await this.findOne(id, tenantId);
+
+    // Validate file type and size (throws BadRequestException if invalid)
+    this.storageService.validateFile(file.mimetype, file.size);
+
+    // Generate object key with tenant prefix
+    const objectKey = this.storageService.generateObjectKey(
+      `items/${tenantId}`,
+      file.filename,
+    );
+
+    // Delete old image if exists
+    if (item.imageKey) {
+      try {
+        await this.storageService.deleteFile(item.imageKey);
+      } catch {
+        // Ignore deletion errors for old files
+      }
+    }
+
+    // Upload new file to MinIO
+    const imageUrl = await this.storageService.uploadFile(
+      file.buffer,
+      objectKey,
+      file.mimetype,
+      file.size,
+    );
+
+    // Update item with image metadata
+    item.imageKey = objectKey;
+    item.imageUrl = imageUrl;
+    item.imageMimeType = file.mimetype;
+    item.imageSize = file.size;
+
+    return this.itemRepository.save(item);
+  }
+
+  validateServiceFields(dto: CreateItemDto): void {
     if (dto.type === ItemType.PRODUCT) {
       // PRODUCT should not have service-related fields
       if (

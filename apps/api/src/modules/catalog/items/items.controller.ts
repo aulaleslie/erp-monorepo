@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -9,10 +10,12 @@ import {
   Post,
   Put,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiCookieAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { FastifyRequest } from 'fastify';
 import { PERMISSIONS } from '@gym-monorepo/shared';
 
 import { ActiveTenantGuard } from '../../tenants/guards/active-tenant.guard';
@@ -21,6 +24,7 @@ import { PermissionGuard } from '../../users/guards/permission.guard';
 import { RequirePermissions } from '../../../common/decorators/require-permissions.decorator';
 import { CurrentTenant } from '../../../common/decorators/current-tenant.decorator';
 import { ItemsService } from './items.service';
+import { ItemsImportService } from './items-import.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { ItemQueryDto } from './dto/item-query.dto';
@@ -35,7 +39,10 @@ import { ItemQueryDto } from './dto/item-query.dto';
   PermissionGuard,
 )
 export class ItemsController {
-  constructor(private readonly itemsService: ItemsService) {}
+  constructor(
+    private readonly itemsService: ItemsService,
+    private readonly itemsImportService: ItemsImportService,
+  ) {}
 
   @Get()
   @RequirePermissions(PERMISSIONS.ITEMS.READ)
@@ -58,6 +65,29 @@ export class ItemsController {
     return this.itemsService.create(dto, tenantId);
   }
 
+  @Post('import')
+  @ApiConsumes('multipart/form-data')
+  @RequirePermissions(PERMISSIONS.ITEMS.CREATE)
+  async importItems(
+    @CurrentTenant() tenantId: string,
+    @Req() request: FastifyRequest,
+  ) {
+    const data = await request.file();
+
+    if (!data) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    const buffer = await data.toBuffer();
+    const file = {
+      buffer,
+      mimetype: data.mimetype,
+      filename: data.filename,
+    };
+
+    return this.itemsImportService.importItems(tenantId, file);
+  }
+
   @Put(':id')
   @RequirePermissions(PERMISSIONS.ITEMS.UPDATE)
   async update(
@@ -73,5 +103,30 @@ export class ItemsController {
   @RequirePermissions(PERMISSIONS.ITEMS.DELETE)
   async remove(@CurrentTenant() tenantId: string, @Param('id') id: string) {
     await this.itemsService.remove(id, tenantId);
+  }
+
+  @Post(':id/image')
+  @ApiConsumes('multipart/form-data')
+  @RequirePermissions(PERMISSIONS.ITEMS.UPDATE)
+  async uploadImage(
+    @CurrentTenant() tenantId: string,
+    @Param('id') id: string,
+    @Req() request: FastifyRequest,
+  ) {
+    const data = await request.file();
+
+    if (!data) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    const buffer = await data.toBuffer();
+    const file = {
+      buffer,
+      mimetype: data.mimetype,
+      filename: data.filename,
+      size: buffer.length,
+    };
+
+    return this.itemsService.uploadImage(id, tenantId, file);
   }
 }

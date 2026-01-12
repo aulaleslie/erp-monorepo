@@ -253,6 +253,75 @@ export const ITEM_ERRORS = {
 } as const;
 
 // ============================================================================
+// Category Errors
+// ============================================================================
+
+export const CATEGORY_ERRORS = {
+  NOT_FOUND: {
+    code: 'CATEGORY_NOT_FOUND',
+    message: 'Category not found',
+  },
+  DUPLICATE_NAME: {
+    code: 'CATEGORY_DUPLICATE_NAME',
+    message: 'Category with this name already exists',
+  },
+  MAX_DEPTH: {
+    code: 'CATEGORY_MAX_DEPTH',
+    message: 'Category tree cannot exceed 2 levels',
+  },
+} as const;
+
+// ============================================================================
+// Import Errors
+// ============================================================================
+
+export const IMPORT_ERRORS = {
+  INVALID_FILE_FORMAT: {
+    code: 'IMPORT_INVALID_FILE_FORMAT',
+    message: 'Invalid file format. Expected CSV or XLSX.',
+  },
+  MISSING_REQUIRED_COLUMN: {
+    code: 'IMPORT_MISSING_REQUIRED_COLUMN',
+    message: 'Missing required column',
+  },
+  INVALID_ROW_DATA: {
+    code: 'IMPORT_INVALID_ROW_DATA',
+    message: 'Invalid data in row',
+  },
+  IMAGE_DOWNLOAD_FAILED: {
+    code: 'IMPORT_IMAGE_DOWNLOAD_FAILED',
+    message: 'Failed to download image from URL',
+  },
+  IMAGE_TOO_LARGE: {
+    code: 'IMPORT_IMAGE_TOO_LARGE',
+    message: 'Downloaded image exceeds 1MB limit',
+  },
+  IMAGE_INVALID_TYPE: {
+    code: 'IMPORT_IMAGE_INVALID_TYPE',
+    message: 'Downloaded image has invalid type',
+  },
+} as const;
+
+// ============================================================================
+// Storage Errors
+// ============================================================================
+
+export const STORAGE_ERRORS = {
+  NOT_CONFIGURED: {
+    code: 'STORAGE_NOT_CONFIGURED',
+    message: 'Storage service is not configured',
+  },
+  INVALID_FILE_TYPE: {
+    code: 'STORAGE_INVALID_FILE_TYPE',
+    message: 'Invalid file type',
+  },
+  FILE_TOO_LARGE: {
+    code: 'STORAGE_FILE_TOO_LARGE',
+    message: 'File size exceeds the maximum allowed size',
+  },
+} as const;
+
+// ============================================================================
 // Theme Errors
 // ============================================================================
 
@@ -311,6 +380,9 @@ export const ERROR_CODES = {
   PEOPLE: PEOPLE_ERRORS,
   DEPARTMENT: DEPARTMENT_ERRORS,
   ITEM: ITEM_ERRORS,
+  CATEGORY: CATEGORY_ERRORS,
+  IMPORT: IMPORT_ERRORS,
+  STORAGE: STORAGE_ERRORS,
   THEME: THEME_ERRORS,
   VALIDATION: VALIDATION_ERRORS,
 } as const;
@@ -327,6 +399,9 @@ export type TaxErrorCode = typeof TAX_ERRORS[keyof typeof TAX_ERRORS];
 export type PeopleErrorCode = typeof PEOPLE_ERRORS[keyof typeof PEOPLE_ERRORS];
 export type DepartmentErrorCode = typeof DEPARTMENT_ERRORS[keyof typeof DEPARTMENT_ERRORS];
 export type ItemErrorCode = typeof ITEM_ERRORS[keyof typeof ITEM_ERRORS];
+export type CategoryErrorCode = typeof CATEGORY_ERRORS[keyof typeof CATEGORY_ERRORS];
+export type ImportErrorCode = typeof IMPORT_ERRORS[keyof typeof IMPORT_ERRORS];
+export type StorageErrorCode = typeof STORAGE_ERRORS[keyof typeof STORAGE_ERRORS];
 export type ThemeErrorCode = typeof THEME_ERRORS[keyof typeof THEME_ERRORS];
 export type ValidationErrorCode = typeof VALIDATION_ERRORS[keyof typeof VALIDATION_ERRORS];
 
@@ -339,5 +414,8 @@ export type AnyErrorCode =
   | PeopleErrorCode
   | DepartmentErrorCode
   | ItemErrorCode
+  | CategoryErrorCode
+  | ImportErrorCode
+  | StorageErrorCode
   | ThemeErrorCode 
   | ValidationErrorCode;

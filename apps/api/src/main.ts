@@ -52,6 +52,14 @@ async function bootstrap() {
   const cookiePlugin = (await import('@fastify/cookie')).default;
   await app.register(cookiePlugin);
 
+  // Multipart file upload support
+  const multipartPlugin = (await import('@fastify/multipart')).default;
+  await app.register(multipartPlugin, {
+    limits: {
+      fileSize: 1 * 1024 * 1024, // 1MB
+    },
+  });
+
   // Swagger API Documentation
   const config = new DocumentBuilder()
     .setTitle('Gym ERP API')

@@ -16,6 +16,7 @@ import {
 } from '../../../database/entities/item.entity';
 import { CategoryEntity } from '../../../database/entities/category.entity';
 import { TenantCountersService } from '../../tenant-counters/tenant-counters.service';
+import { StorageService } from '../../storage/storage.service';
 import { ITEM_ERRORS } from '@gym-monorepo/shared';
 import { CreateItemDto } from './dto/create-item.dto';
 import * as pagination from '../../../common/dto/pagination.dto';
@@ -43,6 +44,12 @@ describe('ItemsService', () => {
   let itemRepo: MockRepository;
   let categoryRepo: MockRepository;
   let countersService: { getNextItemCode: jest.Mock };
+  let storageService: {
+    validateFile: jest.Mock;
+    generateObjectKey: jest.Mock;
+    uploadFile: jest.Mock;
+    deleteFile: jest.Mock;
+  };
 
   const tenantId = 'tenant-123';
 
@@ -52,6 +59,14 @@ describe('ItemsService', () => {
     countersService = {
       getNextItemCode: jest.fn().mockResolvedValue('SKU-000001'),
     };
+    storageService = {
+      validateFile: jest.fn(),
+      generateObjectKey: jest.fn().mockReturnValue('items/tenant-123/uuid.jpg'),
+      uploadFile: jest
+        .fn()
+        .mockResolvedValue('http://minio/bucket/items/tenant-123/uuid.jpg'),
+      deleteFile: jest.fn().mockResolvedValue(undefined),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -59,6 +74,7 @@ describe('ItemsService', () => {
         { provide: getRepositoryToken(ItemEntity), useValue: itemRepo },
         { provide: getRepositoryToken(CategoryEntity), useValue: categoryRepo },
         { provide: TenantCountersService, useValue: countersService },
+        { provide: StorageService, useValue: storageService },
       ],
     }).compile();
 
@@ -389,6 +405,105 @@ describe('ItemsService', () => {
       expect(itemRepo.save).toHaveBeenCalledWith(
         expect.objectContaining({ status: ItemStatus.INACTIVE }),
       );
+    });
+  });
+
+  describe('uploadImage', () => {
+    const mockFile = {
+      buffer: Buffer.from('test image'),
+      mimetype: 'image/jpeg',
+      filename: 'test.jpg',
+      size: 1000,
+    };
+
+    it('uploads image and updates item fields', async () => {
+      const existing = {
+        id: 'item-1',
+        tenantId,
+        code: 'SKU-000001',
+        name: 'Test Item',
+        type: ItemType.PRODUCT,
+        price: 100000,
+        status: ItemStatus.ACTIVE,
+        imageKey: null,
+        imageUrl: null,
+        imageMimeType: null,
+        imageSize: null,
+      } as ItemEntity;
+      itemRepo.findOne.mockResolvedValue(existing);
+
+      const result = await service.uploadImage('item-1', tenantId, mockFile);
+
+      expect(storageService.validateFile).toHaveBeenCalledWith(
+        'image/jpeg',
+        1000,
+      );
+      expect(storageService.generateObjectKey).toHaveBeenCalledWith(
+        `items/${tenantId}`,
+        'test.jpg',
+      );
+      expect(storageService.uploadFile).toHaveBeenCalled();
+      expect(itemRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          imageKey: 'items/tenant-123/uuid.jpg',
+          imageUrl: 'http://minio/bucket/items/tenant-123/uuid.jpg',
+          imageMimeType: 'image/jpeg',
+          imageSize: 1000,
+        }),
+      );
+      expect(result.imageKey).toBe('items/tenant-123/uuid.jpg');
+    });
+
+    it('deletes old image when replacing', async () => {
+      const existing = {
+        id: 'item-1',
+        tenantId,
+        code: 'SKU-000001',
+        name: 'Test Item',
+        type: ItemType.PRODUCT,
+        price: 100000,
+        status: ItemStatus.ACTIVE,
+        imageKey: 'items/tenant-123/old-image.jpg',
+        imageUrl: 'http://minio/bucket/items/tenant-123/old-image.jpg',
+        imageMimeType: 'image/jpeg',
+        imageSize: 500,
+      } as ItemEntity;
+      itemRepo.findOne.mockResolvedValue(existing);
+
+      await service.uploadImage('item-1', tenantId, mockFile);
+
+      expect(storageService.deleteFile).toHaveBeenCalledWith(
+        'items/tenant-123/old-image.jpg',
+      );
+    });
+
+    it('throws NotFoundException when item not found', async () => {
+      itemRepo.findOne.mockResolvedValue(null);
+
+      await expect(
+        service.uploadImage('missing-id', tenantId, mockFile),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('propagates validation errors from StorageService', async () => {
+      const existing = {
+        id: 'item-1',
+        tenantId,
+        code: 'SKU-000001',
+        name: 'Test Item',
+        type: ItemType.PRODUCT,
+        price: 100000,
+        status: ItemStatus.ACTIVE,
+        imageKey: null,
+      } as ItemEntity;
+      itemRepo.findOne.mockResolvedValue(existing);
+      storageService.validateFile.mockImplementation(() => {
+        throw new BadRequestException('File too large');
+      });
+
+      await expect(
+        service.uploadImage('item-1', tenantId, mockFile),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 });
