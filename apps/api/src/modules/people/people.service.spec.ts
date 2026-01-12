@@ -49,6 +49,7 @@ describe('PeopleService', () => {
       findOne: jest.fn(),
       create: jest.fn(),
       save: jest.fn(),
+      update: jest.fn(),
       createQueryBuilder: jest.fn(),
     };
     usersRepository = {
@@ -434,6 +435,7 @@ describe('PeopleService', () => {
 
       expect(peopleRepository.findOne).toHaveBeenNthCalledWith(1, {
         where: { id: 'person-1', tenantId: 'tenant-1' },
+        relations: { user: true },
       });
       expect(peopleRepository.findOne).toHaveBeenNthCalledWith(2, {
         where: { tenantId: 'tenant-1', email: 'new@email.com' },
@@ -774,6 +776,10 @@ describe('PeopleService', () => {
       });
       peopleRepository.findOne!.mockResolvedValueOnce(null); // No existing link
       peopleRepository.save!.mockResolvedValue({ ...person, userId: 'user-1' });
+      peopleRepository.findOne!.mockResolvedValueOnce({
+        ...person,
+        userId: 'user-1',
+      });
 
       await service.linkUser('tenant-1', 'person-1', {
         userId: 'user-1',
@@ -798,6 +804,7 @@ describe('PeopleService', () => {
       });
       peopleRepository.findOne!.mockResolvedValueOnce(person); // Same person
       peopleRepository.save!.mockResolvedValue(person);
+      peopleRepository.findOne!.mockResolvedValueOnce(person);
 
       await expect(
         service.linkUser('tenant-1', 'person-1', { userId: 'user-1' }),
@@ -828,13 +835,18 @@ describe('PeopleService', () => {
         userId: 'user-1',
       } as PeopleEntity;
 
-      peopleRepository.findOne!.mockResolvedValueOnce(person);
-      peopleRepository.save!.mockResolvedValue({ ...person, userId: null });
+      peopleRepository
+        .findOne!.mockResolvedValueOnce(person)
+        .mockResolvedValueOnce({ ...person, userId: null });
+      peopleRepository.update!.mockResolvedValue({} as any);
 
-      await service.unlinkUser('tenant-1', 'person-1');
+      const result = await service.unlinkUser('tenant-1', 'person-1');
 
-      expect(person.userId).toBeNull();
-      expect(peopleRepository.save).toHaveBeenCalledWith(person);
+      expect(peopleRepository.update).toHaveBeenCalledWith(
+        { id: 'person-1', tenantId: 'tenant-1' },
+        { userId: null },
+      );
+      expect(result.userId).toBeNull();
     });
   });
 
@@ -906,7 +918,9 @@ describe('PeopleService', () => {
       const createdUser = { id: 'new-user-id' };
       const membership = { tenantId: 'tenant-1', userId: 'new-user-id' };
 
-      peopleRepository.findOne!.mockResolvedValueOnce(person);
+      peopleRepository
+        .findOne!.mockResolvedValueOnce(person)
+        .mockResolvedValueOnce({ ...person, userId: 'new-user-id' });
       usersRepository.findOne!.mockResolvedValueOnce(null);
       roleRepository.findOne!.mockResolvedValueOnce({
         id: 'role-1',
@@ -958,7 +972,9 @@ describe('PeopleService', () => {
       } as PeopleEntity;
       const createdUser = { id: 'new-user-id' };
 
-      peopleRepository.findOne!.mockResolvedValueOnce(person);
+      peopleRepository
+        .findOne!.mockResolvedValueOnce(person)
+        .mockResolvedValueOnce({ ...person, userId: 'new-user-id' });
       usersRepository.findOne!.mockResolvedValueOnce(null);
       usersRepository.create = jest.fn().mockReturnValue(createdUser);
       usersRepository.save = jest.fn().mockResolvedValue(createdUser);
