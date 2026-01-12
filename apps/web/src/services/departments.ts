@@ -16,7 +16,36 @@ interface DepartmentListParams {
   status?: DepartmentStatus | '';
 }
 
+export interface CreateDepartmentData {
+  name: string;
+  status?: DepartmentStatus;
+}
+
+export interface UpdateDepartmentData {
+  name?: string;
+  status?: DepartmentStatus;
+}
+
 export const departmentsService = {
+  async get(id: string) {
+    const response = await api.get<DepartmentListItem>(`/departments/${id}`);
+    return response.data;
+  },
+
+  async create(data: CreateDepartmentData) {
+    const response = await api.post<DepartmentListItem>('/departments', data);
+    return response.data;
+  },
+
+  async update(id: string, data: UpdateDepartmentData) {
+    const response = await api.put<DepartmentListItem>(`/departments/${id}`, data);
+    return response.data;
+  },
+
+  async remove(id: string) {
+    await api.delete(`/departments/${id}`);
+  },
+
   async list(params: DepartmentListParams) {
     const query: Record<string, unknown> = {
       page: params.page,

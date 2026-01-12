@@ -161,6 +161,7 @@ export class PeopleService {
   async findOne(tenantId: string, id: string): Promise<PeopleEntity> {
     const person = await this.peopleRepository.findOne({
       where: { id, tenantId },
+      relations: { user: true },
     });
 
     if (!person) {
@@ -179,6 +180,25 @@ export class PeopleService {
     await this.assertEmailUnique(tenantId, email);
     await this.assertPhoneUnique(tenantId, phone);
 
+    // Validate userId if provided for STAFF
+    if (type === PeopleType.STAFF && dto.userId) {
+      const user = await this.usersRepository.findOne({
+        where: { id: dto.userId },
+      });
+
+      if (!user || user.isSuperAdmin) {
+        throw new NotFoundException(USER_ERRORS.NOT_FOUND.message);
+      }
+
+      const existingLink = await this.peopleRepository.findOne({
+        where: { userId: dto.userId, type: PeopleType.STAFF },
+      });
+
+      if (existingLink) {
+        throw new ConflictException(PEOPLE_ERRORS.USER_ALREADY_LINKED.message);
+      }
+    }
+
     const code = await this.tenantCountersService.getNextPeopleCode(
       tenantId,
       type,
@@ -195,9 +215,17 @@ export class PeopleService {
       tags: dto.tags ?? [],
       departmentId:
         type === PeopleType.STAFF ? (dto.departmentId ?? null) : null,
+      userId: type === PeopleType.STAFF ? (dto.userId ?? null) : null,
     });
 
-    return this.peopleRepository.save(person);
+    const saved = await this.peopleRepository.save(person);
+
+    // If we linked a user, return with relation loaded
+    if (saved.userId) {
+      return this.findOne(tenantId, saved.id);
+    }
+
+    return saved;
   }
 
   async update(
@@ -486,7 +514,8 @@ export class PeopleService {
     }
 
     person.userId = dto.userId;
-    return this.peopleRepository.save(person);
+    await this.peopleRepository.save(person);
+    return this.findOne(tenantId, personId);
   }
 
   async unlinkUser(tenantId: string, personId: string): Promise<PeopleEntity> {
@@ -497,8 +526,13 @@ export class PeopleService {
       throw new BadRequestException(PEOPLE_ERRORS.NOT_STAFF_RECORD.message);
     }
 
-    person.userId = null;
-    return this.peopleRepository.save(person);
+    await this.peopleRepository.update(
+      { id: personId, tenantId },
+      { userId: null },
+    );
+
+    // Return fresh entity
+    return this.findOne(tenantId, personId);
   }
 
   async createUserForStaff(
@@ -557,6 +591,8 @@ export class PeopleService {
 
     // Link user to staff record
     person.userId = user.id;
-    return this.peopleRepository.save(person);
+    await this.peopleRepository.save(person);
+
+    return this.findOne(tenantId, personId);
   }
 }

@@ -9,6 +9,7 @@ import {
     Building2,
     Percent,
     History,
+    Network,
 } from "lucide-react";
 
 export interface SidebarItem {
@@ -36,21 +37,41 @@ export const sidebarConfig: SidebarItem[] = [
         href: "/dashboard",
     },
     {
-        label: "People",
-        labelKey: "people",
-        icon: User,
-        href: "/people",
-        permissions: [
-            "people.read",
-            "people.create",
-            "people.update",
-            "people.delete",
-        ],
-        routePermissions: [
-            "people.read",
-            "people.create",
-            "people.update",
-            "people.delete",
+        label: "Organization",
+        labelKey: "organization",
+        icon: Users,
+        children: [
+            {
+                label: "People",
+                labelKey: "people",
+                icon: User,
+                href: "/people",
+                permissions: [
+                    "people.read",
+                    "people.create",
+                    "people.update",
+                    "people.delete",
+                ],
+                routePermissions: [
+                    "people.read",
+                    "people.create",
+                    "people.update",
+                    "people.delete",
+                ],
+            },
+            {
+                label: "Departments",
+                labelKey: "departments",
+                icon: Network,
+                href: "/departments",
+                permissions: [
+                    "departments.read",
+                    "departments.create",
+                    "departments.update",
+                    "departments.delete",
+                ],
+                routePermissions: ["departments.read"],
+            },
         ],
     },
     {

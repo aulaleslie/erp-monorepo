@@ -11,6 +11,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { PERMISSIONS } from '@gym-monorepo/shared';
 import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { ActiveTenantGuard } from '../tenants/guards/active-tenant.guard';
@@ -36,7 +37,7 @@ export class DepartmentsController {
   constructor(private readonly departmentsService: DepartmentsService) {}
 
   @Get()
-  @RequirePermissions('departments.read')
+  @RequirePermissions(PERMISSIONS.DEPARTMENTS.READ)
   async findAll(
     @CurrentTenant() tenantId: string,
     @Query() query: DepartmentQueryDto,
@@ -45,13 +46,13 @@ export class DepartmentsController {
   }
 
   @Get(':id')
-  @RequirePermissions('departments.read')
+  @RequirePermissions(PERMISSIONS.DEPARTMENTS.READ)
   async findOne(@CurrentTenant() tenantId: string, @Param('id') id: string) {
     return this.departmentsService.findOne(tenantId, id);
   }
 
   @Post()
-  @RequirePermissions('departments.create')
+  @RequirePermissions(PERMISSIONS.DEPARTMENTS.CREATE)
   async create(
     @CurrentTenant() tenantId: string,
     @Body() dto: CreateDepartmentDto,
@@ -60,7 +61,7 @@ export class DepartmentsController {
   }
 
   @Put(':id')
-  @RequirePermissions('departments.update')
+  @RequirePermissions(PERMISSIONS.DEPARTMENTS.UPDATE)
   async update(
     @CurrentTenant() tenantId: string,
     @Param('id') id: string,
@@ -71,7 +72,7 @@ export class DepartmentsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @RequirePermissions('departments.delete')
+  @RequirePermissions(PERMISSIONS.DEPARTMENTS.DELETE)
   async remove(@CurrentTenant() tenantId: string, @Param('id') id: string) {
     await this.departmentsService.remove(tenantId, id);
   }

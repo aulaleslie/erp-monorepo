@@ -31,15 +31,27 @@ export function StaffUserLinkCard({
     const [loading, setLoading] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState("");
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
+    const [selectedUserObject, setSelectedUserObject] = useState<InvitableUser | null>(null);
 
     const handleLinkUser = async () => {
         if (!selectedUserId) return;
+
+        // If no personId, we are in create mode - just update local state
+        if (!personId) {
+            if (selectedUserObject) {
+                onUserChange(selectedUserObject);
+                setSelectedUserId("");
+                setSelectedUserObject(null);
+            }
+            return;
+        }
 
         setLoading(true);
         try {
             const updated = await peopleService.linkUser(personId, selectedUserId);
             onUserChange(updated.user);
             setSelectedUserId("");
+            setSelectedUserObject(null);
             toast({
                 title: t("staff.userCard.toast.linkSuccess.title"),
                 description: t("staff.userCard.toast.linkSuccess.description"),
@@ -56,6 +68,11 @@ export function StaffUserLinkCard({
     };
 
     const handleUnlinkUser = async () => {
+        if (!personId) {
+            onUserChange(null);
+            return;
+        }
+
         setLoading(true);
         try {
             await peopleService.unlinkUser(personId);
@@ -141,6 +158,7 @@ export function StaffUserLinkCard({
                             <SearchableSelect<InvitableUser>
                                 value={selectedUserId}
                                 onValueChange={setSelectedUserId}
+                                onSelectionChange={(item) => setSelectedUserObject(item)}
                                 placeholder={t("staff.placeholders.searchUser")}
                                 searchPlaceholder={t("staff.placeholders.searchUser")}
                                 fetchItems={fetchInvitableUsers}

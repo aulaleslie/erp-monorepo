@@ -33,4 +33,8 @@ export class CreatePeopleDto {
   @IsOptional()
   @IsUUID()
   departmentId?: string | null;
+
+  @IsOptional()
+  @IsUUID()
+  userId?: string | null;
 }

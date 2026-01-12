@@ -65,6 +65,7 @@ export interface CreatePersonData {
   phone?: string | null;
   tags?: string[];
   departmentId?: string | null;
+  userId?: string | null;
 }
 
 export interface UpdatePersonData {

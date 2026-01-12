@@ -15,6 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 interface SearchableSelectProps<T> {
     value?: string;
     onValueChange: (value: string) => void;
+    onSelectionChange?: (item: T | null) => void;
     placeholder?: string;
     searchPlaceholder?: string;
     initialLabel?: string; // Label to show for pre-selected value before dropdown opens
@@ -44,6 +45,7 @@ interface CachedData<T> {
 export function SearchableSelect<T>({
     value,
     onValueChange,
+    onSelectionChange,
     placeholder = "Select...",
     searchPlaceholder = "Search...",
     initialLabel,
@@ -166,6 +168,9 @@ export function SearchableSelect<T>({
     const handleSelect = (item: T) => {
         const itemValue = getItemValue(item);
         onValueChange(itemValue);
+        if (onSelectionChange) {
+            onSelectionChange(item);
+        }
         setSelectedLabel(getItemLabel(item));
         setOpen(false);
         setSearch("");
@@ -175,6 +180,9 @@ export function SearchableSelect<T>({
         e.preventDefault();
         e.stopPropagation();
         onValueChange("");
+        if (onSelectionChange) {
+            onSelectionChange(null);
+        }
         setSelectedLabel("");
     };
 
@@ -231,6 +239,9 @@ export function SearchableSelect<T>({
                             <div
                                 onClick={() => {
                                     onValueChange("");
+                                    if (onSelectionChange) {
+                                        onSelectionChange(null);
+                                    }
                                     setSelectedLabel("");
                                     setOpen(false);
                                 }}

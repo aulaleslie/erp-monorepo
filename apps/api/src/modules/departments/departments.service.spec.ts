@@ -132,7 +132,7 @@ describe('DepartmentsService', () => {
         code: 'DEP-000001',
         name: 'HR',
         status: DepartmentStatus.ACTIVE,
-      };
+      } as DepartmentEntity;
       repo.save.mockResolvedValue(created);
 
       const result = await service.create(tenantId, { name: 'HR' });

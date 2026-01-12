@@ -171,6 +171,10 @@ export function PersonForm({ mode, initialData, onSuccess }: PersonFormProps) {
                         formData.type === PeopleType.STAFF && formData.departmentId
                             ? formData.departmentId
                             : null,
+                    userId:
+                        formData.type === PeopleType.STAFF && linkedUser?.id
+                            ? linkedUser.id
+                            : null,
                 };
                 await peopleService.create(createData);
                 toast({
@@ -374,14 +378,12 @@ export function PersonForm({ mode, initialData, onSuccess }: PersonFormProps) {
                         </Select>
                     </div>
 
-                    {/* User link card - only in edit mode */}
-                    {mode === "edit" && initialData?.id && (
-                        <StaffUserLinkCard
-                            personId={initialData.id}
-                            linkedUser={linkedUser}
-                            onUserChange={handleUserLinked}
-                        />
-                    )}
+                    {/* User link card - available in both create and edit modes */}
+                    <StaffUserLinkCard
+                        personId={initialData?.id || ""}
+                        linkedUser={linkedUser}
+                        onUserChange={handleUserLinked}
+                    />
                 </div>
             )}
 

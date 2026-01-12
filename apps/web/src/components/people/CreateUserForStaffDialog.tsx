@@ -127,7 +127,7 @@ export function CreateUserForStaffDialog({
         limit: number;
     }) => {
         try {
-            const data: any = await rolesService.getAll(params.page, params.limit);
+            const data: any = await rolesService.getAll(1, 100);
             const items = data.items || data;
             const total = data.total || items.length;
 

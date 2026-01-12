@@ -19,8 +19,10 @@
   },
   "sidebar": {
     "appName": "Apupu ERP",
+    "organization": "Organisasi",
     "dashboard": "Dasbor",
     "people": "Orang",
+    "departments": "Departemen",
     "settings": "Pengaturan",
     "tenant": "Tenant",
     "tenants": "Tenant",
@@ -1092,6 +1094,114 @@
           "title": "Kesalahan",
           "description": "Gagal mengundang pengguna"
         }
+      }
+    }
+  },
+  "departments": {
+    "page": {
+      "title": "Departemen",
+      "description": "Kelola departemen organisasi."
+    },
+    "list": {
+      "filters": {
+        "search": "Cari",
+        "searchPlaceholder": "Cari berdasarkan kode atau nama",
+        "status": "Status"
+      },
+      "table": {
+        "headers": {
+          "code": "Kode",
+          "name": "Nama",
+          "status": "Status",
+          "actions": "Tindakan"
+        },
+        "empty": "Tidak ada departemen ditemukan"
+      }
+    },
+    "buttons": {
+      "new": "Departemen Baru"
+    },
+    "toast": {
+      "fetchError": {
+        "title": "Tidak dapat memuat departemen",
+        "description": "Kami tidak dapat mengambil data departemen saat ini. Coba lagi sebentar lagi."
+      },
+      "deleteSuccess": {
+        "title": "Departemen dihapus",
+        "description": "Departemen telah berhasil dihapus."
+      },
+      "deleteError": {
+        "title": "Tidak dapat menghapus",
+        "description": "Terjadi kesalahan saat menghapus departemen ini."
+      },
+      "createSuccess": {
+        "title": "Departemen dibuat",
+        "description": "Departemen telah berhasil dibuat."
+      },
+      "createError": {
+        "title": "Gagal membuat",
+        "description": "Tidak dapat membuat departemen."
+      },
+      "updateSuccess": {
+        "title": "Departemen diperbarui",
+        "description": "Departemen telah berhasil diperbarui."
+      },
+      "updateError": {
+        "title": "Gagal memperbarui",
+        "description": "Tidak dapat memperbarui departemen."
+      },
+      "loadError": {
+        "title": "Tidak dapat memuat",
+        "description": "Tidak dapat memuat detail departemen."
+      }
+    },
+    "create": {
+      "page": {
+        "title": "Departemen Baru",
+        "description": "Buat departemen baru untuk organisasi Anda."
+      }
+    },
+    "edit": {
+      "page": {
+        "title": "Edit Departemen",
+        "description": "Perbarui detail departemen."
+      }
+    },
+    "alerts": {
+      "noListPermission": "Anda tidak memiliki izin untuk melihat departemen.",
+      "noCreatePermission": "Anda tidak memiliki izin untuk membuat departemen.",
+      "noEditPermission": "Anda tidak memiliki izin untuk mengedit departemen."
+    },
+    "statuses": {
+      "any": "Semua status",
+      "active": "Aktif",
+      "inactive": "Tidak Aktif"
+    },
+    "confirm": {
+      "delete": {
+        "title": "Hapus departemen?",
+        "description": "Ini akan menghapus departemen secara permanen.",
+        "confirmLabel": "Hapus"
+      }
+    },
+    "form": {
+      "labels": {
+        "name": "Nama",
+        "code": "Kode",
+        "status": "Status"
+      },
+      "placeholders": {
+        "name": "mis. Penjualan",
+        "code": "Dibuat otomatis",
+        "status": "Pilih status"
+      },
+      "validation": {
+        "nameRequired": "Nama departemen diperlukan"
+      },
+      "buttons": {
+        "cancel": "Batal",
+        "create": "Buat Departemen",
+        "save": "Simpan Perubahan"
       }
     }
   }
