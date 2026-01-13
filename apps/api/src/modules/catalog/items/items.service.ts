@@ -70,19 +70,24 @@ export class ItemsService {
   }
 
   async findAll(query: ItemQueryDto, tenantId: string) {
-    const {
-      search,
-      type,
-      serviceKind,
-      categoryId,
-      status,
-      page = 1,
-      limit = 10,
-    } = query;
+    const { page = 1, limit = 10 } = query;
     const skip = calculateSkip(page, limit);
+
+    const queryBuilder = this.buildQuery(query, tenantId);
+
+    queryBuilder.orderBy('item.createdAt', 'DESC').skip(skip).take(limit);
+
+    const [items, total] = await queryBuilder.getManyAndCount();
+
+    return paginate(items, total, page, limit);
+  }
+
+  buildQuery(query: ItemQueryDto, tenantId: string) {
+    const { search, type, serviceKind, categoryId, status } = query;
 
     const queryBuilder = this.itemRepository
       .createQueryBuilder('item')
+      .leftJoinAndSelect('item.category', 'category')
       .where('item.tenantId = :tenantId', { tenantId });
 
     if (search) {
@@ -108,11 +113,7 @@ export class ItemsService {
       queryBuilder.andWhere('item.status = :status', { status });
     }
 
-    queryBuilder.orderBy('item.createdAt', 'DESC').skip(skip).take(limit);
-
-    const [items, total] = await queryBuilder.getManyAndCount();
-
-    return paginate(items, total, page, limit);
+    return queryBuilder;
   }
 
   async findOne(id: string, tenantId: string) {

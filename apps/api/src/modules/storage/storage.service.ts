@@ -5,13 +5,15 @@ import {
   Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as Minio from 'minio';
 import { randomUUID } from 'crypto';
 import {
   MAX_FILE_SIZE,
   ALLOWED_IMAGE_MIME_TYPES,
   AllowedImageMimeType,
 } from './storage.constants';
+import { IStorageDriver } from './drivers/storage.driver.interface';
+import { MinioStorageDriver } from './drivers/minio.driver';
+import { LocalStorageDriver } from './drivers/local.driver';
 
 const getErrorMessage = (error: unknown): string =>
   error instanceof Error ? error.message : String(error);
@@ -19,64 +21,35 @@ const getErrorMessage = (error: unknown): string =>
 @Injectable()
 export class StorageService implements OnModuleInit {
   private readonly logger = new Logger(StorageService.name);
-  private minioClient: Minio.Client;
-  private bucket: string;
-  private publicUrl: string;
+  private driver: IStorageDriver;
 
   constructor(private readonly configService: ConfigService) {
-    const endpoint = this.configService.get<string>('MINIO_ENDPOINT');
+    const driverType =
+      this.configService.get<string>('STORAGE_DRIVER') || 'minio';
 
-    // Only initialize if MinIO is configured
-    if (endpoint) {
-      const [host, portStr] = endpoint.split(':');
-      const port = portStr ? parseInt(portStr, 10) : 9000;
-      const useSSL = this.configService.get<string>('MINIO_USE_SSL') === 'true';
+    this.logger.log(`Initializing StorageService with driver: ${driverType}`);
 
-      this.minioClient = new Minio.Client({
-        endPoint: host,
-        port,
-        useSSL,
-        accessKey:
-          this.configService.get<string>('MINIO_ACCESS_KEY') || 'minioadmin',
-        secretKey:
-          this.configService.get<string>('MINIO_SECRET_KEY') || 'minioadmin',
-      });
-
-      this.bucket =
-        this.configService.get<string>('MINIO_BUCKET') || 'gym-assets';
-      this.publicUrl =
-        this.configService.get<string>('MINIO_PUBLIC_URL') ||
-        `http://${endpoint}`;
+    if (driverType === 'local') {
+      this.driver = new LocalStorageDriver(configService);
+    } else {
+      this.driver = new MinioStorageDriver(configService);
     }
   }
 
   async onModuleInit(): Promise<void> {
-    if (this.minioClient) {
-      await this.ensureBucketExists();
-    } else {
-      this.logger.warn(
-        'MinIO is not configured. Storage features will be unavailable.',
-      );
+    if (this.driver.onModuleInit) {
+      await this.driver.onModuleInit();
     }
-  }
 
-  /**
-   * Ensure the configured bucket exists, create if not
-   */
-  async ensureBucketExists(): Promise<void> {
-    try {
-      const exists = await this.minioClient.bucketExists(this.bucket);
-      if (!exists) {
-        await this.minioClient.makeBucket(this.bucket);
-        this.logger.log(`Created bucket: ${this.bucket}`);
-      } else {
-        this.logger.log(`Bucket exists: ${this.bucket}`);
-      }
-    } catch (error) {
-      this.logger.error(
-        `Failed to ensure bucket exists: ${getErrorMessage(error)}`,
+    if (
+      !this.driver.isConfigured() &&
+      this.configService.get<string>('STORAGE_DRIVER') !== 'local'
+    ) {
+      // Only warn for MinIO if it's not configured but was requested (or default).
+      // Local driver is always "configured" technically, but MinIO relies on env vars.
+      this.logger.warn(
+        'Storage driver is not fully configured. Storage features may be unavailable.',
       );
-      throw error;
     }
   }
 
@@ -107,7 +80,7 @@ export class StorageService implements OnModuleInit {
   }
 
   /**
-   * Upload a file to MinIO
+   * Upload a file
    * @returns The public URL of the uploaded file
    */
   async uploadFile(
@@ -118,65 +91,39 @@ export class StorageService implements OnModuleInit {
   ): Promise<string> {
     this.validateFile(mimeType, size);
 
-    if (!this.minioClient) {
-      throw new BadRequestException('Storage service is not configured');
-    }
-
-    await this.minioClient.putObject(this.bucket, objectKey, buffer, size, {
-      'Content-Type': mimeType,
-    });
-
-    return this.getPublicUrl(objectKey);
+    return this.driver.uploadFile(buffer, objectKey, mimeType, size);
   }
 
   /**
-   * Delete a file from MinIO
+   * Delete a file
    */
   async deleteFile(objectKey: string): Promise<void> {
-    if (!this.minioClient) {
-      throw new BadRequestException('Storage service is not configured');
-    }
-
-    await this.minioClient.removeObject(this.bucket, objectKey);
+    return this.driver.deleteFile(objectKey);
   }
 
   /**
-   * Retrieve a file from MinIO
+   * Retrieve a file
    */
   async getFile(objectKey: string): Promise<Buffer> {
-    if (!this.minioClient) {
-      throw new BadRequestException('Storage service is not configured');
-    }
-
-    const stream = await this.minioClient.getObject(this.bucket, objectKey);
-    const chunks: Buffer[] = [];
-
-    return new Promise((resolve, reject) => {
-      stream.on('data', (chunk: Buffer | Uint8Array | string) => {
-        const data = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-        chunks.push(data);
-      });
-      stream.on('end', () => resolve(Buffer.concat(chunks)));
-      stream.on('error', reject);
-    });
+    return this.driver.getFile(objectKey);
   }
 
   /**
    * Get the public URL for an object
    */
   getPublicUrl(objectKey: string): string {
-    return `${this.publicUrl}/${this.bucket}/${objectKey}`;
+    return this.driver.getPublicUrl(objectKey);
   }
 
   /**
    * Check if storage is configured and available
    */
   isConfigured(): boolean {
-    return !!this.minioClient;
+    return this.driver.isConfigured();
   }
 
   /**
-   * Download an image from a URL, validate it, and store in MinIO
+   * Download an image from a URL, validate it, and store using the driver
    * @param url The URL to download the image from
    * @param keyPrefix Prefix for the object key (e.g., 'items/tenant-123')
    * @param timeoutMs Timeout in milliseconds (default 30000)
@@ -192,7 +139,7 @@ export class StorageService implements OnModuleInit {
     imageMimeType: string;
     imageSize: number;
   }> {
-    if (!this.minioClient) {
+    if (!this.driver.isConfigured()) {
       throw new BadRequestException('Storage service is not configured');
     }
 

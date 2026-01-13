@@ -9,6 +9,7 @@ import { ItemEntity } from '../../../database/entities/item.entity';
 import { CategoryEntity } from '../../../database/entities/category.entity';
 import { ItemsService } from './items.service';
 import { ItemsImportService } from './items-import.service';
+import { ItemsExportService } from './items-export.service';
 import { ItemsController } from './items.controller';
 
 @Module({
@@ -20,7 +21,7 @@ import { ItemsController } from './items.controller';
     StorageModule,
   ],
   controllers: [ItemsController],
-  providers: [ItemsService, ItemsImportService],
-  exports: [ItemsService, ItemsImportService],
+  providers: [ItemsService, ItemsImportService, ItemsExportService],
+  exports: [ItemsService, ItemsImportService, ItemsExportService],
 })
 export class ItemsModule {}

@@ -11,11 +11,12 @@ import {
   Put,
   Query,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { ApiConsumes, ApiCookieAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { FastifyRequest } from 'fastify';
+import { FastifyRequest, FastifyReply } from 'fastify';
 import { PERMISSIONS } from '@gym-monorepo/shared';
 
 import { ActiveTenantGuard } from '../../tenants/guards/active-tenant.guard';
@@ -25,9 +26,11 @@ import { RequirePermissions } from '../../../common/decorators/require-permissio
 import { CurrentTenant } from '../../../common/decorators/current-tenant.decorator';
 import { ItemsService } from './items.service';
 import { ItemsImportService } from './items-import.service';
+import { ItemsExportService } from './items-export.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { ItemQueryDto } from './dto/item-query.dto';
+import { ExportItemQueryDto } from './dto/export-item-query.dto';
 
 @ApiTags('catalog/items')
 @ApiCookieAuth('access_token')
@@ -42,7 +45,23 @@ export class ItemsController {
   constructor(
     private readonly itemsService: ItemsService,
     private readonly itemsImportService: ItemsImportService,
+    private readonly itemsExportService: ItemsExportService,
   ) {}
+
+  @Get('export')
+  @RequirePermissions(PERMISSIONS.ITEMS.READ)
+  async exportItems(
+    @CurrentTenant() tenantId: string,
+    @Query() query: ExportItemQueryDto,
+    @Res() res: FastifyReply,
+  ) {
+    const { buffer, filename, mimetype } =
+      await this.itemsExportService.exportItems(tenantId, query);
+
+    res.header('Content-Type', mimetype);
+    res.header('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(buffer);
+  }
 
   @Get()
   @RequirePermissions(PERMISSIONS.ITEMS.READ)
