@@ -10,6 +10,9 @@ import {
     Percent,
     History,
     Network,
+    Package,
+    ShoppingBag,
+    Layers,
 } from "lucide-react";
 
 export interface SidebarItem {
@@ -71,6 +74,39 @@ export const sidebarConfig: SidebarItem[] = [
                     "departments.delete",
                 ],
                 routePermissions: ["departments.read"],
+            },
+        ],
+    },
+    {
+        label: "Catalog",
+        labelKey: "catalog",
+        icon: Package,
+        children: [
+            {
+                label: "Items",
+                labelKey: "items",
+                icon: ShoppingBag,
+                href: "/catalog/items",
+                permissions: [
+                    "items.read",
+                    "items.create",
+                    "items.update",
+                    "items.delete",
+                ],
+                routePermissions: ["items.read"],
+            },
+            {
+                label: "Categories",
+                labelKey: "categories",
+                icon: Layers,
+                href: "/catalog/categories",
+                permissions: [
+                    "categories.read",
+                    "categories.create",
+                    "categories.update",
+                    "categories.delete",
+                ],
+                routePermissions: ["categories.read"],
             },
         ],
     },

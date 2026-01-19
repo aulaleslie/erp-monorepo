@@ -29,7 +29,10 @@
     "taxes": "Pajak",
     "auditLogs": "Log Audit",
     "roles": "Peran",
-    "users": "Pengguna"
+    "users": "Pengguna",
+    "catalog": "Katalog",
+    "items": "Item",
+    "categories": "Kategori"
   },
   "labels": {
     "tenantSettings": {
@@ -1216,6 +1219,80 @@
         "create": "Buat Departemen",
         "save": "Simpan Perubahan"
       }
+    }
+  },
+  "items": {
+    "page": {
+      "title": "Item",
+      "description": "Kelola item katalog termasuk produk dan layanan."
+    },
+    "create": {
+      "page": {
+        "title": "Item Baru",
+        "description": "Tambahkan item baru ke katalog."
+      }
+    },
+    "edit": {
+      "page": {
+        "title": "Edit Item",
+        "description": "Perbarui detail item."
+      }
+    },
+    "detail": {
+      "page": {
+        "title": "Detail Item"
+      }
+    },
+    "alerts": {
+      "noListPermission": "Anda tidak memiliki izin untuk melihat item.",
+      "noCreatePermission": "Anda tidak memiliki izin untuk membuat item.",
+      "noEditPermission": "Anda tidak memiliki izin untuk mengedit item.",
+      "noReadPermission": "Anda tidak memiliki izin untuk melihat detail item."
+    },
+    "placeholders": {
+      "listTitle": "Daftar item segera hadir",
+      "listDescription": "Halaman ini akan menyertakan filter, pencarian, dan aksi untuk item.",
+      "formTitle": "Form item segera hadir",
+      "formDescription": "Halaman ini akan menangani alur buat dan edit untuk item.",
+      "detailTitle": "Detail item segera hadir",
+      "detailDescription": "Halaman ini akan menampilkan detail item dan gambar."
+    },
+    "buttons": {
+      "new": "Item Baru",
+      "edit": "Edit"
+    }
+  },
+  "categories": {
+    "page": {
+      "title": "Kategori",
+      "description": "Kelola kategori katalog untuk mengorganisir item."
+    },
+    "create": {
+      "page": {
+        "title": "Kategori Baru",
+        "description": "Tambahkan kategori baru ke katalog."
+      }
+    },
+    "edit": {
+      "page": {
+        "title": "Edit Kategori",
+        "description": "Perbarui detail kategori."
+      }
+    },
+    "alerts": {
+      "noListPermission": "Anda tidak memiliki izin untuk melihat kategori.",
+      "noCreatePermission": "Anda tidak memiliki izin untuk membuat kategori.",
+      "noEditPermission": "Anda tidak memiliki izin untuk mengedit kategori."
+    },
+    "placeholders": {
+      "listTitle": "Daftar kategori segera hadir",
+      "listDescription": "Halaman ini akan menyertakan filter, pencarian, dan aksi untuk kategori.",
+      "formTitle": "Form kategori segera hadir",
+      "formDescription": "Halaman ini akan menangani alur buat dan edit untuk kategori."
+    },
+    "buttons": {
+      "new": "Kategori Baru",
+      "edit": "Edit"
     }
   }
 }

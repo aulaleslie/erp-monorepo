@@ -29,7 +29,10 @@
     "taxes": "Taxes",
     "auditLogs": "Audit Logs",
     "roles": "Roles",
-    "users": "Users"
+    "users": "Users",
+    "catalog": "Catalog",
+    "items": "Items",
+    "categories": "Categories"
   },
   "labels": {
     "tenantSettings": {
@@ -1216,6 +1219,80 @@
         "create": "Create Department",
         "save": "Save Changes"
       }
+    }
+  },
+  "items": {
+    "page": {
+      "title": "Items",
+      "description": "Manage catalog items including products and services."
+    },
+    "create": {
+      "page": {
+        "title": "New Item",
+        "description": "Add a new item to the catalog."
+      }
+    },
+    "edit": {
+      "page": {
+        "title": "Edit Item",
+        "description": "Update item details."
+      }
+    },
+    "detail": {
+      "page": {
+        "title": "Item Details"
+      }
+    },
+    "alerts": {
+      "noListPermission": "You do not have permission to view items.",
+      "noCreatePermission": "You do not have permission to create items.",
+      "noEditPermission": "You do not have permission to edit items.",
+      "noReadPermission": "You do not have permission to view item details."
+    },
+    "placeholders": {
+      "listTitle": "Items list coming soon",
+      "listDescription": "This page will include filters, search, and actions for items.",
+      "formTitle": "Item form coming soon",
+      "formDescription": "This page will handle create and edit flows for items.",
+      "detailTitle": "Item details coming soon",
+      "detailDescription": "This page will display item details and image."
+    },
+    "buttons": {
+      "new": "New Item",
+      "edit": "Edit"
+    }
+  },
+  "categories": {
+    "page": {
+      "title": "Categories",
+      "description": "Manage catalog categories for organizing items."
+    },
+    "create": {
+      "page": {
+        "title": "New Category",
+        "description": "Add a new category to the catalog."
+      }
+    },
+    "edit": {
+      "page": {
+        "title": "Edit Category",
+        "description": "Update category details."
+      }
+    },
+    "alerts": {
+      "noListPermission": "You do not have permission to view categories.",
+      "noCreatePermission": "You do not have permission to create categories.",
+      "noEditPermission": "You do not have permission to edit categories."
+    },
+    "placeholders": {
+      "listTitle": "Categories list coming soon",
+      "listDescription": "This page will include filters, search, and actions for categories.",
+      "formTitle": "Category form coming soon",
+      "formDescription": "This page will handle create and edit flows for categories."
+    },
+    "buttons": {
+      "new": "New Category",
+      "edit": "Edit"
     }
   }
 }
