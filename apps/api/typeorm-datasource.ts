@@ -15,6 +15,7 @@ import { PeopleEntity } from './src/database/entities/people.entity';
 import { DepartmentEntity } from './src/database/entities/department.entity';
 import { CategoryEntity } from './src/database/entities/category.entity';
 import { ItemEntity } from './src/database/entities/item.entity';
+import { ALL_ENTITIES } from './src/database/entities';
 
 dotenv.config();
 
@@ -29,23 +30,7 @@ export const AppDataSource = new DataSource({
   extra: {
     options: '-c timezone=UTC',
   },
-  entities: [
-    UserEntity,
-    TenantEntity,
-    PermissionEntity,
-    RoleEntity,
-    RolePermissionEntity,
-    TenantUserEntity,
-    AuditLogEntity,
-    TaxEntity,
-    TenantCounterEntity,
-    TenantTaxEntity,
-    TenantThemeEntity,
-    PeopleEntity,
-    DepartmentEntity,
-    CategoryEntity,
-    ItemEntity,
-  ],
+  entities: ALL_ENTITIES,
   migrations: ['src/database/migrations/*.ts'],
   synchronize: false,
 });

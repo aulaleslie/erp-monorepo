@@ -1,33 +1,80 @@
-/**
- * Barrel export for all database entities
- */
-
-export { AuditLogEntity } from './audit-log.entity';
-export { CategoryEntity, CategoryStatus } from './category.entity';
-export { DepartmentEntity } from './department.entity';
-export {
+import { AuditLogEntity } from './audit-log.entity';
+import { CategoryEntity, CategoryStatus } from './category.entity';
+import { DepartmentEntity } from './department.entity';
+import {
   ItemEntity,
   ItemType,
   ItemServiceKind,
   ItemDurationUnit,
   ItemStatus,
 } from './item.entity';
-export { PermissionEntity } from './permission.entity';
-export { PeopleEntity } from './people.entity';
-export { RolePermissionEntity } from './role-permission.entity';
-export { RoleEntity } from './role.entity';
-export { TaxEntity } from './tax.entity';
-export { TenantCounterEntity } from './tenant-counter.entity';
-export { TenantTaxEntity } from './tenant-tax.entity';
-export { TenantThemeEntity } from './tenant-theme.entity';
-export { TenantUserEntity } from './tenant-user.entity';
-export { TenantEntity } from './tenant.entity';
-export { UserEntity } from './user.entity';
+import { PermissionEntity } from './permission.entity';
+import { PeopleEntity } from './people.entity';
+import { RolePermissionEntity } from './role-permission.entity';
+import { RoleEntity } from './role.entity';
+import { TaxEntity } from './tax.entity';
+import { TenantCounterEntity } from './tenant-counter.entity';
+import { TenantTaxEntity } from './tenant-tax.entity';
+import { TenantThemeEntity } from './tenant-theme.entity';
+import { TenantUserEntity } from './tenant-user.entity';
+import { TenantEntity } from './tenant.entity';
+import { UserEntity } from './user.entity';
+import { ChartOfAccountsEntity } from './chart-of-accounts.entity';
+import { CostCenterEntity } from './cost-center.entity';
+import { DocumentEntity } from './document.entity';
+import { DocumentItemEntity } from './document-item.entity';
+import { DocumentTaxLineEntity } from './document-tax-line.entity';
+import { DocumentAccountLineEntity } from './document-account-line.entity';
 
-/**
- * Array of all entities for TypeORM configuration
- */
+export {
+  AuditLogEntity,
+  CategoryEntity,
+  CategoryStatus,
+  DepartmentEntity,
+  ItemEntity,
+  ItemType,
+  ItemServiceKind,
+  ItemDurationUnit,
+  ItemStatus,
+  PermissionEntity,
+  PeopleEntity,
+  RolePermissionEntity,
+  RoleEntity,
+  TaxEntity,
+  TenantCounterEntity,
+  TenantTaxEntity,
+  TenantThemeEntity,
+  TenantUserEntity,
+  TenantEntity,
+  UserEntity,
+  ChartOfAccountsEntity,
+  CostCenterEntity,
+  DocumentEntity,
+  DocumentItemEntity,
+  DocumentTaxLineEntity,
+  DocumentAccountLineEntity,
+};
+
 export const ALL_ENTITIES = [
-  // Note: Import dynamically to avoid circular dependency issues
-  // This is used in database.module.ts and typeorm-datasource.ts
+  AuditLogEntity,
+  CategoryEntity,
+  DepartmentEntity,
+  ItemEntity,
+  PermissionEntity,
+  PeopleEntity,
+  RolePermissionEntity,
+  RoleEntity,
+  TaxEntity,
+  TenantCounterEntity,
+  TenantTaxEntity,
+  TenantThemeEntity,
+  TenantUserEntity,
+  TenantEntity,
+  UserEntity,
+  ChartOfAccountsEntity,
+  CostCenterEntity,
+  DocumentEntity,
+  DocumentItemEntity,
+  DocumentTaxLineEntity,
+  DocumentAccountLineEntity,
 ];

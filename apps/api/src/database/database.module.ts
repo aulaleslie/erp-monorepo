@@ -1,18 +1,7 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PermissionEntity } from './entities/permission.entity';
-import { PeopleEntity } from './entities/people.entity';
-import { RolePermissionEntity } from './entities/role-permission.entity';
-import { RoleEntity } from './entities/role.entity';
-import { TenantCounterEntity } from './entities/tenant-counter.entity';
-import { TenantUserEntity } from './entities/tenant-user.entity';
-import { TenantEntity } from './entities/tenant.entity';
-import { UserEntity } from './entities/user.entity';
-
-import { AuditLogEntity } from './entities/audit-log.entity';
-import { TaxEntity } from './entities/tax.entity';
-import { TenantTaxEntity } from './entities/tenant-tax.entity';
+import { ALL_ENTITIES } from './entities';
 
 @Global()
 @Module({
@@ -31,19 +20,7 @@ import { TenantTaxEntity } from './entities/tenant-tax.entity';
         extra: {
           options: '-c timezone=UTC',
         },
-        entities: [
-          UserEntity,
-          TenantEntity,
-          PermissionEntity,
-          PeopleEntity,
-          RoleEntity,
-          RolePermissionEntity,
-          TenantCounterEntity,
-          TenantUserEntity,
-          AuditLogEntity,
-          TaxEntity,
-          TenantTaxEntity,
-        ],
+        entities: ALL_ENTITIES,
         autoLoadEntities: true,
         synchronize: false, // checking explicitly as per requirements
       }),

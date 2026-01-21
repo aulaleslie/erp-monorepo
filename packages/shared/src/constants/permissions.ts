@@ -47,6 +47,30 @@ export const PERMISSIONS = {
       UPDATE: 'settings.tenant.update',
     },
   },
+  CHART_OF_ACCOUNTS: {
+    READ: 'chartOfAccounts.read',
+    CREATE: 'chartOfAccounts.create',
+    UPDATE: 'chartOfAccounts.update',
+    DELETE: 'chartOfAccounts.delete',
+  },
+  COST_CENTERS: {
+    READ: 'costCenters.read',
+    CREATE: 'costCenters.create',
+    UPDATE: 'costCenters.update',
+    DELETE: 'costCenters.delete',
+  },
+  DOCUMENTS: {
+    READ: 'documents.read',
+    CREATE: 'documents.create',
+    UPDATE: 'documents.update',
+    DELETE: 'documents.delete',
+    SUBMIT: 'documents.submit',
+    APPROVE: 'documents.approve',
+    POST: 'documents.post',
+    CANCEL: 'documents.cancel',
+    REJECT: 'documents.reject',
+    REVISE: 'documents.revise',
+  },
 } as const;
 
 // Type-safe permission values
@@ -57,7 +81,10 @@ export type PermissionCode =
   | typeof PERMISSIONS.CATEGORIES[keyof typeof PERMISSIONS.CATEGORIES]
   | typeof PERMISSIONS.ITEMS[keyof typeof PERMISSIONS.ITEMS]
   | typeof PERMISSIONS.USERS[keyof typeof PERMISSIONS.USERS]
-  | typeof PERMISSIONS.SETTINGS.TENANT[keyof typeof PERMISSIONS.SETTINGS.TENANT];
+  | typeof PERMISSIONS.SETTINGS.TENANT[keyof typeof PERMISSIONS.SETTINGS.TENANT]
+  | typeof PERMISSIONS.CHART_OF_ACCOUNTS[keyof typeof PERMISSIONS.CHART_OF_ACCOUNTS]
+  | typeof PERMISSIONS.COST_CENTERS[keyof typeof PERMISSIONS.COST_CENTERS]
+  | typeof PERMISSIONS.DOCUMENTS[keyof typeof PERMISSIONS.DOCUMENTS];
 
 // All permission codes as a flat array (useful for validation)
 export const ALL_PERMISSION_CODES: PermissionCode[] = [
@@ -88,4 +115,22 @@ export const ALL_PERMISSION_CODES: PermissionCode[] = [
   PERMISSIONS.USERS.DELETE,
   PERMISSIONS.SETTINGS.TENANT.READ,
   PERMISSIONS.SETTINGS.TENANT.UPDATE,
+  PERMISSIONS.CHART_OF_ACCOUNTS.READ,
+  PERMISSIONS.CHART_OF_ACCOUNTS.CREATE,
+  PERMISSIONS.CHART_OF_ACCOUNTS.UPDATE,
+  PERMISSIONS.CHART_OF_ACCOUNTS.DELETE,
+  PERMISSIONS.COST_CENTERS.READ,
+  PERMISSIONS.COST_CENTERS.CREATE,
+  PERMISSIONS.COST_CENTERS.UPDATE,
+  PERMISSIONS.COST_CENTERS.DELETE,
+  PERMISSIONS.DOCUMENTS.READ,
+  PERMISSIONS.DOCUMENTS.CREATE,
+  PERMISSIONS.DOCUMENTS.UPDATE,
+  PERMISSIONS.DOCUMENTS.DELETE,
+  PERMISSIONS.DOCUMENTS.SUBMIT,
+  PERMISSIONS.DOCUMENTS.APPROVE,
+  PERMISSIONS.DOCUMENTS.POST,
+  PERMISSIONS.DOCUMENTS.CANCEL,
+  PERMISSIONS.DOCUMENTS.REJECT,
+  PERMISSIONS.DOCUMENTS.REVISE,
 ];

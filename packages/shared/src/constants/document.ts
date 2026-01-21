@@ -1,0 +1,31 @@
+export enum DocumentModule {
+  SALES = 'SALES',
+  PURCHASE = 'PURCHASE',
+  ACCOUNTING = 'ACCOUNTING',
+  INVENTORY = 'INVENTORY',
+}
+
+export enum DocumentStatus {
+  DRAFT = 'DRAFT',
+  SUBMITTED = 'SUBMITTED',
+  REVISION_REQUESTED = 'REVISION_REQUESTED',
+  REJECTED = 'REJECTED',
+  APPROVED = 'APPROVED',
+  POSTED = 'POSTED',
+  CANCELLED = 'CANCELLED',
+}
+
+export enum AccountType {
+  ASSET = 'ASSET',
+  LIABILITY = 'LIABILITY',
+  EQUITY = 'EQUITY',
+  REVENUE = 'REVENUE',
+  EXPENSE = 'EXPENSE',
+}
+
+export enum DocumentAccessScope {
+  TENANT = 'TENANT',
+  CREATOR = 'CREATOR',
+  ROLE = 'ROLE',
+  USER = 'USER',
+}

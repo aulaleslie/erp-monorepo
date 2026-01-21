@@ -30,6 +30,7 @@ class MockRepository {
 
 function buildQueryBuilder(items: ItemEntity[], total: number) {
   return {
+    leftJoinAndSelect: jest.fn().mockReturnThis(),
     where: jest.fn().mockReturnThis(),
     andWhere: jest.fn().mockReturnThis(),
     orderBy: jest.fn().mockReturnThis(),
