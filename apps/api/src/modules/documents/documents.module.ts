@@ -6,6 +6,8 @@ import {
   DocumentItemEntity,
   DocumentStatusHistoryEntity,
   DocumentNumberSettingEntity,
+  LedgerEntryEntity,
+  DocumentTypeRegistryEntity,
 } from '../../database/entities';
 import { DocumentsController } from './documents.controller';
 import { DocumentsService } from './documents.service';
@@ -19,6 +21,8 @@ import { DocumentNumberService } from './document-number.service';
       DocumentApprovalEntity,
       DocumentStatusHistoryEntity,
       DocumentNumberSettingEntity,
+      LedgerEntryEntity,
+      DocumentTypeRegistryEntity,
     ]),
   ],
   controllers: [DocumentsController],

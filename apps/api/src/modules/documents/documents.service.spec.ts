@@ -22,6 +22,9 @@ import {
 } from '../../database/entities';
 import { DocumentsService } from './documents.service';
 import { DocumentNumberService } from './document-number.service';
+import { DefaultPostingHandler } from './posting/default-posting-handler';
+
+jest.mock('./posting/default-posting-handler');
 
 describe('DocumentsService', () => {
   let service: DocumentsService;
@@ -146,6 +149,20 @@ describe('DocumentsService', () => {
       expect(getNextDocumentNumberMock).toHaveBeenCalledWith(
         mockTenantId,
         'sales.invoice',
+      );
+    });
+
+    it('should throw if document key is invalid', async () => {
+      await expect(
+        service.create(
+          mockTenantId,
+          'invalid.key',
+          DocumentModule.SALES,
+          {},
+          mockUserId,
+        ),
+      ).rejects.toThrow(
+        new BadRequestException(DOCUMENT_ERRORS.INVALID_DOCUMENT_TYPE.message),
       );
     });
   });
@@ -440,23 +457,29 @@ describe('DocumentsService', () => {
   });
 
   describe('post', () => {
-    it('should transition document from APPROVED to POSTED', async () => {
+    it('should call posting handler and transition document from APPROVED to POSTED', async () => {
       const mockDoc = {
         id: mockDocId,
         status: DocumentStatus.APPROVED,
+        documentKey: 'sales.invoice',
       } as DocumentEntity;
-      const manager: Partial<EntityManager> = {
-        save: jest.fn().mockResolvedValue({}),
-        create: createEntity,
-      };
+
+      const postMock = jest.fn().mockResolvedValue(undefined);
+      (DefaultPostingHandler as jest.Mock).mockImplementation(() => ({
+        post: postMock,
+      }));
 
       (documentRepo.findOne as jest.Mock).mockResolvedValue(mockDoc);
-      setupTransactionMock(manager);
+      setupTransactionMock({
+        findOne: jest.fn().mockResolvedValue(mockDoc),
+        save: jest.fn().mockResolvedValue({}),
+        create: createEntity,
+      });
 
       const result = await service.post(mockDocId, mockTenantId, mockUserId);
 
-      expect(result.status).toBe(DocumentStatus.POSTED);
-      expect(result.postedAt).toBeDefined();
+      expect(postMock).toHaveBeenCalled();
+      expect(result.id).toBe(mockDocId);
     });
 
     it('should throw if document is not APPROVED', async () => {

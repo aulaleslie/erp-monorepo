@@ -22,6 +22,9 @@ import {
   isValidTransition,
 } from './state-machine/document-state-machine';
 import { DocumentNumberService } from './document-number.service';
+import { DocumentTypeRegistry } from './registry/document-type-registry';
+import { DefaultPostingHandler } from './posting/default-posting-handler';
+import { PostingHandler } from './posting/posting-handler.interface';
 
 @Injectable()
 export class DocumentsService {
@@ -45,6 +48,12 @@ export class DocumentsService {
     data: Partial<DocumentEntity>,
     userId: string,
   ): Promise<DocumentEntity> {
+    if (!DocumentTypeRegistry.isValidKey(documentKey)) {
+      throw new BadRequestException(
+        DOCUMENT_ERRORS.INVALID_DOCUMENT_TYPE.message,
+      );
+    }
+
     const documentNumber =
       await this.documentNumberService.getNextDocumentNumber(
         tenantId,
@@ -277,20 +286,28 @@ export class DocumentsService {
 
       this.validateTransition(document, DocumentStatus.POSTED);
 
-      const fromStatus = document.status;
-      document.status = DocumentStatus.POSTED;
-      document.postedAt = new Date();
-      document.postingDate = document.postingDate || new Date();
-      await manager.save(document);
+      // Execute posting handler (stub logic for now)
+      const typeDef = DocumentTypeRegistry.getType(document.documentKey);
+      if (!typeDef) {
+        throw new BadRequestException(
+          DOCUMENT_ERRORS.INVALID_DOCUMENT_TYPE.message,
+        );
+      }
 
-      await this.recordStatusHistory(
-        id,
-        fromStatus,
-        DocumentStatus.POSTED,
-        userId,
-        null,
+      // In a real system, we'd use a factory or injection to get the handler
+      let handler: PostingHandler;
+      if (typeDef.postingHandler === 'DefaultPostingHandler') {
+        handler = new DefaultPostingHandler();
+      } else {
+        handler = new DefaultPostingHandler(); // Fallback
+      }
+
+      await handler.post({
+        document,
         manager,
-      );
+        tenantId,
+        userId,
+      });
 
       return document;
     });

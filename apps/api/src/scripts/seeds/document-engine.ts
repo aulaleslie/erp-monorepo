@@ -4,7 +4,10 @@ import {
   CostCenterEntity,
   TenantEntity,
   DocumentNumberSettingEntity,
+  DocumentTypeRegistryEntity,
 } from '../../database/entities';
+
+import { DocumentTypeRegistry } from '../../modules/documents/registry/document-type-registry';
 
 import { AccountType } from '@gym-monorepo/shared';
 
@@ -115,6 +118,29 @@ export const seedDocumentEngine = async (
           }),
         );
       }
+    }
+  }
+
+  // 4. Seed Document Type Registry (Global)
+  const registryRepo = dataSource.getRepository(DocumentTypeRegistryEntity);
+  const registryEntries = DocumentTypeRegistry.getAllTypes();
+
+  for (const entry of registryEntries) {
+    const existing = await registryRepo.findOneBy({
+      documentKey: entry.key,
+    });
+
+    if (!existing) {
+      await registryRepo.save(
+        registryRepo.create({
+          documentKey: entry.key,
+          module: entry.module,
+          name: entry.name,
+          requiresItems: entry.requiresItems,
+          approvalSteps: entry.approvalSteps,
+          isActive: true,
+        }),
+      );
     }
   }
 };

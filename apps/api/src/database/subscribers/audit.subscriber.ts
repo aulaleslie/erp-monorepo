@@ -129,14 +129,16 @@ export class AuditSubscriber implements EntitySubscriberInterface<BaseAuditEntit
   async afterRemove(event: RemoveEvent<BaseAuditEntity>) {
     if (event.databaseEntity instanceof BaseAuditEntity) {
       const entityId = getEntityId(event.databaseEntity);
-      await this.createAuditLog(
-        event.manager,
-        'DELETE',
-        event.metadata.tableName,
-        entityId,
-        toRecord(event.databaseEntity),
-        null,
-      );
+      if (entityId) {
+        await this.createAuditLog(
+          event.manager,
+          'DELETE',
+          event.metadata.tableName,
+          entityId,
+          toRecord(event.databaseEntity),
+          null,
+        );
+      }
     }
   }
 
@@ -188,5 +190,5 @@ function toRecord(
   if (!entity) {
     return null;
   }
-  return entity as Record<string, unknown>;
+  return entity as unknown as Record<string, unknown>;
 }

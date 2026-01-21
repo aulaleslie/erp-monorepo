@@ -36,3 +36,22 @@ export enum ApprovalStatus {
   REJECTED = 'REJECTED',
   REVISION_REQUESTED = 'REVISION_REQUESTED',
 }
+
+export enum LedgerEntryType {
+  DEBIT = 'DEBIT',
+  CREDIT = 'CREDIT',
+}
+
+export const DOCUMENT_TYPE_KEY = {
+  SALES_ORDER: 'sales.order',
+  SALES_INVOICE: 'sales.invoice',
+  PURCHASING_PO: 'purchasing.po',
+  PURCHASING_GRN: 'purchasing.grn',
+  ACCOUNTING_JOURNAL: 'accounting.journal',
+  INVENTORY_TRANSFER: 'inventory.transfer',
+  INVENTORY_ADJUSTMENT: 'inventory.adjustment',
+  INVENTORY_COUNT: 'inventory.count',
+} as const;
+
+export type DocumentTypeKey =
+  (typeof DOCUMENT_TYPE_KEY)[keyof typeof DOCUMENT_TYPE_KEY];

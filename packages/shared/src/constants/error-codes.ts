@@ -377,6 +377,18 @@ export const DOCUMENT_ERRORS = {
     code: 'DOCUMENT_APPROVAL_ALREADY_DECIDED',
     message: 'This approval step has already been decided',
   },
+  INVALID_DOCUMENT_TYPE: {
+    code: 'DOCUMENT_INVALID_TYPE',
+    message: 'Invalid or unsupported document type',
+  },
+  POSTING_ALREADY_PROCESSED: {
+    code: 'DOCUMENT_POSTING_ALREADY_PROCESSED',
+    message: 'Document has already been posted',
+  },
+  LEDGER_IMBALANCE: {
+    code: 'DOCUMENT_LEDGER_IMBALANCE',
+    message: 'Debit and credit amounts do not balance',
+  },
 } as const;
 
 // ============================================================================
