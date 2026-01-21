@@ -1,4 +1,19 @@
 {
+  "common": {
+    "comingSoon": {
+      "badge": "Coming Soon"
+    },
+    "imageUpload": {
+      "upload": "Upload Image",
+      "change": "Change Image",
+      "remove": "Remove",
+      "error": {
+        "large": "File too large (max {size}MB)",
+        "type": "Invalid file type"
+      },
+      "hint": "JPG, PNG or WebP up to {size}MB"
+    }
+  },
   "authGuard": {
     "loading": "Loading..."
   },

@@ -2,6 +2,16 @@
   "common": {
     "comingSoon": {
       "badge": "Segera Hadir"
+    },
+    "imageUpload": {
+      "upload": "Unggah Gambar",
+      "change": "Ganti Gambar",
+      "remove": "Hapus",
+      "error": {
+        "large": "File terlalu besar (maks {size}MB)",
+        "type": "Tipe file tidak valid"
+      },
+      "hint": "JPG, PNG atau WebP hingga {size}MB"
     }
   },
   "sales": {

@@ -26,9 +26,9 @@ export function ImageUpload({
 }: ImageUploadProps) {
     const t = useTranslations("common.imageUpload");
     // Fallback translations if "common.imageUpload" is not defined
-    const ft = (key: string) => {
+    const ft = (key: string, values?: Record<string, any>) => {
         try {
-            return t(key);
+            return t(key, values);
         } catch {
             const fallbacks: Record<string, string> = {
                 "upload": "Upload Image",
@@ -38,7 +38,13 @@ export function ImageUpload({
                 "error.type": "Invalid file type",
                 "hint": "JPG, PNG or WebP up to {size}MB"
             };
-            return fallbacks[key]?.replace("{size}", maxSizeMB.toString()) || key;
+            let text = fallbacks[key] || key;
+            if (values) {
+                Object.entries(values).forEach(([k, v]) => {
+                    text = text.replace(`{${k}}`, String(v));
+                });
+            }
+            return text;
         }
     };
 
@@ -58,7 +64,7 @@ export function ImageUpload({
         if (file.size > maxSizeMB * 1024 * 1024) {
             toast({
                 title: "Error",
-                description: ft("error.large"),
+                description: ft("error.large", { size: maxSizeMB }),
                 variant: "destructive",
             });
             return;
@@ -125,7 +131,7 @@ export function ImageUpload({
                 ) : (
                     <div className="flex flex-col items-center justify-center text-muted-foreground">
                         <ImageIcon className="h-10 w-10 mb-2 opacity-20" />
-                        <p className="text-xs text-center px-2">{ft("hint")}</p>
+                        <p className="text-xs text-center px-2">{ft("hint", { size: maxSizeMB })}</p>
                     </div>
                 )}
 
