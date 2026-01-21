@@ -15,11 +15,13 @@ import {
   DocumentStatusHistoryEntity,
 } from '../../database/entities';
 import { DocumentsService } from './documents.service';
+import { DocumentNumberService } from './document-number.service';
 
 describe('DocumentsService', () => {
   let service: DocumentsService;
   let documentRepo: Repository<DocumentEntity>;
   let dataSource: DataSource;
+  let documentNumberService: DocumentNumberService;
 
   const mockTenantId = 'tenant-1';
   const mockUserId = 'user-1';
@@ -34,6 +36,7 @@ describe('DocumentsService', () => {
           useValue: {
             findOne: jest.fn(),
             save: jest.fn(),
+            create: jest.fn(),
           },
         },
         {
@@ -62,16 +65,22 @@ describe('DocumentsService', () => {
         {
           provide: DataSource,
           useValue: {
-            transaction: jest.fn((cb) =>
+            transaction: jest.fn((cb: (mgr: EntityManager) => Promise<any>) =>
               cb({
                 findOne: jest.fn(),
                 save: jest.fn(),
                 count: jest.fn(),
-                create: jest.fn((entity, data) => data),
+                create: jest.fn((entity: any, data: any) => data),
                 update: jest.fn(),
                 delete: jest.fn(),
               } as unknown as EntityManager),
             ),
+          },
+        },
+        {
+          provide: DocumentNumberService,
+          useValue: {
+            getNextDocumentNumber: jest.fn(),
           },
         },
       ],
@@ -80,13 +89,53 @@ describe('DocumentsService', () => {
     service = module.get<DocumentsService>(DocumentsService);
     documentRepo = module.get(getRepositoryToken(DocumentEntity));
     dataSource = module.get(DataSource);
+    documentNumberService = module.get<DocumentNumberService>(
+      DocumentNumberService,
+    );
   });
 
-  const setupTransactionMock = (manager: any) => {
-    (dataSource.transaction as jest.Mock).mockImplementation(async (cb) =>
-      cb(manager),
+  const setupTransactionMock = (manager: Partial<EntityManager>) => {
+    (dataSource.transaction as jest.Mock).mockImplementation(
+      async (cb: (mgr: EntityManager) => Promise<any>) =>
+        cb(manager as EntityManager),
     );
   };
+
+  describe('create', () => {
+    it('should create a new draft document with a generated number', async () => {
+      const mockData = {
+        documentDate: new Date(),
+        notes: 'Test note',
+      };
+
+      (
+        documentNumberService.getNextDocumentNumber as jest.Mock
+      ).mockResolvedValue('INV-2026-01-000001');
+      (documentRepo.create as jest.Mock).mockImplementation(
+        (data: any) => data,
+      );
+      (documentRepo.save as jest.Mock).mockImplementation((doc: any) =>
+        Promise.resolve(doc),
+      );
+
+      const result = await service.create(
+        mockTenantId,
+        'sales.invoice',
+        DocumentModule.SALES,
+        mockData,
+        mockUserId,
+      );
+
+      expect(result.number).toBe('INV-2026-01-000001');
+      expect(result.status).toBe(DocumentStatus.DRAFT);
+      expect(result.tenantId).toBe(mockTenantId);
+      expect(result.createdBy).toBe(mockUserId);
+      expect(documentNumberService.getNextDocumentNumber).toHaveBeenCalledWith(
+        mockTenantId,
+        'sales.invoice',
+      );
+    });
+  });
 
   describe('submit', () => {
     it('should transition document from DRAFT to SUBMITTED and create approval records', async () => {
@@ -97,10 +146,10 @@ describe('DocumentsService', () => {
         documentKey: 'sales.invoice',
       } as DocumentEntity;
 
-      const manager = {
+      const manager: Partial<EntityManager> = {
         save: jest.fn().mockResolvedValue({}),
         count: jest.fn().mockResolvedValue(1), // items exist
-        create: jest.fn((entity, data) => data),
+        create: jest.fn((entity: any, data: any) => data),
       };
 
       (documentRepo.findOne as jest.Mock).mockResolvedValue(mockDoc);
@@ -141,10 +190,11 @@ describe('DocumentsService', () => {
         documentKey: 'purchasing.po',
       } as DocumentEntity;
 
-      const manager = {
+      const manager: Partial<EntityManager> = {
         save: jest.fn().mockResolvedValue({}),
         count: jest.fn().mockResolvedValue(1),
-        create: jest.fn((entity, data) => data),
+        delete: jest.fn().mockResolvedValue({}),
+        create: jest.fn((entity: any, data: any) => data),
       };
 
       (documentRepo.findOne as jest.Mock).mockResolvedValue(mockDoc);
@@ -168,7 +218,7 @@ describe('DocumentsService', () => {
         module: DocumentModule.SALES,
       } as DocumentEntity;
 
-      const manager = {
+      const manager: Partial<EntityManager> = {
         count: jest.fn().mockResolvedValue(0),
       };
 
@@ -197,11 +247,11 @@ describe('DocumentsService', () => {
         status: ApprovalStatus.PENDING,
       };
 
-      const manager = {
+      const manager: Partial<EntityManager> = {
         findOne: jest.fn().mockResolvedValue(mockApproval),
         save: jest.fn().mockResolvedValue({}),
         count: jest.fn().mockResolvedValue(0), // no more pending
-        create: jest.fn((entity, data) => data),
+        create: jest.fn((entity: any, data: any) => data),
       };
 
       (documentRepo.findOne as jest.Mock).mockResolvedValue(mockDoc);
@@ -238,11 +288,11 @@ describe('DocumentsService', () => {
         status: ApprovalStatus.PENDING,
       };
 
-      const manager = {
+      const manager: Partial<EntityManager> = {
         findOne: jest.fn().mockResolvedValue(mockApproval),
         save: jest.fn().mockResolvedValue({}),
         count: jest.fn().mockResolvedValue(1), // still has pending (step 1)
-        create: jest.fn((entity, data) => data),
+        create: jest.fn((entity: any, data: any) => data),
       };
 
       (documentRepo.findOne as jest.Mock).mockResolvedValue(mockDoc);
@@ -282,11 +332,14 @@ describe('DocumentsService', () => {
         status: ApprovalStatus.PENDING, // NOT YET APPROVED
       };
 
-      const manager = {
+      const manager: Partial<EntityManager> = {
         findOne: jest
           .fn()
           .mockResolvedValueOnce(mockApproval1)
           .mockResolvedValueOnce(mockApproval0),
+        save: jest.fn().mockResolvedValue({}),
+        update: jest.fn().mockResolvedValue({}),
+        create: jest.fn((entity: any, data: any) => data),
       };
 
       (documentRepo.findOne as jest.Mock).mockResolvedValue(mockDoc);
@@ -308,10 +361,10 @@ describe('DocumentsService', () => {
         id: mockDocId,
         status: DocumentStatus.SUBMITTED,
       } as DocumentEntity;
-      const manager = {
+      const manager: Partial<EntityManager> = {
         save: jest.fn().mockResolvedValue({}),
         update: jest.fn().mockResolvedValue({}),
-        create: jest.fn((entity, data) => data),
+        create: jest.fn((entity: any, data: any) => data),
       };
 
       (documentRepo.findOne as jest.Mock).mockResolvedValue(mockDoc);
@@ -340,10 +393,10 @@ describe('DocumentsService', () => {
         id: mockDocId,
         status: DocumentStatus.SUBMITTED,
       } as DocumentEntity;
-      const manager = {
+      const manager: Partial<EntityManager> = {
         save: jest.fn().mockResolvedValue({}),
         update: jest.fn().mockResolvedValue({}),
-        create: jest.fn((entity, data) => data),
+        create: jest.fn((entity: any, data: any) => data),
       };
 
       (documentRepo.findOne as jest.Mock).mockResolvedValue(mockDoc);
@@ -379,9 +432,9 @@ describe('DocumentsService', () => {
         id: mockDocId,
         status: DocumentStatus.APPROVED,
       } as DocumentEntity;
-      const manager = {
+      const manager: Partial<EntityManager> = {
         save: jest.fn().mockResolvedValue({}),
-        create: jest.fn((entity, data) => data),
+        create: jest.fn((entity: any, data: any) => data),
       };
 
       (documentRepo.findOne as jest.Mock).mockResolvedValue(mockDoc);
@@ -419,10 +472,10 @@ describe('DocumentsService', () => {
         id: mockDocId,
         status: DocumentStatus.APPROVED,
       } as DocumentEntity;
-      const manager = {
+      const manager: Partial<EntityManager> = {
         save: jest.fn().mockResolvedValue({}),
         delete: jest.fn().mockResolvedValue({}),
-        create: jest.fn((entity, data) => data),
+        create: jest.fn((entity: any, data: any) => data),
       };
 
       (documentRepo.findOne as jest.Mock).mockResolvedValue(mockDoc);

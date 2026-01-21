@@ -21,6 +21,7 @@ import {
   getApprovalStepsCount,
   isValidTransition,
 } from './state-machine/document-state-machine';
+import { DocumentNumberService } from './document-number.service';
 
 @Injectable()
 export class DocumentsService {
@@ -34,7 +35,34 @@ export class DocumentsService {
     @InjectRepository(DocumentStatusHistoryEntity)
     private readonly historyRepository: Repository<DocumentStatusHistoryEntity>,
     private readonly dataSource: DataSource,
+    private readonly documentNumberService: DocumentNumberService,
   ) {}
+
+  async create(
+    tenantId: string,
+    documentKey: string,
+    module: DocumentModule,
+    data: Partial<DocumentEntity>,
+    userId: string,
+  ): Promise<DocumentEntity> {
+    const documentNumber =
+      await this.documentNumberService.getNextDocumentNumber(
+        tenantId,
+        documentKey,
+      );
+
+    const document = this.documentRepository.create({
+      ...data,
+      tenantId,
+      documentKey,
+      module,
+      number: documentNumber,
+      status: DocumentStatus.DRAFT,
+      createdBy: userId,
+    });
+
+    return this.documentRepository.save(document);
+  }
 
   async findOne(id: string, tenantId: string): Promise<DocumentEntity> {
     const document = await this.documentRepository.findOne({

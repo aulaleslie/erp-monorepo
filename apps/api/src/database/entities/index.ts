@@ -27,6 +27,7 @@ import { DocumentTaxLineEntity } from './document-tax-line.entity';
 import { DocumentAccountLineEntity } from './document-account-line.entity';
 import { DocumentApprovalEntity } from './document-approval.entity';
 import { DocumentStatusHistoryEntity } from './document-status-history.entity';
+import { DocumentNumberSettingEntity } from './document-number-setting.entity';
 
 export {
   AuditLogEntity,
@@ -57,6 +58,7 @@ export {
   DocumentAccountLineEntity,
   DocumentApprovalEntity,
   DocumentStatusHistoryEntity,
+  DocumentNumberSettingEntity,
 };
 
 export const ALL_ENTITIES = [
@@ -83,4 +85,5 @@ export const ALL_ENTITIES = [
   DocumentAccountLineEntity,
   DocumentApprovalEntity,
   DocumentStatusHistoryEntity,
+  DocumentNumberSettingEntity,
 ];

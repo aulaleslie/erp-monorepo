@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { PERMISSIONS } from '@gym-monorepo/shared';
@@ -9,12 +17,15 @@ import { RequirePermissions } from '../../common/decorators/require-permissions.
 import { CurrentTenant } from '../../common/decorators/current-tenant.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { DocumentsService } from './documents.service';
+import { DocumentNumberService } from './document-number.service';
 import {
   ApproveDocumentDto,
   CancelDocumentDto,
   RejectDocumentDto,
   RequestRevisionDto,
 } from './dto/workflow-document.dto';
+import { UpdateDocumentNumberSettingsDto } from './dto/document-number-settings.dto';
+import { CreateDocumentDto } from './dto/create-document.dto';
 
 @ApiTags('documents')
 @ApiCookieAuth('access_token')
@@ -26,7 +37,60 @@ import {
   PermissionGuard,
 )
 export class DocumentsController {
-  constructor(private readonly documentsService: DocumentsService) {}
+  constructor(
+    private readonly documentsService: DocumentsService,
+    private readonly documentNumberService: DocumentNumberService,
+  ) {}
+
+  @Post()
+  @ApiOperation({ summary: 'Create a new draft document' })
+  @RequirePermissions(PERMISSIONS.DOCUMENTS.SUBMIT)
+  async create(
+    @Body() dto: CreateDocumentDto,
+    @CurrentTenant() tenantId: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    const { documentKey, module, ...data } = dto;
+    return this.documentsService.create(
+      tenantId,
+      documentKey,
+      module,
+      {
+        ...data,
+        documentDate: new Date(data.documentDate),
+        dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
+      },
+      userId,
+    );
+  }
+
+  @Get('number-settings')
+  @ApiOperation({ summary: 'Get all document number settings' })
+  @RequirePermissions(PERMISSIONS.SETTINGS.TENANT.READ)
+  async getAllNumberSettings(@CurrentTenant() tenantId: string) {
+    return this.documentNumberService.findAllSettings(tenantId);
+  }
+
+  @Get('number-settings/:documentKey')
+  @ApiOperation({ summary: 'Get document number setting for a specific key' })
+  @RequirePermissions(PERMISSIONS.SETTINGS.TENANT.READ)
+  async getNumberSetting(
+    @CurrentTenant() tenantId: string,
+    @Param('documentKey') documentKey: string,
+  ) {
+    return this.documentNumberService.findOneSetting(tenantId, documentKey);
+  }
+
+  @Put('number-settings/:documentKey')
+  @ApiOperation({ summary: 'Update document number setting' })
+  @RequirePermissions(PERMISSIONS.SETTINGS.TENANT.UPDATE)
+  async updateNumberSetting(
+    @CurrentTenant() tenantId: string,
+    @Param('documentKey') documentKey: string,
+    @Body() dto: UpdateDocumentNumberSettingsDto,
+  ) {
+    return this.documentNumberService.updateSetting(tenantId, documentKey, dto);
+  }
 
   @Post(':id/submit')
   @ApiOperation({ summary: 'Submit document for approval' })

@@ -3,7 +3,9 @@ import {
   ChartOfAccountsEntity,
   CostCenterEntity,
   TenantEntity,
+  DocumentNumberSettingEntity,
 } from '../../database/entities';
+
 import { AccountType } from '@gym-monorepo/shared';
 
 export const seedDocumentEngine = async (
@@ -74,6 +76,42 @@ export const seedDocumentEngine = async (
             code: ccData.code,
             name: ccData.name,
             isActive: true,
+          }),
+        );
+      }
+    }
+
+    // 3. Seed Document Numbering Settings
+    const numberingToSeed = [
+      { documentKey: 'sales.order', prefix: 'SO' },
+      { documentKey: 'sales.invoice', prefix: 'INV' },
+      { documentKey: 'purchasing.po', prefix: 'PO' },
+      { documentKey: 'purchasing.grn', prefix: 'GRN' },
+      { documentKey: 'accounting.journal', prefix: 'JE' },
+      { documentKey: 'inventory.transfer', prefix: 'TRF' },
+      { documentKey: 'inventory.adjustment', prefix: 'ADJ' },
+      { documentKey: 'inventory.count', prefix: 'CNT' },
+    ];
+
+    const numberingRepo = dataSource.getRepository(DocumentNumberSettingEntity);
+
+    for (const data of numberingToSeed) {
+      const existing = await numberingRepo.findOneBy({
+        tenantId: tenant.id,
+        documentKey: data.documentKey,
+      });
+
+      if (!existing) {
+        await numberingRepo.save(
+          numberingRepo.create({
+            tenantId: tenant.id,
+            documentKey: data.documentKey,
+            prefix: data.prefix,
+            paddingLength: 6,
+            includePeriod: true,
+            periodFormat: 'yyyy-MM',
+            currentCounter: 0,
+            lastPeriod: null,
           }),
         );
       }

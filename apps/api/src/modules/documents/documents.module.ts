@@ -5,9 +5,11 @@ import {
   DocumentEntity,
   DocumentItemEntity,
   DocumentStatusHistoryEntity,
+  DocumentNumberSettingEntity,
 } from '../../database/entities';
 import { DocumentsController } from './documents.controller';
 import { DocumentsService } from './documents.service';
+import { DocumentNumberService } from './document-number.service';
 
 @Module({
   imports: [
@@ -16,10 +18,11 @@ import { DocumentsService } from './documents.service';
       DocumentItemEntity,
       DocumentApprovalEntity,
       DocumentStatusHistoryEntity,
+      DocumentNumberSettingEntity,
     ]),
   ],
   controllers: [DocumentsController],
-  providers: [DocumentsService],
-  exports: [DocumentsService],
+  providers: [DocumentsService, DocumentNumberService],
+  exports: [DocumentsService, DocumentNumberService],
 })
 export class DocumentsModule {}
