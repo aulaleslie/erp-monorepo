@@ -10,6 +10,7 @@ import {
 import { BadRequestException } from '@nestjs/common';
 import {
   ApprovalStatus,
+  DocumentAccessScope,
   DocumentModule,
   DocumentStatus,
   DOCUMENT_ERRORS,
@@ -529,6 +530,145 @@ describe('DocumentsService', () => {
       expect(manager.delete).toHaveBeenCalledWith(DocumentApprovalEntity, {
         documentId: mockDocId,
         status: ApprovalStatus.PENDING,
+      });
+    });
+  });
+
+  describe('Row-level Access Rules', () => {
+    describe('findOne access scope enforcement', () => {
+      it('should return document when accessScope is TENANT', async () => {
+        const doc = {
+          id: mockDocId,
+          tenantId: mockTenantId,
+          accessScope: DocumentAccessScope.TENANT,
+        } as DocumentEntity;
+        (documentRepo.findOne as jest.Mock).mockResolvedValue(doc);
+
+        const result = await service.findOne(
+          mockDocId,
+          mockTenantId,
+          mockUserId,
+        );
+        expect(result).toEqual(doc);
+      });
+
+      it('should return document when accessScope is CREATOR and user is creator', async () => {
+        const doc = {
+          id: mockDocId,
+          tenantId: mockTenantId,
+          accessScope: DocumentAccessScope.CREATOR,
+          createdBy: mockUserId,
+        } as DocumentEntity;
+        (documentRepo.findOne as jest.Mock).mockResolvedValue(doc);
+
+        const result = await service.findOne(
+          mockDocId,
+          mockTenantId,
+          mockUserId,
+        );
+        expect(result).toEqual(doc);
+      });
+
+      it('should throw ForbiddenException when accessScope is CREATOR and user is NOT creator', async () => {
+        const doc = {
+          id: mockDocId,
+          tenantId: mockTenantId,
+          accessScope: DocumentAccessScope.CREATOR,
+          createdBy: 'other-user',
+        } as DocumentEntity;
+        (documentRepo.findOne as jest.Mock).mockResolvedValue(doc);
+
+        await expect(
+          service.findOne(mockDocId, mockTenantId, mockUserId),
+        ).rejects.toThrow(DOCUMENT_ERRORS.ACCESS_DENIED.message);
+      });
+
+      it('should allow access when accessScope is ROLE (reserved for future)', async () => {
+        const doc = {
+          id: mockDocId,
+          tenantId: mockTenantId,
+          accessScope: DocumentAccessScope.ROLE,
+          accessRoleId: 'some-role',
+        } as DocumentEntity;
+        (documentRepo.findOne as jest.Mock).mockResolvedValue(doc);
+
+        const result = await service.findOne(
+          mockDocId,
+          mockTenantId,
+          mockUserId,
+        );
+        expect(result).toEqual(doc);
+      });
+
+      it('should allow access when accessScope is USER (reserved for future)', async () => {
+        const doc = {
+          id: mockDocId,
+          tenantId: mockTenantId,
+          accessScope: DocumentAccessScope.USER,
+          accessUserId: 'some-user',
+        } as DocumentEntity;
+        (documentRepo.findOne as jest.Mock).mockResolvedValue(doc);
+
+        const result = await service.findOne(
+          mockDocId,
+          mockTenantId,
+          mockUserId,
+        );
+        expect(result).toEqual(doc);
+      });
+    });
+
+    describe('workflow methods context passing', () => {
+      it('should pass userId to findOne in submit', async () => {
+        const doc = {
+          id: mockDocId,
+          tenantId: mockTenantId,
+          status: DocumentStatus.DRAFT,
+          module: DocumentModule.SALES,
+        } as DocumentEntity;
+        const findOneSpy = jest
+          .spyOn(service, 'findOne')
+          .mockResolvedValue(doc);
+
+        setupTransactionMock({
+          save: jest.fn().mockResolvedValue({}),
+          count: jest.fn().mockResolvedValue(1),
+          create: createEntity,
+        });
+
+        await service.submit(mockDocId, mockTenantId, mockUserId);
+        expect(findOneSpy).toHaveBeenCalledWith(
+          mockDocId,
+          mockTenantId,
+          mockUserId,
+        );
+      });
+
+      it('should pass userId to findOne in approveStep', async () => {
+        const doc = {
+          id: mockDocId,
+          tenantId: mockTenantId,
+          status: DocumentStatus.SUBMITTED,
+          documentKey: 'sales.invoice',
+        } as DocumentEntity;
+        const findOneSpy = jest
+          .spyOn(service, 'findOne')
+          .mockResolvedValue(doc);
+        const mockApproval = { status: ApprovalStatus.PENDING };
+
+        setupTransactionMock({
+          findOne: jest.fn().mockResolvedValue(mockApproval),
+          save: jest.fn().mockResolvedValue({}),
+          count: jest.fn().mockResolvedValue(0),
+          create: createEntity,
+        });
+
+        await service.approveStep(mockDocId, 0, null, mockTenantId, mockUserId);
+        expect(findOneSpy).toHaveBeenCalledWith(
+          mockDocId,
+          mockTenantId,
+          mockUserId,
+        );
       });
     });
   });

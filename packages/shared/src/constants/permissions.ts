@@ -71,6 +71,30 @@ export const PERMISSIONS = {
     REJECT: 'documents.reject',
     REVISE: 'documents.revise',
   },
+  SALES: {
+    READ: 'sales.read',
+    CREATE: 'sales.create',
+    UPDATE: 'sales.update',
+    DELETE: 'sales.delete',
+  },
+  PURCHASING: {
+    READ: 'purchasing.read',
+    CREATE: 'purchasing.create',
+    UPDATE: 'purchasing.update',
+    DELETE: 'purchasing.delete',
+  },
+  ACCOUNTING: {
+    READ: 'accounting.read',
+    CREATE: 'accounting.create',
+    UPDATE: 'accounting.update',
+    DELETE: 'accounting.delete',
+  },
+  INVENTORY: {
+    READ: 'inventory.read',
+    CREATE: 'inventory.create',
+    UPDATE: 'inventory.update',
+    DELETE: 'inventory.delete',
+  },
 } as const;
 
 // Type-safe permission values
@@ -84,7 +108,11 @@ export type PermissionCode =
   | typeof PERMISSIONS.SETTINGS.TENANT[keyof typeof PERMISSIONS.SETTINGS.TENANT]
   | typeof PERMISSIONS.CHART_OF_ACCOUNTS[keyof typeof PERMISSIONS.CHART_OF_ACCOUNTS]
   | typeof PERMISSIONS.COST_CENTERS[keyof typeof PERMISSIONS.COST_CENTERS]
-  | typeof PERMISSIONS.DOCUMENTS[keyof typeof PERMISSIONS.DOCUMENTS];
+  | typeof PERMISSIONS.DOCUMENTS[keyof typeof PERMISSIONS.DOCUMENTS]
+  | typeof PERMISSIONS.SALES[keyof typeof PERMISSIONS.SALES]
+  | typeof PERMISSIONS.PURCHASING[keyof typeof PERMISSIONS.PURCHASING]
+  | typeof PERMISSIONS.ACCOUNTING[keyof typeof PERMISSIONS.ACCOUNTING]
+  | typeof PERMISSIONS.INVENTORY[keyof typeof PERMISSIONS.INVENTORY];
 
 // All permission codes as a flat array (useful for validation)
 export const ALL_PERMISSION_CODES: PermissionCode[] = [
@@ -133,4 +161,20 @@ export const ALL_PERMISSION_CODES: PermissionCode[] = [
   PERMISSIONS.DOCUMENTS.CANCEL,
   PERMISSIONS.DOCUMENTS.REJECT,
   PERMISSIONS.DOCUMENTS.REVISE,
+  PERMISSIONS.SALES.READ,
+  PERMISSIONS.SALES.CREATE,
+  PERMISSIONS.SALES.UPDATE,
+  PERMISSIONS.SALES.DELETE,
+  PERMISSIONS.PURCHASING.READ,
+  PERMISSIONS.PURCHASING.CREATE,
+  PERMISSIONS.PURCHASING.UPDATE,
+  PERMISSIONS.PURCHASING.DELETE,
+  PERMISSIONS.ACCOUNTING.READ,
+  PERMISSIONS.ACCOUNTING.CREATE,
+  PERMISSIONS.ACCOUNTING.UPDATE,
+  PERMISSIONS.ACCOUNTING.DELETE,
+  PERMISSIONS.INVENTORY.READ,
+  PERMISSIONS.INVENTORY.CREATE,
+  PERMISSIONS.INVENTORY.UPDATE,
+  PERMISSIONS.INVENTORY.DELETE,
 ];

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   Param,
   Post,
@@ -18,6 +19,7 @@ import { CurrentTenant } from '../../common/decorators/current-tenant.decorator'
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { DocumentsService } from './documents.service';
 import { DocumentNumberService } from './document-number.service';
+import { UsersService } from '../users/users.service';
 import {
   ApproveDocumentDto,
   CancelDocumentDto,
@@ -40,6 +42,7 @@ export class DocumentsController {
   constructor(
     private readonly documentsService: DocumentsService,
     private readonly documentNumberService: DocumentNumberService,
+    private readonly usersService: UsersService,
   ) {}
 
   @Post()
@@ -51,6 +54,10 @@ export class DocumentsController {
     @CurrentUser('id') userId: string,
   ) {
     const { documentKey, module, ...data } = dto;
+
+    // Module-specific permission check
+    await this.checkModulePermission(userId, tenantId, module, 'CREATE');
+
     return this.documentsService.create(
       tenantId,
       documentKey,
@@ -185,8 +192,11 @@ export class DocumentsController {
   async getStatusHistory(
     @Param('id') id: string,
     @CurrentTenant() tenantId: string,
+    @CurrentUser('id') userId: string,
   ) {
-    return this.documentsService.getStatusHistory(id, tenantId);
+    const document = await this.documentsService.findOne(id, tenantId, userId);
+    await this.checkModulePermission(userId, tenantId, document.module, 'READ');
+    return this.documentsService.getStatusHistory(id, tenantId, userId);
   }
 
   @Get(':id/approvals')
@@ -195,7 +205,40 @@ export class DocumentsController {
   async getApprovals(
     @Param('id') id: string,
     @CurrentTenant() tenantId: string,
+    @CurrentUser('id') userId: string,
   ) {
-    return this.documentsService.getApprovals(id, tenantId);
+    const document = await this.documentsService.findOne(id, tenantId, userId);
+    await this.checkModulePermission(userId, tenantId, document.module, 'READ');
+    return this.documentsService.getApprovals(id, tenantId, userId);
+  }
+
+  private async checkModulePermission(
+    userId: string,
+    tenantId: string,
+    module: string,
+    action: 'READ' | 'CREATE' | 'UPDATE' | 'DELETE',
+  ) {
+    const { superAdmin, permissions } = await this.usersService.getPermissions(
+      userId,
+      tenantId,
+    );
+
+    if (superAdmin) return;
+
+    const moduleUpper = module.toUpperCase();
+    const permissionsMap = PERMISSIONS as unknown as Record<
+      string,
+      Record<string, string>
+    >;
+    const modulePermissions = permissionsMap[moduleUpper];
+    const permissionCode = modulePermissions
+      ? modulePermissions[action]
+      : undefined;
+
+    if (permissionCode && !permissions?.includes(permissionCode)) {
+      throw new ForbiddenException(
+        `Insufficient module permissions: ${permissionCode} required`,
+      );
+    }
   }
 }

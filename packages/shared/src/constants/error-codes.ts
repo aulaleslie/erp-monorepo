@@ -389,6 +389,10 @@ export const DOCUMENT_ERRORS = {
     code: 'DOCUMENT_LEDGER_IMBALANCE',
     message: 'Debit and credit amounts do not balance',
   },
+  ACCESS_DENIED: {
+    code: 'DOCUMENT_ACCESS_DENIED',
+    message: 'You do not have access to this document',
+  },
 } as const;
 
 // ============================================================================

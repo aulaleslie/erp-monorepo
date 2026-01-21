@@ -69,4 +69,123 @@ export const corePermissions: SeedPermission[] = [
   { code: PERMISSIONS.ITEMS.CREATE, name: 'Create Items', group: 'Catalog' },
   { code: PERMISSIONS.ITEMS.UPDATE, name: 'Update Items', group: 'Catalog' },
   { code: PERMISSIONS.ITEMS.DELETE, name: 'Delete Items', group: 'Catalog' },
+  // Documents
+  {
+    code: PERMISSIONS.DOCUMENTS.READ,
+    name: 'Read Documents',
+    group: 'Documents',
+  },
+  {
+    code: PERMISSIONS.DOCUMENTS.CREATE,
+    name: 'Create Documents',
+    group: 'Documents',
+  },
+  {
+    code: PERMISSIONS.DOCUMENTS.UPDATE,
+    name: 'Update Documents',
+    group: 'Documents',
+  },
+  {
+    code: PERMISSIONS.DOCUMENTS.DELETE,
+    name: 'Delete Documents',
+    group: 'Documents',
+  },
+  {
+    code: PERMISSIONS.DOCUMENTS.SUBMIT,
+    name: 'Submit Documents',
+    group: 'Documents',
+  },
+  {
+    code: PERMISSIONS.DOCUMENTS.APPROVE,
+    name: 'Approve Documents',
+    group: 'Documents',
+  },
+  {
+    code: PERMISSIONS.DOCUMENTS.POST,
+    name: 'Post Documents',
+    group: 'Documents',
+  },
+  {
+    code: PERMISSIONS.DOCUMENTS.CANCEL,
+    name: 'Cancel Documents',
+    group: 'Documents',
+  },
+  {
+    code: PERMISSIONS.DOCUMENTS.REJECT,
+    name: 'Reject Documents',
+    group: 'Documents',
+  },
+  {
+    code: PERMISSIONS.DOCUMENTS.REVISE,
+    name: 'Request Revision',
+    group: 'Documents',
+  },
+  // Sales
+  { code: PERMISSIONS.SALES.READ, name: 'Read Sales', group: 'Sales' },
+  { code: PERMISSIONS.SALES.CREATE, name: 'Create Sales', group: 'Sales' },
+  { code: PERMISSIONS.SALES.UPDATE, name: 'Update Sales', group: 'Sales' },
+  { code: PERMISSIONS.SALES.DELETE, name: 'Delete Sales', group: 'Sales' },
+  // Purchasing
+  {
+    code: PERMISSIONS.PURCHASING.READ,
+    name: 'Read Purchasing',
+    group: 'Purchasing',
+  },
+  {
+    code: PERMISSIONS.PURCHASING.CREATE,
+    name: 'Create Purchasing',
+    group: 'Purchasing',
+  },
+  {
+    code: PERMISSIONS.PURCHASING.UPDATE,
+    name: 'Update Purchasing',
+    group: 'Purchasing',
+  },
+  {
+    code: PERMISSIONS.PURCHASING.DELETE,
+    name: 'Delete Purchasing',
+    group: 'Purchasing',
+  },
+  // Accounting
+  {
+    code: PERMISSIONS.ACCOUNTING.READ,
+    name: 'Read Accounting',
+    group: 'Accounting',
+  },
+  {
+    code: PERMISSIONS.ACCOUNTING.CREATE,
+    name: 'Create Accounting',
+    group: 'Accounting',
+  },
+  {
+    code: PERMISSIONS.ACCOUNTING.UPDATE,
+    name: 'Update Accounting',
+    group: 'Accounting',
+  },
+  {
+    code: PERMISSIONS.ACCOUNTING.DELETE,
+    name: 'Delete Accounting',
+    group: 'Accounting',
+  },
+  // Inventory
+  {
+    code: PERMISSIONS.INVENTORY.READ,
+    name: 'Read Inventory',
+    group: 'Inventory',
+  },
+  {
+    code: PERMISSIONS.INVENTORY.CREATE,
+    name: 'Create Inventory',
+    group: 'Inventory',
+  },
+  {
+    code: PERMISSIONS.INVENTORY.UPDATE,
+    name: 'Update Inventory',
+    group: 'Inventory',
+  },
+  {
+    code: PERMISSIONS.INVENTORY.DELETE,
+    name: 'Delete Inventory',
+    group: 'Inventory',
+  },
 ];

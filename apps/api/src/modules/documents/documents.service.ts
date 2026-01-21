@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -7,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, EntityManager, Repository } from 'typeorm';
 import {
   ApprovalStatus,
+  DocumentAccessScope,
   DocumentModule,
   DocumentStatus,
   DOCUMENT_ERRORS,
@@ -73,7 +75,11 @@ export class DocumentsService {
     return this.documentRepository.save(document);
   }
 
-  async findOne(id: string, tenantId: string): Promise<DocumentEntity> {
+  async findOne(
+    id: string,
+    tenantId: string,
+    userId: string,
+  ): Promise<DocumentEntity> {
     const document = await this.documentRepository.findOne({
       where: { id, tenantId },
     });
@@ -82,7 +88,30 @@ export class DocumentsService {
       throw new NotFoundException(DOCUMENT_ERRORS.NOT_FOUND.message);
     }
 
+    this.validateAccess(document, { userId, tenantId });
+
     return document;
+  }
+
+  private validateAccess(
+    document: DocumentEntity,
+    context: { userId: string; tenantId: string },
+  ): void {
+    switch (document.accessScope) {
+      case DocumentAccessScope.TENANT:
+        return; // Already filtered by tenantId
+      case DocumentAccessScope.CREATOR:
+        if (document.createdBy !== context.userId) {
+          throw new ForbiddenException(DOCUMENT_ERRORS.ACCESS_DENIED.message);
+        }
+        return;
+      case DocumentAccessScope.ROLE:
+      case DocumentAccessScope.USER:
+        // Reserved for future - currently block access for safety if someone accidentally sets these
+        // Or if you prefer, allowed by tenantId (as per my previous updated plan "current allow (tenant-scoped)")
+        // Let's stick to the plan: currently allow (tenant-scoped)
+        return;
+    }
   }
 
   async submit(
@@ -91,7 +120,7 @@ export class DocumentsService {
     userId: string,
   ): Promise<DocumentEntity> {
     return this.dataSource.transaction(async (manager) => {
-      const document = await this.findOne(id, tenantId);
+      const document = await this.findOne(id, tenantId, userId);
 
       this.validateTransition(document, DocumentStatus.SUBMITTED);
       await this.validateItemsForSubmit(document, manager);
@@ -134,7 +163,7 @@ export class DocumentsService {
     userId: string,
   ): Promise<DocumentEntity> {
     return this.dataSource.transaction(async (manager) => {
-      const document = await this.findOne(id, tenantId);
+      const document = await this.findOne(id, tenantId, userId);
 
       if (document.status !== DocumentStatus.SUBMITTED) {
         throw new BadRequestException(
@@ -190,7 +219,7 @@ export class DocumentsService {
     userId: string,
   ): Promise<DocumentEntity> {
     return this.dataSource.transaction(async (manager) => {
-      const document = await this.findOne(id, tenantId);
+      const document = await this.findOne(id, tenantId, userId);
 
       this.validateTransition(document, DocumentStatus.REJECTED);
 
@@ -231,7 +260,7 @@ export class DocumentsService {
     userId: string,
   ): Promise<DocumentEntity> {
     return this.dataSource.transaction(async (manager) => {
-      const document = await this.findOne(id, tenantId);
+      const document = await this.findOne(id, tenantId, userId);
 
       this.validateTransition(document, DocumentStatus.REVISION_REQUESTED);
 
@@ -282,7 +311,7 @@ export class DocumentsService {
     userId: string,
   ): Promise<DocumentEntity> {
     return this.dataSource.transaction(async (manager) => {
-      const document = await this.findOne(id, tenantId);
+      const document = await this.findOne(id, tenantId, userId);
 
       this.validateTransition(document, DocumentStatus.POSTED);
 
@@ -320,7 +349,7 @@ export class DocumentsService {
     userId: string,
   ): Promise<DocumentEntity> {
     return this.dataSource.transaction(async (manager) => {
-      const document = await this.findOne(id, tenantId);
+      const document = await this.findOne(id, tenantId, userId);
 
       this.validateTransition(document, DocumentStatus.CANCELLED);
 
@@ -351,9 +380,10 @@ export class DocumentsService {
   async getApprovals(
     documentId: string,
     tenantId: string,
+    userId: string,
   ): Promise<DocumentApprovalEntity[]> {
     // Basic existence check
-    await this.findOne(documentId, tenantId);
+    await this.findOne(documentId, tenantId, userId);
 
     return this.approvalRepository.find({
       where: { documentId },
@@ -365,9 +395,10 @@ export class DocumentsService {
   async getStatusHistory(
     documentId: string,
     tenantId: string,
+    userId: string,
   ): Promise<DocumentStatusHistoryEntity[]> {
     // Basic existence check
-    await this.findOne(documentId, tenantId);
+    await this.findOne(documentId, tenantId, userId);
 
     return this.historyRepository.find({
       where: { documentId },

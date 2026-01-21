@@ -12,6 +12,7 @@ import {
 import { DocumentsController } from './documents.controller';
 import { DocumentsService } from './documents.service';
 import { DocumentNumberService } from './document-number.service';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { DocumentNumberService } from './document-number.service';
       LedgerEntryEntity,
       DocumentTypeRegistryEntity,
     ]),
+    UsersModule,
   ],
   controllers: [DocumentsController],
   providers: [DocumentsService, DocumentNumberService],
