@@ -37,6 +37,7 @@ The shared package exports common types, constants, and utilities:
 6. Git commits trigger lint-staged via Husky pre-commit hooks. Staged files in `apps/api/src` and `apps/web/src` are linted automatically.
 
 ## Testing & verification
+- **Mandatory on every change:** run `pnpm --filter api lint`, `pnpm --filter web lint`, `pnpm --filter api test`, and `pnpm --filter web test`. Fix all lint errors/warnings and test failures before handoff unless the user explicitly approves skipping.
 - Run `pnpm --filter web test` (or `pnpm --filter web test:run` for CI) to cover the client code.
 - Run `pnpm --filter api test` for Jest coverage.
 - After backend changes, execute `apps/api/verify.sh` against a running instance to ensure the auth cookie flows still work.
@@ -87,7 +88,7 @@ The shared package exports common types, constants, and utilities:
 ## Agent behavior
 1. Start with the Cycle docs above before writing a single line of code. If a request references a future feature not yet captured in the docs, ask for clarification and update the docs before implementing.
 2. When you modify files, explain what changed, why, and which doc section or script guided your decision.
-3. Suggest follow-up steps (test, build, docker) when handing off work. If you can't run a verification command because of environment limits, state it explicitly.
+3. Suggest follow-up steps (test, build, docker) when handing off work. If you can't run a required lint/test command because of environment limits, state it explicitly and wait for user approval to proceed.
 4. Keep context short: summarize large files instead of pasting them; load only the docs or source files needed for the task at hand.
 
 ## Maintain this file
