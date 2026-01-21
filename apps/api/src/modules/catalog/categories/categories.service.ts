@@ -13,6 +13,11 @@ import {
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CategoryQueryDto } from './dto/category-query.dto';
+import {
+  PaginatedResponse,
+  calculateSkip,
+  paginate,
+} from '../../../common/dto/pagination.dto';
 
 @Injectable()
 export class CategoriesService {
@@ -50,12 +55,15 @@ export class CategoriesService {
     return this.categoryRepository.save(category);
   }
 
-  async findAll(query: CategoryQueryDto, tenantId: string) {
+  async findAll(
+    query: CategoryQueryDto,
+    tenantId: string,
+  ): Promise<PaginatedResponse<CategoryEntity>> {
     const { search, status, parentId, limit = 10, page = 1 } = query;
-    const skip = (page - 1) * limit;
 
     const queryBuilder = this.categoryRepository
       .createQueryBuilder('category')
+      .leftJoinAndSelect('category.parent', 'parent')
       .where('category.tenantId = :tenantId', { tenantId });
 
     if (search) {
@@ -73,24 +81,20 @@ export class CategoriesService {
       queryBuilder.andWhere('category.parentId = :parentId', { parentId });
     }
 
-    queryBuilder.orderBy('category.createdAt', 'DESC').skip(skip).take(limit);
+    queryBuilder
+      .orderBy('category.createdAt', 'DESC')
+      .skip(calculateSkip(page, limit))
+      .take(limit);
 
     const [items, total] = await queryBuilder.getManyAndCount();
 
-    return {
-      data: items,
-      meta: {
-        total,
-        page,
-        limit,
-        pages: Math.ceil(total / limit),
-      },
-    };
+    return paginate(items, total, page, limit);
   }
 
   async findOne(id: string, tenantId: string) {
     const category = await this.categoryRepository.findOne({
       where: { id, tenantId },
+      relations: { parent: true },
     });
 
     if (!category) {
@@ -131,9 +135,7 @@ export class CategoriesService {
       }
     }
 
-    // Name uniqueness check is handled by potential database constraints or we can add it here explicitly if needed.
-    // The requirement says "unique (tenant_id, name)".
-    // If the DTO has name, we should check if another category has the same name.
+    // Name uniqueness check
     if (updateCategoryDto.name && updateCategoryDto.name !== category.name) {
       const existingName = await this.categoryRepository.findOne({
         where: {
@@ -143,7 +145,6 @@ export class CategoriesService {
         },
       });
       if (existingName) {
-        // We could use a specific error code here later as per C4A-BE-07
         throw new BadRequestException('Category with this name already exists');
       }
     }

@@ -1,10 +1,12 @@
 "use client";
 
+import React from "react";
 import { useTranslations } from "next-intl";
 import { PageHeader } from "@/components/common/PageHeader";
 import { PermissionGuard } from "@/components/guards/PermissionGuard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { CategoryForm } from "@/components/features/catalog/CategoryForm";
 
 export default function CreateCategoryPage() {
     const t = useTranslations("categories");
@@ -25,14 +27,8 @@ export default function CreateCategoryPage() {
                 />
 
                 <Card>
-                    <CardHeader>
-                        <CardTitle>{t("placeholders.formTitle")}</CardTitle>
-                        <CardDescription>{t("placeholders.formDescription")}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-muted-foreground">
-                            Category creation form will be implemented in C4D-FE-02.
-                        </p>
+                    <CardContent className="pt-6">
+                        <CategoryForm />
                     </CardContent>
                 </Card>
             </div>

@@ -206,7 +206,7 @@ export default function EditRolePage() {
                                     checked={isAllSelected()}
                                     onCheckedChange={toggleAll}
                                 />
-                                    <Label htmlFor="select-all" className="cursor-pointer">{t("form.selectAll")}</Label>
+                                <Label htmlFor="select-all" className="cursor-pointer">{t("form.selectAll")}</Label>
                             </div>
                         </div>
 
@@ -218,7 +218,7 @@ export default function EditRolePage() {
                                         checked={isGroupSelected(group)}
                                         onCheckedChange={() => toggleGroup(group)}
                                     />
-                                    <h4 className="font-semibold text-sm">{group}</h4>
+                                    <h4 className="font-semibold text-sm">{t(`permissionGroups.${group}`)}</h4>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pl-6">
                                     {perms.map((permission) => (

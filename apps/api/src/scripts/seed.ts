@@ -11,6 +11,7 @@ import {
   UserEntity,
 } from '../database/entities';
 import { permissionsData } from './seeds/permissions';
+import { seedCatalog } from './seeds/catalog';
 import { PeopleType, TenantType } from '@gym-monorepo/shared';
 import { TenantCountersService } from '../modules/tenant-counters/tenant-counters.service';
 
@@ -189,6 +190,7 @@ const SEEDERS: Seeder[] = [
   { name: 'admin', run: seedAdminUser },
   { name: 'roles', run: seedRolesAndAssignments },
   { name: 'walk-in', run: seedWalkInCustomers },
+  { name: 'catalog', run: seedCatalog },
 ];
 
 const parseList = (value?: string): string[] => {

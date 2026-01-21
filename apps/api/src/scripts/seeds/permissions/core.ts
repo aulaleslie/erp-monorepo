@@ -45,4 +45,28 @@ export const corePermissions: SeedPermission[] = [
     name: 'Update Tenant Settings',
     group: 'Tenant',
   },
+  {
+    code: PERMISSIONS.CATEGORIES.READ,
+    name: 'Read Categories',
+    group: 'Catalog',
+  },
+  {
+    code: PERMISSIONS.CATEGORIES.CREATE,
+    name: 'Create Categories',
+    group: 'Catalog',
+  },
+  {
+    code: PERMISSIONS.CATEGORIES.UPDATE,
+    name: 'Update Categories',
+    group: 'Catalog',
+  },
+  {
+    code: PERMISSIONS.CATEGORIES.DELETE,
+    name: 'Delete Categories',
+    group: 'Catalog',
+  },
+  { code: PERMISSIONS.ITEMS.READ, name: 'Read Items', group: 'Catalog' },
+  { code: PERMISSIONS.ITEMS.CREATE, name: 'Create Items', group: 'Catalog' },
+  { code: PERMISSIONS.ITEMS.UPDATE, name: 'Update Items', group: 'Catalog' },
+  { code: PERMISSIONS.ITEMS.DELETE, name: 'Delete Items', group: 'Catalog' },
 ];

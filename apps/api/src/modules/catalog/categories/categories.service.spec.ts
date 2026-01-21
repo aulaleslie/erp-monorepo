@@ -20,6 +20,7 @@ function buildQueryBuilder(items: CategoryEntity[], total: number) {
   return {
     where: jest.fn().mockReturnThis(),
     andWhere: jest.fn().mockReturnThis(),
+    leftJoinAndSelect: jest.fn().mockReturnThis(),
     orderBy: jest.fn().mockReturnThis(),
     skip: jest.fn().mockReturnThis(),
     take: jest.fn().mockReturnThis(),
@@ -152,9 +153,9 @@ describe('CategoriesService', () => {
 
       const result = await service.findAll({ page: 1, limit: 10 }, tenantId);
 
-      expect(result.data).toHaveLength(1);
-      expect(result.meta.total).toBe(1);
-      expect(result.meta.page).toBe(1);
+      expect(result.items).toHaveLength(1);
+      expect(result.total).toBe(1);
+      expect(result.page).toBe(1);
     });
 
     it('filters by status', async () => {

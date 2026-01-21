@@ -781,6 +781,14 @@
       "superAdmin": "Super Admin",
       "actions": "Aksi"
     },
+    "permissionGroups": {
+      "Roles": "Peran",
+      "People": "Orang",
+      "Departments": "Departemen",
+      "Users": "Pengguna",
+      "Tenant": "Pengaturan Tenant",
+      "Catalog": "Katalog"
+    },
     "labels": {
       "yes": "Ya",
       "no": "Tidak"
@@ -1278,37 +1286,188 @@
     "create": {
       "page": {
         "title": "Item Baru",
-        "description": "Tambahkan item baru ke katalog."
+        "description": "Tambah item baru ke katalog."
       }
     },
     "edit": {
       "page": {
-        "title": "Edit Item",
+        "title": "Ubah Item",
         "description": "Perbarui detail item."
       }
     },
     "detail": {
       "page": {
-        "title": "Detail Item"
+        "title": "Detail Item",
+        "description": "Lihat detail lengkap dari item katalog."
       }
     },
     "alerts": {
       "noListPermission": "Anda tidak memiliki izin untuk melihat item.",
       "noCreatePermission": "Anda tidak memiliki izin untuk membuat item.",
-      "noEditPermission": "Anda tidak memiliki izin untuk mengedit item.",
+      "noEditPermission": "Anda tidak memiliki izin untuk mengubah item.",
       "noReadPermission": "Anda tidak memiliki izin untuk melihat detail item."
     },
-    "placeholders": {
-      "listTitle": "Daftar item segera hadir",
-      "listDescription": "Halaman ini akan menyertakan filter, pencarian, dan aksi untuk item.",
-      "formTitle": "Form item segera hadir",
-      "formDescription": "Halaman ini akan menangani alur buat dan edit untuk item.",
-      "detailTitle": "Detail item segera hadir",
-      "detailDescription": "Halaman ini akan menampilkan detail item dan gambar."
+    "list": {
+      "table": {
+        "headers": {
+          "code": "SKU",
+          "name": "Nama",
+          "type": "Tipe",
+          "price": "Harga",
+          "status": "Status",
+          "actions": "Aksi"
+        },
+        "empty": "Item tidak ditemukan"
+      },
+      "filters": {
+        "search": "Cari",
+        "searchPlaceholder": "Cari berdasarkan SKU, nama, atau barcode",
+        "type": "Tipe",
+        "allTypes": "Semua Tipe",
+        "status": "Status",
+        "anyStatus": "Semua Status",
+        "category": "Kategori"
+      }
+    },
+    "form": {
+      "sections": {
+        "basic": "Informasi Dasar",
+        "service": "Detail Layanan",
+        "image": "Gambar Item"
+      },
+      "labels": {
+        "name": "Nama Item",
+        "type": "Tipe Item",
+        "price": "Harga",
+        "status": "Status",
+        "category": "Kategori",
+        "barcode": "Barcode / EAN",
+        "unit": "Unit (misal: pcs, botol)",
+        "tags": "Tag",
+        "description": "Deskripsi",
+        "serviceKind": "Jenis Layanan",
+        "durationValue": "Durasi",
+        "durationUnit": "Satuan Durasi",
+        "sessionCount": "Jumlah Sesi",
+        "includedPtSessions": "Termasuk Sesi PT"
+      },
+      "placeholders": {
+        "name": "misal: Air Mineral",
+        "price": "0",
+        "category": "Pilih kategori",
+        "status": "Pilih status",
+        "barcode": "Scan atau masukkan barcode",
+        "unit": "misal: pcs",
+        "tags": "Masukkan tag dipisahkan dengan koma",
+        "description": "Deskripsi item...",
+        "type": "Pilih tipe",
+        "serviceKind": "Pilih jenis layanan",
+        "durationUnit": "Pilih satuan"
+      },
+      "validation": {
+        "nameRequired": "Nama item wajib diisi",
+        "typeRequired": "Tipe item wajib diisi",
+        "priceRequired": "Harga wajib diisi",
+        "serviceKindRequired": "Jenis layanan wajib diisi untuk layanan",
+        "durationRequired": "Durasi wajib diisi",
+        "sessionCountRequired": "Jumlah sesi wajib diisi"
+      },
+      "buttons": {
+        "cancel": "Batal",
+        "create": "Tambah Item",
+        "save": "Simpan Perubahan"
+      }
+    },
+    "toast": {
+      "createSuccess": {
+        "title": "Item berhasil dibuat",
+        "description": "Item telah berhasil ditambahkan."
+      },
+      "updateSuccess": {
+        "title": "Item berhasil diperbarui",
+        "description": "Perubahan telah berhasil disimpan."
+      },
+      "deleteSuccess": {
+        "title": "Item berhasil dihapus",
+        "description": "Item telah dihapus."
+      },
+      "imageSuccess": {
+        "title": "Gambar berhasil diunggah",
+        "description": "Gambar item telah diperbarui."
+      },
+      "error": {
+        "title": "Kesalahan",
+        "description": "Terjadi kesalahan. Silakan coba lagi."
+      },
+      "loadError": {
+        "title": "Kesalahan",
+        "description": "Gagal memuat data item."
+      }
+    },
+    "confirm": {
+      "delete": {
+        "title": "Hapus Item?",
+        "description": "Apakah Anda yakin ingin menghapus item ini? Tindakan ini tidak dapat dibatalkan.",
+        "confirmLabel": "Hapus"
+      }
+    },
+    "import": {
+      "button": "Impor",
+      "dialog": {
+        "title": "Impor Item",
+        "description": "Unggah file CSV atau XLSX untuk mengimpor item. Kolom wajib: name, type, price, status.",
+        "fileLabel": "Pilih File",
+        "fileHint": "Format yang diterima: .csv, .xlsx (Maks 5MB)",
+        "downloadTemplate": "Unduh Templat",
+        "importing": "Mengimpor...",
+        "success": {
+          "title": "Impor Berhasil",
+          "description": "Item telah berhasil diimpor."
+        },
+        "error": {
+          "title": "Impor Gagal",
+          "description": "Terjadi kesalahan selama proses impor."
+        }
+      }
+    },
+    "export": {
+      "button": "Ekspor",
+      "dialog": {
+        "title": "Ekspor Item",
+        "description": "Pilih format dan kolom yang ingin Anda ekspor.",
+        "format": "Format",
+        "fields": "Kolom untuk Diekspor",
+        "exporting": "Mengekspor...",
+        "success": {
+          "title": "Ekspor Berhasil",
+          "description": "File sedang diunduh."
+        },
+        "fields_list": {
+          "code": "SKU",
+          "name": "Nama",
+          "type": "Tipe",
+          "price": "Harga",
+          "status": "Status",
+          "barcode": "Barcode",
+          "unit": "Unit",
+          "category": "Kategori",
+          "description": "Deskripsi"
+        }
+      }
     },
     "buttons": {
       "new": "Item Baru",
-      "edit": "Edit"
+      "edit": "Ubah",
+      "view": "Lihat",
+      "cancel": "Batal"
+    },
+    "types": {
+      "PRODUCT": "Produk",
+      "SERVICE": "Layanan"
+    },
+    "serviceKinds": {
+      "MEMBERSHIP": "Keanggotaan",
+      "PT_SESSION": "Sesi PT"
     }
   },
   "categories": {
@@ -1333,11 +1492,70 @@
       "noCreatePermission": "Anda tidak memiliki izin untuk membuat kategori.",
       "noEditPermission": "Anda tidak memiliki izin untuk mengedit kategori."
     },
-    "placeholders": {
-      "listTitle": "Daftar kategori segera hadir",
-      "listDescription": "Halaman ini akan menyertakan filter, pencarian, dan aksi untuk kategori.",
-      "formTitle": "Form kategori segera hadir",
-      "formDescription": "Halaman ini akan menangani alur buat dan edit untuk kategori."
+    "list": {
+      "table": {
+        "headers": {
+          "code": "Kode",
+          "name": "Nama",
+          "parent": "Induk",
+          "status": "Status",
+          "actions": "Aksi"
+        },
+        "empty": "Tidak ada kategori ditemukan"
+      },
+      "filters": {
+        "search": "Cari",
+        "searchPlaceholder": "Cari berdasarkan kode atau nama"
+      }
+    },
+    "form": {
+      "labels": {
+        "name": "Nama Kategori",
+        "parent": "Kategori Induk",
+        "status": "Status"
+      },
+      "placeholders": {
+        "name": "misal Keanggotaan",
+        "parent": "Pilih induk (opsional)",
+        "status": "Pilih status"
+      },
+      "validation": {
+        "nameRequired": "Nama kategori wajib diisi"
+      },
+      "buttons": {
+        "cancel": "Batal",
+        "create": "Buat Kategori",
+        "save": "Simpan Perubahan"
+      }
+    },
+    "toast": {
+      "createSuccess": {
+        "title": "Kategori dibuat",
+        "description": "Kategori telah berhasil ditambahkan."
+      },
+      "updateSuccess": {
+        "title": "Kategori diperbarui",
+        "description": "Perubahan telah berhasil disimpan."
+      },
+      "deleteSuccess": {
+        "title": "Kategori dihapus",
+        "description": "Kategori telah dihapus."
+      },
+      "error": {
+        "title": "Kesalahan",
+        "description": "Terjadi kesalahan. Silakan coba lagi."
+      },
+      "loadError": {
+        "title": "Kesalahan",
+        "description": "Gagal memuat data kategori."
+      }
+    },
+    "confirm": {
+      "delete": {
+        "title": "Hapus Kategori?",
+        "description": "Apakah Anda yakin ingin menghapus kategori ini? Tindakan ini tidak dapat dibatalkan.",
+        "confirmLabel": "Hapus"
+      }
     },
     "buttons": {
       "new": "Kategori Baru",

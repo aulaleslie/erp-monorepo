@@ -1,59 +1,29 @@
 import { api } from '@/lib/api';
 import { PaginatedResponse } from '@/services/types';
+import {
+  ItemListItem,
+  CreateItemData,
+  UpdateItemData,
+  ItemType,
+  ItemServiceKind,
+  ItemStatus,
+  ItemDurationUnit,
+} from '@gym-monorepo/shared';
 
-export enum ItemType {
-  PRODUCT = 'PRODUCT',
-  SERVICE = 'SERVICE',
-}
+export type {
+  ItemListItem,
+  CreateItemData,
+  UpdateItemData,
+};
 
-export enum ItemServiceKind {
-  MEMBERSHIP = 'MEMBERSHIP',
-  PT_SESSION = 'PT_SESSION',
-}
+export {
+  ItemType,
+  ItemServiceKind,
+  ItemStatus,
+  ItemDurationUnit,
+};
 
-export enum ItemDurationUnit {
-  DAY = 'DAY',
-  WEEK = 'WEEK',
-  MONTH = 'MONTH',
-  YEAR = 'YEAR',
-}
-
-export enum ItemStatus {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-}
-
-export interface CategorySummary {
-  id: string;
-  code: string;
-  name: string;
-}
-
-export interface ItemListItem {
-  id: string;
-  code: string;
-  name: string;
-  type: ItemType;
-  serviceKind: ItemServiceKind | null;
-  price: number;
-  status: ItemStatus;
-  categoryId: string | null;
-  category: CategorySummary | null;
-  barcode: string | null;
-  unit: string | null;
-  tags: string[];
-  description: string | null;
-  durationValue: number | null;
-  durationUnit: ItemDurationUnit | null;
-  sessionCount: number | null;
-  includedPtSessions: number | null;
-  imageKey: string | null;
-  imageUrl: string | null;
-  imageMimeType: string | null;
-  imageSize: number | null;
-}
-
-interface ItemListParams {
+export interface ItemListParams {
   page: number;
   limit: number;
   search?: string;
@@ -61,39 +31,6 @@ interface ItemListParams {
   serviceKind?: ItemServiceKind | '';
   categoryId?: string;
   status?: ItemStatus | '';
-}
-
-export interface CreateItemData {
-  name: string;
-  type: ItemType;
-  price: number;
-  categoryId?: string;
-  serviceKind?: ItemServiceKind;
-  barcode?: string;
-  unit?: string;
-  tags?: string[];
-  description?: string;
-  durationValue?: number;
-  durationUnit?: ItemDurationUnit;
-  sessionCount?: number;
-  includedPtSessions?: number;
-}
-
-export interface UpdateItemData {
-  name?: string;
-  type?: ItemType;
-  price?: number;
-  categoryId?: string | null;
-  serviceKind?: ItemServiceKind | null;
-  barcode?: string | null;
-  unit?: string | null;
-  tags?: string[];
-  description?: string | null;
-  durationValue?: number | null;
-  durationUnit?: ItemDurationUnit | null;
-  sessionCount?: number | null;
-  includedPtSessions?: number | null;
-  status?: ItemStatus;
 }
 
 export const itemsService = {
@@ -153,5 +90,46 @@ export const itemsService = {
     );
 
     return response.data.items;
+  },
+
+  async uploadImage(id: string, file: File) {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const response = await api.post<ItemListItem>(
+      `/catalog/items/${id}/image`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+
+    return response.data;
+  },
+
+  async importItems(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await api.post('/catalog/items/import', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    return response.data;
+  },
+
+  async exportItems(params: { format: 'csv' | 'xlsx'; fields?: string[]; search?: string; type?: string; status?: string; categoryId?: string }) {
+    const response = await api.get('/catalog/items/export', {
+      params,
+      responseType: 'blob',
+    });
+
+    // The interceptor might not unwrap blobs, so we handle it here
+    // If it's a blob, it's already what we want.
+    return response.data;
   },
 };

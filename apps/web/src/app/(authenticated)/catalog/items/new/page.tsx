@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { PageHeader } from "@/components/common/PageHeader";
 import { PermissionGuard } from "@/components/guards/PermissionGuard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ItemForm } from "@/components/features/catalog/ItemForm";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function CreateItemPage() {
@@ -24,17 +25,7 @@ export default function CreateItemPage() {
                     description={t("create.page.description")}
                 />
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>{t("placeholders.formTitle")}</CardTitle>
-                        <CardDescription>{t("placeholders.formDescription")}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-muted-foreground">
-                            Item creation form will be implemented in C4D-FE-03.
-                        </p>
-                    </CardContent>
-                </Card>
+                <ItemForm />
             </div>
         </PermissionGuard>
     );
