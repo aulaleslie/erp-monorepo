@@ -25,6 +25,7 @@ import { usePermissions } from "@/hooks/use-permissions";
 import { TENANT_TYPE_OPTIONS, TenantType, Locale } from "@gym-monorepo/shared";
 import { useTranslations } from "next-intl";
 import { LABEL_REGISTRY, LANGUAGE_SELECT_OPTIONS } from "@/lib/labelRegistry";
+import { getApiErrorMessage, getApiFieldErrors } from "@/lib/api";
 
 export default function EditTenantPage() {
     const params = useParams();
@@ -76,10 +77,11 @@ export default function EditTenantPage() {
                     language: data.language ?? Locale.EN,
                 });
                 setInitialTaxLabel(defaultTax ? formatTaxLabel(defaultTax) : "");
-            } catch (error) {
+            } catch (error: unknown) {
+                const message = getApiErrorMessage(error);
                 toast({
                     title: t("edit.toast.fetchError.title"),
-                    description: t("edit.toast.fetchError.description"),
+                    description: message || t("edit.toast.fetchError.description"),
                     variant: "destructive",
                 });
             } finally {
@@ -92,7 +94,7 @@ export default function EditTenantPage() {
         } else {
             setLoading(false);
         }
-    }, [tenantId, isSuperAdmin]);
+    }, [tenantId, isSuperAdmin, t, toast]);
 
     const fetchTaxes = async ({ search, page, limit }: { search: string; page: number; limit: number }) => {
         const response = await taxesService.getAll({
@@ -131,12 +133,12 @@ export default function EditTenantPage() {
                 description: t("edit.toast.success.description"),
             });
             router.push("/settings/tenants");
-        } catch (error: any) {
-            const responseData = error.response?.data;
-            const errorMessage = responseData?.message || "Failed to update tenant.";
+        } catch (error: unknown) {
+            const responseErrors = getApiFieldErrors(error);
+            const errorMessage = getApiErrorMessage(error) || "Failed to update tenant.";
 
-            if (responseData?.errors) {
-                setErrors(responseData.errors);
+            if (responseErrors) {
+                setErrors(responseErrors);
             } else {
                 setErrors({ form: errorMessage });
             }

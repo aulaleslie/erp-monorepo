@@ -17,6 +17,7 @@ import { usersService } from "@/services/users";
 import { rolesService, Role } from "@/services/roles";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "next-intl";
+import { getApiErrorMessage } from "@/lib/api";
 
 interface InvitableUser {
     id: string;
@@ -87,9 +88,8 @@ export function InviteUserDialog({
             onOpenChange(false);
             resetForm();
             onSuccess?.();
-        } catch (error: any) {
-            const message =
-                error.response?.data?.message || t('invite.toast.error.description');
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error) || t('invite.toast.error.description');
             toast({
                 title: t('invite.toast.error.title'),
                 description: message,
@@ -111,7 +111,7 @@ export function InviteUserDialog({
                 total: data.total,
                 hasMore: data.hasMore,
             };
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("Failed to fetch users:", error);
             return { items: [], total: 0, hasMore: false };
         }
@@ -119,23 +119,21 @@ export function InviteUserDialog({
 
     const fetchRoles = async (params: { search: string; page: number; limit: number }) => {
         try {
-            const data: any = await rolesService.getAll(params.page, params.limit);
-            const items = data.items || data;
-            const total = data.total || items.length;
+            const data = await rolesService.getAll(params.page, params.limit);
 
             // Filter by search term (client-side for simplicity)
             const filtered = params.search
-                ? items.filter((role: Role) =>
+                ? data.items.filter((role: Role) =>
                     role.name.toLowerCase().includes(params.search.toLowerCase())
                 )
-                : items;
+                : data.items;
 
             return {
                 items: filtered,
-                total,
-                hasMore: params.page * params.limit < total,
+                total: data.total,
+                hasMore: params.page * params.limit < data.total,
             };
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("Failed to fetch roles:", error);
             return { items: [], total: 0, hasMore: false };
         }

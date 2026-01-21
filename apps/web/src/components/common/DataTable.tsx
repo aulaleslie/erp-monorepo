@@ -18,7 +18,7 @@ export interface Column<T> {
     className?: string;
 }
 
-export interface DataTableProps<T> {
+export interface DataTableProps<T extends { id?: string | number }> {
     data: T[];
     columns: Column<T>[];
     loading?: boolean;
@@ -28,7 +28,7 @@ export interface DataTableProps<T> {
     rowKey?: (item: T) => string | number;
 }
 
-export function DataTable<T>({
+export function DataTable<T extends { id?: string | number }>({
     data,
     columns,
     loading = false,
@@ -72,7 +72,7 @@ export function DataTable<T>({
                         ) : (
                             data.map((item, index) => (
                                 <TableRow
-                                    key={rowKey ? rowKey(item) : (item as any).id || index}
+                                    key={rowKey ? rowKey(item) : item.id ?? index}
                                     onClick={onRowClick ? () => onRowClick(item) : undefined}
                                     className={onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''}
                                 >

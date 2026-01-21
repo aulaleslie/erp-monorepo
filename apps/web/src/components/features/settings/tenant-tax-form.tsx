@@ -22,13 +22,11 @@ import { MultiSearchableSelect } from "@/components/common/MultiSearchableSelect
 import { EmptyState } from "@/components/common/EmptyState";
 import {
     getPlatformTaxes,
-    TaxStatus,
     TaxType
 } from "@/lib/api/taxes";
 import {
     getTenantTaxSettings,
     updateTenantTaxSettings,
-    TenantTaxSettings
 } from "@/lib/api/tenant-settings";
 import { useTranslations } from "next-intl";
 
@@ -66,7 +64,6 @@ export function TenantTaxForm() {
 
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [settings, setSettings] = useState<TenantTaxSettings | null>(null);
     // We keep a cache of full tax objects to display labels for selected IDs
     // Initialized with taxes from settings if available
     const [availableTaxes, setAvailableTaxes] = useState<TaxOption[]>([]);
@@ -79,7 +76,7 @@ export function TenantTaxForm() {
         },
     });
 
-    const { control, handleSubmit, watch, setValue, formState: { errors } } = form;
+    const { control, handleSubmit, watch, formState: { errors } } = form;
     const selectedTaxIds = watch("taxIds");
 
     // Fetch settings
@@ -100,7 +97,6 @@ export function TenantTaxForm() {
 
                 const response = await getTenantTaxSettings();
                 const data = response.data; // access inner data from axios response
-                setSettings(data);
 
                 // If the settings response includes expanded taxes, add them to availableTaxes
                 if (data.taxes) {
@@ -129,7 +125,7 @@ export function TenantTaxForm() {
         }
 
         loadData();
-    }, [activeTenant, form, toast]);
+    }, [activeTenant, form, t, toast]);
 
     const fetchTaxes = async ({ search, page, limit }: { search: string; page: number; limit: number }) => {
         const res = await getPlatformTaxes({

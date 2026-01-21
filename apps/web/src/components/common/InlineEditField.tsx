@@ -88,6 +88,7 @@ export function InlineEditField({
                     onChange={(e) => setEditValue(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder={placeholder}
+                    aria-label={label || placeholder}
                     disabled={loading}
                     className={cn("h-8 flex-1", inputClassName)}
                 />

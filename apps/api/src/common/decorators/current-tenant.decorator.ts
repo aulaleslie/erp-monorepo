@@ -1,4 +1,5 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import type { RequestWithTenant } from '../types/request';
 
 /**
  * Parameter decorator to extract the current tenant ID from the request
@@ -10,7 +11,7 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common';
  */
 export const CurrentTenant = createParamDecorator(
   (data: unknown, ctx: ExecutionContext): string | undefined => {
-    const request = ctx.switchToHttp().getRequest();
+    const request = ctx.switchToHttp().getRequest<RequestWithTenant>();
     return request.tenantId;
   },
 );

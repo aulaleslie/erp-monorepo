@@ -7,6 +7,7 @@ import * as z from "zod";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { getApiErrorMessage } from "@/lib/api";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -110,10 +111,11 @@ export function CategoryForm({ initialData, onSuccess }: CategoryFormProps) {
                 router.push("/catalog/categories");
                 router.refresh();
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
             toast({
                 title: commonT("error.title"),
-                description: error.response?.data?.message || commonT("error.description"),
+                description: message || commonT("error.description"),
                 variant: "destructive",
             });
         } finally {

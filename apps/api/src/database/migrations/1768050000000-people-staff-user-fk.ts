@@ -4,15 +4,15 @@ export class PeopleStaffUserFk1768050000000 implements MigrationInterface {
   name = 'PeopleStaffUserFk1768050000000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const usersTable = await queryRunner.query(
+    const usersTable = (await queryRunner.query(
       `SELECT EXISTS (
         SELECT 1
         FROM information_schema.tables
         WHERE table_schema = 'public' AND table_name = 'users'
       ) AS "exists"`,
-    );
+    )) as Array<{ exists: boolean }>;
 
-    const fkConstraint = await queryRunner.query(
+    const fkConstraint = (await queryRunner.query(
       `SELECT EXISTS (
         SELECT 1
         FROM information_schema.table_constraints
@@ -20,7 +20,7 @@ export class PeopleStaffUserFk1768050000000 implements MigrationInterface {
           AND table_name = 'people'
           AND constraint_name = 'FK_people_userId'
       ) AS "exists"`,
-    );
+    )) as Array<{ exists: boolean }>;
 
     if (usersTable[0]?.exists && !fkConstraint[0]?.exists) {
       await queryRunner.query(

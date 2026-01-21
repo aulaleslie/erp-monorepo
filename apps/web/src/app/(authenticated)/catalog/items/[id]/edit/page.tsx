@@ -9,7 +9,6 @@ import React from "react";
 import { itemsService, ItemListItem } from "@/services/items";
 import { ItemForm } from "@/components/features/catalog/ItemForm";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function EditItemPage() {
     const t = useTranslations("items");

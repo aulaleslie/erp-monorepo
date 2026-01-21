@@ -6,15 +6,17 @@ import {
   RemoveEvent,
   SoftRemoveEvent,
   DataSource,
+  EntityManager,
 } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { ClsService } from 'nestjs-cls';
 import { BaseAuditEntity } from '../../common/entities/base-audit.entity';
 import { AuditLogEntity } from '../entities/audit-log.entity';
+import type { JwtPayload } from '../../common/decorators/current-user.decorator';
 
 @EventSubscriber()
 @Injectable()
-export class AuditSubscriber implements EntitySubscriberInterface {
+export class AuditSubscriber implements EntitySubscriberInterface<BaseAuditEntity> {
   constructor(
     dataSource: DataSource,
     private readonly cls: ClsService,
@@ -32,11 +34,11 @@ export class AuditSubscriber implements EntitySubscriberInterface {
   private getCurrentUserId(): string | null {
     // Assuming you store the user object or ID in CLS under 'user' key
     // Adjust based on your AuthGuard implementation
-    const user = this.cls.get('user');
-    return user ? user.id : null;
+    const user = this.cls.get<JwtPayload | null>('user');
+    return user?.id ?? null;
   }
 
-  async beforeInsert(event: InsertEvent<any>) {
+  beforeInsert(event: InsertEvent<BaseAuditEntity>) {
     if (event.entity instanceof BaseAuditEntity) {
       const userId = this.getCurrentUserId();
       if (userId) {
@@ -46,12 +48,12 @@ export class AuditSubscriber implements EntitySubscriberInterface {
     }
   }
 
-  async afterInsert(event: InsertEvent<any>) {
+  async afterInsert(event: InsertEvent<BaseAuditEntity>) {
     if (event.entity instanceof BaseAuditEntity) {
       // We need to cast event.entity to access id, assuming it has one.
       // Most entities have 'id', but we should be careful.
       // BaseAuditEntity doesn't define 'id', but concrete entities do.
-      const entityId = (event.entity as any).id;
+      const entityId = getEntityId(event.entity);
 
       if (entityId) {
         await this.createAuditLog(
@@ -60,13 +62,13 @@ export class AuditSubscriber implements EntitySubscriberInterface {
           event.metadata.tableName,
           entityId,
           null,
-          event.entity,
+          toRecord(event.entity),
         );
       }
     }
   }
 
-  async beforeUpdate(event: UpdateEvent<any>) {
+  beforeUpdate(event: UpdateEvent<BaseAuditEntity>) {
     if (event.entity instanceof BaseAuditEntity) {
       const userId = this.getCurrentUserId();
       if (userId) {
@@ -78,21 +80,24 @@ export class AuditSubscriber implements EntitySubscriberInterface {
     }
   }
 
-  async afterUpdate(event: UpdateEvent<any>) {
+  async afterUpdate(event: UpdateEvent<BaseAuditEntity>) {
     if (event.entity instanceof BaseAuditEntity && event.databaseEntity) {
-      const entityId = event.databaseEntity.id;
+      const entityId = getEntityId(event.databaseEntity);
+      if (!entityId) {
+        return;
+      }
       await this.createAuditLog(
         event.manager,
         'UPDATE',
         event.metadata.tableName,
         entityId,
-        event.databaseEntity,
-        event.entity,
+        toRecord(event.databaseEntity),
+        toRecord(event.entity),
       );
     }
   }
 
-  async beforeSoftRemove(event: SoftRemoveEvent<any>) {
+  beforeSoftRemove(event: SoftRemoveEvent<BaseAuditEntity>) {
     if (event.entity instanceof BaseAuditEntity) {
       const userId = this.getCurrentUserId();
       if (userId) {
@@ -101,16 +106,19 @@ export class AuditSubscriber implements EntitySubscriberInterface {
     }
   }
 
-  async afterSoftRemove(event: SoftRemoveEvent<any>) {
+  async afterSoftRemove(event: SoftRemoveEvent<BaseAuditEntity>) {
     // Soft remove updates the entity to set deletedAt, so strictly passed entity might hold the info
     if (event.entity instanceof BaseAuditEntity && event.databaseEntity) {
-      const entityId = event.databaseEntity.id;
+      const entityId = getEntityId(event.databaseEntity);
+      if (!entityId) {
+        return;
+      }
       await this.createAuditLog(
         event.manager,
         'SOFT_REMOVE',
         event.metadata.tableName,
         entityId,
-        event.databaseEntity,
+        toRecord(event.databaseEntity),
         null, // Or maybe { deletedAt: ... }
       );
     }
@@ -118,27 +126,27 @@ export class AuditSubscriber implements EntitySubscriberInterface {
 
   // Handling Hard Remove if necessary, though requirement implies we mostly do Soft Delete.
   // But for completeness:
-  async afterRemove(event: RemoveEvent<any>) {
+  async afterRemove(event: RemoveEvent<BaseAuditEntity>) {
     if (event.databaseEntity instanceof BaseAuditEntity) {
-      const entityId = (event.databaseEntity as any).id;
+      const entityId = getEntityId(event.databaseEntity);
       await this.createAuditLog(
         event.manager,
         'DELETE',
         event.metadata.tableName,
         entityId,
-        event.databaseEntity,
+        toRecord(event.databaseEntity),
         null,
       );
     }
   }
 
   private async createAuditLog(
-    manager: any,
+    manager: EntityManager,
     action: 'CREATE' | 'UPDATE' | 'DELETE' | 'SOFT_REMOVE',
     entityName: string,
     entityId: string,
-    previousValues: any,
-    newValues: any,
+    previousValues: Record<string, unknown> | null,
+    newValues: Record<string, unknown> | null,
   ) {
     const userId = this.getCurrentUserId();
 
@@ -156,4 +164,29 @@ export class AuditSubscriber implements EntitySubscriberInterface {
     // Use the same transaction manager to ensure atomicity
     await manager.save(AuditLogEntity, log);
   }
+}
+
+function getEntityId(
+  entity: BaseAuditEntity | null | undefined,
+): string | null {
+  if (!entity) {
+    return null;
+  }
+  const candidate = (entity as { id?: unknown }).id;
+  if (typeof candidate === 'string') {
+    return candidate;
+  }
+  if (typeof candidate === 'number') {
+    return String(candidate);
+  }
+  return null;
+}
+
+function toRecord(
+  entity: BaseAuditEntity | null | undefined,
+): Record<string, unknown> | null {
+  if (!entity) {
+    return null;
+  }
+  return entity as Record<string, unknown>;
 }

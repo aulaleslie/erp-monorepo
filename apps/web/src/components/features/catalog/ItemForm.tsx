@@ -33,6 +33,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ImageUpload } from "@/components/common/ImageUpload";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { getApiErrorMessage } from "@/lib/api";
 
 const formSchema = z.object({
     name: z.string().min(1, "nameRequired"),
@@ -148,7 +149,7 @@ export function ItemForm({ initialData }: ItemFormProps) {
                 ? values.tags.split(",").map((t: string) => t.trim()).filter(Boolean)
                 : [];
 
-            const payload: any = {
+            const payload: Partial<CreateItemData & UpdateItemData> = {
                 ...values,
                 tags: tagsArray,
             };
@@ -181,10 +182,11 @@ export function ItemForm({ initialData }: ItemFormProps) {
 
             router.push("/catalog/items");
             router.refresh();
-        } catch (error) {
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
             toast({
                 title: t("toast.error.title"),
-                description: t("toast.error.description"),
+                description: message || t("toast.error.description"),
                 variant: "destructive",
             });
         } finally {

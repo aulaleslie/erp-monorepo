@@ -9,6 +9,7 @@ import { Loader2, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "@/contexts/ThemeContext";
 import { THEME_PRESETS } from "@gym-monorepo/shared";
+import { getApiErrorMessage } from "@/lib/api";
 
 export default function ThemeSettingsPage() {
   const { toast } = useToast();
@@ -35,11 +36,12 @@ export default function ThemeSettingsPage() {
         title: "Success",
         description: "Theme updated successfully.",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = getApiErrorMessage(error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error?.message || "Failed to update theme.",
+        description: message || "Failed to update theme.",
       });
     } finally {
       setSaving(false);

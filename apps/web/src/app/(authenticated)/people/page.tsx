@@ -19,6 +19,7 @@ import { usePagination } from "@/hooks/use-pagination";
 import { peopleService, PersonListItem } from "@/services/people";
 import { PeopleStatus, PeopleType } from "@gym-monorepo/shared";
 import { StatusBadge } from "@/components/common/StatusBadge";
+import { getApiErrorMessage } from "@/lib/api";
 import { InvitePeopleDialog } from "@/components/people/InvitePeopleDialog";
 
 export default function PeoplePage() {
@@ -53,25 +54,17 @@ export default function PeoplePage() {
             });
             setPeople(data.items);
             pagination.setTotal(data.total);
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
             toast({
                 title: t("toast.fetchError.title"),
-                description: t("toast.fetchError.description"),
+                description: message || t("toast.fetchError.description"),
                 variant: "destructive",
             });
         } finally {
             setLoading(false);
         }
-    }, [
-        debouncedSearch,
-        pagination.limit,
-        pagination.page,
-        pagination.setTotal,
-        statusFilter,
-        t,
-        toast,
-        typeFilter,
-    ]);
+    }, [debouncedSearch, pagination, statusFilter, t, toast, typeFilter]);
 
     useEffect(() => {
         fetchPeople();
@@ -86,8 +79,8 @@ export default function PeoplePage() {
                 description: t("toast.deactivateSuccess.description"),
             });
             fetchPeople();
-        } catch (error: any) {
-            const message = error.response?.data?.message;
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
             toast({
                 title: t("toast.deactivateError.title"),
                 description: message || t("toast.deactivateError.description"),

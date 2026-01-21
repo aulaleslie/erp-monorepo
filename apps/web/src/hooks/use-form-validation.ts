@@ -22,7 +22,7 @@ export type FormErrors<T> = Partial<Record<keyof T, string>>;
  * Hook for managing form validation state
  * @param validators - Configuration of validators for each field
  */
-export function useFormValidation<T extends Record<string, any>>(
+export function useFormValidation<T extends Record<string, unknown>>(
   validators: ValidatorConfig<T>
 ) {
   const [errors, setErrors] = useState<FormErrors<T>>({});
@@ -118,21 +118,40 @@ export function useFormValidation<T extends Record<string, any>>(
 // Common validators
 export const validators = {
   required: (message = 'This field is required') => 
-    (value: any) => !value || (typeof value === 'string' && !value.trim()) ? message : undefined,
+    (value: unknown) =>
+      !value || (typeof value === 'string' && !value.trim()) ? message : undefined,
   
   email: (message = 'Please enter a valid email') =>
-    (value: any) => value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? message : undefined,
+    (value: unknown) =>
+      typeof value === 'string' && value.length > 0 &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+        ? message
+        : undefined,
   
   minLength: (length: number, message?: string) =>
-    (value: any) => value && value.length < length 
-      ? message || `Must be at least ${length} characters` 
-      : undefined,
+    (value: unknown) => {
+      if (typeof value === 'string' || Array.isArray(value)) {
+        if (value.length === 0) {
+          return undefined;
+        }
+        return value.length < length
+          ? message || `Must be at least ${length} characters`
+          : undefined;
+      }
+      return undefined;
+    },
   
   maxLength: (length: number, message?: string) =>
-    (value: any) => value && value.length > length 
-      ? message || `Must be at most ${length} characters` 
-      : undefined,
+    (value: unknown) => {
+      if (typeof value === 'string' || Array.isArray(value)) {
+        return value.length > length
+          ? message || `Must be at most ${length} characters`
+          : undefined;
+      }
+      return undefined;
+    },
   
   match: <T>(field: keyof T, message = 'Fields do not match') =>
-    (value: any, formData: T) => value !== formData[field] ? message : undefined,
+    (value: unknown, formData: T) =>
+      value !== formData[field] ? message : undefined,
 };

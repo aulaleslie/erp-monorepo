@@ -7,13 +7,14 @@ import { Button } from "@/components/ui/button";
 import { rolesService, Role } from "@/services/roles";
 import { Check, Plus, X } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { DataTable, Column } from "@/components/common/DataTable";
 import { usePagination } from "@/hooks/use-pagination";
 import { ActionButtons } from "@/components/common/ActionButtons";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { useTranslations } from "next-intl";
+import { getApiErrorMessage } from "@/lib/api";
 
 export default function RolesPage() {
     const [roles, setRoles] = useState<Role[]>([]);
@@ -24,31 +25,27 @@ export default function RolesPage() {
     const { toast } = useToast();
     const t = useTranslations("roles");
 
-    useEffect(() => {
-        fetchRoles();
-    }, [pagination.page]);
-
-    const fetchRoles = async () => {
+    const fetchRoles = useCallback(async () => {
         setLoading(true);
         try {
-            const data: any = await rolesService.getAll(pagination.page, pagination.limit);
-            if (data.items) {
-                setRoles(data.items);
-                pagination.setTotal(data.total);
-            } else {
-                setRoles(data);
-                pagination.setTotal(data.length);
-            }
-        } catch (error) {
+            const data = await rolesService.getAll(pagination.page, pagination.limit);
+            setRoles(data.items);
+            pagination.setTotal(data.total);
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
             toast({
                 title: t("toast.fetchError.title"),
-                description: t("toast.fetchError.description"),
+                description: message || t("toast.fetchError.description"),
                 variant: "destructive",
             });
         } finally {
             setLoading(false);
         }
-    };
+    }, [pagination, t, toast]);
+
+    useEffect(() => {
+        fetchRoles();
+    }, [fetchRoles]);
 
     const confirmDelete = async () => {
         if (!roleToDelete) return;
@@ -60,10 +57,11 @@ export default function RolesPage() {
                 description: t("toast.deleteSuccess.description"),
             });
             fetchRoles();
-        } catch (error) {
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
             toast({
                 title: t("toast.deleteError.title"),
-                description: t("toast.deleteError.description"),
+                description: message || t("toast.deleteError.description"),
                 variant: "destructive",
             });
         } finally {

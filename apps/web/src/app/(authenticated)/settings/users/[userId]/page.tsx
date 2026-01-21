@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, Pencil, Trash2, ArrowLeft } from "lucide-react";
 import { usersService, TenantUser } from "@/services/users";
 import { useToast } from "@/hooks/use-toast";
+import { getApiErrorMessage } from "@/lib/api";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -35,24 +36,25 @@ export default function UserDetailsPage() {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [deleting, setDeleting] = useState(false);
 
-    useEffect(() => {
-        fetchUser();
-    }, [userId]);
-
-    const fetchUser = async () => {
+    const fetchUser = useCallback(async () => {
         try {
             const data = await usersService.getOne(userId);
             setUser(data);
-        } catch (error) {
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
             toast({
                 title: "Error",
-                description: "Failed to load user details.",
+                description: message || "Failed to load user details.",
                 variant: "destructive",
             });
         } finally {
             setLoading(false);
         }
-    };
+    }, [toast, userId]);
+
+    useEffect(() => {
+        fetchUser();
+    }, [fetchUser]);
 
     const handleDelete = async () => {
         setDeleting(true);
@@ -63,10 +65,11 @@ export default function UserDetailsPage() {
                 description: "The user has been removed from this tenant.",
             });
             router.push("/settings/users");
-        } catch (error) {
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
             toast({
                 title: "Error",
-                description: "Failed to remove user.",
+                description: message || "Failed to remove user.",
                 variant: "destructive",
             });
         } finally {

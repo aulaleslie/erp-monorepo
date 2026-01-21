@@ -13,6 +13,8 @@ import Link from "next/link";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { DataTable, Column } from "@/components/common/DataTable";
 import { usePagination } from "@/hooks/use-pagination";
+import { getApiErrorMessage } from "@/lib/api";
+import { PersonListItem } from "@/services/people";
 
 export default function DepartmentDetailsPage() {
     const t = useTranslations("departments");
@@ -29,10 +31,11 @@ export default function DepartmentDetailsPage() {
         try {
             const data = await departmentsService.get(id as string);
             setDepartment(data);
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
             toast({
                 title: t("toast.fetchError.title"),
-                description: t("toast.fetchError.description"),
+                description: message || t("toast.fetchError.description"),
                 variant: "destructive",
             });
             router.push("/departments");
@@ -45,7 +48,7 @@ export default function DepartmentDetailsPage() {
         fetchDepartment();
     }, [fetchDepartment]);
 
-    const peopleColumns: Column<any>[] = [
+    const peopleColumns: Column<PersonListItem>[] = [
         {
             header: t("details.people.code"),
             accessorKey: "code",

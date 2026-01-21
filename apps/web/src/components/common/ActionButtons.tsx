@@ -1,13 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Eye, Pencil, Trash2, MoreHorizontal } from 'lucide-react';
+import { Eye, Pencil, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { PermissionGuard } from '@/components/guards/PermissionGuard';
 
 export interface ActionButtonProps {

@@ -32,6 +32,7 @@ import {
 import { Locale } from "@gym-monorepo/shared";
 import { useTranslations } from "next-intl";
 import { LABEL_REGISTRY, LANGUAGE_SELECT_OPTIONS } from "@/lib/labelRegistry";
+import { getApiErrorMessage, getApiFieldErrors } from "@/lib/api";
 
 export default function TenantSettingsPage() {
     const { isSuperAdmin, can, canAny } = usePermissions();
@@ -88,10 +89,11 @@ export default function TenantSettingsPage() {
                     themePresetId: currentThemePresetId,
                     language: data.language ?? Locale.EN,
                 });
-            } catch (error) {
+            } catch (error: unknown) {
+                const message = getApiErrorMessage(error);
                 toast({
                     title: t("toast.loadError.title"),
-                    description: t("toast.loadError.description"),
+                    description: message || t("toast.loadError.description"),
                     variant: "destructive",
                 });
             } finally {
@@ -100,7 +102,7 @@ export default function TenantSettingsPage() {
         };
 
         fetchTenant();
-    }, [canView, toast]);
+    }, [canView, t, toast]);
 
     const fetchTaxes = async ({ search, page, limit }: { search: string; page: number; limit: number }) => {
         const normalizedSearch = search.toLowerCase();
@@ -160,12 +162,12 @@ export default function TenantSettingsPage() {
                 description: t("toast.saveSuccess.description"),
             });
             await refreshPermissions();
-        } catch (error: any) {
-            const responseData = error.response?.data;
-            const errorMessage = responseData?.message || "Failed to update tenant settings.";
+        } catch (error: unknown) {
+            const responseErrors = getApiFieldErrors(error);
+            const errorMessage = getApiErrorMessage(error) || "Failed to update tenant settings.";
 
-            if (responseData?.errors) {
-                setErrors(responseData.errors);
+            if (responseErrors) {
+                setErrors(responseErrors);
             } else {
                 setErrors({ form: errorMessage });
             }

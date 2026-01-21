@@ -1,6 +1,5 @@
 "use client";
 
-import { PageHeader } from "@/components/common/PageHeader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { tenantsService, Tenant } from "@/services/tenants";
@@ -14,6 +13,7 @@ import { usePermissions } from "@/hooks/use-permissions";
 import { TENANT_TYPE_OPTIONS, LOCALE_LABELS } from "@gym-monorepo/shared";
 import { useTranslations } from "next-intl";
 import { LABEL_REGISTRY } from "@/lib/labelRegistry";
+import { getApiErrorMessage } from "@/lib/api";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -45,10 +45,11 @@ export default function TenantDetailPage() {
             try {
                 const tenantData = await tenantsService.getOne(tenantId);
                 setTenant(tenantData);
-            } catch (error) {
+            } catch (error: unknown) {
+                const message = getApiErrorMessage(error);
                 toast({
                     title: t("detail.toast.fetchError.title"),
-                    description: t("detail.toast.fetchError.description"),
+                    description: message || t("detail.toast.fetchError.description"),
                     variant: "destructive",
                 });
             } finally {
@@ -61,7 +62,7 @@ export default function TenantDetailPage() {
         } else {
             setLoading(false);
         }
-    }, [tenantId, isSuperAdmin]);
+    }, [tenantId, isSuperAdmin, t, toast]);
 
 
     const restoreTenant = async () => {
@@ -74,10 +75,11 @@ export default function TenantDetailPage() {
                 title: t("detail.toast.restoreSuccess.title"),
                 description: t("detail.toast.restoreSuccess.description"),
             });
-        } catch (error) {
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
             toast({
                 title: t("detail.toast.restoreError.title"),
-                description: t("detail.toast.restoreError.description"),
+                description: message || t("detail.toast.restoreError.description"),
                 variant: "destructive",
             });
         }
@@ -93,10 +95,11 @@ export default function TenantDetailPage() {
                 title: t("detail.toast.archiveSuccess.title"),
                 description: t("detail.toast.archiveSuccess.description"),
             });
-        } catch (error) {
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
             toast({
                 title: t("detail.toast.archiveError.title"),
-                description: t("detail.toast.archiveError.description"),
+                description: message || t("detail.toast.archiveError.description"),
                 variant: "destructive",
             });
         } finally {

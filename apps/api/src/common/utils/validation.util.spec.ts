@@ -79,8 +79,14 @@ describe('ValidationErrorBuilder', () => {
         fail('Should have thrown');
       } catch (error) {
         expect(error).toBeInstanceOf(BadRequestException);
-        const response = (error as BadRequestException).getResponse() as any;
-        expect(response.message).toBe('Validation failed');
+        const response = (error as BadRequestException).getResponse() as {
+          message?: string | string[];
+          errors?: Record<string, string[]>;
+        };
+        const message = Array.isArray(response.message)
+          ? response.message[0]
+          : response.message;
+        expect(message).toBe('Validation failed');
         expect(response.errors).toEqual({
           email: ['Email is taken'],
         });

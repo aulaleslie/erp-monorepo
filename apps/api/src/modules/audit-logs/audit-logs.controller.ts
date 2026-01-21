@@ -11,6 +11,7 @@ import { ApiTags, ApiCookieAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AuditLogsService } from './audit-logs.service';
 import { AuditLogsQueryDto } from './dto/audit-logs-query.dto';
+import type { RequestWithUser } from '../../common/types/request';
 
 @ApiTags('platform')
 @ApiCookieAuth('access_token')
@@ -20,7 +21,10 @@ export class AuditLogsController {
   constructor(private readonly auditLogsService: AuditLogsService) {}
 
   @Get()
-  async findAll(@Request() req, @Query() query: AuditLogsQueryDto) {
+  async findAll(
+    @Request() req: RequestWithUser,
+    @Query() query: AuditLogsQueryDto,
+  ) {
     if (!req.user?.isSuperAdmin) {
       throw new ForbiddenException('Only Super Admins can access audit logs');
     }

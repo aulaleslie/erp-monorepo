@@ -3,6 +3,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
+import type { RequestWithUser } from '../../common/types/request';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -30,12 +31,13 @@ describe('AuthController', () => {
         email: 'test@test.com',
         isSuperAdmin: false,
       };
+      const setCookie = jest.fn();
       const mockReply = {
-        setCookie: jest.fn(),
+        setCookie,
       } as unknown as FastifyReply;
 
       (authService.validateUser as jest.Mock).mockResolvedValue(mockUser);
-      (authService.login as jest.Mock).mockResolvedValue({
+      (authService.login as jest.Mock).mockReturnValue({
         access_token: 'jwt-token',
       });
 
@@ -45,7 +47,7 @@ describe('AuthController', () => {
       );
 
       expect(result).toEqual({ message: 'Logged in successfully' });
-      expect(mockReply.setCookie).toHaveBeenCalledWith(
+      expect(setCookie).toHaveBeenCalledWith(
         'access_token',
         'jwt-token',
         expect.objectContaining({
@@ -69,18 +71,19 @@ describe('AuthController', () => {
   });
 
   describe('logout', () => {
-    it('should clear cookies and return success message', async () => {
+    it('should clear cookies and return success message', () => {
+      const clearCookie = jest.fn();
       const mockReply = {
-        clearCookie: jest.fn(),
+        clearCookie,
       } as unknown as FastifyReply;
 
-      const result = await controller.logout(mockReply);
+      const result = controller.logout(mockReply);
 
       expect(result).toEqual({ message: 'Logged out successfully' });
-      expect(mockReply.clearCookie).toHaveBeenCalledWith('access_token', {
+      expect(clearCookie).toHaveBeenCalledWith('access_token', {
         path: '/',
       });
-      expect(mockReply.clearCookie).toHaveBeenCalledWith('active_tenant', {
+      expect(clearCookie).toHaveBeenCalledWith('active_tenant', {
         path: '/',
       });
     });
@@ -96,7 +99,9 @@ describe('AuthController', () => {
       };
       (authService.findUserById as jest.Mock).mockResolvedValue(mockUser);
 
-      const mockRequest = { user: { id: 'user-1' } };
+      const mockRequest = {
+        user: { id: 'user-1' },
+      } as unknown as RequestWithUser;
       const result = await controller.getProfile(mockRequest);
 
       expect(result).toEqual({
@@ -110,7 +115,9 @@ describe('AuthController', () => {
     it('should throw UnauthorizedException if user not found', async () => {
       (authService.findUserById as jest.Mock).mockResolvedValue(null);
 
-      const mockRequest = { user: { id: 'user-1' } };
+      const mockRequest = {
+        user: { id: 'user-1' },
+      } as unknown as RequestWithUser;
       await expect(controller.getProfile(mockRequest)).rejects.toThrow(
         UnauthorizedException,
       );

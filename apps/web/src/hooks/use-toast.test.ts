@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { reducer } from './use-toast';
 
 // Type definitions for testing (matching the module's internal types)

@@ -20,6 +20,7 @@ import { SearchableSelect } from "@/components/common/SearchableSelect";
 import { useToast } from "@/hooks/use-toast";
 import { rolesService, Role } from "@/services/roles";
 import { peopleService, PersonLinkedUser } from "@/services/people";
+import { getApiErrorMessage } from "@/lib/api";
 
 interface CreateUserForStaffDialogProps {
     open: boolean;
@@ -103,10 +104,8 @@ export function CreateUserForStaffDialog({
             }
             onOpenChange(false);
             resetForm();
-        } catch (error: any) {
-            const message =
-                error.response?.data?.message ||
-                t("createUser.toast.error.description");
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error) || t("createUser.toast.error.description");
             toast({
                 title: t("createUser.toast.error.title"),
                 description: message,
@@ -127,21 +126,19 @@ export function CreateUserForStaffDialog({
         limit: number;
     }) => {
         try {
-            const data: any = await rolesService.getAll(1, 100);
-            const items = data.items || data;
-            const total = data.total || items.length;
+            const data = await rolesService.getAll(1, 100);
 
             // Filter by search term (client-side)
             const filtered = params.search
-                ? items.filter((role: Role) =>
+                ? data.items.filter((role: Role) =>
                     role.name.toLowerCase().includes(params.search.toLowerCase())
                 )
-                : items;
+                : data.items;
 
             return {
                 items: filtered,
-                total,
-                hasMore: params.page * params.limit < total,
+                total: data.total,
+                hasMore: params.page * params.limit < data.total,
             };
         } catch {
             return { items: [], total: 0, hasMore: false };

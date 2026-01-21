@@ -4,7 +4,6 @@ import { useTranslations } from "next-intl";
 import { PageHeader } from "@/components/common/PageHeader";
 import { PermissionGuard } from "@/components/guards/PermissionGuard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
@@ -85,7 +84,7 @@ function ItemsTableWrapper() {
         } finally {
             setLoading(false);
         }
-    }, [pagination.page, pagination.limit, search, resolvedStatus, resolvedType]);
+    }, [pagination, search, resolvedStatus, resolvedType]);
 
     React.useEffect(() => {
         fetchData();

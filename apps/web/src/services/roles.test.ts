@@ -61,7 +61,7 @@ describe('rolesService', () => {
       const mockResponse = { items: [], total: 0, page: 2, limit: 20 };
       mockApi.get.mockResolvedValue({ data: mockResponse });
 
-      const result = await rolesService.getAll(2, 20);
+      await rolesService.getAll(2, 20);
 
       expect(mockApi.get).toHaveBeenCalledWith('/roles', {
         params: { page: 2, limit: 20 },

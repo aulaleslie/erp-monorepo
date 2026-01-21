@@ -26,7 +26,7 @@ export default function EditDepartmentPage() {
             try {
                 const data = await departmentsService.get(id);
                 setDepartment(data);
-            } catch (err) {
+            } catch {
                 setError(true);
                 toast({
                     title: t("toast.loadError.title"),

@@ -25,6 +25,7 @@ import { usePermissions } from "@/hooks/use-permissions";
 import { TENANT_TYPE_OPTIONS, TenantType, Locale } from "@gym-monorepo/shared";
 import { useTranslations } from "next-intl";
 import { LABEL_REGISTRY, LANGUAGE_SELECT_OPTIONS } from "@/lib/labelRegistry";
+import { getApiErrorMessage, getApiFieldErrors } from "@/lib/api";
 
 export default function CreateTenantPage() {
     const router = useRouter();
@@ -81,12 +82,12 @@ export default function CreateTenantPage() {
                 description: t("create.toast.success.description"),
             });
             router.push("/settings/tenants");
-        } catch (error: any) {
-            const responseData = error.response?.data;
-            const errorMessage = responseData?.message || "Failed to create tenant.";
+        } catch (error: unknown) {
+            const responseErrors = getApiFieldErrors(error);
+            const errorMessage = getApiErrorMessage(error) || "Failed to create tenant.";
 
-            if (responseData?.errors) {
-                setErrors(responseData.errors);
+            if (responseErrors) {
+                setErrors(responseErrors);
             } else {
                 setErrors({ form: errorMessage });
             }

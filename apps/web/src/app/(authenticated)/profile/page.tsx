@@ -13,6 +13,7 @@ import { Loader2, Key, Building2 } from "lucide-react";
 import { profileService, UserTenant } from "@/services/users";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "next-intl";
+import { getApiErrorMessage } from "@/lib/api";
 
 export default function ProfilePage() {
     const { user, activeTenant, refreshAuth } = useAuth();
@@ -45,11 +46,11 @@ export default function ProfilePage() {
             });
             // Refresh auth to update user info in context
             refreshAuth();
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
             toast({
                 title: t("toast.profileUpdateError.title"),
-                description:
-                    error.response?.data?.message ?? t("toast.profileUpdateError.description"),
+                description: message || t("toast.profileUpdateError.description"),
                 variant: "destructive",
             });
             throw error; // Rethrow to keep edit mode open

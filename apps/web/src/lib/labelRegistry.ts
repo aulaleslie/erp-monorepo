@@ -1,8 +1,4 @@
-import {
-  Locale,
-  LOCALE_LABELS,
-  SUPPORTED_LOCALES,
-} from '@gym-monorepo/shared';
+import { LOCALE_LABELS, SUPPORTED_LOCALES } from '@gym-monorepo/shared';
 
 export const LABEL_REGISTRY = {
   tenantSettings: {

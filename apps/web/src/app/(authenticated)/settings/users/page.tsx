@@ -9,7 +9,7 @@ import { usersService, TenantUser } from "@/services/users";
 import { Plus, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { InviteUserDialog } from "@/components/users/InviteUserDialog";
@@ -18,6 +18,7 @@ import { usePagination } from "@/hooks/use-pagination";
 import { ActionButtons } from "@/components/common/ActionButtons";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { StatusBadge } from "@/components/common/StatusBadge";
+import { getApiErrorMessage } from "@/lib/api";
 
 export default function UsersPage() {
     const { user } = useAuth();
@@ -30,11 +31,7 @@ export default function UsersPage() {
     const { toast } = useToast();
     const t = useTranslations("users");
 
-    useEffect(() => {
-        fetchUsers();
-    }, [pagination.page]);
-
-    const fetchUsers = async () => {
+    const fetchUsers = useCallback(async () => {
         setLoading(true);
         try {
             const data = await usersService.getAll(pagination.page, pagination.limit);
@@ -44,16 +41,21 @@ export default function UsersPage() {
                 : data.items.filter((tenantUser) => !tenantUser.role?.isSuperAdmin);
             setUsers(filteredUsers);
             pagination.setTotal(data.total);
-        } catch (error) {
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
             toast({
                 title: t("toast.fetchError.title"),
-                description: t("toast.fetchError.description"),
+                description: message || t("toast.fetchError.description"),
                 variant: "destructive",
             });
         } finally {
             setLoading(false);
         }
-    };
+    }, [pagination, t, toast, user?.isSuperAdmin]);
+
+    useEffect(() => {
+        fetchUsers();
+    }, [fetchUsers]);
 
     const confirmDelete = async () => {
         if (!userToDelete) return;
@@ -65,10 +67,11 @@ export default function UsersPage() {
                 description: t("toast.removeSuccess.description"),
             });
             fetchUsers();
-        } catch (error) {
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
             toast({
                 title: t("toast.removeError.title"),
-                description: t("toast.removeError.description"),
+                description: message || t("toast.removeError.description"),
                 variant: "destructive",
             });
         } finally {

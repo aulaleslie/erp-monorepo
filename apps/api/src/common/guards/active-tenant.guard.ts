@@ -4,13 +4,13 @@ import {
   ExecutionContext,
   BadRequestException,
 } from '@nestjs/common';
-import { FastifyRequest } from 'fastify';
 import { TENANT_ERRORS } from '@gym-monorepo/shared';
+import type { RequestWithTenant } from '../types/request';
 
 @Injectable()
 export class ActiveTenantGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest<FastifyRequest>();
+    const request = context.switchToHttp().getRequest<RequestWithTenant>();
     const tenantId = request.cookies['active_tenant'];
 
     if (!tenantId) {
@@ -20,7 +20,7 @@ export class ActiveTenantGuard implements CanActivate {
     }
 
     // Attach to request for easier access
-    (request as any).tenantId = tenantId;
+    request.tenantId = tenantId;
 
     return true;
   }

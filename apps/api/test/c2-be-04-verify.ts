@@ -80,4 +80,4 @@ async function verify() {
   }
 }
 
-verify();
+void verify();

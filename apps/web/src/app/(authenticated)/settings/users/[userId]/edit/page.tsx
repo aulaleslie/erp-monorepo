@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -15,6 +15,7 @@ import { Loader2, ArrowLeft } from "lucide-react";
 import { usersService, TenantUser } from "@/services/users";
 import { rolesService, Role } from "@/services/roles";
 import { useToast } from "@/hooks/use-toast";
+import { getApiErrorMessage } from "@/lib/api";
 
 export default function EditUserPage() {
     const params = useParams();
@@ -35,11 +36,7 @@ export default function EditUserPage() {
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
 
-    useEffect(() => {
-        fetchUser();
-    }, [userId]);
-
-    const fetchUser = async () => {
+    const fetchUser = useCallback(async () => {
         try {
             const data = await usersService.getOne(userId);
             setUser(data);
@@ -50,16 +47,21 @@ export default function EditUserPage() {
                 confirmPassword: "",
                 roleId: data.roleId || "",
             });
-        } catch (error) {
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
             toast({
                 title: "Error",
-                description: "Failed to load user details.",
+                description: message || "Failed to load user details.",
                 variant: "destructive",
             });
         } finally {
             setLoading(false);
         }
-    };
+    }, [toast, userId]);
+
+    useEffect(() => {
+        fetchUser();
+    }, [fetchUser]);
 
     const validate = (): boolean => {
         const newErrors: Record<string, string> = {};
@@ -121,10 +123,11 @@ export default function EditUserPage() {
                 description: "The user has been updated successfully.",
             });
             router.push(`/settings/users/${userId}`);
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
             toast({
                 title: "Error",
-                description: error.response?.data?.message || "Failed to update user.",
+                description: message || "Failed to update user.",
                 variant: "destructive",
             });
         } finally {
@@ -134,22 +137,19 @@ export default function EditUserPage() {
 
     const fetchRoles = async (params: { search: string; page: number; limit: number }) => {
         try {
-            const data: any = await rolesService.getAll(params.page, params.limit);
-            const items = data.items || data;
-            const total = data.total || items.length;
-
+            const data = await rolesService.getAll(params.page, params.limit);
             const filtered = params.search
-                ? items.filter((role: Role) =>
+                ? data.items.filter((role: Role) =>
                     role.name.toLowerCase().includes(params.search.toLowerCase())
                 )
-                : items;
+                : data.items;
 
             return {
                 items: filtered,
-                total,
-                hasMore: params.page * params.limit < total,
+                total: data.total,
+                hasMore: params.page * params.limit < data.total,
             };
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("Failed to fetch roles:", error);
             return { items: [], total: 0, hasMore: false };
         }

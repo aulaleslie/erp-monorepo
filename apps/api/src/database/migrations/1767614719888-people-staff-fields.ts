@@ -14,13 +14,13 @@ export class PeopleStaffFields1767614719888 implements MigrationInterface {
     await queryRunner.query(
       `CREATE UNIQUE INDEX "UQ_people_tenant_user" ON "people" ("tenantId", "userId") WHERE "userId" IS NOT NULL`,
     );
-    const usersTable = await queryRunner.query(
+    const usersTable = (await queryRunner.query(
       `SELECT EXISTS (
         SELECT 1
         FROM information_schema.tables
         WHERE table_schema = 'public' AND table_name = 'users'
       ) AS "exists"`,
-    );
+    )) as Array<{ exists: boolean }>;
 
     if (usersTable[0]?.exists) {
       await queryRunner.query(

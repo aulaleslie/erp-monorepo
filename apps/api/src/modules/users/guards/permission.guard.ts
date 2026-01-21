@@ -7,6 +7,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { UsersService } from '../users.service';
 import { PERMISSIONS_KEY } from '../../../common/decorators/require-permissions.decorator';
+import type { RequestWithTenantUser } from '../../../common/types/request';
 
 @Injectable()
 export class PermissionGuard implements CanActivate {
@@ -25,7 +26,7 @@ export class PermissionGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<RequestWithTenantUser>();
     const user = request.user;
     const tenantId = request.tenantId;
 

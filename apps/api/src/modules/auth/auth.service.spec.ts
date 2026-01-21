@@ -3,11 +3,12 @@ import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { UserEntity } from '../../database/entities';
 
 describe('AuthService', () => {
   let service: AuthService;
-  let usersService: Partial<UsersService>;
-  let jwtService: Partial<JwtService>;
+  let usersService: jest.Mocked<Pick<UsersService, 'findOneByEmail'>>;
+  let jwtService: jest.Mocked<Pick<JwtService, 'sign'>>;
 
   beforeEach(async () => {
     // Mock UsersService
@@ -48,12 +49,14 @@ describe('AuthService', () => {
         email: 'test@example.com',
         passwordHash: 'hashed_password',
         isSuperAdmin: false,
-      };
+      } as UserEntity;
 
-      (usersService.findOneByEmail as jest.Mock).mockResolvedValue(mockUser);
-      jest
-        .spyOn(bcrypt, 'compare')
-        .mockImplementation(() => Promise.resolve(true));
+      usersService.findOneByEmail.mockResolvedValue(mockUser);
+      const compareSpy = jest.spyOn(
+        bcrypt,
+        'compare',
+      ) as unknown as jest.SpyInstance<Promise<boolean>, [string, string]>;
+      compareSpy.mockResolvedValue(true);
 
       const result = await service.validateUser('test@example.com', 'password');
 
@@ -65,7 +68,7 @@ describe('AuthService', () => {
     });
 
     it('should return null if user not found', async () => {
-      (usersService.findOneByEmail as jest.Mock).mockResolvedValue(null);
+      usersService.findOneByEmail.mockResolvedValue(null);
 
       const result = await service.validateUser('test@example.com', 'password');
 
@@ -77,12 +80,14 @@ describe('AuthService', () => {
         id: '1',
         email: 'test@example.com',
         passwordHash: 'hashed_password',
-      };
+      } as UserEntity;
 
-      (usersService.findOneByEmail as jest.Mock).mockResolvedValue(mockUser);
-      jest
-        .spyOn(bcrypt, 'compare')
-        .mockImplementation(() => Promise.resolve(false));
+      usersService.findOneByEmail.mockResolvedValue(mockUser);
+      const compareSpy = jest.spyOn(
+        bcrypt,
+        'compare',
+      ) as unknown as jest.SpyInstance<Promise<boolean>, [string, string]>;
+      compareSpy.mockResolvedValue(false);
 
       const result = await service.validateUser(
         'test@example.com',
@@ -94,14 +99,14 @@ describe('AuthService', () => {
   });
 
   describe('login', () => {
-    it('should return access token', async () => {
+    it('should return access token', () => {
       const user = {
         id: '1',
         email: 'test@example.com',
         isSuperAdmin: false,
       };
 
-      const result = await service.login(user);
+      const result = service.login(user);
 
       expect(result).toHaveProperty('access_token', 'mock_token');
       expect(jwtService.sign).toHaveBeenCalledWith({

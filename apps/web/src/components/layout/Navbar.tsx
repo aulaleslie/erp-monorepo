@@ -21,7 +21,7 @@ import { useTranslations } from "next-intl";
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
 
 export function Navbar() {
-    const { user, activeTenant, hasTenants, refreshAuth } = useAuth();
+    const { user, activeTenant, refreshAuth } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
     const { toast } = useToast();

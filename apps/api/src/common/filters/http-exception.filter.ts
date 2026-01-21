@@ -14,8 +14,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<FastifyReply>();
-    const status = exception.getStatus();
-    const exceptionResponse = exception.getResponse();
+    const status = exception.getStatus() as HttpStatus;
+    const exceptionResponse: unknown = exception.getResponse();
 
     const responseBody: BaseResponse = {
       success: false,
@@ -24,17 +24,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     if (
       status === HttpStatus.BAD_REQUEST &&
-      typeof exceptionResponse === 'object' &&
-      exceptionResponse !== null &&
+      isExceptionResponse(exceptionResponse) &&
       'errors' in exceptionResponse
     ) {
       // This comes from our custom ValidationPipe exceptionFactory
       responseBody.message =
-        (exceptionResponse as any).message || 'Validation failed';
-      responseBody.errors = (exceptionResponse as any).errors;
+        normalizeMessage(exceptionResponse.message) || 'Validation failed';
+      responseBody.errors = exceptionResponse.errors;
     } else if (
       exception instanceof BadRequestException &&
-      typeof exceptionResponse === 'object' &&
+      isExceptionResponse(exceptionResponse) &&
       'message' in exceptionResponse
     ) {
       // Handle manual BadRequestException(message)
@@ -45,4 +44,20 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     response.status(status).send(responseBody);
   }
+}
+
+type ExceptionResponse = {
+  message?: string | string[];
+  errors?: Record<string, string[]>;
+};
+
+function isExceptionResponse(value: unknown): value is ExceptionResponse {
+  return typeof value === 'object' && value !== null;
+}
+
+function normalizeMessage(message?: string | string[]): string | undefined {
+  if (Array.isArray(message)) {
+    return message[0];
+  }
+  return message;
 }

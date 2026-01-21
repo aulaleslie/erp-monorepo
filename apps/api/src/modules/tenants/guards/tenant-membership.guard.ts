@@ -5,13 +5,14 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { TenantsService } from '../tenants.service';
+import type { RequestWithTenantUser } from '../../../common/types/request';
 
 @Injectable()
 export class TenantMembershipGuard implements CanActivate {
   constructor(private tenantsService: TenantsService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<RequestWithTenantUser>();
     const user = request.user;
     const tenantId = request.tenantId;
 

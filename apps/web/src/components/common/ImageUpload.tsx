@@ -3,6 +3,7 @@
 import React from "react";
 import { Upload, X, ImageIcon, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -26,7 +27,7 @@ export function ImageUpload({
 }: ImageUploadProps) {
     const t = useTranslations("common.imageUpload");
     // Fallback translations if "common.imageUpload" is not defined
-    const ft = (key: string, values?: Record<string, any>) => {
+    const ft = (key: string, values?: Record<string, string | number>) => {
         try {
             return t(key, values);
         } catch {
@@ -106,10 +107,13 @@ export function ImageUpload({
             >
                 {preview ? (
                     <>
-                        <img
+                        <Image
                             src={preview}
                             alt="Preview"
-                            className="w-full h-full object-cover"
+                            fill
+                            sizes="160px"
+                            className="object-cover"
+                            unoptimized
                         />
                         <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                             {!disabled && !loading && (

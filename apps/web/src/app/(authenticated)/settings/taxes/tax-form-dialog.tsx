@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Loader2 } from "lucide-react";
@@ -84,8 +84,8 @@ export function TaxFormDialog({ open, onOpenChange, tax, onSuccess }: TaxFormDia
         },
     });
 
-    const { control, handleSubmit, watch, reset, setError, formState: { errors, isSubmitting } } = form;
-    const selectedType = watch("type");
+    const { control, handleSubmit, reset, setError, formState: { errors, isSubmitting } } = form;
+    const selectedType = useWatch({ control, name: "type" });
 
     useEffect(() => {
         if (open) {

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { tenantsService, Tenant, TenantStatus } from "@/services/tenants";
 import { Plus, Archive, RotateCcw } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { usePermissions } from "@/hooks/use-permissions";
 import { DataTable, Column } from "@/components/common/DataTable";
@@ -18,6 +18,7 @@ import { useSearchParams } from "next/navigation";
 import { LOCALE_LABELS } from "@gym-monorepo/shared";
 import { useTranslations } from "next-intl";
 import { LABEL_REGISTRY } from "@/lib/labelRegistry";
+import { getApiErrorMessage } from "@/lib/api";
 
 export default function TenantsPage() {
     const [tenants, setTenants] = useState<Tenant[]>([]);
@@ -33,45 +34,41 @@ export default function TenantsPage() {
     const isArchivedView = searchParams.get("status") === "archived";
     const statusFilter: TenantStatus = isArchivedView ? "DISABLED" : "ACTIVE";
 
+    const fetchTenants = useCallback(async () => {
+        setLoading(true);
+        try {
+            const data = await tenantsService.getAll(
+                pagination.page,
+                pagination.limit,
+                statusFilter
+            );
+            setTenants(data.items);
+            pagination.setTotal(data.total);
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
+            toast({
+                title: t("toast.fetchError.title"),
+                description: message || t("toast.fetchError.description"),
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
+        }
+    }, [pagination, statusFilter, t, toast]);
+
     useEffect(() => {
         if (isSuperAdmin) {
             fetchTenants();
         } else {
             setLoading(false);
         }
-    }, [isSuperAdmin, pagination.page, pagination.limit, statusFilter]);
+    }, [fetchTenants, isSuperAdmin]);
 
     useEffect(() => {
         pagination.resetPagination();
-    }, [statusFilter]);
+    }, [pagination, statusFilter]);
 
-    const fetchTenants = async () => {
-        setLoading(true);
-        try {
-            const data: any = await tenantsService.getAll(
-                pagination.page,
-                pagination.limit,
-                statusFilter
-            );
-            if (data.items) {
-                setTenants(data.items);
-                pagination.setTotal(data.total);
-            } else {
-                setTenants(data);
-                pagination.setTotal(data.length);
-            }
-        } catch (error) {
-            toast({
-                title: t("toast.fetchError.title"),
-                description: t("toast.fetchError.description"),
-                variant: "destructive",
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const confirmArchive = async () => {
+    const confirmArchive = useCallback(async () => {
         if (!tenantToArchive) return;
 
         try {
@@ -81,18 +78,19 @@ export default function TenantsPage() {
                 description: t("toast.archiveSuccess.description"),
             });
             fetchTenants();
-        } catch (error) {
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
             toast({
                 title: t("toast.archiveError.title"),
-                description: t("toast.archiveError.description"),
+                description: message || t("toast.archiveError.description"),
                 variant: "destructive",
             });
         } finally {
             setTenantToArchive(null);
         }
-    };
+    }, [fetchTenants, t, tenantToArchive, toast]);
 
-    const restoreTenant = async (tenant: Tenant) => {
+    const restoreTenant = useCallback(async (tenant: Tenant) => {
         try {
             await tenantsService.update(tenant.id, { status: "ACTIVE" });
             toast({
@@ -100,14 +98,15 @@ export default function TenantsPage() {
                 description: t("toast.restoreSuccess.description"),
             });
             fetchTenants();
-        } catch (error) {
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
             toast({
                 title: t("toast.restoreError.title"),
-                description: t("toast.restoreError.description"),
+                description: message || t("toast.restoreError.description"),
                 variant: "destructive",
             });
         }
-    };
+    }, [fetchTenants, t, toast]);
 
     const columns: Column<Tenant>[] = useMemo(
         () => [
@@ -174,7 +173,7 @@ export default function TenantsPage() {
                 ),
             },
         ],
-        [restoreTenant, t]
+        [restoreTenant, t, tLabels]
     );
 
     if (!isSuperAdmin) {

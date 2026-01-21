@@ -12,6 +12,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+const DEFAULT_LIMIT = 10;
+
 interface SearchableSelectProps<T> {
     value?: string;
     onValueChange: (value: string) => void;
@@ -34,12 +36,6 @@ interface SearchableSelectProps<T> {
     getItemDescription?: (item: T) => string | undefined;
     disabled?: boolean;
     className?: string;
-}
-
-interface CachedData<T> {
-    items: T[];
-    hasMore: boolean;
-    page: number;
 }
 
 export function SearchableSelect<T>({
@@ -71,14 +67,12 @@ export function SearchableSelect<T>({
     const observerRef = React.useRef<IntersectionObserver | null>(null);
     const loadMoreTriggerRef = React.useRef<HTMLDivElement>(null);
 
-    const limit = 10;
-
     // Update selectedLabel when initialLabel changes (for async loading)
     React.useEffect(() => {
         if (initialLabel && !selectedLabel) {
             setSelectedLabel(initialLabel);
         }
-    }, [initialLabel]);
+    }, [initialLabel, selectedLabel]);
 
     // Debounce search input
     React.useEffect(() => {
@@ -88,6 +82,40 @@ export function SearchableSelect<T>({
         return () => clearTimeout(timer);
     }, [search]);
 
+    const loadItems = React.useCallback(async (
+        pageNum: number,
+        searchTerm: string,
+        isNewSearch: boolean
+    ) => {
+        if (isNewSearch) {
+            setLoading(true);
+        } else {
+            setLoadingMore(true);
+        }
+
+        try {
+            const result = await fetchItems({
+                search: searchTerm,
+                page: pageNum,
+                limit: DEFAULT_LIMIT,
+            });
+
+            if (isNewSearch) {
+                setItems(result.items);
+            } else {
+                setItems((prev) => [...prev, ...result.items]);
+            }
+
+            setHasMore(result.hasMore);
+            setPage(pageNum);
+        } catch (error) {
+            console.error("Failed to fetch items:", error);
+        } finally {
+            setLoading(false);
+            setLoadingMore(false);
+        }
+    }, [fetchItems]);
+
     // Reset and fetch when search changes
     React.useEffect(() => {
         if (open) {
@@ -95,7 +123,7 @@ export function SearchableSelect<T>({
             setItems([]);
             loadItems(1, debouncedSearch, true);
         }
-    }, [debouncedSearch, open]);
+    }, [debouncedSearch, loadItems, open]);
 
     // Set up intersection observer for infinite scroll
     React.useEffect(() => {
@@ -117,41 +145,7 @@ export function SearchableSelect<T>({
                 observerRef.current.disconnect();
             }
         };
-    }, [hasMore, loading, loadingMore, page, debouncedSearch, open]);
-
-    const loadItems = async (
-        pageNum: number,
-        searchTerm: string,
-        isNewSearch: boolean
-    ) => {
-        if (isNewSearch) {
-            setLoading(true);
-        } else {
-            setLoadingMore(true);
-        }
-
-        try {
-            const result = await fetchItems({
-                search: searchTerm,
-                page: pageNum,
-                limit,
-            });
-
-            if (isNewSearch) {
-                setItems(result.items);
-            } else {
-                setItems((prev) => [...prev, ...result.items]);
-            }
-
-            setHasMore(result.hasMore);
-            setPage(pageNum);
-        } catch (error) {
-            console.error("Failed to fetch items:", error);
-        } finally {
-            setLoading(false);
-            setLoadingMore(false);
-        }
-    };
+    }, [debouncedSearch, hasMore, loadItems, loading, loadingMore, open, page]);
 
     // Find selected item label from loaded items
     React.useEffect(() => {

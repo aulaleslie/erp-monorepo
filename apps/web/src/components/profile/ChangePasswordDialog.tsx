@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { profileService } from "@/services/users";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "next-intl";
+import { getApiErrorMessage } from "@/lib/api";
 
 interface ChangePasswordDialogProps {
     trigger?: React.ReactNode;
@@ -84,9 +85,8 @@ export function ChangePasswordDialog({ trigger }: ChangePasswordDialogProps) {
             });
             setOpen(false);
             resetForm();
-        } catch (error: any) {
-            const message =
-                error.response?.data?.message || t('changePassword.toast.error.description');
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error) || t('changePassword.toast.error.description');
             toast({
                 title: t('changePassword.toast.error.title'),
                 description: message,

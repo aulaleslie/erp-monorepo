@@ -8,7 +8,6 @@ import Link from "next/link";
 import {
     ItemListItem,
     ItemStatus,
-    ItemType,
     itemsService
 } from "@/services/items";
 import { DataTable, Column } from "@/components/common/DataTable";
@@ -33,6 +32,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { UsePaginationReturn } from "@/hooks/use-pagination";
 import { usePermissions } from "@/hooks/use-permissions";
+import { getApiErrorMessage } from "@/lib/api";
 
 interface ItemsTableProps {
     data: ItemListItem[];
@@ -65,10 +65,11 @@ export function ItemsTable({
                 description: t("toast.deleteSuccess.description"),
             });
             onRefresh?.();
-        } catch (error) {
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
             toast({
                 title: t("toast.error.title"),
-                description: t("toast.error.description"),
+                description: message || t("toast.error.description"),
                 variant: "destructive",
             });
         } finally {

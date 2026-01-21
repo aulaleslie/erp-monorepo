@@ -1,6 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { DataSource, EntityManager, Repository } from 'typeorm';
+import {
+  DataSource,
+  DeepPartial,
+  EntityManager,
+  EntityTarget,
+  Repository,
+} from 'typeorm';
 import { BadRequestException } from '@nestjs/common';
 import {
   ApprovalStatus,
@@ -26,6 +32,12 @@ describe('DocumentsService', () => {
   const mockTenantId = 'tenant-1';
   const mockUserId = 'user-1';
   const mockDocId = 'doc-1';
+  const createEntity = ((
+    _: EntityTarget<Record<string, unknown>>,
+    data?:
+      | DeepPartial<Record<string, unknown>>
+      | DeepPartial<Record<string, unknown>>[],
+  ) => data) as EntityManager['create'];
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -65,15 +77,16 @@ describe('DocumentsService', () => {
         {
           provide: DataSource,
           useValue: {
-            transaction: jest.fn((cb: (mgr: EntityManager) => Promise<any>) =>
-              cb({
-                findOne: jest.fn(),
-                save: jest.fn(),
-                count: jest.fn(),
-                create: jest.fn((entity: any, data: any) => data),
-                update: jest.fn(),
-                delete: jest.fn(),
-              } as unknown as EntityManager),
+            transaction: jest.fn(
+              (cb: (mgr: EntityManager) => Promise<unknown>) =>
+                cb({
+                  findOne: jest.fn(),
+                  save: jest.fn(),
+                  count: jest.fn(),
+                  create: createEntity,
+                  update: jest.fn(),
+                  delete: jest.fn(),
+                } as unknown as EntityManager),
             ),
           },
         },
@@ -96,7 +109,7 @@ describe('DocumentsService', () => {
 
   const setupTransactionMock = (manager: Partial<EntityManager>) => {
     (dataSource.transaction as jest.Mock).mockImplementation(
-      async (cb: (mgr: EntityManager) => Promise<any>) =>
+      async (cb: (mgr: EntityManager) => Promise<unknown>) =>
         cb(manager as EntityManager),
     );
   };
@@ -108,14 +121,14 @@ describe('DocumentsService', () => {
         notes: 'Test note',
       };
 
-      (
-        documentNumberService.getNextDocumentNumber as jest.Mock
-      ).mockResolvedValue('INV-2026-01-000001');
+      const getNextDocumentNumberMock = jest
+        .spyOn(documentNumberService, 'getNextDocumentNumber')
+        .mockResolvedValue('INV-2026-01-000001');
       (documentRepo.create as jest.Mock).mockImplementation(
-        (data: any) => data,
+        (data: DeepPartial<DocumentEntity>) => data as DocumentEntity,
       );
-      (documentRepo.save as jest.Mock).mockImplementation((doc: any) =>
-        Promise.resolve(doc),
+      (documentRepo.save as jest.Mock).mockImplementation(
+        (doc: DocumentEntity) => Promise.resolve(doc),
       );
 
       const result = await service.create(
@@ -130,7 +143,7 @@ describe('DocumentsService', () => {
       expect(result.status).toBe(DocumentStatus.DRAFT);
       expect(result.tenantId).toBe(mockTenantId);
       expect(result.createdBy).toBe(mockUserId);
-      expect(documentNumberService.getNextDocumentNumber).toHaveBeenCalledWith(
+      expect(getNextDocumentNumberMock).toHaveBeenCalledWith(
         mockTenantId,
         'sales.invoice',
       );
@@ -149,7 +162,7 @@ describe('DocumentsService', () => {
       const manager: Partial<EntityManager> = {
         save: jest.fn().mockResolvedValue({}),
         count: jest.fn().mockResolvedValue(1), // items exist
-        create: jest.fn((entity: any, data: any) => data),
+        create: createEntity,
       };
 
       (documentRepo.findOne as jest.Mock).mockResolvedValue(mockDoc);
@@ -194,7 +207,7 @@ describe('DocumentsService', () => {
         save: jest.fn().mockResolvedValue({}),
         count: jest.fn().mockResolvedValue(1),
         delete: jest.fn().mockResolvedValue({}),
-        create: jest.fn((entity: any, data: any) => data),
+        create: createEntity,
       };
 
       (documentRepo.findOne as jest.Mock).mockResolvedValue(mockDoc);
@@ -251,7 +264,7 @@ describe('DocumentsService', () => {
         findOne: jest.fn().mockResolvedValue(mockApproval),
         save: jest.fn().mockResolvedValue({}),
         count: jest.fn().mockResolvedValue(0), // no more pending
-        create: jest.fn((entity: any, data: any) => data),
+        create: createEntity,
       };
 
       (documentRepo.findOne as jest.Mock).mockResolvedValue(mockDoc);
@@ -292,7 +305,7 @@ describe('DocumentsService', () => {
         findOne: jest.fn().mockResolvedValue(mockApproval),
         save: jest.fn().mockResolvedValue({}),
         count: jest.fn().mockResolvedValue(1), // still has pending (step 1)
-        create: jest.fn((entity: any, data: any) => data),
+        create: createEntity,
       };
 
       (documentRepo.findOne as jest.Mock).mockResolvedValue(mockDoc);
@@ -339,7 +352,7 @@ describe('DocumentsService', () => {
           .mockResolvedValueOnce(mockApproval0),
         save: jest.fn().mockResolvedValue({}),
         update: jest.fn().mockResolvedValue({}),
-        create: jest.fn((entity: any, data: any) => data),
+        create: createEntity,
       };
 
       (documentRepo.findOne as jest.Mock).mockResolvedValue(mockDoc);
@@ -364,7 +377,7 @@ describe('DocumentsService', () => {
       const manager: Partial<EntityManager> = {
         save: jest.fn().mockResolvedValue({}),
         update: jest.fn().mockResolvedValue({}),
-        create: jest.fn((entity: any, data: any) => data),
+        create: createEntity,
       };
 
       (documentRepo.findOne as jest.Mock).mockResolvedValue(mockDoc);
@@ -396,7 +409,7 @@ describe('DocumentsService', () => {
       const manager: Partial<EntityManager> = {
         save: jest.fn().mockResolvedValue({}),
         update: jest.fn().mockResolvedValue({}),
-        create: jest.fn((entity: any, data: any) => data),
+        create: createEntity,
       };
 
       (documentRepo.findOne as jest.Mock).mockResolvedValue(mockDoc);
@@ -434,7 +447,7 @@ describe('DocumentsService', () => {
       } as DocumentEntity;
       const manager: Partial<EntityManager> = {
         save: jest.fn().mockResolvedValue({}),
-        create: jest.fn((entity: any, data: any) => data),
+        create: createEntity,
       };
 
       (documentRepo.findOne as jest.Mock).mockResolvedValue(mockDoc);
@@ -475,7 +488,7 @@ describe('DocumentsService', () => {
       const manager: Partial<EntityManager> = {
         save: jest.fn().mockResolvedValue({}),
         delete: jest.fn().mockResolvedValue({}),
-        create: jest.fn((entity: any, data: any) => data),
+        create: createEntity,
       };
 
       (documentRepo.findOne as jest.Mock).mockResolvedValue(mockDoc);

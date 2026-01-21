@@ -17,6 +17,7 @@ import { usePagination } from "@/hooks/use-pagination";
 import { departmentsService, DepartmentListItem } from "@/services/departments";
 import { DepartmentStatus } from "@gym-monorepo/shared";
 import { StatusBadge } from "@/components/common/StatusBadge";
+import { getApiErrorMessage } from "@/lib/api";
 
 export default function DepartmentsPage() {
     const t = useTranslations("departments");
@@ -47,24 +48,17 @@ export default function DepartmentsPage() {
             });
             setDepartments(data.items);
             pagination.setTotal(data.total);
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
             toast({
                 title: t("toast.fetchError.title"),
-                description: t("toast.fetchError.description"),
+                description: message || t("toast.fetchError.description"),
                 variant: "destructive",
             });
         } finally {
             setLoading(false);
         }
-    }, [
-        debouncedSearch,
-        pagination.limit,
-        pagination.page,
-        pagination.setTotal,
-        statusFilter,
-        t,
-        toast,
-    ]);
+    }, [debouncedSearch, pagination, statusFilter, t, toast]);
 
     useEffect(() => {
         fetchDepartments();
@@ -79,8 +73,8 @@ export default function DepartmentsPage() {
                 description: t("toast.deleteSuccess.description"),
             });
             fetchDepartments();
-        } catch (error: any) {
-            const message = error.response?.data?.message;
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
             toast({
                 title: t("toast.deleteError.title"),
                 description: message || t("toast.deleteError.description"),

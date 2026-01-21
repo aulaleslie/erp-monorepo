@@ -5,7 +5,8 @@ import { useParams } from "next/navigation";
 import { PageHeader } from "@/components/common/PageHeader";
 import { PermissionGuard } from "@/components/guards/PermissionGuard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Edit, Package } from "lucide-react";
 import Link from "next/link";
@@ -120,12 +121,15 @@ function ItemDetailWrapper({ id }: { id: string }) {
             <Card>
                 <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row gap-8">
-                        <div className="w-full md:w-64 h-64 rounded-lg border bg-muted flex items-center justify-center overflow-hidden">
+                        <div className="relative w-full md:w-64 h-64 rounded-lg border bg-muted flex items-center justify-center overflow-hidden">
                             {item.imageUrl ? (
-                                <img
+                                <Image
                                     src={item.imageUrl}
                                     alt={item.name}
-                                    className="w-full h-full object-cover"
+                                    fill
+                                    sizes="(min-width: 768px) 16rem, 100vw"
+                                    className="object-cover"
+                                    unoptimized
                                 />
                             ) : (
                                 <Package className="h-16 w-16 text-muted-foreground opacity-20" />

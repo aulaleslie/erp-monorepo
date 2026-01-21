@@ -84,8 +84,8 @@ export class AuditLogsService {
       entityId: log.entityId,
       action: log.action,
       performedBy: log.performedBy,
-      previousValues: log.previousValues,
-      newValues: log.newValues,
+      previousValues: log.previousValues as Record<string, unknown> | null,
+      newValues: log.newValues as Record<string, unknown> | null,
       timestamp: log.timestamp,
       performedByUser: log.performedBy
         ? usersMap.get(log.performedBy) || null

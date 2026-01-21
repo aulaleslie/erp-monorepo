@@ -21,14 +21,14 @@ export class CreateTaxDto {
   @IsOptional()
   type?: TaxType = TaxType.PERCENTAGE;
 
-  @ValidateIf((o) => o.type === TaxType.PERCENTAGE || !o.type)
+  @ValidateIf((o: CreateTaxDto) => o.type === TaxType.PERCENTAGE || !o.type)
   @IsNumber()
   @Min(0)
   @Max(1)
   @IsOptional()
   rate?: number;
 
-  @ValidateIf((o) => o.type === TaxType.FIXED)
+  @ValidateIf((o: CreateTaxDto) => o.type === TaxType.FIXED)
   @IsNumber()
   @Min(0)
   @IsOptional()

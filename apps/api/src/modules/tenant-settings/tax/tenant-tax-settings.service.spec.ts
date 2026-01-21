@@ -8,7 +8,7 @@ import {
   TaxType,
 } from '../../../database/entities/tax.entity';
 import { TenantTaxEntity } from '../../../database/entities/tenant-tax.entity';
-import { DataSource, ObjectLiteral, Repository } from 'typeorm';
+import { DataSource, EntityManager, ObjectLiteral, Repository } from 'typeorm';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 
 const mockTenantRepository = () => ({
@@ -27,7 +27,36 @@ const mockDataSource = () => ({
   transaction: jest.fn(),
 });
 
-type MockRepository<T extends ObjectLiteral = any> = {
+type TransactionCallback<T = unknown> = (manager: EntityManager) => Promise<T>;
+type TransactionIsolationLevel = string;
+
+type TransactionFn = {
+  <T = unknown>(runInTransaction: TransactionCallback<T>): Promise<T>;
+  <T = unknown>(
+    isolationLevel: TransactionIsolationLevel,
+    runInTransaction: TransactionCallback<T>,
+  ): Promise<T>;
+};
+
+const runTransaction =
+  (manager: EntityManager): TransactionFn =>
+  <T>(
+    isolationOrCallback: TransactionIsolationLevel | TransactionCallback<T>,
+    maybeCallback?: TransactionCallback<T>,
+  ) => {
+    const callback =
+      typeof isolationOrCallback === 'function'
+        ? isolationOrCallback
+        : maybeCallback;
+
+    if (!callback) {
+      throw new Error('Missing transaction callback');
+    }
+
+    return callback(manager);
+  };
+
+type MockRepository<T extends ObjectLiteral = ObjectLiteral> = {
   [P in keyof Repository<T>]: jest.Mock;
 };
 
@@ -36,7 +65,7 @@ describe('TenantTaxSettingsService', () => {
   let tenantRepository: MockRepository<TenantEntity>;
   let taxRepository: MockRepository<TaxEntity>;
   let tenantTaxRepository: MockRepository<TenantTaxEntity>;
-  let dataSource: any;
+  let dataSource: jest.Mocked<DataSource>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -127,14 +156,15 @@ describe('TenantTaxSettingsService', () => {
   describe('updateSettings', () => {
     it('should throw ConflictException if tenant is not taxable', async () => {
       // We mock the transaction execution to simulate the callback running
-      dataSource.transaction.mockImplementation(async (cb) => {
-        const mockManager = {
-          findOne: jest
-            .fn()
-            .mockResolvedValue({ id: 'tenant-1', isTaxable: false }),
-        };
-        await cb(mockManager);
-      });
+      const mockManager: jest.Mocked<Partial<EntityManager>> = {
+        findOne: jest
+          .fn()
+          .mockResolvedValue({ id: 'tenant-1', isTaxable: false }),
+      };
+
+      dataSource.transaction.mockImplementation(
+        runTransaction(mockManager as EntityManager),
+      );
 
       await expect(
         service.updateSettings('tenant-1', { taxIds: [] }),
@@ -146,7 +176,7 @@ describe('TenantTaxSettingsService', () => {
       const taxIds = ['tax-1', 'tax-2'];
       const defaultTaxId = 'tax-1';
 
-      const mockManager = {
+      const mockManager: jest.Mocked<Partial<EntityManager>> = {
         findOne: jest.fn().mockResolvedValue({ id: tenantId, isTaxable: true }),
         find: jest.fn().mockResolvedValue([
           { id: 'tax-1', status: TaxStatus.ACTIVE },
@@ -157,9 +187,9 @@ describe('TenantTaxSettingsService', () => {
         save: jest.fn().mockResolvedValue([{}]),
       };
 
-      dataSource.transaction.mockImplementation(async (cb) => {
-        await cb(mockManager);
-      });
+      dataSource.transaction.mockImplementation(
+        runTransaction(mockManager as EntityManager),
+      );
 
       await service.updateSettings(tenantId, { taxIds, defaultTaxId });
 

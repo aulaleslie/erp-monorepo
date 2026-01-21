@@ -1,5 +1,6 @@
 import { api } from '@/lib/api';
 import { PaginatedResponse } from '@/services/types';
+import { PersonListItem } from '@/services/people';
 import { DepartmentStatus } from '@gym-monorepo/shared';
 
 export interface DepartmentListItem {
@@ -7,7 +8,7 @@ export interface DepartmentListItem {
   code: string;
   name: string;
   status: DepartmentStatus;
-  people?: any[]; // Using any[] for now to avoid circular dependency or extensive importing, ideally should be PeopleListItem[]
+  people?: PersonListItem[];
 }
 
 interface DepartmentListParams {

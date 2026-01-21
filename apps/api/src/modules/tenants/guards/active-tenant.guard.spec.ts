@@ -1,6 +1,6 @@
 import { ActiveTenantGuard } from './active-tenant.guard';
 import { ExecutionContext, BadRequestException } from '@nestjs/common';
-import { FastifyRequest } from 'fastify';
+import type { RequestWithTenant } from '../../../common/types/request';
 
 describe('ActiveTenantGuard', () => {
   let guard: ActiveTenantGuard;
@@ -19,7 +19,7 @@ describe('ActiveTenantGuard', () => {
         cookies: {
           active_tenant: 'tenant-1',
         },
-      } as unknown as FastifyRequest;
+      } as unknown as RequestWithTenant & { cookies: Record<string, string> };
 
       const mockContext = {
         switchToHttp: () => ({
@@ -29,13 +29,13 @@ describe('ActiveTenantGuard', () => {
 
       const result = guard.canActivate(mockContext);
       expect(result).toBe(true);
-      expect((mockRequest as any).tenantId).toBe('tenant-1');
+      expect(mockRequest.tenantId).toBe('tenant-1');
     });
 
     it('should throw BadRequestException if active_tenant cookie is missing', () => {
       const mockRequest = {
         cookies: {},
-      } as unknown as FastifyRequest;
+      } as unknown as RequestWithTenant & { cookies: Record<string, string> };
 
       const mockContext = {
         switchToHttp: () => ({

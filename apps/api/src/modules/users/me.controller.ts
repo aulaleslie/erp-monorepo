@@ -18,9 +18,10 @@ import { ApiTags, ApiCookieAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
 import { TenantsService } from '../tenants/tenants.service';
-import { FastifyRequest, FastifyReply } from 'fastify';
+import { FastifyReply } from 'fastify';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import type { RequestWithUser } from '../../common/types/request';
 
 @ApiTags('users')
 @ApiCookieAuth('access_token')
@@ -34,21 +35,21 @@ export class MeController {
   ) {}
 
   @Get('permissions')
-  async getPermissions(@Req() req: FastifyRequest & { user: any }) {
+  async getPermissions(@Req() req: RequestWithUser) {
     const tenantId = req.cookies['active_tenant'];
-    return this.usersService.getPermissions(req.user.id, tenantId);
+    return this.usersService.getPermissions(req.user!.id, tenantId);
   }
 
   @Get('tenants')
-  async getMyTenants(@Req() req: FastifyRequest & { user: any }) {
+  async getMyTenants(@Req() req: RequestWithUser) {
     // Returns tenants with role information for the authenticated user
-    return this.usersService.getUserTenants(req.user.id);
+    return this.usersService.getUserTenants(req.user!.id);
   }
 
   @Post('tenants/active')
   @HttpCode(HttpStatus.OK)
   async setActiveTenant(
-    @Req() req: any,
+    @Req() req: RequestWithUser,
     @Body('tenantId') tenantId: string,
     @Res({ passthrough: true }) res: FastifyReply,
   ) {
@@ -57,9 +58,9 @@ export class MeController {
       throw new BadRequestException('tenantId is required');
     }
 
-    const hasAccess = req.user.isSuperAdmin
+    const hasAccess = req.user!.isSuperAdmin
       ? true
-      : await this.tenantsService.validateTenantAccess(req.user.id, tenantId);
+      : await this.tenantsService.validateTenantAccess(req.user!.id, tenantId);
 
     if (!hasAccess) {
       throw new ForbiddenException('You do not have access to this tenant');
@@ -81,7 +82,7 @@ export class MeController {
   }
 
   @Get('tenants/active')
-  async getActiveTenant(@Req() req: FastifyRequest & { user: any }) {
+  async getActiveTenant(@Req() req: RequestWithUser) {
     // Moved from TenantsController
     // Note: If no active tenant cookie/header, this might fail or return null?
     // In TenantsController it was guarded by ActiveTenantGuard which set req.tenantId
@@ -100,9 +101,9 @@ export class MeController {
       // validate access again just in case?
       // simple read is okay if we trust the cookie + service check
       // but explicit access check is safer.
-      if (!req.user.isSuperAdmin) {
+      if (!req.user!.isSuperAdmin) {
         const hasAccess = await this.tenantsService.validateTenantAccess(
-          req.user.id,
+          req.user!.id,
           tenantId,
         );
         if (!hasAccess) {
@@ -121,10 +122,10 @@ export class MeController {
 
   @Patch('profile')
   async updateProfile(
-    @Req() req: FastifyRequest & { user: any },
+    @Req() req: RequestWithUser,
     @Body() body: UpdateProfileDto,
   ) {
-    const user = await this.usersService.updateProfile(req.user.id, {
+    const user = await this.usersService.updateProfile(req.user!.id, {
       fullName: body.fullName,
     });
     return {
@@ -137,11 +138,11 @@ export class MeController {
 
   @Patch('password')
   async updatePassword(
-    @Req() req: FastifyRequest & { user: any },
+    @Req() req: RequestWithUser,
     @Body() body: UpdatePasswordDto,
   ) {
     await this.usersService.updatePassword(
-      req.user.id,
+      req.user!.id,
       body.currentPassword,
       body.newPassword,
     );

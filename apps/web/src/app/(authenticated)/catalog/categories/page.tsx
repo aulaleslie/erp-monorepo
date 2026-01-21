@@ -46,7 +46,7 @@ export default function CategoriesPage() {
         } finally {
             setLoading(false);
         }
-    }, [pagination.page, pagination.limit, debouncedSearch]);
+    }, [pagination, debouncedSearch]);
 
     React.useEffect(() => {
         fetchData();

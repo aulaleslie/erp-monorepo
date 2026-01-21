@@ -13,6 +13,8 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 
+const DEFAULT_LIMIT = 10;
+
 interface MultiSearchableSelectProps<T> {
     value?: string[];
     onValueChange: (value: string[]) => void;
@@ -70,8 +72,6 @@ export function MultiSearchableSelect<T>({
     const observerRef = React.useRef<IntersectionObserver | null>(null);
     const loadMoreTriggerRef = React.useRef<HTMLDivElement>(null);
 
-    const limit = 10;
-
     // Initialize cache with initialSelectedItems
     React.useEffect(() => {
         if (initialSelectedItems.length > 0) {
@@ -106,6 +106,40 @@ export function MultiSearchableSelect<T>({
         return () => clearTimeout(timer);
     }, [search]);
 
+    const loadItems = React.useCallback(async (
+        pageNum: number,
+        searchTerm: string,
+        isNewSearch: boolean
+    ) => {
+        if (isNewSearch) {
+            setLoading(true);
+        } else {
+            setLoadingMore(true);
+        }
+
+        try {
+            const result = await fetchItems({
+                search: searchTerm,
+                page: pageNum,
+                limit: DEFAULT_LIMIT,
+            });
+
+            if (isNewSearch) {
+                setItems(result.items);
+            } else {
+                setItems((prev) => [...prev, ...result.items]);
+            }
+
+            setHasMore(result.hasMore);
+            setPage(pageNum);
+        } catch (error) {
+            console.error("Failed to fetch items:", error);
+        } finally {
+            setLoading(false);
+            setLoadingMore(false);
+        }
+    }, [fetchItems]);
+
     // Reset and fetch when search changes
     React.useEffect(() => {
         if (open) {
@@ -113,7 +147,7 @@ export function MultiSearchableSelect<T>({
             setItems([]);
             loadItems(1, debouncedSearch, true);
         }
-    }, [debouncedSearch, open]);
+    }, [debouncedSearch, loadItems, open]);
 
     // Set up intersection observer for infinite scroll
     React.useEffect(() => {
@@ -135,41 +169,7 @@ export function MultiSearchableSelect<T>({
                 observerRef.current.disconnect();
             }
         };
-    }, [hasMore, loading, loadingMore, page, debouncedSearch, open]);
-
-    const loadItems = async (
-        pageNum: number,
-        searchTerm: string,
-        isNewSearch: boolean
-    ) => {
-        if (isNewSearch) {
-            setLoading(true);
-        } else {
-            setLoadingMore(true);
-        }
-
-        try {
-            const result = await fetchItems({
-                search: searchTerm,
-                page: pageNum,
-                limit,
-            });
-
-            if (isNewSearch) {
-                setItems(result.items);
-            } else {
-                setItems((prev) => [...prev, ...result.items]);
-            }
-
-            setHasMore(result.hasMore);
-            setPage(pageNum);
-        } catch (error) {
-            console.error("Failed to fetch items:", error);
-        } finally {
-            setLoading(false);
-            setLoadingMore(false);
-        }
-    };
+    }, [debouncedSearch, hasMore, loadItems, loading, loadingMore, open, page]);
 
     const handleSelect = (item: T) => {
         const itemValue = getItemValue(item);

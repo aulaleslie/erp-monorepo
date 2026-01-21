@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { getApiErrorMessage } from "@/lib/api";
 
 export default function RoleDetailPage() {
     const params = useParams();
@@ -45,10 +46,11 @@ export default function RoleDetailPage() {
                 setRole(roleData);
                 setUsers(usersData);
                 setAllPermissions(permissionsData);
-            } catch (error) {
+            } catch (error: unknown) {
+                const message = getApiErrorMessage(error);
                 toast({
                     title: t("detailPage.toast.fetchDetailsError.title"),
-                    description: t("detailPage.toast.fetchDetailsError.description"),
+                    description: message || t("detailPage.toast.fetchDetailsError.description"),
                     variant: "destructive",
                 });
             } finally {
@@ -57,7 +59,7 @@ export default function RoleDetailPage() {
         };
 
         fetchData();
-    }, [roleId]);
+    }, [roleId, t, toast]);
 
     const handleDelete = async () => {
         if (!role || !confirm(t("detailPage.confirm.message"))) return;
@@ -69,10 +71,11 @@ export default function RoleDetailPage() {
                 description: t("toast.deleteSuccess.description"),
             });
             router.push("/settings/roles");
-        } catch (error) {
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error);
             toast({
                 title: t("toast.deleteError.title"),
-                description: t("toast.deleteError.description"),
+                description: message || t("toast.deleteError.description"),
                 variant: "destructive",
             });
         }

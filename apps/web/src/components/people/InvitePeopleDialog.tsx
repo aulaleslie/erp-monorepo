@@ -24,6 +24,7 @@ import { peopleService, InvitablePerson } from "@/services/people";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "next-intl";
 import { PeopleType } from "@gym-monorepo/shared";
+import { getApiErrorMessage } from "@/lib/api";
 
 interface InvitePeopleDialogProps {
     open: boolean;
@@ -79,9 +80,8 @@ export function InvitePeopleDialog({
             onOpenChange(false);
             resetForm();
             onSuccess?.();
-        } catch (error: any) {
-            const message =
-                error.response?.data?.message || t("invite.toast.error.description");
+        } catch (error: unknown) {
+            const message = getApiErrorMessage(error) || t("invite.toast.error.description");
             toast({
                 title: t("invite.toast.error.title"),
                 description: message,

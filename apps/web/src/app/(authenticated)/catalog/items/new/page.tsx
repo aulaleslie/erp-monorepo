@@ -5,7 +5,6 @@ import { PageHeader } from "@/components/common/PageHeader";
 import { PermissionGuard } from "@/components/guards/PermissionGuard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ItemForm } from "@/components/features/catalog/ItemForm";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function CreateItemPage() {
     const t = useTranslations("items");

@@ -15,6 +15,7 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { FastifyReply } from 'fastify';
 import { LoginDto } from './dto/login.dto';
+import type { RequestWithUser } from '../../common/types/request';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -31,7 +32,7 @@ export class AuthController {
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    const { access_token } = await this.authService.login(user);
+    const { access_token } = this.authService.login(user);
 
     res.setCookie('access_token', access_token, {
       httpOnly: true,
@@ -45,7 +46,7 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(@Res({ passthrough: true }) res: FastifyReply) {
+  logout(@Res({ passthrough: true }) res: FastifyReply) {
     res.clearCookie('access_token', { path: '/' });
     res.clearCookie('active_tenant', { path: '/' });
     return { message: 'Logged out successfully' };
@@ -53,8 +54,11 @@ export class AuthController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get('me')
-  async getProfile(@Req() req: any) {
+  async getProfile(@Req() req: RequestWithUser) {
     // Fetch fresh user data from database instead of using JWT payload
+    if (!req.user) {
+      throw new UnauthorizedException('User not found');
+    }
     const user = await this.authService.findUserById(req.user.id);
     if (!user) {
       throw new UnauthorizedException('User not found');

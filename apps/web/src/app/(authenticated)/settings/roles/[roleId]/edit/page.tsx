@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { getApiErrorMessage } from "@/lib/api";
 
 export default function EditRolePage() {
     const params = useParams();
@@ -49,7 +50,7 @@ export default function EditRolePage() {
                     permissions: roleData.permissions || [],
                 });
                 setIsSuperAdmin(roleData.isSuperAdmin);
-            } catch (error) {
+            } catch {
                 toast({
                     title: t("editPage.toast.loadError.title"),
                     description: t("editPage.toast.loadError.description"),
@@ -60,7 +61,7 @@ export default function EditRolePage() {
             }
         };
         fetchData();
-    }, [roleId]);
+    }, [roleId, t, toast]);
 
     // Group permissions by 'group' field
     const groupedPermissions = permissions.reduce((acc, permission) => {
@@ -83,8 +84,8 @@ export default function EditRolePage() {
                 description: t("editPage.toast.success.description"),
             });
             router.push("/settings/roles");
-        } catch (error: any) {
-            const errorMessage = error.response?.data?.message || "Failed to update role.";
+        } catch (error: unknown) {
+            const errorMessage = getApiErrorMessage(error) || "Failed to update role.";
 
             if (errorMessage.toLowerCase().includes("name")) {
                 setErrors({ name: errorMessage });

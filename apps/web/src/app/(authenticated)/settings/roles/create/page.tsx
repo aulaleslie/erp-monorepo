@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslations } from "next-intl";
+import { getApiErrorMessage, getApiFieldErrors } from "@/lib/api";
 
 export default function CreateRolePage() {
     const router = useRouter();
@@ -34,16 +35,17 @@ export default function CreateRolePage() {
             try {
                 const data = await rolesService.getAllPermissions();
                 setPermissions(data);
-            } catch (error) {
+            } catch (error: unknown) {
+                const message = getApiErrorMessage(error);
                 toast({
                     title: t("toast.loadPermissionsError.title"),
-                    description: t("toast.loadPermissionsError.description"),
+                    description: message || t("toast.loadPermissionsError.description"),
                     variant: "destructive",
                 });
             }
         };
         fetchPermissions();
-    }, []);
+    }, [t, toast]);
 
     // Group permissions by 'group' field
     const groupedPermissions = permissions.reduce((acc, permission) => {
@@ -72,12 +74,12 @@ export default function CreateRolePage() {
                 description: t("toast.createSuccess.description"),
             });
             router.push("/settings/roles");
-        } catch (error: any) {
-            const responseData = error.response?.data;
-            const errorMessage = responseData?.message || "Failed to create role.";
+        } catch (error: unknown) {
+            const responseErrors = getApiFieldErrors(error);
+            const errorMessage = getApiErrorMessage(error) || "Failed to create role.";
 
-            if (responseData?.errors) {
-                setErrors(responseData.errors);
+            if (responseErrors) {
+                setErrors(responseErrors);
             } else if (errorMessage.toLowerCase().includes("name")) {
                 setErrors({ name: errorMessage });
             }

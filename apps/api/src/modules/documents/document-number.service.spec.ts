@@ -9,45 +9,60 @@ describe('DocumentNumberService', () => {
   let dataSource: DataSource;
   let manager: EntityManager;
   let repository: Repository<DocumentNumberSettingEntity>;
+  let saveMock: jest.Mock;
+  let findMock: jest.Mock;
+  let findOneMock: jest.Mock;
+  let createMock: jest.Mock;
+  let queryBuilderGetOneMock: jest.Mock;
 
   beforeEach(async () => {
-    // Mock Repository
-    repository = {
-      createQueryBuilder: jest.fn().mockReturnThis(),
+    queryBuilderGetOneMock = jest.fn();
+    const queryBuilderMock = {
       setLock: jest.fn().mockReturnThis(),
       where: jest.fn().mockReturnThis(),
       andWhere: jest.fn().mockReturnThis(),
-      getOne: jest.fn(),
+      getOne: queryBuilderGetOneMock,
       insert: jest.fn().mockReturnThis(),
       into: jest.fn().mockReturnThis(),
       values: jest.fn().mockReturnThis(),
       orIgnore: jest.fn().mockReturnThis(),
       execute: jest.fn(),
-      create: jest.fn(),
-      save: jest
-        .fn()
-        .mockImplementation((entity: DocumentNumberSettingEntity) =>
-          Promise.resolve(entity),
-        ),
-      find: jest.fn(),
-      findOne: jest.fn(),
+    };
+
+    saveMock = jest
+      .fn()
+      .mockImplementation((entity: DocumentNumberSettingEntity) =>
+        Promise.resolve(entity),
+      );
+    findMock = jest.fn();
+    findOneMock = jest.fn();
+    createMock = jest.fn(
+      (data: Partial<DocumentNumberSettingEntity>) =>
+        ({
+          ...data,
+        }) as DocumentNumberSettingEntity,
+    );
+
+    // Mock Repository
+    repository = {
+      createQueryBuilder: jest.fn().mockReturnValue(queryBuilderMock),
+      create: createMock,
+      save: saveMock,
+      find: findMock,
+      findOne: findOneMock,
     } as unknown as Repository<DocumentNumberSettingEntity>;
 
     // Mock EntityManager
     manager = {
       getRepository: jest.fn().mockReturnValue(repository),
-      save: jest
-        .fn()
-        .mockImplementation((entity: DocumentNumberSettingEntity) =>
-          Promise.resolve(entity),
-        ),
+      save: saveMock,
     } as unknown as EntityManager;
 
     // Mock DataSource
     dataSource = {
       transaction: jest
         .fn()
-        .mockImplementation((cb: (mgr: EntityManager) => Promise<any>) =>
+        .mockImplementation((cb: (mgr: EntityManager) => Promise<unknown>) =>
           cb(manager),
         ),
       getRepository: jest.fn().mockReturnValue(repository),
@@ -72,7 +87,7 @@ describe('DocumentNumberService', () => {
 
     it('should generate number with default format when no settings exist', async () => {
       // First call: settings not found, then returned after creation
-      (repository.createQueryBuilder().getOne as jest.Mock)
+      queryBuilderGetOneMock
         .mockResolvedValueOnce(null) // First find
         .mockResolvedValueOnce({
           tenantId,
@@ -93,7 +108,7 @@ describe('DocumentNumberService', () => {
       const expected = `INV-${year}-${month}-000001`;
 
       expect(result).toBe(expected);
-      expect(manager.save).toHaveBeenCalled();
+      expect(saveMock).toHaveBeenCalled();
     });
 
     it('should increment counter within the same period', async () => {
@@ -101,7 +116,7 @@ describe('DocumentNumberService', () => {
       const month = String(new Date().getMonth() + 1).padStart(2, '0');
       const period = `${year}-${month}`;
 
-      (repository.createQueryBuilder().getOne as jest.Mock).mockResolvedValue({
+      queryBuilderGetOneMock.mockResolvedValue({
         tenantId,
         documentKey,
         prefix: 'INV',
@@ -124,7 +139,7 @@ describe('DocumentNumberService', () => {
         now.getMonth() + 1,
       ).padStart(2, '0')}`;
 
-      (repository.createQueryBuilder().getOne as jest.Mock).mockResolvedValue({
+      queryBuilderGetOneMock.mockResolvedValue({
         tenantId,
         documentKey,
         prefix: 'INV',
@@ -141,7 +156,7 @@ describe('DocumentNumberService', () => {
     });
 
     it('should omit period when includePeriod is false', async () => {
-      (repository.createQueryBuilder().getOne as jest.Mock).mockResolvedValue({
+      queryBuilderGetOneMock.mockResolvedValue({
         tenantId,
         documentKey,
         prefix: 'INV',
@@ -156,9 +171,7 @@ describe('DocumentNumberService', () => {
     });
 
     it('should throw InternalServerErrorException if settings cannot be fetched after creation', async () => {
-      (repository.createQueryBuilder().getOne as jest.Mock).mockResolvedValue(
-        null,
-      );
+      queryBuilderGetOneMock.mockResolvedValue(null);
 
       await expect(
         service.getNextDocumentNumber(tenantId, documentKey),
@@ -174,14 +187,12 @@ describe('DocumentNumberService', () => {
         { documentKey: 'type-1' },
         { documentKey: 'type-2' },
       ];
-      (repository.find as jest.Mock) = jest
-        .fn()
-        .mockResolvedValue(mockSettings);
+      findMock.mockResolvedValue(mockSettings);
 
       const result = await service.findAllSettings(tenantId);
 
       expect(result).toEqual(mockSettings);
-      expect(repository.find).toHaveBeenCalledWith({
+      expect(findMock).toHaveBeenCalledWith({
         where: { tenantId },
         order: { documentKey: 'ASC' },
       });
@@ -189,9 +200,7 @@ describe('DocumentNumberService', () => {
 
     it('findOneSetting should return existing settings', async () => {
       const mockSetting = { documentKey: 'type-1', tenantId };
-      (repository.findOne as jest.Mock) = jest
-        .fn()
-        .mockResolvedValue(mockSetting);
+      findOneMock.mockResolvedValue(mockSetting);
 
       const result = await service.findOneSetting(tenantId, 'type-1');
 
@@ -199,8 +208,13 @@ describe('DocumentNumberService', () => {
     });
 
     it('findOneSetting should return defaults if not found', async () => {
-      (repository.findOne as jest.Mock) = jest.fn().mockResolvedValue(null);
-      (repository.create as jest.Mock).mockImplementation((d) => d);
+      findOneMock.mockResolvedValue(null);
+      createMock.mockImplementation(
+        (data: Partial<DocumentNumberSettingEntity>) =>
+          ({
+            ...data,
+          }) as DocumentNumberSettingEntity,
+      );
 
       const result = await service.findOneSetting(tenantId, 'sales.invoice');
 
@@ -212,12 +226,12 @@ describe('DocumentNumberService', () => {
 
     it('updateSetting should update existing settings', async () => {
       const existing = { documentKey: 'type-1', prefix: 'OLD', tenantId };
-      (repository.findOne as jest.Mock) = jest.fn().mockResolvedValue(existing);
+      findOneMock.mockResolvedValue(existing);
 
-      await service.updateSetting(tenantId, 'type-1', { prefix: 'NEW' } as any);
+      await service.updateSetting(tenantId, 'type-1', { prefix: 'NEW' });
 
       expect(existing.prefix).toBe('NEW');
-      expect(repository.save).toHaveBeenCalled();
+      expect(saveMock).toHaveBeenCalled();
     });
   });
 });
