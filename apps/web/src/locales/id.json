@@ -1,4 +1,47 @@
 {
+  "common": {
+    "comingSoon": {
+      "badge": "Segera Hadir"
+    }
+  },
+  "sales": {
+    "title": "Penjualan",
+    "comingSoon": {
+      "title": "Modul Penjualan Segera Hadir",
+      "description": "Kami sedang membangun sistem penjualan yang komprehensif untuk membantu Anda mengelola pesanan dan pelanggan secara efisien."
+    }
+  },
+  "purchase": {
+    "title": "Pembelian",
+    "comingSoon": {
+      "title": "Modul Pembelian Segera Hadir",
+      "description": "Sederhanakan proses pengadaan Anda dengan alat manajemen pembelian kami yang akan datang."
+    }
+  },
+  "inventory": {
+    "title": "Inventaris",
+    "comingSoon": {
+      "title": "Modul Inventaris Segera Hadir",
+      "description": "Pantau stok dan pergerakan produk Anda dengan fitur inventaris canggih."
+    }
+  },
+  "memberManagement": {
+    "title": "Manajemen Anggota",
+    "members": {
+      "title": "Anggota",
+      "comingSoon": {
+        "title": "Modul Anggota Segera Hadir",
+        "description": "Kelola anggota gym, keanggotaan, dan profil Anda di satu tempat."
+      }
+    },
+    "scheduling": {
+      "title": "Penjadwalan",
+      "comingSoon": {
+        "title": "Modul Penjadwalan Segera Hadir",
+        "description": "Kelola kelas, sesi, dan jadwal pelatih dengan efisien."
+      }
+    }
+  },
   "authGuard": {
     "loading": "Memuat..."
   },
@@ -32,7 +75,13 @@
     "users": "Pengguna",
     "catalog": "Katalog",
     "items": "Item",
-    "categories": "Kategori"
+    "categories": "Kategori",
+    "sales": "Penjualan",
+    "purchase": "Pembelian",
+    "inventory": "Inventaris",
+    "memberManagement": "Manajemen Anggota",
+    "members": "Anggota",
+    "scheduling": "Penjadwalan"
   },
   "labels": {
     "tenantSettings": {

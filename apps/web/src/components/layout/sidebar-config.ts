@@ -13,6 +13,10 @@ import {
     Package,
     ShoppingBag,
     Layers,
+    UserCheck,
+    Calendar,
+    ShoppingCart,
+    CreditCard,
 } from "lucide-react";
 
 export interface SidebarItem {
@@ -74,6 +78,43 @@ export const sidebarConfig: SidebarItem[] = [
                     "departments.delete",
                 ],
                 routePermissions: ["departments.read"],
+            },
+        ],
+    },
+    {
+        label: "Sales",
+        labelKey: "sales",
+        icon: ShoppingCart,
+        href: "/sales",
+    },
+    {
+        label: "Purchase",
+        labelKey: "purchase",
+        icon: CreditCard,
+        href: "/purchase",
+    },
+    {
+        label: "Inventory",
+        labelKey: "inventory",
+        icon: Package,
+        href: "/inventory",
+    },
+    {
+        label: "Member Management",
+        labelKey: "memberManagement",
+        icon: Users,
+        children: [
+            {
+                label: "Members",
+                labelKey: "members",
+                icon: UserCheck,
+                href: "/members",
+            },
+            {
+                label: "Scheduling",
+                labelKey: "scheduling",
+                icon: Calendar,
+                href: "/scheduling",
             },
         ],
     },

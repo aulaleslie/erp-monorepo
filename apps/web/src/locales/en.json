@@ -32,7 +32,13 @@
     "users": "Users",
     "catalog": "Catalog",
     "items": "Items",
-    "categories": "Categories"
+    "categories": "Categories",
+    "sales": "Sales",
+    "purchase": "Purchase",
+    "inventory": "Inventory",
+    "memberManagement": "Member Management",
+    "members": "Members",
+    "scheduling": "Scheduling"
   },
   "labels": {
     "tenantSettings": {
