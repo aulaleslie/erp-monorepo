@@ -14,7 +14,7 @@ export class CreateDocumentTypeRegistryTable1769022100000 implements MigrationIn
             generationStrategy: 'uuid',
           },
           {
-            name: 'document_key',
+            name: 'documentKey',
             type: 'varchar',
             isUnique: true,
           },
@@ -33,27 +33,27 @@ export class CreateDocumentTypeRegistryTable1769022100000 implements MigrationIn
             isNullable: true,
           },
           {
-            name: 'requires_items',
+            name: 'requiresItems',
             type: 'boolean',
             default: false,
           },
           {
-            name: 'approval_steps',
+            name: 'approvalSteps',
             type: 'int',
             default: 1,
           },
           {
-            name: 'is_active',
+            name: 'isActive',
             type: 'boolean',
             default: true,
           },
           {
-            name: 'created_at',
+            name: 'createdAt',
             type: 'timestamptz',
             default: 'now()',
           },
           {
-            name: 'updated_at',
+            name: 'updatedAt',
             type: 'timestamptz',
             default: 'now()',
           },

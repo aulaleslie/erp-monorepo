@@ -19,24 +19,24 @@ export class CreateLedgerEntriesTable1769022000000 implements MigrationInterface
             generationStrategy: 'uuid',
           },
           {
-            name: 'tenant_id',
+            name: 'tenantId',
             type: 'uuid',
           },
           {
-            name: 'document_id',
+            name: 'documentId',
             type: 'uuid',
           },
           {
-            name: 'entry_type',
+            name: 'entryType',
             type: 'enum',
             enum: ['DEBIT', 'CREDIT'],
           },
           {
-            name: 'account_id',
+            name: 'accountId',
             type: 'uuid',
           },
           {
-            name: 'account_code',
+            name: 'accountCode',
             type: 'varchar',
           },
           {
@@ -46,17 +46,17 @@ export class CreateLedgerEntriesTable1769022000000 implements MigrationInterface
             scale: 2,
           },
           {
-            name: 'currency_code',
+            name: 'currencyCode',
             type: 'varchar',
             default: "'IDR'",
           },
           {
-            name: 'cost_center_id',
+            name: 'costCenterId',
             type: 'uuid',
             isNullable: true,
           },
           {
-            name: 'posted_at',
+            name: 'postedAt',
             type: 'timestamptz',
           },
           {
@@ -65,32 +65,32 @@ export class CreateLedgerEntriesTable1769022000000 implements MigrationInterface
             isNullable: true,
           },
           {
-            name: 'created_at',
+            name: 'createdAt',
             type: 'timestamptz',
             default: 'now()',
           },
           {
-            name: 'updated_at',
+            name: 'updatedAt',
             type: 'timestamptz',
             default: 'now()',
           },
           {
-            name: 'created_by',
+            name: 'createdBy',
             type: 'uuid',
             isNullable: true,
           },
           {
-            name: 'updated_by',
+            name: 'updatedBy',
             type: 'uuid',
             isNullable: true,
           },
           {
-            name: 'deleted_at',
+            name: 'deletedAt',
             type: 'timestamptz',
             isNullable: true,
           },
           {
-            name: 'deleted_by',
+            name: 'deletedBy',
             type: 'uuid',
             isNullable: true,
           },
@@ -101,25 +101,25 @@ export class CreateLedgerEntriesTable1769022000000 implements MigrationInterface
 
     await queryRunner.createForeignKeys('ledger_entries', [
       new TableForeignKey({
-        columnNames: ['tenant_id'],
+        columnNames: ['tenantId'],
         referencedColumnNames: ['id'],
         referencedTableName: 'tenants',
         onDelete: 'CASCADE',
       }),
       new TableForeignKey({
-        columnNames: ['document_id'],
+        columnNames: ['documentId'],
         referencedColumnNames: ['id'],
         referencedTableName: 'documents',
         onDelete: 'CASCADE',
       }),
       new TableForeignKey({
-        columnNames: ['account_id'],
+        columnNames: ['accountId'],
         referencedColumnNames: ['id'],
         referencedTableName: 'chart_of_accounts',
         onDelete: 'RESTRICT',
       }),
       new TableForeignKey({
-        columnNames: ['cost_center_id'],
+        columnNames: ['costCenterId'],
         referencedColumnNames: ['id'],
         referencedTableName: 'cost_centers',
         onDelete: 'SET NULL',
