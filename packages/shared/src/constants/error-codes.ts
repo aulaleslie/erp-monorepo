@@ -341,6 +341,45 @@ export const THEME_ERRORS = {
 } as const;
 
 // ============================================================================
+// Document Errors
+// ============================================================================
+
+export const DOCUMENT_ERRORS = {
+  NOT_FOUND: {
+    code: 'DOCUMENT_NOT_FOUND',
+    message: 'Document not found',
+  },
+  INVALID_TRANSITION: {
+    code: 'DOCUMENT_INVALID_TRANSITION',
+    message: 'Invalid status transition',
+  },
+  ITEMS_REQUIRED: {
+    code: 'DOCUMENT_ITEMS_REQUIRED',
+    message: 'Sales and Purchase documents require at least one item before submission',
+  },
+  ALREADY_POSTED: {
+    code: 'DOCUMENT_ALREADY_POSTED',
+    message: 'Posted documents cannot be modified. Create a reversal document instead.',
+  },
+  APPROVAL_PENDING: {
+    code: 'DOCUMENT_APPROVAL_PENDING',
+    message: 'Document has pending approvals',
+  },
+  APPROVAL_NOT_FOUND: {
+    code: 'DOCUMENT_APPROVAL_NOT_FOUND',
+    message: 'Approval record not found',
+  },
+  APPROVAL_STEP_NOT_READY: {
+    code: 'DOCUMENT_APPROVAL_STEP_NOT_READY',
+    message: 'Previous approval steps must be completed first',
+  },
+  APPROVAL_ALREADY_DECIDED: {
+    code: 'DOCUMENT_APPROVAL_ALREADY_DECIDED',
+    message: 'This approval step has already been decided',
+  },
+} as const;
+
+// ============================================================================
 // Validation Errors
 // ============================================================================
 
@@ -385,6 +424,7 @@ export const ERROR_CODES = {
   STORAGE: STORAGE_ERRORS,
   THEME: THEME_ERRORS,
   VALIDATION: VALIDATION_ERRORS,
+  DOCUMENT: DOCUMENT_ERRORS,
 } as const;
 
 // ============================================================================
@@ -404,6 +444,7 @@ export type ImportErrorCode = typeof IMPORT_ERRORS[keyof typeof IMPORT_ERRORS];
 export type StorageErrorCode = typeof STORAGE_ERRORS[keyof typeof STORAGE_ERRORS];
 export type ThemeErrorCode = typeof THEME_ERRORS[keyof typeof THEME_ERRORS];
 export type ValidationErrorCode = typeof VALIDATION_ERRORS[keyof typeof VALIDATION_ERRORS];
+export type DocumentErrorCode = typeof DOCUMENT_ERRORS[keyof typeof DOCUMENT_ERRORS];
 
 export type AnyErrorCode = 
   | AuthErrorCode 
@@ -418,4 +459,5 @@ export type AnyErrorCode =
   | ImportErrorCode
   | StorageErrorCode
   | ThemeErrorCode 
-  | ValidationErrorCode;
+  | ValidationErrorCode
+  | DocumentErrorCode;

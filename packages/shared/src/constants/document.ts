@@ -29,3 +29,10 @@ export enum DocumentAccessScope {
   ROLE = 'ROLE',
   USER = 'USER',
 }
+
+export enum ApprovalStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+  REVISION_REQUESTED = 'REVISION_REQUESTED',
+}

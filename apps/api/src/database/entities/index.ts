@@ -25,6 +25,8 @@ import { DocumentEntity } from './document.entity';
 import { DocumentItemEntity } from './document-item.entity';
 import { DocumentTaxLineEntity } from './document-tax-line.entity';
 import { DocumentAccountLineEntity } from './document-account-line.entity';
+import { DocumentApprovalEntity } from './document-approval.entity';
+import { DocumentStatusHistoryEntity } from './document-status-history.entity';
 
 export {
   AuditLogEntity,
@@ -53,6 +55,8 @@ export {
   DocumentItemEntity,
   DocumentTaxLineEntity,
   DocumentAccountLineEntity,
+  DocumentApprovalEntity,
+  DocumentStatusHistoryEntity,
 };
 
 export const ALL_ENTITIES = [
@@ -77,4 +81,6 @@ export const ALL_ENTITIES = [
   DocumentItemEntity,
   DocumentTaxLineEntity,
   DocumentAccountLineEntity,
+  DocumentApprovalEntity,
+  DocumentStatusHistoryEntity,
 ];
