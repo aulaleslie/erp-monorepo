@@ -42,6 +42,13 @@ export enum LedgerEntryType {
   CREDIT = 'CREDIT',
 }
 
+export enum OutboxEventStatus {
+  PENDING = 'PENDING',
+  PROCESSING = 'PROCESSING',
+  DONE = 'DONE',
+  FAILED = 'FAILED',
+}
+
 export const DOCUMENT_TYPE_KEY = {
   SALES_ORDER: 'sales.order',
   SALES_INVOICE: 'sales.invoice',
@@ -55,3 +62,21 @@ export const DOCUMENT_TYPE_KEY = {
 
 export type DocumentTypeKey =
   (typeof DOCUMENT_TYPE_KEY)[keyof typeof DOCUMENT_TYPE_KEY];
+
+export const OUTBOX_EVENT_KEYS = {
+  DOCUMENT_SUBMITTED: 'document.submitted',
+  DOCUMENT_APPROVED: 'document.approved',
+  DOCUMENT_POSTED: 'document.posted',
+  DOCUMENT_CANCELLED: 'document.cancelled',
+  DOCUMENT_REJECTED: 'document.rejected',
+  DOCUMENT_REVISION_REQUESTED: 'document.revision_requested',
+  DOCUMENT_TAGS_UPDATED: 'document.tags_updated',
+  // Module-specific events
+  SALES_INVOICE_POSTED: 'sales.invoice.posted',
+  SALES_ORDER_POSTED: 'sales.order.posted',
+  PURCHASING_PO_POSTED: 'purchasing.po.posted',
+  PURCHASING_GRN_POSTED: 'purchasing.grn.posted',
+} as const;
+
+export type OutboxEventKey =
+  (typeof OUTBOX_EVENT_KEYS)[keyof typeof OUTBOX_EVENT_KEYS];

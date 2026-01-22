@@ -8,10 +8,12 @@ import {
   DocumentNumberSettingEntity,
   LedgerEntryEntity,
   DocumentTypeRegistryEntity,
+  DocumentOutboxEntity,
 } from '../../database/entities';
 import { DocumentsController } from './documents.controller';
 import { DocumentsService } from './documents.service';
 import { DocumentNumberService } from './document-number.service';
+import { DocumentOutboxService } from './document-outbox.service';
 import { UsersModule } from '../users/users.module';
 
 @Module({
@@ -24,11 +26,12 @@ import { UsersModule } from '../users/users.module';
       DocumentNumberSettingEntity,
       LedgerEntryEntity,
       DocumentTypeRegistryEntity,
+      DocumentOutboxEntity,
     ]),
     UsersModule,
   ],
   controllers: [DocumentsController],
-  providers: [DocumentsService, DocumentNumberService],
-  exports: [DocumentsService, DocumentNumberService],
+  providers: [DocumentsService, DocumentNumberService, DocumentOutboxService],
+  exports: [DocumentsService, DocumentNumberService, DocumentOutboxService],
 })
 export class DocumentsModule {}

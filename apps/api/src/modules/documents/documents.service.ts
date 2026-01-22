@@ -12,6 +12,7 @@ import {
   DocumentModule,
   DocumentStatus,
   DOCUMENT_ERRORS,
+  OUTBOX_EVENT_KEYS,
 } from '@gym-monorepo/shared';
 import {
   DocumentApprovalEntity,
@@ -27,6 +28,7 @@ import { DocumentNumberService } from './document-number.service';
 import { DocumentTypeRegistry } from './registry/document-type-registry';
 import { DefaultPostingHandler } from './posting/default-posting-handler';
 import { PostingHandler } from './posting/posting-handler.interface';
+import { DocumentOutboxService } from './document-outbox.service';
 
 @Injectable()
 export class DocumentsService {
@@ -41,6 +43,7 @@ export class DocumentsService {
     private readonly historyRepository: Repository<DocumentStatusHistoryEntity>,
     private readonly dataSource: DataSource,
     private readonly documentNumberService: DocumentNumberService,
+    private readonly outboxService: DocumentOutboxService,
   ) {}
 
   async create(
@@ -151,6 +154,16 @@ export class DocumentsService {
         manager,
       );
 
+      await this.outboxService.createEvent(
+        {
+          tenantId,
+          documentId: id,
+          eventKey: OUTBOX_EVENT_KEYS.DOCUMENT_SUBMITTED,
+          userId,
+        },
+        manager,
+      );
+
       return document;
     });
   }
@@ -206,6 +219,16 @@ export class DocumentsService {
           notes,
           manager,
         );
+
+        await this.outboxService.createEvent(
+          {
+            tenantId,
+            documentId: id,
+            eventKey: OUTBOX_EVENT_KEYS.DOCUMENT_APPROVED,
+            userId,
+          },
+          manager,
+        );
       }
 
       return document;
@@ -246,6 +269,16 @@ export class DocumentsService {
         DocumentStatus.REJECTED,
         userId,
         notes,
+        manager,
+      );
+
+      await this.outboxService.createEvent(
+        {
+          tenantId,
+          documentId: id,
+          eventKey: OUTBOX_EVENT_KEYS.DOCUMENT_REJECTED,
+          userId,
+        },
         manager,
       );
 
@@ -301,6 +334,16 @@ export class DocumentsService {
         manager,
       );
 
+      await this.outboxService.createEvent(
+        {
+          tenantId,
+          documentId: id,
+          eventKey: OUTBOX_EVENT_KEYS.DOCUMENT_REVISION_REQUESTED,
+          userId,
+        },
+        manager,
+      );
+
       return document;
     });
   }
@@ -336,6 +379,7 @@ export class DocumentsService {
         manager,
         tenantId,
         userId,
+        outboxService: this.outboxService,
       });
 
       return document;
@@ -370,6 +414,16 @@ export class DocumentsService {
         DocumentStatus.CANCELLED,
         userId,
         reason,
+        manager,
+      );
+
+      await this.outboxService.createEvent(
+        {
+          tenantId,
+          documentId: id,
+          eventKey: OUTBOX_EVENT_KEYS.DOCUMENT_CANCELLED,
+          userId,
+        },
         manager,
       );
 

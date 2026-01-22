@@ -14,6 +14,7 @@ import {
   DocumentModule,
   DocumentStatus,
   DOCUMENT_ERRORS,
+  OUTBOX_EVENT_KEYS,
 } from '@gym-monorepo/shared';
 import {
   DocumentApprovalEntity,
@@ -24,6 +25,7 @@ import {
 import { DocumentsService } from './documents.service';
 import { DocumentNumberService } from './document-number.service';
 import { DefaultPostingHandler } from './posting/default-posting-handler';
+import { DocumentOutboxService } from './document-outbox.service';
 
 jest.mock('./posting/default-posting-handler');
 
@@ -32,6 +34,7 @@ describe('DocumentsService', () => {
   let documentRepo: Repository<DocumentEntity>;
   let dataSource: DataSource;
   let documentNumberService: DocumentNumberService;
+  let outboxService: DocumentOutboxService;
 
   const mockTenantId = 'tenant-1';
   const mockUserId = 'user-1';
@@ -100,6 +103,12 @@ describe('DocumentsService', () => {
             getNextDocumentNumber: jest.fn(),
           },
         },
+        {
+          provide: DocumentOutboxService,
+          useValue: {
+            createEvent: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -109,6 +118,7 @@ describe('DocumentsService', () => {
     documentNumberService = module.get<DocumentNumberService>(
       DocumentNumberService,
     );
+    outboxService = module.get<DocumentOutboxService>(DocumentOutboxService);
   });
 
   const setupTransactionMock = (manager: Partial<EntityManager>) => {
@@ -211,6 +221,14 @@ describe('DocumentsService', () => {
           toStatus: DocumentStatus.SUBMITTED,
         }),
       );
+      // Outbox event
+      const createEventSpy = jest.spyOn(outboxService, 'createEvent');
+      expect(createEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventKey: OUTBOX_EVENT_KEYS.DOCUMENT_SUBMITTED,
+        }),
+        manager,
+      );
     });
 
     it('should create multiple approval records for purchasing.po', async () => {
@@ -303,6 +321,14 @@ describe('DocumentsService', () => {
           status: ApprovalStatus.APPROVED,
           notes: 'Looks good',
         }),
+      );
+      // Outbox event
+      const createEventSpy = jest.spyOn(outboxService, 'createEvent');
+      expect(createEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventKey: OUTBOX_EVENT_KEYS.DOCUMENT_APPROVED,
+        }),
+        manager,
       );
     });
 
@@ -415,6 +441,14 @@ describe('DocumentsService', () => {
         { documentId: mockDocId, status: ApprovalStatus.PENDING },
         expect.objectContaining({ status: ApprovalStatus.REJECTED }),
       );
+      // Outbox event
+      const createEventSpy = jest.spyOn(outboxService, 'createEvent');
+      expect(createEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventKey: OUTBOX_EVENT_KEYS.DOCUMENT_REJECTED,
+        }),
+        manager,
+      );
     });
   });
 
@@ -453,6 +487,14 @@ describe('DocumentsService', () => {
       );
       expect(manager.save).toHaveBeenCalledWith(
         expect.objectContaining({ toStatus: DocumentStatus.DRAFT }),
+      );
+      // Outbox event
+      const createEventSpy = jest.spyOn(outboxService, 'createEvent');
+      expect(createEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventKey: OUTBOX_EVENT_KEYS.DOCUMENT_REVISION_REQUESTED,
+        }),
+        manager,
       );
     });
   });
@@ -531,6 +573,14 @@ describe('DocumentsService', () => {
         documentId: mockDocId,
         status: ApprovalStatus.PENDING,
       });
+      // Outbox event
+      const createEventSpy = jest.spyOn(outboxService, 'createEvent');
+      expect(createEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventKey: OUTBOX_EVENT_KEYS.DOCUMENT_CANCELLED,
+        }),
+        manager,
+      );
     });
   });
 

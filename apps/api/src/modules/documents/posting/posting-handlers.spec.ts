@@ -3,6 +3,7 @@ import {
   DocumentStatus,
   DOCUMENT_ERRORS,
   LedgerEntryType,
+  OUTBOX_EVENT_KEYS,
 } from '@gym-monorepo/shared';
 import { EntityManager } from 'typeorm';
 import {
@@ -14,6 +15,7 @@ import {
 import { BasePostingHandler } from './base-posting-handler';
 import { DefaultPostingHandler } from './default-posting-handler';
 import { PostingContext } from './posting-handler.interface';
+import { DocumentOutboxService } from '../document-outbox.service';
 
 // Concrete implementation of BasePostingHandler for testing
 class TestPostingHandler extends BasePostingHandler {
@@ -25,6 +27,7 @@ class TestPostingHandler extends BasePostingHandler {
 describe('PostingHandlers', () => {
   let mockManager: Partial<EntityManager>;
   let mockDocument: Partial<DocumentEntity>;
+  let mockOutboxService: Partial<DocumentOutboxService>;
   let context: PostingContext;
 
   beforeEach(() => {
@@ -47,11 +50,16 @@ describe('PostingHandlers', () => {
       findOne: jest.fn(),
     };
 
+    mockOutboxService = {
+      createEvent: jest.fn().mockResolvedValue({}),
+    };
+
     context = {
       document: mockDocument as DocumentEntity,
       manager: mockManager as EntityManager,
       tenantId: 'tenant-1',
       userId: 'user-1',
+      outboxService: mockOutboxService as DocumentOutboxService,
     };
   });
 
@@ -93,6 +101,17 @@ describe('PostingHandlers', () => {
           fromStatus: DocumentStatus.APPROVED,
           toStatus: DocumentStatus.POSTED,
         }),
+      );
+    });
+
+    it('should trigger document.posted outbox event', async () => {
+      const createEventSpy = jest.spyOn(mockOutboxService, 'createEvent');
+      await handler.post(context);
+      expect(createEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventKey: OUTBOX_EVENT_KEYS.DOCUMENT_POSTED,
+        }),
+        mockManager,
       );
     });
   });
@@ -140,6 +159,26 @@ describe('PostingHandlers', () => {
       // check number of saves for LedgerEntryEntity
       // 1 for document, 2 for ledger entries, 1 for history = 4 total saves
       expect(mockManager.save).toHaveBeenCalledTimes(4);
+    });
+
+    it('should trigger module-specific outbox events for sales invoice', async () => {
+      mockDocument.documentKey = 'sales.invoice';
+      const createEventSpy = jest.spyOn(mockOutboxService, 'createEvent');
+      await handler.post(context);
+
+      // Should call for generic document.posted AND specific sales.invoice.posted
+      expect(createEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventKey: OUTBOX_EVENT_KEYS.DOCUMENT_POSTED,
+        }),
+        mockManager,
+      );
+      expect(createEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventKey: OUTBOX_EVENT_KEYS.SALES_INVOICE_POSTED,
+        }),
+        mockManager,
+      );
     });
   });
 });

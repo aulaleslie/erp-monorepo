@@ -396,6 +396,25 @@ export const DOCUMENT_ERRORS = {
 } as const;
 
 // ============================================================================
+// Outbox Errors
+// ============================================================================
+
+export const OUTBOX_ERRORS = {
+  NOT_FOUND: {
+    code: 'OUTBOX_NOT_FOUND',
+    message: 'Outbox event not found',
+  },
+  ALREADY_PROCESSED: {
+    code: 'OUTBOX_ALREADY_PROCESSED',
+    message: 'Outbox event has already been processed',
+  },
+  MAX_RETRIES_EXCEEDED: {
+    code: 'OUTBOX_MAX_RETRIES_EXCEEDED',
+    message: 'Maximum retry attempts exceeded',
+  },
+} as const;
+
+// ============================================================================
 // Validation Errors
 // ============================================================================
 
@@ -441,6 +460,7 @@ export const ERROR_CODES = {
   THEME: THEME_ERRORS,
   VALIDATION: VALIDATION_ERRORS,
   DOCUMENT: DOCUMENT_ERRORS,
+  OUTBOX: OUTBOX_ERRORS,
 } as const;
 
 // ============================================================================
@@ -461,6 +481,7 @@ export type StorageErrorCode = typeof STORAGE_ERRORS[keyof typeof STORAGE_ERRORS
 export type ThemeErrorCode = typeof THEME_ERRORS[keyof typeof THEME_ERRORS];
 export type ValidationErrorCode = typeof VALIDATION_ERRORS[keyof typeof VALIDATION_ERRORS];
 export type DocumentErrorCode = typeof DOCUMENT_ERRORS[keyof typeof DOCUMENT_ERRORS];
+export type OutboxErrorCode = typeof OUTBOX_ERRORS[keyof typeof OUTBOX_ERRORS];
 
 export type AnyErrorCode = 
   | AuthErrorCode 
@@ -476,4 +497,5 @@ export type AnyErrorCode =
   | StorageErrorCode
   | ThemeErrorCode 
   | ValidationErrorCode
-  | DocumentErrorCode;
+  | DocumentErrorCode
+  | OutboxErrorCode;

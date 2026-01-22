@@ -3,6 +3,7 @@ import {
   DocumentStatus,
   DOCUMENT_ERRORS,
   LedgerEntryType,
+  OUTBOX_EVENT_KEYS,
 } from '@gym-monorepo/shared';
 import {
   ChartOfAccountsEntity,
@@ -32,6 +33,17 @@ export abstract class BasePostingHandler implements PostingHandler {
       fromStatus,
       DocumentStatus.POSTED,
       'Document posted successfully',
+    );
+
+    // Trigger generic document.posted outbox event
+    await context.outboxService.createEvent(
+      {
+        tenantId: context.tenantId,
+        documentId: context.document.id,
+        eventKey: OUTBOX_EVENT_KEYS.DOCUMENT_POSTED,
+        userId: context.userId,
+      },
+      context.manager,
     );
   }
 
