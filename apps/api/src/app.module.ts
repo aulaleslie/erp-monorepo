@@ -19,6 +19,7 @@ import { CatalogModule } from './modules/catalog/catalog.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { DocumentsModule } from './modules/documents/documents.module';
 import { QueueModule } from './modules/queue/queue.module';
+import { RedisCacheModule } from './common/redis/redis-cache.module';
 
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { UserContextInterceptor } from './common/interceptors/user-context.interceptor';
@@ -46,6 +47,7 @@ import { UserContextInterceptor } from './common/interceptors/user-context.inter
     StorageModule,
     DocumentsModule,
     QueueModule,
+    RedisCacheModule,
   ],
   controllers: [AppController],
   providers: [

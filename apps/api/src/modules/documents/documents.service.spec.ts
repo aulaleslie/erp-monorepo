@@ -26,6 +26,7 @@ import { DocumentsService } from './documents.service';
 import { DocumentNumberService } from './document-number.service';
 import { DefaultPostingHandler } from './posting/default-posting-handler';
 import { DocumentOutboxService } from './document-outbox.service';
+import { RedisCacheService, CACHE_KEYS } from '../../common/redis';
 
 jest.mock('./posting/default-posting-handler');
 
@@ -35,6 +36,7 @@ describe('DocumentsService', () => {
   let dataSource: DataSource;
   let documentNumberService: DocumentNumberService;
   let outboxService: DocumentOutboxService;
+  let cacheService: RedisCacheService;
 
   const mockTenantId = 'tenant-1';
   const mockUserId = 'user-1';
@@ -109,6 +111,14 @@ describe('DocumentsService', () => {
             createEvent: jest.fn(),
           },
         },
+        {
+          provide: RedisCacheService,
+          useValue: {
+            get: jest.fn(),
+            set: jest.fn(),
+            del: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -119,6 +129,7 @@ describe('DocumentsService', () => {
       DocumentNumberService,
     );
     outboxService = module.get<DocumentOutboxService>(DocumentOutboxService);
+    cacheService = module.get<RedisCacheService>(RedisCacheService);
   });
 
   const setupTransactionMock = (manager: Partial<EntityManager>) => {
@@ -719,6 +730,81 @@ describe('DocumentsService', () => {
           mockTenantId,
           mockUserId,
         );
+      });
+    });
+
+    describe('Caching', () => {
+      it('should return cached document and skip DB query on cache hit', async () => {
+        const mockDoc = {
+          id: mockDocId,
+          tenantId: mockTenantId,
+          accessScope: DocumentAccessScope.TENANT,
+        } as DocumentEntity;
+
+        (cacheService.get as jest.Mock).mockResolvedValue(mockDoc);
+
+        const result = await service.findOne(
+          mockDocId,
+          mockTenantId,
+          mockUserId,
+        );
+
+        expect(result).toEqual(mockDoc);
+        expect(cacheService.get).toHaveBeenCalledWith(
+          CACHE_KEYS.document(mockTenantId, mockDocId),
+        );
+        expect(documentRepo.findOne).not.toHaveBeenCalled();
+      });
+
+      it('should query DB and cache result on cache miss', async () => {
+        const mockDoc = {
+          id: mockDocId,
+          tenantId: mockTenantId,
+          accessScope: DocumentAccessScope.TENANT,
+        } as DocumentEntity;
+
+        (cacheService.get as jest.Mock).mockResolvedValue(null);
+        (documentRepo.findOne as jest.Mock).mockResolvedValue(mockDoc);
+
+        const result = await service.findOne(
+          mockDocId,
+          mockTenantId,
+          mockUserId,
+        );
+
+        expect(result).toEqual(mockDoc);
+        expect(documentRepo.findOne).toHaveBeenCalled();
+        expect(cacheService.set).toHaveBeenCalledWith(
+          CACHE_KEYS.document(mockTenantId, mockDocId),
+          mockDoc,
+          expect.any(Number),
+        );
+      });
+
+      it('should invalidate cache on document update', async () => {
+        const mockDoc = {
+          id: mockDocId,
+          status: DocumentStatus.DRAFT,
+          module: DocumentModule.SALES,
+          documentKey: 'sales.invoice',
+          tenantId: mockTenantId,
+        } as DocumentEntity;
+
+        const findOneSpy = jest
+          .spyOn(service, 'findOne')
+          .mockResolvedValue(mockDoc);
+        setupTransactionMock({
+          save: jest.fn().mockResolvedValue({}),
+          count: jest.fn().mockResolvedValue(1),
+          create: createEntity,
+        });
+
+        await service.submit(mockDocId, mockTenantId, mockUserId);
+
+        expect(cacheService.del).toHaveBeenCalledWith(
+          CACHE_KEYS.document(mockTenantId, mockDocId),
+        );
+        findOneSpy.mockRestore();
       });
     });
   });

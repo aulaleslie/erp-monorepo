@@ -29,6 +29,7 @@ import { DocumentTypeRegistry } from './registry/document-type-registry';
 import { DefaultPostingHandler } from './posting/default-posting-handler';
 import { PostingHandler } from './posting/posting-handler.interface';
 import { DocumentOutboxService } from './document-outbox.service';
+import { RedisCacheService, CACHE_TTL, CACHE_KEYS } from '../../common/redis';
 
 @Injectable()
 export class DocumentsService {
@@ -44,6 +45,7 @@ export class DocumentsService {
     private readonly dataSource: DataSource,
     private readonly documentNumberService: DocumentNumberService,
     private readonly outboxService: DocumentOutboxService,
+    private readonly cacheService: RedisCacheService,
   ) {}
 
   async create(
@@ -83,6 +85,14 @@ export class DocumentsService {
     tenantId: string,
     userId: string,
   ): Promise<DocumentEntity> {
+    const cacheKey = CACHE_KEYS.document(tenantId, id);
+    const cached = await this.cacheService.get<DocumentEntity>(cacheKey);
+
+    if (cached) {
+      this.validateAccess(cached, { userId, tenantId });
+      return cached;
+    }
+
     const document = await this.documentRepository.findOne({
       where: { id, tenantId },
     });
@@ -92,6 +102,9 @@ export class DocumentsService {
     }
 
     this.validateAccess(document, { userId, tenantId });
+
+    // Cache the result
+    await this.cacheService.set(cacheKey, document, CACHE_TTL.DOCUMENT_LOOKUP);
 
     return document;
   }
@@ -164,6 +177,8 @@ export class DocumentsService {
         manager,
       );
 
+      await this.cacheService.del(CACHE_KEYS.document(tenantId, id));
+
       return document;
     });
   }
@@ -231,6 +246,8 @@ export class DocumentsService {
         );
       }
 
+      await this.cacheService.del(CACHE_KEYS.document(tenantId, id));
+
       return document;
     });
   }
@@ -281,6 +298,8 @@ export class DocumentsService {
         },
         manager,
       );
+
+      await this.cacheService.del(CACHE_KEYS.document(tenantId, id));
 
       return document;
     });
@@ -344,6 +363,8 @@ export class DocumentsService {
         manager,
       );
 
+      await this.cacheService.del(CACHE_KEYS.document(tenantId, id));
+
       return document;
     });
   }
@@ -381,6 +402,8 @@ export class DocumentsService {
         userId,
         outboxService: this.outboxService,
       });
+
+      await this.cacheService.del(CACHE_KEYS.document(tenantId, id));
 
       return document;
     });
@@ -426,6 +449,8 @@ export class DocumentsService {
         },
         manager,
       );
+
+      await this.cacheService.del(CACHE_KEYS.document(tenantId, id));
 
       return document;
     });
