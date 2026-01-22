@@ -36,6 +36,16 @@ export class TenantEntity extends BaseAuditEntity {
   })
   language: Locale;
 
+  @Column({ name: 'tag_max_length', type: 'int', nullable: true })
+  tagMaxLength: number | null;
+
+  @Column({
+    name: 'tag_allowed_pattern',
+    type: 'varchar',
+    nullable: true,
+  })
+  tagAllowedPattern: string | null;
+
   @Column({ name: 'is_taxable', default: false })
   isTaxable: boolean;
 

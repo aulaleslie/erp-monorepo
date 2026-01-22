@@ -15,7 +15,10 @@ import {
   paginate,
   calculateSkip,
 } from '../../common/dto/pagination.dto';
-import { createValidationBuilder } from '../../common/utils/validation.util';
+import {
+  createValidationBuilder,
+  ValidationErrorBuilder,
+} from '../../common/utils/validation.util';
 import { TenantType, THEME_PRESETS, Locale } from '@gym-monorepo/shared';
 
 @Injectable()
@@ -81,6 +84,8 @@ export class TenantsService {
       language?: Locale;
       taxIds?: string[];
       themePresetId?: string;
+      tagMaxLength?: number | null;
+      tagAllowedPattern?: string | null;
     },
   ): Promise<TenantEntity> {
     const validator = createValidationBuilder();
@@ -142,6 +147,12 @@ export class TenantsService {
       }
     }
 
+    this.validateTagSettings(
+      validator,
+      data.tagMaxLength,
+      data.tagAllowedPattern,
+    );
+
     validator.throwIfErrors();
 
     const tenant = this.tenantRepository.create({
@@ -151,6 +162,8 @@ export class TenantsService {
       type: data.type ?? TenantType.GYM,
       isTaxable,
       language,
+      tagMaxLength: data.tagMaxLength ?? null,
+      tagAllowedPattern: data.tagAllowedPattern ?? null,
     });
     await this.tenantRepository.save(tenant);
 
@@ -211,7 +224,12 @@ export class TenantsService {
 
   async update(
     id: string,
-    data: Partial<TenantEntity> & { taxIds?: string[]; themePresetId?: string },
+    data: Partial<TenantEntity> & {
+      taxIds?: string[];
+      themePresetId?: string;
+      tagMaxLength?: number | null;
+      tagAllowedPattern?: string | null;
+    },
   ): Promise<TenantEntity> {
     const tenant = await this.getTenantById(id);
     const validator = createValidationBuilder();
@@ -288,10 +306,28 @@ export class TenantsService {
       }
     }
 
+    this.validateTagSettings(
+      validator,
+      data.tagMaxLength,
+      data.tagAllowedPattern,
+    );
+
     validator.throwIfErrors();
 
-    const { taxIds: _taxIds, themePresetId, ...tenantUpdate } = data;
+    const {
+      taxIds: _taxIds,
+      themePresetId,
+      tagMaxLength,
+      tagAllowedPattern,
+      ...tenantUpdate
+    } = data;
     Object.assign(tenant, tenantUpdate);
+    if (typeof tagMaxLength !== 'undefined') {
+      tenant.tagMaxLength = tagMaxLength;
+    }
+    if (typeof tagAllowedPattern !== 'undefined') {
+      tenant.tagAllowedPattern = tagAllowedPattern;
+    }
     await this.tenantRepository.save(tenant);
 
     // Update theme if provided
@@ -338,5 +374,34 @@ export class TenantsService {
     const tenant = await this.getTenantById(id);
     tenant.status = 'DISABLED';
     await this.tenantRepository.save(tenant);
+  }
+
+  private validateTagSettings(
+    validator: ValidationErrorBuilder,
+    tagMaxLength?: number | null,
+    tagAllowedPattern?: string | null,
+  ): void {
+    if (typeof tagMaxLength !== 'undefined' && tagMaxLength !== null) {
+      if (!Number.isInteger(tagMaxLength) || tagMaxLength <= 0) {
+        validator.addError(
+          'tagMaxLength',
+          'Tag max length must be a positive integer',
+        );
+      }
+    }
+
+    if (
+      typeof tagAllowedPattern !== 'undefined' &&
+      tagAllowedPattern !== null
+    ) {
+      try {
+        new RegExp(tagAllowedPattern);
+      } catch {
+        validator.addError(
+          'tagAllowedPattern',
+          'Tag allowed pattern must be a valid regular expression',
+        );
+      }
+    }
   }
 }

@@ -95,6 +95,10 @@ export const PERMISSIONS = {
     UPDATE: 'inventory.update',
     DELETE: 'inventory.delete',
   },
+  TAGS: {
+    ASSIGN: 'tags.assign',
+    MANAGE: 'tags.manage',
+  },
 } as const;
 
 // Type-safe permission values
@@ -112,7 +116,8 @@ export type PermissionCode =
   | typeof PERMISSIONS.SALES[keyof typeof PERMISSIONS.SALES]
   | typeof PERMISSIONS.PURCHASING[keyof typeof PERMISSIONS.PURCHASING]
   | typeof PERMISSIONS.ACCOUNTING[keyof typeof PERMISSIONS.ACCOUNTING]
-  | typeof PERMISSIONS.INVENTORY[keyof typeof PERMISSIONS.INVENTORY];
+  | typeof PERMISSIONS.INVENTORY[keyof typeof PERMISSIONS.INVENTORY]
+  | typeof PERMISSIONS.TAGS[keyof typeof PERMISSIONS.TAGS];
 
 // All permission codes as a flat array (useful for validation)
 export const ALL_PERMISSION_CODES: PermissionCode[] = [
@@ -177,4 +182,6 @@ export const ALL_PERMISSION_CODES: PermissionCode[] = [
   PERMISSIONS.INVENTORY.CREATE,
   PERMISSIONS.INVENTORY.UPDATE,
   PERMISSIONS.INVENTORY.DELETE,
+  PERMISSIONS.TAGS.ASSIGN,
+  PERMISSIONS.TAGS.MANAGE,
 ];

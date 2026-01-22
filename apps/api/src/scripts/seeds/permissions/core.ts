@@ -188,4 +188,6 @@ export const corePermissions: SeedPermission[] = [
     name: 'Delete Inventory',
     group: 'Inventory',
   },
+  { code: PERMISSIONS.TAGS.ASSIGN, name: 'Assign Tags', group: 'Tags' },
+  { code: PERMISSIONS.TAGS.MANAGE, name: 'Manage Tags', group: 'Tags' },
 ];

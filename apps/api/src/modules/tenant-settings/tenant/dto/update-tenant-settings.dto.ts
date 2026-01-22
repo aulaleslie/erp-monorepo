@@ -6,6 +6,8 @@ import {
   IsBoolean,
   IsArray,
   IsUUID,
+  IsInt,
+  Min,
 } from 'class-validator';
 import { TenantType, Locale } from '@gym-monorepo/shared';
 
@@ -40,4 +42,13 @@ export class UpdateTenantSettingsDto {
   @IsOptional()
   @IsString({ message: 'Theme preset ID must be a string' })
   themePresetId?: string;
+
+  @IsOptional()
+  @IsInt({ message: 'Tag max length must be an integer' })
+  @Min(1, { message: 'Tag max length must be at least 1' })
+  tagMaxLength?: number | null;
+
+  @IsOptional()
+  @IsString()
+  tagAllowedPattern?: string | null;
 }

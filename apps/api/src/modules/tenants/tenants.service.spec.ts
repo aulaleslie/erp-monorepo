@@ -264,4 +264,24 @@ describe('TenantsService', () => {
       );
     });
   });
+
+  describe('update', () => {
+    it('throws when tag max length is invalid', async () => {
+      const tenant = { id: 'tenant-1' } as TenantEntity;
+      tenantRepository.findOne!.mockResolvedValue(tenant);
+
+      await expect(
+        service.update('tenant-1', { tagMaxLength: 0 }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('throws when tag allowed pattern is invalid', async () => {
+      const tenant = { id: 'tenant-1' } as TenantEntity;
+      tenantRepository.findOne!.mockResolvedValue(tenant);
+
+      await expect(
+        service.update('tenant-1', { tagAllowedPattern: '[' }),
+      ).rejects.toThrow(BadRequestException);
+    });
+  });
 });

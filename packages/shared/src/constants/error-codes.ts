@@ -396,6 +396,29 @@ export const DOCUMENT_ERRORS = {
 } as const;
 
 // ============================================================================
+// Tag Errors
+// ============================================================================
+
+export const TAG_ERRORS = {
+  INVALID_NAME: {
+    code: 'TAG_INVALID_NAME',
+    message: 'Tag name must contain at least one non-whitespace character',
+  },
+  NAME_TOO_LONG: {
+    code: 'TAG_NAME_TOO_LONG',
+    message: 'Tag name exceeds the maximum length allowed for this tenant',
+  },
+  PATTERN_MISMATCH: {
+    code: 'TAG_PATTERN_MISMATCH',
+    message: 'Tag name does not match the tenant\'s allowed pattern',
+  },
+  LOCKED: {
+    code: 'TAG_LOCKED',
+    message: 'Tags cannot be modified once the document is approved or posted',
+  },
+} as const;
+
+// ============================================================================
 // Outbox Errors
 // ============================================================================
 
@@ -460,6 +483,7 @@ export const ERROR_CODES = {
   THEME: THEME_ERRORS,
   VALIDATION: VALIDATION_ERRORS,
   DOCUMENT: DOCUMENT_ERRORS,
+  TAG: TAG_ERRORS,
   OUTBOX: OUTBOX_ERRORS,
 } as const;
 
@@ -481,6 +505,7 @@ export type StorageErrorCode = typeof STORAGE_ERRORS[keyof typeof STORAGE_ERRORS
 export type ThemeErrorCode = typeof THEME_ERRORS[keyof typeof THEME_ERRORS];
 export type ValidationErrorCode = typeof VALIDATION_ERRORS[keyof typeof VALIDATION_ERRORS];
 export type DocumentErrorCode = typeof DOCUMENT_ERRORS[keyof typeof DOCUMENT_ERRORS];
+export type TagErrorCode = typeof TAG_ERRORS[keyof typeof TAG_ERRORS];
 export type OutboxErrorCode = typeof OUTBOX_ERRORS[keyof typeof OUTBOX_ERRORS];
 
 export type AnyErrorCode = 
@@ -498,4 +523,5 @@ export type AnyErrorCode =
   | ThemeErrorCode 
   | ValidationErrorCode
   | DocumentErrorCode
+  | TagErrorCode
   | OutboxErrorCode;
