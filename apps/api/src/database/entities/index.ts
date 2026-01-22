@@ -31,6 +31,8 @@ import { DocumentNumberSettingEntity } from './document-number-setting.entity';
 import { LedgerEntryEntity } from './ledger-entry.entity';
 import { DocumentTypeRegistryEntity } from './document-type-registry.entity';
 import { DocumentOutboxEntity } from './document-outbox.entity';
+import { TagEntity } from './tag.entity';
+import { TagLinkEntity } from './tag-link.entity';
 
 export {
   AuditLogEntity,
@@ -65,6 +67,8 @@ export {
   LedgerEntryEntity,
   DocumentTypeRegistryEntity,
   DocumentOutboxEntity,
+  TagEntity,
+  TagLinkEntity,
 };
 
 export const ALL_ENTITIES = [
@@ -95,4 +99,6 @@ export const ALL_ENTITIES = [
   LedgerEntryEntity,
   DocumentTypeRegistryEntity,
   DocumentOutboxEntity,
+  TagEntity,
+  TagLinkEntity,
 ];
