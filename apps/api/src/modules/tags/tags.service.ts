@@ -1,7 +1,15 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
-import { DocumentStatus, TAG_ERRORS } from '@gym-monorepo/shared';
+import { FindOptionsWhere, ILike, In, Repository } from 'typeorm';
+import {
+  DocumentStatus,
+  PaginatedResponse,
+  TAG_ERRORS,
+} from '@gym-monorepo/shared';
 import {
   DocumentEntity,
   TagEntity,
@@ -9,11 +17,15 @@ import {
 } from '../../database/entities';
 import { TenantsService } from '../tenants/tenants.service';
 import { TagAssignmentDto } from './dto/tag-assignment.dto';
+import { TagListQueryDto } from './dto/tag-list-query.dto';
+import { UpdateTagDto } from './dto/update-tag.dto';
+import { calculateSkip, paginate } from '../../common/dto/pagination.dto';
 
 interface TagSummary {
   id: string;
   name: string;
   usageCount: number;
+  lastUsedAt: Date | null;
 }
 
 interface TagAssignmentResult {
@@ -36,8 +48,82 @@ export class TagsService {
     private readonly tenantsService: TenantsService,
   ) {}
 
-  suggest(_tenantId: string, _query?: string): Promise<never[]> {
-    return Promise.resolve([]);
+  async list(
+    tenantId: string,
+    query: TagListQueryDto,
+  ): Promise<PaginatedResponse<TagEntity>> {
+    const { page, limit, query: searchTerm, includeInactive } = query;
+    const where = this.buildSearchWhere(
+      tenantId,
+      includeInactive ?? false,
+      searchTerm,
+    );
+    const [items, total] = await Promise.all([
+      this.tagRepository.find({
+        where,
+        order: { isActive: 'DESC', name: 'ASC' },
+        skip: calculateSkip(page, limit),
+        take: limit,
+      }),
+      this.tagRepository.count({ where }),
+    ]);
+
+    return paginate(items, total, page, limit);
+  }
+
+  async suggest(tenantId: string, query?: string): Promise<TagSummary[]> {
+    const where = this.buildSearchWhere(tenantId, false, query);
+    const tags = await this.tagRepository.find({
+      where,
+      order: { usageCount: 'DESC', lastUsedAt: 'DESC', name: 'ASC' },
+      take: 10,
+    });
+
+    return tags.map((tag) => ({
+      id: tag.id,
+      name: tag.name,
+      usageCount: tag.usageCount,
+      lastUsedAt: tag.lastUsedAt,
+    }));
+  }
+
+  async update(
+    tenantId: string,
+    tagId: string,
+    dto: UpdateTagDto,
+  ): Promise<TagEntity> {
+    const tag = await this.tagRepository.findOne({
+      where: { id: tagId, tenantId },
+    });
+
+    if (!tag) {
+      throw new NotFoundException(TAG_ERRORS.NOT_FOUND.message);
+    }
+
+    if (dto.name !== undefined && dto.name !== null) {
+      const normalized = this.normalizeRawTag(dto.name);
+      if (!normalized) {
+        throw new BadRequestException(TAG_ERRORS.INVALID_NAME.message);
+      }
+
+      await this.enforceTenantTagRules(tenantId, [normalized]);
+
+      const existingTag = await this.tagRepository.findOne({
+        where: { tenantId, nameNormalized: normalized.normalized },
+      });
+      if (existingTag && existingTag.id !== tag.id) {
+        throw new BadRequestException(TAG_ERRORS.DUPLICATE_NAME.message);
+      }
+
+      tag.name = normalized.original;
+      tag.nameNormalized = normalized.normalized;
+    }
+
+    if (dto.isActive !== undefined) {
+      tag.isActive = dto.isActive;
+    }
+
+    return this.tagRepository.save(tag);
   }
 
   async assign(
@@ -83,6 +169,7 @@ export class TagsService {
         nameNormalized: tag.normalized,
         usageCount: 0,
         lastUsedAt: null,
+        isActive: true,
       }),
     );
 
@@ -138,6 +225,7 @@ export class TagsService {
         id: tag.id,
         name: tag.name,
         usageCount: tag.usageCount,
+        lastUsedAt: tag.lastUsedAt,
       })),
     };
   }
@@ -210,25 +298,43 @@ export class TagsService {
     };
   }
 
-  private normalizeTags(tags: string[]): Array<{
-    normalized: string;
-    original: string;
-  }> {
+  private buildSearchWhere(
+    tenantId: string,
+    includeInactive: boolean,
+    search?: string,
+  ): FindOptionsWhere<TagEntity> | FindOptionsWhere<TagEntity>[] {
+    const baseFilter: FindOptionsWhere<TagEntity> = { tenantId };
+    if (!includeInactive) {
+      baseFilter.isActive = true;
+    }
+
+    const trimmed = search?.trim();
+    if (!trimmed) {
+      return baseFilter;
+    }
+
+    const normalizedPattern = `%${trimmed.toLowerCase()}%`;
+    const displayPattern = `%${trimmed}%`;
+
+    return [
+      { ...baseFilter, name: ILike(displayPattern) },
+      { ...baseFilter, nameNormalized: ILike(normalizedPattern) },
+    ];
+  }
+
+  private normalizeTags(
+    tags: string[],
+  ): Array<{ normalized: string; original: string }> {
     const normalizedMap = new Map<string, string>();
 
     for (const raw of tags ?? []) {
-      if (!raw) {
+      const normalized = this.normalizeRawTag(raw);
+      if (!normalized) {
         continue;
       }
 
-      const trimmed = raw.trim();
-      if (!trimmed) {
-        continue;
-      }
-
-      const normalized = trimmed.toLowerCase();
-      if (!normalizedMap.has(normalized)) {
-        normalizedMap.set(normalized, trimmed);
+      if (!normalizedMap.has(normalized.normalized)) {
+        normalizedMap.set(normalized.normalized, normalized.original);
       }
     }
 
@@ -238,6 +344,24 @@ export class TagsService {
         original,
       }),
     );
+  }
+
+  private normalizeRawTag(
+    raw: string,
+  ): { normalized: string; original: string } | null {
+    if (!raw) {
+      return null;
+    }
+
+    const trimmed = raw.trim();
+    if (!trimmed) {
+      return null;
+    }
+
+    return {
+      normalized: trimmed.toLowerCase(),
+      original: trimmed,
+    };
   }
 
   private normalizeResourceType(resourceType: string): string {

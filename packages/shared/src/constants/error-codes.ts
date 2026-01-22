@@ -400,9 +400,17 @@ export const DOCUMENT_ERRORS = {
 // ============================================================================
 
 export const TAG_ERRORS = {
+  NOT_FOUND: {
+    code: 'TAG_NOT_FOUND',
+    message: 'Tag not found',
+  },
   INVALID_NAME: {
     code: 'TAG_INVALID_NAME',
     message: 'Tag name must contain at least one non-whitespace character',
+  },
+  DUPLICATE_NAME: {
+    code: 'TAG_DUPLICATE_NAME',
+    message: 'Tag name already exists',
   },
   NAME_TOO_LONG: {
     code: 'TAG_NAME_TOO_LONG',

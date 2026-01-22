@@ -30,6 +30,9 @@ export class TagEntity extends BaseAuditEntity {
   @Column({ type: 'timestamptz', nullable: true })
   lastUsedAt: Date | null;
 
+  @Column({ type: 'boolean', default: true })
+  isActive: boolean;
+
   @ManyToOne(() => TenantEntity)
   @JoinColumn({ name: 'tenantId' })
   tenant: TenantEntity;
