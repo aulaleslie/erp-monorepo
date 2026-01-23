@@ -34,6 +34,7 @@ export function TagInput({
     const [debouncedSearch, setDebouncedSearch] = React.useState("");
     const [suggestions, setSuggestions] = React.useState<TagSuggestion[]>([]);
     const [loading, setLoading] = React.useState(false);
+    const listboxId = React.useId();
 
     // Debounce search input
     React.useEffect(() => {
@@ -112,6 +113,7 @@ export function TagInput({
                     <div
                         role="combobox"
                         aria-expanded={open}
+                        aria-controls={open ? listboxId : undefined}
                         aria-haspopup="listbox"
                         className={cn(
                             "flex min-h-10 w-full flex-wrap gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
@@ -156,7 +158,7 @@ export function TagInput({
                     onOpenAutoFocus={(e) => e.preventDefault()}
                 >
                     <ScrollArea className="max-h-60 overflow-y-auto">
-                        <div className="p-1">
+                        <div id={listboxId} role="listbox" className="p-1">
                             {loading && (
                                 <div className="flex items-center justify-center py-6">
                                     <Loader2 className="h-4 w-4 animate-spin" />
