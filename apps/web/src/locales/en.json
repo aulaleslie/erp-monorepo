@@ -92,7 +92,9 @@
     "inventory": "Inventory",
     "memberManagement": "Member Management",
     "members": "Members",
-    "scheduling": "Scheduling"
+    "scheduling": "Scheduling",
+    "inventorySales": "Inventory & Sales",
+    "administration": "Administration"
   },
   "labels": {
     "tenantSettings": {

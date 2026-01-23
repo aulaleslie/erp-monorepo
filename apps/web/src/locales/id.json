@@ -92,7 +92,9 @@
     "memberManagement": "Manajemen Anggota",
     "members": "Anggota",
     "scheduling": "Penjadwalan",
-    "tags": "Tag"
+    "tags": "Tag",
+    "inventorySales": "Inventaris & Penjualan",
+    "administration": "Administrasi"
   },
   "labels": {
     "tenantSettings": {

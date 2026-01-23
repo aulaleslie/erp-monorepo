@@ -57,11 +57,48 @@ export class MinioStorageDriver implements IStorageDriver {
       } else {
         this.logger.log(`Bucket exists: ${this.bucket}`);
       }
+
+      // Always ensure the bucket has a public read policy so that images can be viewed
+      await this.setBucketPolicyToPublic();
     } catch (error) {
       this.logger.error(
         `Failed to ensure bucket exists: ${getErrorMessage(error)}`,
       );
       throw error;
+    }
+  }
+
+  private async setBucketPolicyToPublic(): Promise<void> {
+    const policy = {
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Effect: 'Allow',
+          Principal: { AWS: ['*'] },
+          Action: ['s3:GetBucketLocation', 's3:ListBucket'],
+          Resource: [`arn:aws:s3:::${this.bucket}`],
+        },
+        {
+          Effect: 'Allow',
+          Principal: { AWS: ['*'] },
+          Action: ['s3:GetObject'],
+          Resource: [`arn:aws:s3:::${this.bucket}/*`],
+        },
+      ],
+    };
+
+    try {
+      await this.minioClient.setBucketPolicy(
+        this.bucket,
+        JSON.stringify(policy),
+      );
+      this.logger.log(`Set public read policy for bucket: ${this.bucket}`);
+    } catch (error) {
+      this.logger.error(
+        `Failed to set bucket policy: ${getErrorMessage(error)}`,
+      );
+      // We don't throw here to avoid blocking startup if policy setting fails
+      // but the bucket exists and is functional for other operations
     }
   }
 
