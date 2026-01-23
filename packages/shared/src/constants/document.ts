@@ -49,6 +49,17 @@ export enum OutboxEventStatus {
   FAILED = 'FAILED',
 }
 
+export enum SalesDocumentType {
+  ORDER = 'ORDER',
+  INVOICE = 'INVOICE',
+  CREDIT_NOTE = 'CREDIT_NOTE',
+}
+
+export enum SalesTaxPricingMode {
+  INCLUSIVE = 'INCLUSIVE',
+  EXCLUSIVE = 'EXCLUSIVE',
+}
+
 export const DOCUMENT_TYPE_KEY = {
   SALES_ORDER: 'sales.order',
   SALES_INVOICE: 'sales.invoice',
