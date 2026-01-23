@@ -31,7 +31,7 @@ describe('TagInput', () => {
 
     it('renders with placeholder when empty', () => {
         render(<TagInput value={[]} onChange={() => { }} />);
-        expect(screen.getByText('placeholder')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('placeholder')).toBeInTheDocument();
     });
 
     it('renders selected tags as badges', () => {
@@ -44,10 +44,7 @@ describe('TagInput', () => {
         const onChange = vi.fn();
         render(<TagInput value={[]} onChange={onChange} />);
 
-        // Open popover
-        fireEvent.click(screen.getByRole('combobox'));
-
-        const input = screen.getByPlaceholderText('searchPlaceholder');
+        const input = screen.getByRole('textbox');
         fireEvent.change(input, { target: { value: 'new-tag' } });
         fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
 
@@ -59,22 +56,20 @@ describe('TagInput', () => {
         render(<TagInput value={['tag1', 'tag2']} onChange={onChange} />);
 
         const removeButtons = screen.getAllByRole('button');
-        // Index 0: X for tag1, Index 1: X for tag2, Index 2: PopoverTrigger
+        // Now buttons are just the X marks on badges
         fireEvent.click(removeButtons[0]); // Remove 'tag1'
 
         expect(onChange).toHaveBeenCalledWith(['tag2']);
     });
 
-    it('fetches suggestions when popover opens and search changes', async () => {
+    it('fetches suggestions when search changes', async () => {
         vi.mocked(tagsService.suggest).mockResolvedValue([
-            { id: '1', name: 'suggestion1', usageCount: 1, lastUsedAt: null },
+            { id: '1', name: 'suggestion1', usageCount: 1, lastUsedAt: null, isActive: true },
         ]);
 
         render(<TagInput value={[]} onChange={() => { }} />);
 
-        fireEvent.click(screen.getByRole('combobox'));
-
-        const input = screen.getByPlaceholderText('searchPlaceholder');
+        const input = screen.getByRole('textbox');
         fireEvent.change(input, { target: { value: 'sug' } });
 
         await waitFor(() => {
@@ -89,13 +84,12 @@ describe('TagInput', () => {
     it('adds tag when clicking a suggestion', async () => {
         const onChange = vi.fn();
         vi.mocked(tagsService.suggest).mockResolvedValue([
-            { id: '1', name: 'suggestion1', usageCount: 1, lastUsedAt: null },
+            { id: '1', name: 'suggestion1', usageCount: 1, lastUsedAt: null, isActive: true },
         ]);
 
         render(<TagInput value={[]} onChange={onChange} />);
 
-        fireEvent.click(screen.getByRole('combobox'));
-        const input = screen.getByPlaceholderText('searchPlaceholder');
+        const input = screen.getByRole('textbox');
         fireEvent.change(input, { target: { value: 'sug' } });
 
         await waitFor(() => {
@@ -111,8 +105,7 @@ describe('TagInput', () => {
         const onChange = vi.fn();
         render(<TagInput value={['Existing']} onChange={onChange} />);
 
-        fireEvent.click(screen.getByRole('combobox'));
-        const input = screen.getByPlaceholderText('searchPlaceholder');
+        const input = screen.getByRole('textbox');
 
         // Try adding "existing" (lowercase)
         fireEvent.change(input, { target: { value: 'existing' } });
@@ -124,12 +117,21 @@ describe('TagInput', () => {
     it('shows "Create" button when search does not match suggestions', async () => {
         render(<TagInput value={[]} onChange={() => { }} />);
 
-        fireEvent.click(screen.getByRole('combobox'));
-        const input = screen.getByPlaceholderText('searchPlaceholder');
+        const input = screen.getByRole('textbox');
         fireEvent.change(input, { target: { value: 'unique-tag' } });
 
         await waitFor(() => {
             expect(screen.getByText('Create "unique-tag"')).toBeInTheDocument();
         });
+    });
+
+    it('removes last tag when Backspace is pressed on empty input', () => {
+        const onChange = vi.fn();
+        render(<TagInput value={['tag1', 'tag2']} onChange={onChange} />);
+
+        const input = screen.getByRole('textbox');
+        fireEvent.keyDown(input, { key: 'Backspace', code: 'Backspace' });
+
+        expect(onChange).toHaveBeenCalledWith(['tag1']);
     });
 });
