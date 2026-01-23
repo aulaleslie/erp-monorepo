@@ -1533,5 +1533,14 @@
       "new": "New Category",
       "edit": "Edit"
     }
+  },
+  "tags": {
+    "input": {
+      "placeholder": "Add tags...",
+      "searchPlaceholder": "Search or type a new tag...",
+      "noSuggestions": "No matching tags. Press Enter to create.",
+      "addNew": "Create \"{tag}\"",
+      "loading": "Loading..."
+    }
   }
 }

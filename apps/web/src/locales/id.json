@@ -1571,5 +1571,14 @@
       "new": "Kategori Baru",
       "edit": "Edit"
     }
+  },
+  "tags": {
+    "input": {
+      "placeholder": "Tambah tag...",
+      "searchPlaceholder": "Cari atau ketik tag baru...",
+      "noSuggestions": "Tidak ada tag cocok. Tekan Enter untuk membuat.",
+      "addNew": "Buat \"{tag}\"",
+      "loading": "Memuat..."
+    }
   }
 }
