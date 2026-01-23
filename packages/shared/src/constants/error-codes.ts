@@ -427,6 +427,33 @@ export const TAG_ERRORS = {
 } as const;
 
 // ============================================================================
+// Sales Errors
+// ============================================================================
+
+export const SALES_ERRORS = {
+  NOT_FOUND: {
+    code: 'SALES_NOT_FOUND',
+    message: 'Sales record not found',
+  },
+  INVALID_STATUS: {
+    code: 'SALES_INVALID_STATUS',
+    message: 'Invalid sales document status for this action',
+  },
+  INVALID_PERSON: {
+    code: 'SALES_INVALID_PERSON',
+    message: 'Invalid person for sales document',
+  },
+  MISSING_APPROVAL_CONFIG: {
+    code: 'SALES_MISSING_APPROVAL_CONFIG',
+    message: 'No approval configuration found for this document type',
+  },
+  INVALID_TAX_MODE: {
+    code: 'SALES_INVALID_TAX_MODE',
+    message: 'Invalid tax pricing mode',
+  },
+} as const;
+
+// ============================================================================
 // Outbox Errors
 // ============================================================================
 
@@ -493,6 +520,7 @@ export const ERROR_CODES = {
   DOCUMENT: DOCUMENT_ERRORS,
   TAG: TAG_ERRORS,
   OUTBOX: OUTBOX_ERRORS,
+  SALES: SALES_ERRORS,
 } as const;
 
 // ============================================================================
@@ -515,6 +543,7 @@ export type ValidationErrorCode = typeof VALIDATION_ERRORS[keyof typeof VALIDATI
 export type DocumentErrorCode = typeof DOCUMENT_ERRORS[keyof typeof DOCUMENT_ERRORS];
 export type TagErrorCode = typeof TAG_ERRORS[keyof typeof TAG_ERRORS];
 export type OutboxErrorCode = typeof OUTBOX_ERRORS[keyof typeof OUTBOX_ERRORS];
+export type SalesErrorCode = typeof SALES_ERRORS[keyof typeof SALES_ERRORS];
 
 export type AnyErrorCode = 
   | AuthErrorCode 
@@ -532,4 +561,5 @@ export type AnyErrorCode =
   | ValidationErrorCode
   | DocumentErrorCode
   | TagErrorCode
-  | OutboxErrorCode;
+  | OutboxErrorCode
+  | SalesErrorCode;

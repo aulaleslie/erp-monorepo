@@ -52,6 +52,7 @@ export enum OutboxEventStatus {
 export const DOCUMENT_TYPE_KEY = {
   SALES_ORDER: 'sales.order',
   SALES_INVOICE: 'sales.invoice',
+  SALES_CREDIT_NOTE: 'sales.credit_note',
   PURCHASING_PO: 'purchasing.po',
   PURCHASING_GRN: 'purchasing.grn',
   ACCOUNTING_JOURNAL: 'accounting.journal',
