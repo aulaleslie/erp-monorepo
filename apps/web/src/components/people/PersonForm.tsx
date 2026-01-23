@@ -27,16 +27,18 @@ import {
 } from "@/services/people";
 import { departmentsService, DepartmentListItem } from "@/services/departments";
 import { StaffUserLinkCard } from "./StaffUserLinkCard";
+import { TagInput } from "@/components/common/TagInput";
 
 interface PersonFormData {
     fullName: string;
     type: PeopleType;
     email: string;
     phone: string;
-    tags: string;
+    tags: string[];
     status: PeopleStatus;
     code?: string;
     departmentId: string;
+    [key: string]: unknown;
 }
 
 interface PersonFormProps {
@@ -47,7 +49,7 @@ interface PersonFormProps {
         type: PeopleType;
         email: string | null;
         phone: string | null;
-        tags: string[];
+        tags?: string[];
         status: PeopleStatus;
         code: string;
         departmentId: string | null;
@@ -62,7 +64,7 @@ const NONE_DEPARTMENT = "_NONE_";
 const isPersonFormField = (
     field: string,
     data: PersonFormData
-): field is keyof PersonFormData => Object.prototype.hasOwnProperty.call(data, field);
+): field is Extract<keyof PersonFormData, string> => Object.prototype.hasOwnProperty.call(data, field);
 
 export function PersonForm({ mode, initialData, onSuccess }: PersonFormProps) {
     const t = useTranslations("people");
@@ -80,7 +82,7 @@ export function PersonForm({ mode, initialData, onSuccess }: PersonFormProps) {
         type: initialData?.type ?? PeopleType.CUSTOMER,
         email: initialData?.email ?? "",
         phone: initialData?.phone ?? "",
-        tags: initialData?.tags?.join(", ") ?? "",
+        tags: initialData?.tags ?? [],
         status: initialData?.status ?? PeopleStatus.ACTIVE,
         code: initialData?.code,
         departmentId: initialData?.departmentId ?? "",
@@ -122,7 +124,7 @@ export function PersonForm({ mode, initialData, onSuccess }: PersonFormProps) {
                 type: initialData.type,
                 email: initialData.email ?? "",
                 phone: initialData.phone ?? "",
-                tags: initialData.tags.join(", "),
+                tags: initialData.tags ?? [],
                 status: initialData.status,
                 code: initialData.code,
                 departmentId: initialData.departmentId ?? "",
@@ -155,10 +157,7 @@ export function PersonForm({ mode, initialData, onSuccess }: PersonFormProps) {
         setLoading(true);
 
         try {
-            const tags = formData.tags
-                .split(",")
-                .map((tag) => tag.trim())
-                .filter(Boolean);
+            const tags = formData.tags;
 
             if (mode === "create") {
                 const createData: CreatePersonData = {
@@ -337,15 +336,11 @@ export function PersonForm({ mode, initialData, onSuccess }: PersonFormProps) {
 
             <div className="grid w-full items-center gap-1.5">
                 <Label htmlFor="tags">{t("form.labels.tags")}</Label>
-                <Input
-                    id="tags"
+                <TagInput
                     value={formData.tags}
-                    onChange={(e) => handleChange("tags", e.target.value)}
+                    onChange={(tags) => handleChange("tags", tags)}
                     placeholder={t("form.placeholders.tags")}
                 />
-                <p className="text-xs text-muted-foreground">
-                    Separated by comma, e.g. &quot;vip, wholesale&quot;
-                </p>
             </div>
 
             {/* Staff-only section */}

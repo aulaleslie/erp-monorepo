@@ -122,6 +122,25 @@ export function ItemsTable({
             ),
         },
         {
+            header: t("list.table.headers.tags"),
+            cell: (item) => {
+                const tags = item.tags || [];
+                return (
+                    <div className="flex flex-wrap gap-1">
+                        {tags.length === 0 ? (
+                            <span className="text-sm text-muted-foreground">-</span>
+                        ) : (
+                            tags.map((tag) => (
+                                <Badge key={tag} variant="secondary">
+                                    {tag}
+                                </Badge>
+                            ))
+                        )}
+                    </div>
+                );
+            },
+        },
+        {
             header: t("list.table.headers.actions"),
             className: "text-right",
             cell: (item) => {

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 
 export interface UsePaginationProps {
   initialPage?: number;
@@ -30,13 +30,13 @@ export function usePagination({
     return Math.max(1, Math.ceil(total / limit));
   }, [total, limit]);
 
-  const resetPagination = () => {
+  const resetPagination = useCallback(() => {
     setPage(initialPage);
     setLimit(initialLimit);
     setTotal(initialTotal);
-  };
+  }, [initialPage, initialLimit, initialTotal]);
 
-  return {
+  return useMemo(() => ({
     page,
     limit,
     total,
@@ -45,5 +45,5 @@ export function usePagination({
     setLimit,
     setTotal,
     resetPagination,
-  };
+  }), [page, limit, total, totalPages, resetPagination]);
 }

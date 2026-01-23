@@ -15,6 +15,7 @@ import { DocumentsService } from './documents.service';
 import { DocumentNumberService } from './document-number.service';
 import { DocumentOutboxService } from './document-outbox.service';
 import { UsersModule } from '../users/users.module';
+import { TenantsModule } from '../tenants/tenants.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { UsersModule } from '../users/users.module';
       DocumentOutboxEntity,
     ]),
     UsersModule,
+    TenantsModule,
   ],
   controllers: [DocumentsController],
   providers: [DocumentsService, DocumentNumberService, DocumentOutboxService],

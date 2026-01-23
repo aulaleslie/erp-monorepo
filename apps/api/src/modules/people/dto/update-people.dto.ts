@@ -27,11 +27,11 @@ export class UpdatePeopleDto {
   status?: PeopleStatus;
 
   @IsOptional()
+  @IsUUID()
+  departmentId?: string | null;
+
+  @IsOptional()
   @IsArray()
   @IsString({ each: true })
   tags?: string[];
-
-  @IsOptional()
-  @IsUUID()
-  departmentId?: string | null;
 }

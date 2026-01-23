@@ -69,8 +69,7 @@ export class PeopleEntity extends BaseAuditEntity {
   })
   status: PeopleStatus;
 
-  @Column({ type: 'jsonb', default: () => "'[]'" })
-  tags: string[];
+  tags?: string[];
 
   @ManyToOne(() => TenantEntity)
   @JoinColumn({ name: 'tenantId' })

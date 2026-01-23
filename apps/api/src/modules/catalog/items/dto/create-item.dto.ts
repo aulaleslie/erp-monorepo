@@ -49,11 +49,6 @@ export class CreateItemDto {
   unit?: string;
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  tags?: string[];
-
-  @IsOptional()
   @IsString()
   description?: string;
 
@@ -96,4 +91,9 @@ export class CreateItemDto {
   @IsNumber()
   @Min(0)
   includedPtSessions?: number;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  tags?: string[];
 }

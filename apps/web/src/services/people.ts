@@ -16,7 +16,7 @@ export interface PersonListItem {
   email: string | null;
   phone: string | null;
   status: PeopleStatus;
-  tags: string[];
+  tags?: string[];
   departmentId: string | null;
   userId: string | null;
   user: PersonLinkedUser | null;
@@ -28,7 +28,7 @@ export interface InvitablePerson {
   fullName: string;
   email: string | null;
   phone: string | null;
-  tags: string[];
+  tags?: string[];
 }
 
 export interface InvitableUser {

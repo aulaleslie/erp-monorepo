@@ -26,15 +26,15 @@ export class CreatePeopleDto {
   phone?: string | null;
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  tags?: string[];
-
-  @IsOptional()
   @IsUUID()
   departmentId?: string | null;
 
   @IsOptional()
   @IsUUID()
   userId?: string | null;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  tags?: string[];
 }

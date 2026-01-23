@@ -21,6 +21,7 @@ import {
 import { IMPORT_ERRORS, CATEGORY_ERRORS } from '@gym-monorepo/shared';
 import { ItemsService } from './items.service';
 import { CreateItemDto } from './dto/create-item.dto';
+import { TagsService } from '../../tags/tags.service';
 
 const REQUIRED_COLUMNS = ['name', 'type', 'price'];
 const getErrorMessage = (error: unknown): string =>
@@ -38,6 +39,7 @@ export class ItemsImportService {
     private readonly tenantCountersService: TenantCountersService,
     private readonly storageService: StorageService,
     private readonly itemsService: ItemsService,
+    private readonly tagsService: TagsService,
   ) {}
 
   /**
@@ -226,6 +228,18 @@ export class ItemsImportService {
         }
       }
 
+      // Process tags if provided
+      if (dto.tags) {
+        await this.tagsService.assign(tenantId, {
+          resourceType: 'items',
+          resourceId: item.id,
+          tags: dto.tags
+            .split(',')
+            .map((t) => t.trim())
+            .filter(Boolean),
+        });
+      }
+
       return {
         row: rowNumber,
         success: true,
@@ -324,7 +338,7 @@ export class ItemsImportService {
       serviceKind: dto.service_kind,
       barcode: dto.barcode || undefined,
       unit: dto.unit || undefined,
-      tags: dto.tags ? dto.tags.split(',').map((t) => t.trim()) : undefined,
+
       description: dto.description || undefined,
       durationValue: dto.duration_value,
       durationUnit: dto.duration_unit,
@@ -347,7 +361,7 @@ export class ItemsImportService {
     if (dto.status) item.status = dto.status;
     if (dto.barcode !== undefined) item.barcode = dto.barcode || null;
     if (dto.unit !== undefined) item.unit = dto.unit || null;
-    if (dto.tags) item.tags = dto.tags.split(',').map((t) => t.trim());
+
     if (dto.description !== undefined) {
       item.description = dto.description || null;
     }

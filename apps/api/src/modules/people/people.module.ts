@@ -11,6 +11,7 @@ import { PeopleService } from './people.service';
 import { TenantCountersModule } from '../tenant-counters/tenant-counters.module';
 import { TenantsModule } from '../tenants/tenants.module';
 import { UsersModule } from '../users/users.module';
+import { TagsModule } from '../tags/tags.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { UsersModule } from '../users/users.module';
     TenantCountersModule,
     TenantsModule,
     UsersModule,
+    TagsModule,
   ],
   controllers: [PeopleController],
   providers: [PeopleService],

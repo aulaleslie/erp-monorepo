@@ -8,6 +8,7 @@ Future agents have to deliver work that feels like a natural continuation of the
 - `docs/CYCLE_1.md` (Cycle 1 domain model, migrations order, seed data, authentication and permission endpoints).
 - `docs/CYCLE_2.md` (tenant flags, platform taxes, tenant tax settings, and related permissions/guards).
 - `docs/CYCLE_3.md` (people master data, staff user linking, and related permissions/endpoints).
+- `docs/CYCLE_ALTER.md` (document engine, tags module, outbox, Redis/BullMQ worker foundation).
 - `docs/summary.md` (current implementation map across cycles and addenda).
 - UI migration guidance now lives in Cycle 1/2 (Tailwind + shadcn UI guide, app shell expectations, menu permissions, component list, and cycle-1 page targets).
 
@@ -21,10 +22,11 @@ Always cite the relevant section of these docs when you describe your plan or ju
 
 ## Shared package structure (`packages/shared`)
 The shared package exports common types, constants, and utilities:
-- `constants/error-codes.ts` — Centralized error codes (`AUTH_ERRORS`, `TENANT_ERRORS`, `USER_ERRORS`, `ROLE_ERRORS`, `TAX_ERRORS`, `VALIDATION_ERRORS`)
-- `constants/permissions.ts` — Permission code constants (`PERMISSIONS.ROLES.READ`, etc.)
+- `constants/error-codes.ts` — Centralized error codes (`AUTH_ERRORS`, `TENANT_ERRORS`, `USER_ERRORS`, `ROLE_ERRORS`, `TAX_ERRORS`, `VALIDATION_ERRORS`, `DOCUMENT_ERRORS`, `TAG_ERRORS`)
+- `constants/permissions.ts` — Permission code constants (`PERMISSIONS.ROLES.READ`, `PERMISSIONS.DOCUMENTS.*`, `PERMISSIONS.TAGS.*`, etc.)
+- `constants/document-types.ts` — Document type registry keys (`sales.order`, `sales.invoice`, `purchasing.po`, etc.)
 - `types/pagination.ts` — `PaginatedResponse<T>`, `PaginationParams`, `PAGINATION_DEFAULTS`
-- Root exports for `BaseResponse`, `TenantType`, `AuditLog`, etc.
+- Root exports for `BaseResponse`, `TenantType`, `AuditLog`, `DocumentStatus`, `ApprovalStatus`, etc.
 
 **Always rebuild after edits:** `pnpm --filter @gym-monorepo/shared build`
 
@@ -47,7 +49,32 @@ The shared package exports common types, constants, and utilities:
 ## API documentation
 - **Swagger/OpenAPI** is available at `/api/docs` when the API is running.
 - All controllers use `@ApiTags()` decorators for grouping and `@ApiCookieAuth()` for authentication.
-- Tags: `auth`, `users`, `tenants`, `roles`, `taxes`, `platform`.
+- Tags: `auth`, `users`, `tenants`, `roles`, `taxes`, `platform`, `documents`, `tags`.
+
+## Document Engine + Tags (Cycle ALTER)
+The document engine provides a reusable foundation for transactional documents across modules (sales, purchase, accounting, inventory).
+
+### Document workflow
+- Status machine: `DRAFT → SUBMITTED → APPROVED → POSTED` (terminal), with `CANCELLED`, `REJECTED`, and `REVISION_REQUESTED` branches.
+- Multi-step approvals tracked in `document_approvals` table.
+- Status history recorded in `document_status_history` table.
+- Posted documents require reversal documents (no cancel after POSTED).
+
+### Document numbering
+- Configurable per document type via `document_number_settings` table.
+- Format: `{prefix}-{yyyy}-{mm}-{counter}` when `include_period` is true.
+- Counters managed via `tenant_counters` for uniqueness per tenant + document_key.
+
+### Outbox + Redis/BullMQ
+- Document lifecycle events persisted in `document_outbox` table.
+- BullMQ worker (`doc-engine` queue) processes outbox items with exponential backoff.
+- Redis caching with TTL: document lookups (5 min), tag suggestions (10 min).
+
+### Tags module
+- Tenant-scoped tags with `tags` and `tag_links` tables.
+- `GET /tags?query=` returns prefix-matched suggestions ordered by usage.
+- `POST /tags/assign` and `DELETE /tags/assign` for resource tagging.
+- Tags locked on APPROVED/POSTED documents.
 
 ## Code standards
 
@@ -83,6 +110,8 @@ The shared package exports common types, constants, and utilities:
 - Sidebar/menu configuration and permission checks should be centralized in one file so toggling items is simple (per `docs/CYCLE_1.md: section 9.5`).
 - Entities, migrations, and seeds must follow the Cycle 1 schema order (`users`, `tenants`, `permissions`, `roles`, `role_permissions`, `tenant_users`) with enforced foreign keys; always add migrations via the TypeORM CLI rather than manual SQL.
 - JWTs for auth stay in HttpOnly cookies, tenant selection/state is stored via `active_tenant` cookie as described in `docs/CYCLE_1.md`.
+- Document engine entities extend `BaseAuditEntity` and use the document type registry for validation (per `docs/CYCLE_ALTER.md`).
+- Tag assignments are tenant-scoped; tag changes are blocked once a document reaches APPROVED or POSTED status.
 - PRs should reference the relevant docs section numbers when possible and confirm that `pnpm lint`, `pnpm --filter web test`, and `pnpm --filter api test` pass unless explained.
 
 ## Agent behavior

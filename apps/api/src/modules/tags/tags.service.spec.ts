@@ -83,9 +83,51 @@ describe('TagsService', () => {
   });
 
   describe('suggest', () => {
-    it('returns an empty array while stubbed', async () => {
-      await expect(service.suggest('tenant-1', 'foo')).resolves.toEqual([]);
-      expect(tagRepository.find).not.toHaveBeenCalled();
+    it('returns tag summaries from the repository', async () => {
+      const mockTags = [
+        toTagEntity({
+          id: '1',
+          name: 'Alpha',
+          usageCount: 5,
+          lastUsedAt: new Date(),
+        }),
+        toTagEntity({
+          id: '2',
+          name: 'Beta',
+          usageCount: 3,
+          lastUsedAt: new Date(),
+        }),
+      ];
+
+      tagRepository.find!.mockResolvedValue(mockTags);
+
+      const result = await service.suggest('tenant-1', 'al');
+
+      expect(tagRepository.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.arrayContaining([
+            expect.objectContaining({
+              tenantId: 'tenant-1',
+              name: expect.anything() as unknown,
+            }),
+          ]) as unknown,
+          take: 10,
+        }),
+      );
+      expect(result).toHaveLength(2);
+      expect(result[0]).toEqual({
+        id: '1',
+        name: 'Alpha',
+        usageCount: 5,
+        lastUsedAt: expect.any(Date) as unknown as Date,
+      });
+    });
+
+    it('returns an empty array when no tags are found', async () => {
+      tagRepository.find!.mockResolvedValue([]);
+      const result = await service.suggest('tenant-1', 'foo');
+      expect(result).toEqual([]);
+      expect(tagRepository.find).toHaveBeenCalled();
     });
   });
 

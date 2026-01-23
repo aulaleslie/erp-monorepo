@@ -6,10 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "pnpm i18n:check && eslint",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "i18n:check": "node scripts/check-translations.mjs"
   },
   "dependencies": {
     "@gym-monorepo/shared": "workspace:*",

@@ -131,19 +131,22 @@ export default function PeoplePage() {
             },
             {
                 header: t("list.table.headers.tags"),
-                cell: (person) => (
-                    <div className="flex flex-wrap gap-1">
-                        {person.tags.length === 0 ? (
-                            <span className="text-sm text-muted-foreground">-</span>
-                        ) : (
-                            person.tags.map((tag) => (
-                                <Badge key={tag} variant="secondary">
-                                    {tag}
-                                </Badge>
-                            ))
-                        )}
-                    </div>
-                ),
+                cell: (person) => {
+                    const tags = person.tags || [];
+                    return (
+                        <div className="flex flex-wrap gap-1">
+                            {tags.length === 0 ? (
+                                <span className="text-sm text-muted-foreground">-</span>
+                            ) : (
+                                tags.map((tag) => (
+                                    <Badge key={tag} variant="secondary">
+                                        {tag}
+                                    </Badge>
+                                ))
+                            )}
+                        </div>
+                    );
+                },
             },
             {
                 header: t("list.table.headers.status"),

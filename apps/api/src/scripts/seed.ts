@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import { DataSource, Raw } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { AppDataSource } from '../../typeorm-datasource';
 import {
   PeopleEntity,
@@ -161,7 +161,7 @@ const seedWalkInCustomers = async (dataSource: DataSource): Promise<void> => {
       where: {
         tenantId: tenant.id,
         type: PeopleType.CUSTOMER,
-        tags: Raw((alias) => `${alias} @> '["walk-in"]'`),
+        fullName: 'Walk in',
       },
     });
 
@@ -179,7 +179,6 @@ const seedWalkInCustomers = async (dataSource: DataSource): Promise<void> => {
         type: PeopleType.CUSTOMER,
         code,
         fullName: 'Walk in',
-        tags: ['walk-in'],
       }),
     );
   }

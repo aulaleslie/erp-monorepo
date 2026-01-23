@@ -25,6 +25,7 @@ export default function UsersPage() {
     const [users, setUsers] = useState<TenantUser[]>([]);
     const [loading, setLoading] = useState(true);
     const pagination = usePagination();
+    const { page, limit, setTotal } = pagination;
 
     const [userToDelete, setUserToDelete] = useState<string | null>(null);
     const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
@@ -34,13 +35,13 @@ export default function UsersPage() {
     const fetchUsers = useCallback(async () => {
         setLoading(true);
         try {
-            const data = await usersService.getAll(pagination.page, pagination.limit);
+            const data = await usersService.getAll(page, limit);
             // Filter out superadmin users unless the current user is a superadmin
             const filteredUsers = user?.isSuperAdmin
                 ? data.items
                 : data.items.filter((tenantUser) => !tenantUser.role?.isSuperAdmin);
             setUsers(filteredUsers);
-            pagination.setTotal(data.total);
+            setTotal(data.total);
         } catch (error: unknown) {
             const message = getApiErrorMessage(error);
             toast({
@@ -51,7 +52,7 @@ export default function UsersPage() {
         } finally {
             setLoading(false);
         }
-    }, [pagination, t, toast, user?.isSuperAdmin]);
+    }, [page, limit, setTotal, t, toast, user?.isSuperAdmin]);
 
     useEffect(() => {
         fetchUsers();

@@ -173,14 +173,7 @@ export function TagInput({
                                             onClick={() => handleAddTag(suggestion.name)}
                                             className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
                                         >
-                                            <div className="flex flex-col">
-                                                <span>{suggestion.name}</span>
-                                                {suggestion.usageCount > 0 && (
-                                                    <span className="text-xs text-muted-foreground">
-                                                        Used {suggestion.usageCount} times
-                                                    </span>
-                                                )}
-                                            </div>
+                                            <span>{suggestion.name}</span>
                                         </div>
                                     ))}
                                 </div>

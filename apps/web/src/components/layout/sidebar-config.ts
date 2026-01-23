@@ -17,6 +17,7 @@ import {
     Calendar,
     ShoppingCart,
     CreditCard,
+    Tag,
 } from "lucide-react";
 
 export interface SidebarItem {
@@ -210,6 +211,13 @@ export const sidebarConfig: SidebarItem[] = [
                     "users.assignRole",
                 ],
                 routePermissions: ["users.read"],
+            },
+            {
+                label: "Tags",
+                labelKey: "tags",
+                icon: Tag,
+                href: "/settings/tags",
+                superAdminOnly: true,
             },
         ],
     },

@@ -32,6 +32,16 @@
 - Categories with 2-level tree and optional item assignment.
 - Item media via MinIO and CSV/XLSX import/export.
 
+## Cycle ALTER - Document Engine + Tags Foundation
+- Document headers + items with workflow states (DRAFT → SUBMITTED → APPROVED → POSTED).
+- Configurable document numbering with tenant-scoped counters.
+- Document type registry (sales.order, sales.invoice, purchasing.po, etc.).
+- Posting handlers with ledger entry stubs.
+- Document outbox + BullMQ worker for event-driven processing.
+- Redis caching for document lookups (5 min TTL) and tag suggestions (10 min TTL).
+- Tags module with tenant-scoped tags, assignment APIs, and usage metrics.
+- Row-level access rules (TENANT, CREATOR, ROLE, USER scopes).
+
 ## Implemented Addenda (post-spec)
 - Audit logs: audit_logs table + subscriber, super-admin list API, audit logs UI with filters and detail dialog.
 - Theme system: tenant_themes table + theme presets, tenant theme settings API, ThemeProvider + /settings/theme UI.

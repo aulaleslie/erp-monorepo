@@ -3,14 +3,20 @@ import * as XLSX from 'xlsx';
 
 import { ItemsService } from './items.service';
 import { ExportFormat, ExportItemQueryDto } from './dto/export-item-query.dto';
-import { ItemEntity } from '../../../database/entities/item.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { In, Repository } from 'typeorm';
+import { ItemEntity, TagLinkEntity } from '../../../database/entities';
 
 type ItemExportValue = string | number | boolean | null | Date | undefined;
 type ItemExportRow = Record<string, ItemExportValue>;
 
 @Injectable()
 export class ItemsExportService {
-  constructor(private readonly itemsService: ItemsService) {}
+  constructor(
+    private readonly itemsService: ItemsService,
+    @InjectRepository(TagLinkEntity)
+    private readonly tagLinkRepository: Repository<TagLinkEntity>,
+  ) {}
 
   async exportItems(tenantId: string, query: ExportItemQueryDto) {
     const queryBuilder = this.itemsService.buildQuery(query, tenantId);
@@ -18,8 +24,14 @@ export class ItemsExportService {
     // Fetch all matching items without pagination
     const items = await queryBuilder.getMany();
 
+    // Fetch tags for these items
+    const itemIds = items.map((i) => i.id);
+    const tagsMap = await this.getItemsTagsMap(tenantId, itemIds);
+
     // Transform items to flat rows
-    const rows = items.map((item) => this.flattenItem(item));
+    const rows = items.map((item) =>
+      this.flattenItem(item, tagsMap.get(item.id) || []),
+    );
 
     // Filter fields if requested
     const finalRows = query.fields
@@ -30,7 +42,7 @@ export class ItemsExportService {
     return this.generateFile(finalRows, query.format);
   }
 
-  private flattenItem(item: ItemEntity): ItemExportRow {
+  private flattenItem(item: ItemEntity, tags: string[]): ItemExportRow {
     return {
       id: item.id,
       code: item.code,
@@ -43,7 +55,7 @@ export class ItemsExportService {
       categoryCode: item.category?.code || null,
       barcode: item.barcode,
       unit: item.unit,
-      tags: item.tags?.join(', '),
+      tags: tags.join(', '),
       description: item.description,
       durationValue: item.durationValue,
       durationUnit: item.durationUnit,
@@ -53,6 +65,31 @@ export class ItemsExportService {
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
     };
+  }
+
+  private async getItemsTagsMap(
+    tenantId: string,
+    itemIds: string[],
+  ): Promise<Map<string, string[]>> {
+    if (itemIds.length === 0) return new Map();
+
+    const links = await this.tagLinkRepository.find({
+      where: {
+        tenantId,
+        resourceType: 'items',
+        resourceId: In(itemIds),
+      },
+      relations: ['tag'],
+    });
+
+    const map = new Map<string, string[]>();
+    links.forEach((link) => {
+      const tags = map.get(link.resourceId) || [];
+      tags.push(link.tag.name);
+      map.set(link.resourceId, tags);
+    });
+
+    return map;
   }
 
   private filterFields(

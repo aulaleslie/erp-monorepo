@@ -35,6 +35,7 @@ import { InvitableUsersQueryDto } from './dto/invitable-users-query.dto';
 import { LinkUserDto } from './dto/link-user.dto';
 import { CreateUserForStaffDto } from './dto/create-user-for-staff.dto';
 import { hashPassword } from '../../common/utils/password.util';
+import { TagsService } from '../tags/tags.service';
 
 @Injectable()
 export class PeopleService {
@@ -48,6 +49,7 @@ export class PeopleService {
     @InjectRepository(RoleEntity)
     private readonly roleRepository: Repository<RoleEntity>,
     private readonly tenantCountersService: TenantCountersService,
+    private readonly tagsService: TagsService,
   ) {}
 
   async findAll(
@@ -72,16 +74,30 @@ export class PeopleService {
 
     if (search) {
       qb.andWhere(
-        '(people.code ILIKE :search OR people.fullName ILIKE :search OR people.email ILIKE :search OR people.phone ILIKE :search)',
-        { search: `%${search}%` },
+        '(people.code ILIKE :search OR people.fullName ILIKE :search OR people.email ILIKE :search OR people.phone ILIKE :search OR EXISTS (SELECT 1 FROM tag_links tl INNER JOIN tags t ON t.id = tl."tagId" WHERE tl."resourceType" = \'people\' AND tl."resourceId" = people.id AND t."nameNormalized" ILIKE :searchNormalized))',
+        {
+          search: `%${search}%`,
+          searchNormalized: `%${search.toLowerCase()}%`,
+        },
       );
     }
-
     qb.orderBy('people.createdAt', 'DESC')
       .skip(calculateSkip(page, limit))
       .take(limit);
 
     const [items, total] = await qb.getManyAndCount();
+
+    // Attach tags
+    const resourceIds = items.map((i) => i.id);
+    const tagsMap = await this.tagsService.findTagsForResources(
+      tenantId,
+      'people',
+      resourceIds,
+    );
+
+    items.forEach((item) => {
+      item.tags = (tagsMap.get(item.id) || []).map((t) => t.name);
+    });
 
     return paginate(items, total, page, limit);
   }
@@ -96,7 +112,6 @@ export class PeopleService {
       fullName: string;
       email: string | null;
       phone: string | null;
-      tags: string[];
     }>;
     total: number;
     page: number;
@@ -146,7 +161,6 @@ export class PeopleService {
       fullName: person.fullName,
       email: person.email,
       phone: person.phone,
-      tags: person.tags ?? [],
     }));
 
     return {
@@ -167,6 +181,13 @@ export class PeopleService {
     if (!person) {
       throw new NotFoundException(PEOPLE_ERRORS.NOT_FOUND.message);
     }
+
+    const tagsMap = await this.tagsService.findTagsForResources(
+      tenantId,
+      'people',
+      [id],
+    );
+    person.tags = (tagsMap.get(id) || []).map((t) => t.name);
 
     return person;
   }
@@ -212,13 +233,21 @@ export class PeopleService {
       email,
       phone,
       status: PeopleStatus.ACTIVE,
-      tags: dto.tags ?? [],
+
       departmentId:
         type === PeopleType.STAFF ? (dto.departmentId ?? null) : null,
       userId: type === PeopleType.STAFF ? (dto.userId ?? null) : null,
     });
 
     const saved = await this.peopleRepository.save(person);
+
+    if (dto.tags && dto.tags.length > 0) {
+      await this.tagsService.assign(tenantId, {
+        resourceType: 'people',
+        resourceId: saved.id,
+        tags: dto.tags,
+      });
+    }
 
     // If we linked a user, return with relation loaded
     if (saved.userId) {
@@ -255,16 +284,22 @@ export class PeopleService {
       person.status = dto.status;
     }
 
-    if (dto.tags !== undefined) {
-      person.tags = dto.tags ?? [];
-    }
-
     if (dto.departmentId !== undefined) {
       person.departmentId =
         person.type === PeopleType.STAFF ? (dto.departmentId ?? null) : null;
     }
 
-    return this.peopleRepository.save(person);
+    const saved = await this.peopleRepository.save(person);
+
+    if (dto.tags !== undefined) {
+      await this.tagsService.sync(tenantId, {
+        resourceType: 'people',
+        resourceId: id,
+        tags: dto.tags,
+      });
+    }
+
+    return saved;
   }
 
   async inviteExisting(
@@ -295,7 +330,7 @@ export class PeopleService {
       email: person.email,
       phone: person.phone,
       status: person.status,
-      tags: person.tags ?? [],
+
       departmentId: null, // Don't copy departmentId across tenants
       userId: null,
     });

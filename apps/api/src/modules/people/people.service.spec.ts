@@ -195,7 +195,6 @@ describe('PeopleService', () => {
           fullName: 'Alpha',
           email: 'alpha@example.com',
           phone: null,
-          tags: ['vip'],
           status: PeopleStatus.ACTIVE,
         },
         {
@@ -205,7 +204,6 @@ describe('PeopleService', () => {
           fullName: 'Alpha Clone',
           email: 'alpha@example.com',
           phone: '+628123',
-          tags: ['dup'],
           status: PeopleStatus.ACTIVE,
         },
         {
@@ -215,7 +213,6 @@ describe('PeopleService', () => {
           fullName: 'Beta',
           email: null,
           phone: '+628124',
-          tags: [],
           status: PeopleStatus.ACTIVE,
         },
         {
@@ -225,7 +222,6 @@ describe('PeopleService', () => {
           fullName: 'No Contact',
           email: null,
           phone: null,
-          tags: [],
           status: PeopleStatus.ACTIVE,
         },
       ] as PeopleEntity[];
@@ -266,7 +262,6 @@ describe('PeopleService', () => {
           fullName: 'Alpha',
           email: 'alpha@example.com',
           phone: null,
-          tags: ['vip'],
         },
       ]);
       expect(result.hasMore).toBe(true);
@@ -316,7 +311,7 @@ describe('PeopleService', () => {
           email: 'foo@bar.com',
           phone: '+62812345678',
           status: PeopleStatus.ACTIVE,
-          tags: [],
+
           departmentId: null,
         }),
       );
@@ -417,7 +412,6 @@ describe('PeopleService', () => {
         email: 'old@example.com',
         phone: '+628111',
         status: PeopleStatus.ACTIVE,
-        tags: ['vip'],
         departmentId: null,
       } as PeopleEntity;
 
@@ -457,7 +451,6 @@ describe('PeopleService', () => {
         email: null,
         phone: null,
         status: PeopleStatus.ACTIVE,
-        tags: ['existing'],
         departmentId: 'dept-1',
       } as PeopleEntity;
 
@@ -471,7 +464,7 @@ describe('PeopleService', () => {
       } as unknown as UpdatePeopleDto);
 
       expect(result.status).toBe(PeopleStatus.INACTIVE);
-      expect(result.tags).toEqual([]);
+
       expect(result.departmentId).toBe('dept-2');
     });
 
@@ -484,7 +477,6 @@ describe('PeopleService', () => {
         email: null,
         phone: null,
         status: PeopleStatus.ACTIVE,
-        tags: [],
         departmentId: 'dept-legacy',
       } as unknown as PeopleEntity;
 
@@ -509,7 +501,6 @@ describe('PeopleService', () => {
         email: 'staff@example.com',
         phone: '+628123',
         status: PeopleStatus.ACTIVE,
-        tags: ['trainer'],
         departmentId: 'dept-ops',
         userId: 'user-1',
       } as PeopleEntity;
@@ -540,7 +531,6 @@ describe('PeopleService', () => {
           email: 'staff@example.com',
           phone: '+628123',
           status: PeopleStatus.ACTIVE,
-          tags: ['trainer'],
           departmentId: null, // Don't copy departmentId across tenants
           userId: null,
         }),
@@ -574,7 +564,6 @@ describe('PeopleService', () => {
         email: 'dup@example.com',
         phone: null,
         status: PeopleStatus.ACTIVE,
-        tags: [],
       } as unknown as PeopleEntity;
 
       peopleRepository

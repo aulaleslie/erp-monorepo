@@ -21,6 +21,11 @@ import { TagListQueryDto } from './dto/tag-list-query.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import { calculateSkip, paginate } from '../../common/dto/pagination.dto';
 
+export interface ResourceTag {
+  resourceId: string;
+  tags: TagSummary[];
+}
+
 interface TagSummary {
   id: string;
   name: string;
@@ -33,6 +38,11 @@ interface TagAssignmentResult {
 }
 
 interface TagRemovalResult {
+  removed: Array<Pick<TagSummary, 'id' | 'name'>>;
+}
+
+interface TagSyncResult {
+  assigned: TagSummary[];
   removed: Array<Pick<TagSummary, 'id' | 'name'>>;
 }
 
@@ -230,6 +240,65 @@ export class TagsService {
     };
   }
 
+  async sync(tenantId: string, dto: TagAssignmentDto): Promise<TagSyncResult> {
+    const normalizedResourceType = this.normalizeResourceType(dto.resourceType);
+    await this.ensureResourceUnlocked(
+      tenantId,
+      normalizedResourceType,
+      dto.resourceId,
+    );
+
+    const targetTags = this.normalizeTags(dto.tags);
+    const targetNormalized = new Set(targetTags.map((t) => t.normalized));
+
+    // 1. Get current tags
+    const currentLinks = await this.tagLinkRepository.find({
+      where: {
+        tenantId,
+        resourceId: dto.resourceId,
+        resourceType: dto.resourceType,
+      },
+      relations: ['tag'],
+    });
+
+    const currentNormalized = new Set(
+      currentLinks.map((link) => link.tag.nameNormalized),
+    );
+
+    // 2. Determine what to add and what to remove
+    const toAdd = targetTags.filter(
+      (t) => !currentNormalized.has(t.normalized),
+    );
+    const toRemove = currentLinks
+      .filter((link) => !targetNormalized.has(link.tag.nameNormalized))
+      .map((link) => link.tag.name);
+
+    let assigned: TagSummary[] = [];
+    let removed: Array<Pick<TagSummary, 'id' | 'name'>> = [];
+
+    // 3. Perform removal
+    if (toRemove.length > 0) {
+      const removalResult = await this.remove(tenantId, {
+        resourceId: dto.resourceId,
+        resourceType: dto.resourceType,
+        tags: toRemove,
+      });
+      removed = removalResult.removed;
+    }
+
+    // 4. Perform assignment
+    if (toAdd.length > 0) {
+      const assignmentResult = await this.assign(tenantId, {
+        resourceId: dto.resourceId,
+        resourceType: dto.resourceType,
+        tags: toAdd.map((t) => t.original),
+      });
+      assigned = assignmentResult.assigned;
+    }
+
+    return { assigned, removed };
+  }
+
   async remove(
     tenantId: string,
     dto: TagAssignmentDto,
@@ -288,14 +357,45 @@ export class TagsService {
       tagsToUpdate.set(tag.id, tag);
     }
 
-    await this.tagRepository.save(Array.from(tagsToUpdate.values()));
-
     return {
       removed: Array.from(tagsToUpdate.values()).map((tag) => ({
         id: tag.id,
         name: tag.name,
       })),
     };
+  }
+
+  async findTagsForResources(
+    tenantId: string,
+    resourceType: string,
+    resourceIds: string[],
+  ): Promise<Map<string, TagSummary[]>> {
+    if (resourceIds.length === 0) {
+      return new Map();
+    }
+
+    const links = await this.tagLinkRepository.find({
+      where: {
+        tenantId,
+        resourceType,
+        resourceId: In(resourceIds),
+      },
+      relations: ['tag'],
+    });
+
+    const resultMap = new Map<string, TagSummary[]>();
+    for (const link of links) {
+      const tags = resultMap.get(link.resourceId) || [];
+      tags.push({
+        id: link.tag.id,
+        name: link.tag.name,
+        usageCount: link.tag.usageCount,
+        lastUsedAt: link.tag.lastUsedAt,
+      });
+      resultMap.set(link.resourceId, tags);
+    }
+
+    return resultMap;
   }
 
   private buildSearchWhere(

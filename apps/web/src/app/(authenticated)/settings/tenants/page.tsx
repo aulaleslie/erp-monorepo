@@ -25,6 +25,8 @@ export default function TenantsPage() {
     const [loading, setLoading] = useState(true);
     const pagination = usePagination();
 
+    const { page, limit, setTotal, resetPagination } = pagination;
+
     const [tenantToArchive, setTenantToArchive] = useState<string | null>(null);
     const { toast } = useToast();
     const { isSuperAdmin } = usePermissions();
@@ -38,12 +40,12 @@ export default function TenantsPage() {
         setLoading(true);
         try {
             const data = await tenantsService.getAll(
-                pagination.page,
-                pagination.limit,
+                page,
+                limit,
                 statusFilter
             );
             setTenants(data.items);
-            pagination.setTotal(data.total);
+            setTotal(data.total);
         } catch (error: unknown) {
             const message = getApiErrorMessage(error);
             toast({
@@ -54,7 +56,7 @@ export default function TenantsPage() {
         } finally {
             setLoading(false);
         }
-    }, [pagination, statusFilter, t, toast]);
+    }, [page, limit, setTotal, statusFilter, t, toast]);
 
     useEffect(() => {
         if (isSuperAdmin) {
@@ -65,8 +67,8 @@ export default function TenantsPage() {
     }, [fetchTenants, isSuperAdmin]);
 
     useEffect(() => {
-        pagination.resetPagination();
-    }, [pagination, statusFilter]);
+        resetPagination();
+    }, [resetPagination, statusFilter]);
 
     const confirmArchive = useCallback(async () => {
         if (!tenantToArchive) return;

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useTranslations } from "next-intl";
@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { ImageUpload } from "@/components/common/ImageUpload";
+import { TagInput } from "@/components/common/TagInput";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { getApiErrorMessage } from "@/lib/api";
@@ -44,7 +45,7 @@ const formSchema = z.object({
     barcode: z.string().optional().nullable(),
     unit: z.string().optional().nullable(),
     description: z.string().optional().nullable(),
-    tags: z.string().optional().nullable(),
+    tags: z.array(z.string()),
     // Service specific fields
     serviceKind: z.nativeEnum(ItemServiceKind).optional().nullable(),
     durationValue: z.coerce.number().optional().nullable(),
@@ -109,7 +110,7 @@ export function ItemForm({ initialData }: ItemFormProps) {
             barcode: initialData.barcode,
             unit: initialData.unit,
             description: initialData.description,
-            tags: initialData.tags?.join(", "),
+            tags: initialData.tags ?? [],
             serviceKind: initialData.serviceKind,
             durationValue: initialData.durationValue,
             durationUnit: initialData.durationUnit,
@@ -123,7 +124,7 @@ export function ItemForm({ initialData }: ItemFormProps) {
             barcode: "",
             unit: "",
             description: "",
-            tags: "",
+            tags: [],
         },
     });
 
@@ -142,16 +143,12 @@ export function ItemForm({ initialData }: ItemFormProps) {
         fetchCategories();
     }, []);
 
-    const onSubmit = async (values: FormValues) => {
+    const onSubmit: SubmitHandler<FormValues> = async (values) => {
         try {
             setLoading(true);
-            const tagsArray = typeof values.tags === 'string'
-                ? values.tags.split(",").map((t: string) => t.trim()).filter(Boolean)
-                : [];
 
             const payload: Partial<CreateItemData & UpdateItemData> = {
                 ...values,
-                tags: tagsArray,
             };
 
             // Clean up payload based on type
@@ -356,16 +353,12 @@ export function ItemForm({ initialData }: ItemFormProps) {
                                     name="tags"
                                     control={control}
                                     render={({ field }) => (
-                                        <div className="space-y-1">
-                                            <Input
-                                                id="tags"
-                                                disabled={loading}
-                                                placeholder={t("form.placeholders.tags")}
-                                                {...field}
-                                                value={field.value || ""}
-                                            />
-                                            <p className="text-[10px] text-muted-foreground">Separate tags with commas</p>
-                                        </div>
+                                        <TagInput
+                                            value={field.value || []}
+                                            onChange={field.onChange}
+                                            disabled={loading}
+                                            placeholder={t("form.placeholders.tags")}
+                                        />
                                     )}
                                 />
                             </div>

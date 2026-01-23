@@ -313,7 +313,7 @@ describe('ItemsService', () => {
       );
 
       expect(qb.andWhere).toHaveBeenCalledWith(
-        '(item.code ILIKE :search OR item.name ILIKE :search OR item.barcode ILIKE :search OR item.tags::text ILIKE :search)',
+        '(item.code ILIKE :search OR item.name ILIKE :search OR item.barcode ILIKE :search OR EXISTS (SELECT 1 FROM tag_links tl INNER JOIN tags t ON t.id = tl."tagId" WHERE tl."resourceType" = \'items\' AND tl."resourceId" = item.id AND t."nameNormalized" ILIKE :search))',
         { search: '%protein%' },
       );
     });

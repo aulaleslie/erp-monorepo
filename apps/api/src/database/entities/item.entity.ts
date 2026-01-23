@@ -102,8 +102,7 @@ export class ItemEntity extends BaseAuditEntity {
   @Column({ type: 'varchar', nullable: true })
   unit: string | null;
 
-  @Column({ type: 'jsonb', default: [] })
-  tags: string[];
+  tags?: string[];
 
   @Column({ type: 'text', nullable: true })
   description: string | null;

@@ -108,7 +108,7 @@ export function Navbar() {
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                             <Avatar className="h-8 w-8">
-                                <AvatarImage src="/avatars/01.png" alt={user?.fullName || "User"} />
+                                <AvatarImage src={user?.imageUrl} alt={user?.fullName || "User"} />
                                 <AvatarFallback>{user?.fullName?.[0] || "U"}</AvatarFallback>
                             </Avatar>
                         </Button>
@@ -124,15 +124,15 @@ export function Navbar() {
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
-                                <Link href="/profile">
-                                    <User className="mr-2 h-4 w-4" />
-                                    <span>{t('profile')}</span>
-                                </Link>
+                            <Link href="/profile">
+                                <User className="mr-2 h-4 w-4" />
+                                <span>{t('profile')}</span>
+                            </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={handleLogout}>
                             <LogOut className="mr-2 h-4 w-4" />
-                                <span>{t('logout')}</span>
+                            <span>{t('logout')}</span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

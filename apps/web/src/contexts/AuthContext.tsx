@@ -9,6 +9,7 @@ interface User {
     email: string;
     fullName: string;
     isSuperAdmin: boolean;
+    imageUrl?: string;
 }
 
 interface Tenant {

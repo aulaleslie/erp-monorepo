@@ -9,6 +9,7 @@ import { Not, Repository } from 'typeorm';
 import { ITEM_ERRORS } from '@gym-monorepo/shared';
 
 import { TenantCountersService } from '../../tenant-counters/tenant-counters.service';
+import { TagsService } from '../../tags/tags.service';
 import { StorageService } from '../../storage/storage.service';
 import {
   ItemEntity,
@@ -30,6 +31,7 @@ export class ItemsService {
     @InjectRepository(CategoryEntity)
     private readonly categoryRepository: Repository<CategoryEntity>,
     private readonly tenantCountersService: TenantCountersService,
+    private readonly tagsService: TagsService,
     private readonly storageService: StorageService,
   ) {}
 
@@ -62,11 +64,20 @@ export class ItemsService {
       ...itemData,
       tenantId,
       code,
-      tags: createItemDto.tags ?? [],
       status: ItemStatus.ACTIVE,
     });
 
-    return this.itemRepository.save(item);
+    const saved = await this.itemRepository.save(item);
+
+    if (createItemDto.tags && createItemDto.tags.length > 0) {
+      await this.tagsService.assign(tenantId, {
+        resourceType: 'items',
+        resourceId: saved.id,
+        tags: createItemDto.tags,
+      });
+    }
+
+    return saved;
   }
 
   async findAll(query: ItemQueryDto, tenantId: string) {
@@ -78,6 +89,18 @@ export class ItemsService {
     queryBuilder.orderBy('item.createdAt', 'DESC').skip(skip).take(limit);
 
     const [items, total] = await queryBuilder.getManyAndCount();
+
+    // Attach tags
+    const resourceIds = items.map((i) => i.id);
+    const tagsMap = await this.tagsService.findTagsForResources(
+      tenantId,
+      'items',
+      resourceIds,
+    );
+
+    items.forEach((item) => {
+      item.tags = (tagsMap.get(item.id) || []).map((t) => t.name);
+    });
 
     return paginate(items, total, page, limit);
   }
@@ -92,7 +115,7 @@ export class ItemsService {
 
     if (search) {
       queryBuilder.andWhere(
-        '(item.code ILIKE :search OR item.name ILIKE :search OR item.barcode ILIKE :search OR item.tags::text ILIKE :search)',
+        '(item.code ILIKE :search OR item.name ILIKE :search OR item.barcode ILIKE :search OR EXISTS (SELECT 1 FROM tag_links tl INNER JOIN tags t ON t.id = tl."tagId" WHERE tl."resourceType" = \'items\' AND tl."resourceId" = item.id AND t."nameNormalized" ILIKE :search))',
         { search: `%${search}%` },
       );
     }
@@ -125,6 +148,13 @@ export class ItemsService {
     if (!item) {
       throw new NotFoundException(ITEM_ERRORS.NOT_FOUND.message);
     }
+
+    const tagsMap = await this.tagsService.findTagsForResources(
+      tenantId,
+      'items',
+      [id],
+    );
+    item.tags = (tagsMap.get(id) || []).map((t) => t.name);
 
     return item;
   }
@@ -174,7 +204,17 @@ export class ItemsService {
     } as CreateItemDto);
 
     Object.assign(item, sanitizedData);
-    return this.itemRepository.save(item);
+    const saved = await this.itemRepository.save(item);
+
+    if (updateItemDto.tags !== undefined) {
+      await this.tagsService.sync(tenantId, {
+        resourceType: 'items',
+        resourceId: id,
+        tags: updateItemDto.tags,
+      });
+    }
+
+    return saved;
   }
 
   async remove(id: string, tenantId: string) {

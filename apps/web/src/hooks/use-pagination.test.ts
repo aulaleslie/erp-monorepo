@@ -154,4 +154,35 @@ describe('usePagination', () => {
       expect(result.current.total).toBe(0);
     });
   });
+  describe('reference stability', () => {
+    it('returns the same object reference on re-render if values haven\'t changed', () => {
+      const { result, rerender } = renderHook(() => usePagination());
+      const firstReference = result.current;
+
+      rerender();
+
+      expect(result.current).toBe(firstReference);
+    });
+
+    it('returns a new reference only when state changes', () => {
+      const { result } = renderHook(() => usePagination());
+      const firstReference = result.current;
+
+      act(() => {
+        result.current.setPage(2);
+      });
+
+      expect(result.current).not.toBe(firstReference);
+      expect(result.current.page).toBe(2);
+    });
+
+    it('maintains stable resetPagination function reference', () => {
+      const { result, rerender } = renderHook(() => usePagination());
+      const firstResetRef = result.current.resetPagination;
+
+      rerender();
+
+      expect(result.current.resetPagination).toBe(firstResetRef);
+    });
+  });
 });
