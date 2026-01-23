@@ -60,6 +60,11 @@ export enum SalesTaxPricingMode {
   EXCLUSIVE = 'EXCLUSIVE',
 }
 
+export enum DocumentRelationType {
+  ORDER_TO_INVOICE = 'ORDER_TO_INVOICE',
+  INVOICE_TO_CREDIT = 'INVOICE_TO_CREDIT',
+}
+
 export const DOCUMENT_TYPE_KEY = {
   SALES_ORDER: 'sales.order',
   SALES_INVOICE: 'sales.invoice',

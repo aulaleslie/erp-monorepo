@@ -34,6 +34,7 @@ import { DocumentOutboxEntity } from './document-outbox.entity';
 import { TagEntity } from './tag.entity';
 import { TagLinkEntity } from './tag-link.entity';
 import { SalesHeaderEntity } from './sales-header.entity';
+import { DocumentRelationEntity } from './document-relation.entity';
 
 export {
   AuditLogEntity,
@@ -71,6 +72,7 @@ export {
   TagEntity,
   TagLinkEntity,
   SalesHeaderEntity,
+  DocumentRelationEntity,
 };
 
 export const ALL_ENTITIES = [
@@ -104,4 +106,5 @@ export const ALL_ENTITIES = [
   TagEntity,
   TagLinkEntity,
   SalesHeaderEntity,
+  DocumentRelationEntity,
 ];

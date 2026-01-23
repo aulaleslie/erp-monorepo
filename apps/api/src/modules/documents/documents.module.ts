@@ -9,6 +9,7 @@ import {
   LedgerEntryEntity,
   DocumentTypeRegistryEntity,
   DocumentOutboxEntity,
+  DocumentRelationEntity,
 } from '../../database/entities';
 import { DocumentsController } from './documents.controller';
 import { DocumentsService } from './documents.service';
@@ -28,6 +29,7 @@ import { TenantsModule } from '../tenants/tenants.module';
       LedgerEntryEntity,
       DocumentTypeRegistryEntity,
       DocumentOutboxEntity,
+      DocumentRelationEntity,
     ]),
     UsersModule,
     TenantsModule,
