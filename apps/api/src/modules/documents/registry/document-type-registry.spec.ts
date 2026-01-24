@@ -34,7 +34,7 @@ describe('DocumentTypeRegistry', () => {
     it('should return 1 for single-step documents', () => {
       expect(
         DocumentTypeRegistry.getApprovalStepsCount(
-          DOCUMENT_TYPE_KEY.SALES_INVOICE,
+          DOCUMENT_TYPE_KEY.INVENTORY_ADJUSTMENT,
         ),
       ).toBe(1);
     });
@@ -53,9 +53,9 @@ describe('DocumentTypeRegistry', () => {
   });
 
   describe('getAllTypes', () => {
-    it('should return all 8 document types', () => {
+    it('should return all 9 document types', () => {
       const allTypes = DocumentTypeRegistry.getAllTypes();
-      expect(allTypes.length).toBe(8);
+      expect(allTypes.length).toBe(9);
     });
   });
 });

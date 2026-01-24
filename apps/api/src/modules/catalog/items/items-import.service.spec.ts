@@ -18,6 +18,7 @@ import { TenantCountersService } from '../../tenant-counters/tenant-counters.ser
 import { StorageService } from '../../storage/storage.service';
 import { IMPORT_ERRORS, CATEGORY_ERRORS } from '@gym-monorepo/shared';
 import { CreateItemDto } from './dto/create-item.dto';
+import { TagsService } from '../../tags/tags.service';
 
 class MockRepository<T extends object> {
   findOne = jest.fn();
@@ -42,6 +43,7 @@ describe('ItemsImportService', () => {
     create: jest.Mock<Promise<ItemEntity>, [CreateItemDto, string]>;
     validateServiceFields: jest.Mock;
   };
+  let tagsService: { assign: jest.Mock };
 
   const tenantId = 'tenant-123';
 
@@ -75,6 +77,9 @@ describe('ItemsImportService', () => {
         ),
       validateServiceFields: jest.fn(),
     };
+    tagsService = {
+      assign: jest.fn().mockResolvedValue({ assigned: [] }),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -84,6 +89,7 @@ describe('ItemsImportService', () => {
         { provide: TenantCountersService, useValue: countersService },
         { provide: StorageService, useValue: storageService },
         { provide: ItemsService, useValue: itemsService },
+        { provide: TagsService, useValue: tagsService },
       ],
     }).compile();
 

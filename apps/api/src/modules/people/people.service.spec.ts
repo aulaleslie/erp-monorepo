@@ -20,6 +20,7 @@ import { CreatePeopleDto } from './dto/create-people.dto';
 import { UpdatePeopleDto } from './dto/update-people.dto';
 import { InvitablePeopleQueryDto } from './dto/invitable-people-query.dto';
 import * as pagination from '../../common/dto/pagination.dto';
+import { TagsService } from '../tags/tags.service';
 
 type MockRepository<T extends ObjectLiteral = any> = Partial<
   Record<keyof Repository<T>, jest.Mock>
@@ -43,6 +44,11 @@ describe('PeopleService', () => {
   let tenantUserRepository: MockRepository<TenantUserEntity>;
   let roleRepository: MockRepository<RoleEntity>;
   let tenantCountersService: { getNextPeopleCode: jest.Mock };
+  let tagsService: {
+    findTagsForResources: jest.Mock;
+    assign: jest.Mock;
+    sync: jest.Mock;
+  };
 
   beforeEach(async () => {
     peopleRepository = {
@@ -68,6 +74,11 @@ describe('PeopleService', () => {
     tenantCountersService = {
       getNextPeopleCode: jest.fn(),
     };
+    tagsService = {
+      findTagsForResources: jest.fn().mockResolvedValue(new Map()),
+      assign: jest.fn(),
+      sync: jest.fn(),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -91,6 +102,10 @@ describe('PeopleService', () => {
         {
           provide: TenantCountersService,
           useValue: tenantCountersService,
+        },
+        {
+          provide: TagsService,
+          useValue: tagsService,
         },
       ],
     }).compile();
@@ -156,8 +171,8 @@ describe('PeopleService', () => {
         status: PeopleStatus.INACTIVE,
       });
       expect(qb.andWhere).toHaveBeenCalledWith(
-        '(people.code ILIKE :search OR people.fullName ILIKE :search OR people.email ILIKE :search OR people.phone ILIKE :search)',
-        { search: '%Alice%' },
+        '(people.code ILIKE :search OR people.fullName ILIKE :search OR people.email ILIKE :search OR people.phone ILIKE :search OR EXISTS (SELECT 1 FROM tag_links tl INNER JOIN tags t ON t.id = tl."tagId" WHERE tl."resourceType" = \'people\' AND tl."resourceId" = people.id AND t."nameNormalized" ILIKE :searchNormalized))',
+        { search: '%Alice%', searchNormalized: '%alice%' },
       );
       expect(qb.orderBy).toHaveBeenCalledWith('people.createdAt', 'DESC');
       expect(calculateSkipSpy).toHaveBeenCalledWith(2, 5);

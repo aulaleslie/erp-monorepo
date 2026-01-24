@@ -6,7 +6,9 @@ import {
   ItemEntity,
   ItemType,
   ItemStatus,
-} from '../../../database/entities/item.entity';
+  TagLinkEntity,
+} from '../../../database/entities';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import * as XLSX from 'xlsx';
 
 describe('ItemsExportService', () => {
@@ -26,6 +28,12 @@ describe('ItemsExportService', () => {
         {
           provide: ItemsService,
           useValue: mockItemsService,
+        },
+        {
+          provide: getRepositoryToken(TagLinkEntity),
+          useValue: {
+            find: jest.fn().mockResolvedValue([]),
+          },
         },
       ],
     }).compile();

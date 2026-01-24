@@ -17,6 +17,7 @@ import {
 import { CategoryEntity } from '../../../database/entities/category.entity';
 import { TenantCountersService } from '../../tenant-counters/tenant-counters.service';
 import { StorageService } from '../../storage/storage.service';
+import { TagsService } from '../../tags/tags.service';
 import { ITEM_ERRORS } from '@gym-monorepo/shared';
 import { CreateItemDto } from './dto/create-item.dto';
 import * as pagination from '../../../common/dto/pagination.dto';
@@ -45,6 +46,11 @@ describe('ItemsService', () => {
   let itemRepo: MockRepository;
   let categoryRepo: MockRepository;
   let countersService: { getNextItemCode: jest.Mock };
+  let tagsService: {
+    assign: jest.Mock;
+    sync: jest.Mock;
+    findTagsForResources: jest.Mock;
+  };
   let storageService: {
     validateFile: jest.Mock;
     generateObjectKey: jest.Mock;
@@ -59,6 +65,11 @@ describe('ItemsService', () => {
     categoryRepo = new MockRepository();
     countersService = {
       getNextItemCode: jest.fn().mockResolvedValue('SKU-000001'),
+    };
+    tagsService = {
+      assign: jest.fn().mockResolvedValue(undefined),
+      sync: jest.fn().mockResolvedValue(undefined),
+      findTagsForResources: jest.fn().mockResolvedValue(new Map()),
     };
     storageService = {
       validateFile: jest.fn(),
@@ -75,6 +86,7 @@ describe('ItemsService', () => {
         { provide: getRepositoryToken(ItemEntity), useValue: itemRepo },
         { provide: getRepositoryToken(CategoryEntity), useValue: categoryRepo },
         { provide: TenantCountersService, useValue: countersService },
+        { provide: TagsService, useValue: tagsService },
         { provide: StorageService, useValue: storageService },
       ],
     }).compile();

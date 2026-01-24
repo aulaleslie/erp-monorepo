@@ -357,6 +357,9 @@ export class TagsService {
       tagsToUpdate.set(tag.id, tag);
     }
 
+    if (tagsToUpdate.size > 0) {
+      await this.tagRepository.save(Array.from(tagsToUpdate.values()));
+    }
     return {
       removed: Array.from(tagsToUpdate.values()).map((tag) => ({
         id: tag.id,
