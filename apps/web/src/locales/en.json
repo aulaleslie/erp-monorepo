@@ -19,6 +19,104 @@
     "comingSoon": {
       "title": "Sales Module Coming Soon",
       "description": "We're building a comprehensive sales system to help you manage orders and customers efficiently."
+    },
+    "orders": {
+      "page": {
+        "title": "Sales Orders",
+        "description": "Track every order as it moves from draft through approval."
+      },
+      "buttons": {
+        "new": "New Order"
+      },
+      "filters": {
+        "status": "Status",
+        "statusPlaceholder": "All statuses",
+        "customer": "Customer",
+        "customerPlaceholder": "Select a customer",
+        "number": "Order number",
+        "numberPlaceholder": "Filter by number",
+        "search": "Search",
+        "searchPlaceholder": "Search by number, name, or notes",
+        "dateFrom": "From",
+        "dateTo": "To",
+        "datePlaceholder": "Select a date",
+        "tag": "Tag",
+        "tagPlaceholder": "Search tags",
+        "tagHelper": "Type a tag and select it to filter",
+        "clear": "Clear filters",
+        "any": "Any",
+        "customerLoadError": {
+          "title": "Unable to load customers",
+          "description": "We couldn't retrieve the customer list. Please try again."
+        }
+      },
+      "list": {
+        "toast": {
+          "fetchError": {
+            "title": "Unable to load orders",
+            "description": "Something went wrong while loading sales orders."
+          }
+        },
+        "table": {
+          "headers": {
+            "number": "Number",
+            "status": "Status",
+            "customer": "Customer",
+            "salesperson": "Salesperson",
+            "deliveryDate": "Delivery",
+            "total": "Total",
+            "actions": "Actions"
+          },
+          "empty": "No sales orders found."
+        }
+      },
+      "form": {
+        "generalHeader": "General information",
+        "documentDate": "Document Date",
+        "deliveryDate": "Delivery Date",
+        "customerLabel": "Customer",
+        "customerPlaceholder": "Select a customer",
+        "salespersonLabel": "Salesperson",
+        "salespersonPlaceholder": "Select a salesperson",
+        "notSet": "Not set",
+        "externalRefLabel": "External Reference",
+        "externalRefPlaceholder": "Enter external reference",
+        "paymentTermsLabel": "Payment Terms",
+        "paymentTermsPlaceholder": "Enter payment terms",
+        "taxModeLabel": "Tax Pricing Mode",
+        "taxModePlaceholder": "Choose a tax mode",
+        "taxModeInclusive": "Inclusive",
+        "taxModeExclusive": "Exclusive",
+        "itemsHeader": "Order Items",
+        "itemsTable": {
+          "headers": {
+            "item": "Item",
+            "description": "Description",
+            "quantity": "Quantity",
+            "price": "Price",
+            "tax": "Tax",
+            "lineTotal": "Line total"
+          }
+        },
+        "itemPlaceholder": "Select an item",
+        "descriptionPlaceholder": "Add item description",
+        "addItem": "Add item",
+        "toast": {
+          "error": {
+            "title": "Unable to load reference data",
+            "description": "Refresh the page to try again."
+          }
+        },
+        "summary": {
+          "subtotal": "Subtotal",
+          "tax": "Tax",
+          "total": "Total",
+          "notesPlaceholder": "Add order notes (optional)"
+        }
+      },
+      "alerts": {
+        "noPermission": "You do not have permission to view sales orders."
+      }
     }
   },
   "purchase": {
