@@ -56,6 +56,7 @@ export class SalesInvoicesController {
     @Query('search') search?: string,
     @Query('dateFrom') dateFrom?: string,
     @Query('dateTo') dateTo?: string,
+    @Query('tag') tag?: string,
     @Query('page') page?: string,
     @Query('limit') limit?: string,
   ) {
@@ -64,6 +65,7 @@ export class SalesInvoicesController {
       personId,
       number,
       search,
+      tag,
       dateFrom,
       dateTo,
       page: page ? parseInt(page, 10) : 1,

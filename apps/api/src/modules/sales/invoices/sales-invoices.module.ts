@@ -6,6 +6,8 @@ import { DocumentEntity } from '../../../database/entities/document.entity';
 import { DocumentItemEntity } from '../../../database/entities/document-item.entity';
 import { PeopleEntity } from '../../../database/entities/people.entity';
 import { ItemEntity } from '../../../database/entities/item.entity';
+import { TagEntity } from '../../../database/entities/tag.entity';
+import { TagLinkEntity } from '../../../database/entities/tag-link.entity';
 import { DocumentsModule } from '../../documents/documents.module';
 import { PeopleModule } from '../../people/people.module';
 import { TenantsModule } from '../../tenants/tenants.module';
@@ -23,6 +25,8 @@ import { SalesCreditNotesModule } from '../credit-notes/sales-credit-notes.modul
       PeopleEntity,
       DocumentRelationEntity,
       ItemEntity,
+      TagEntity,
+      TagLinkEntity,
     ]),
     DocumentsModule,
     PeopleModule,

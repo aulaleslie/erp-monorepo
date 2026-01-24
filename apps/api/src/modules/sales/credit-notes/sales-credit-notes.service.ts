@@ -18,6 +18,8 @@ import {
   DocumentRelationEntity,
   SalesHeaderEntity,
   ItemEntity,
+  TagEntity,
+  TagLinkEntity,
 } from '../../../database/entities';
 import { DocumentsService } from '../../documents/documents.service';
 import { UpdateSalesCreditNoteDto } from './dtos/update-sales-credit-note.dto';
@@ -47,6 +49,7 @@ export class SalesCreditNotesService {
       personId?: string;
       number?: string;
       search?: string;
+      tag?: string;
       dateFrom?: string;
       dateTo?: string;
       page?: number;
@@ -58,6 +61,7 @@ export class SalesCreditNotesService {
       personId,
       number,
       search,
+      tag,
       dateFrom,
       dateTo,
       page = 1,
@@ -98,6 +102,19 @@ export class SalesCreditNotesService {
 
     if (dateTo) {
       qb.andWhere('document.documentDate <= :dateTo', { dateTo });
+    }
+
+    if (tag) {
+      qb.innerJoin(
+        TagLinkEntity,
+        'tagLink',
+        'tagLink.resourceId = document.id AND tagLink.resourceType = :resourceType',
+        { resourceType: 'sales.documents' },
+      )
+        .innerJoin(TagEntity, 't', 't.id = tagLink.tagId')
+        .andWhere('(t.name = :tag OR t.nameNormalized = :tag)', {
+          tag: tag.toLowerCase(),
+        });
     }
 
     qb.orderBy('document.createdAt', 'DESC')

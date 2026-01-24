@@ -7,6 +7,8 @@ import {
   SalesHeaderEntity,
   PeopleEntity,
   ItemEntity,
+  TagEntity,
+  TagLinkEntity,
 } from '../../../database/entities';
 import { DocumentsModule } from '../../documents/documents.module';
 import { SalesCreditNotesController } from './sales-credit-notes.controller';
@@ -24,6 +26,8 @@ import { PeopleModule } from '../../people/people.module';
       PeopleEntity,
       DocumentRelationEntity,
       ItemEntity,
+      TagEntity,
+      TagLinkEntity,
     ]),
     DocumentsModule,
     TenantsModule,

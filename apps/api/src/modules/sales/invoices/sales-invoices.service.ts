@@ -21,6 +21,8 @@ import {
   SalesHeaderEntity,
   PeopleEntity,
   ItemEntity,
+  TagEntity,
+  TagLinkEntity,
 } from '../../../database/entities';
 import { DocumentsService } from '../../documents/documents.service';
 import { CreateSalesInvoiceDto } from './dtos/create-sales-invoice.dto';
@@ -52,6 +54,7 @@ export class SalesInvoicesService {
       personId?: string;
       number?: string;
       search?: string;
+      tag?: string;
       dateFrom?: string;
       dateTo?: string;
       page?: number;
@@ -63,6 +66,7 @@ export class SalesInvoicesService {
       personId,
       number,
       search,
+      tag,
       dateFrom,
       dateTo,
       page = 1,
@@ -104,6 +108,19 @@ export class SalesInvoicesService {
 
     if (dateTo) {
       qb.andWhere('document.documentDate <= :dateTo', { dateTo });
+    }
+
+    if (tag) {
+      qb.innerJoin(
+        TagLinkEntity,
+        'tagLink',
+        'tagLink.resourceId = document.id AND tagLink.resourceType = :resourceType',
+        { resourceType: 'sales.documents' },
+      )
+        .innerJoin(TagEntity, 't', 't.id = tagLink.tagId')
+        .andWhere('(t.name = :tag OR t.nameNormalized = :tag)', {
+          tag: tag.toLowerCase(),
+        });
     }
 
     qb.orderBy('document.createdAt', 'DESC')
