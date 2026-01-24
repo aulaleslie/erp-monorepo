@@ -94,7 +94,14 @@
     "scheduling": "Penjadwalan",
     "tags": "Tag",
     "inventorySales": "Inventaris & Penjualan",
-    "administration": "Administrasi"
+    "administration": "Administrasi",
+    "salesOrders": "Pesanan Penjualan",
+    "invoices": "Faktur",
+    "creditNotes": "Nota Kredit",
+    "salesApprovals": "Persetujuan",
+    "approvalOrders": "Pesanan",
+    "approvalInvoices": "Faktur",
+    "approvalConfig": "Konfigurasi"
   },
   "labels": {
     "tenantSettings": {
