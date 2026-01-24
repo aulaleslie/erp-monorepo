@@ -21,6 +21,7 @@ import { RoleEntity } from './role.entity';
 import { UserEntity } from './user.entity';
 import { DocumentItemEntity } from './document-item.entity';
 import { SalesHeaderEntity } from './sales-header.entity';
+import { DocumentRelationEntity } from './document-relation.entity';
 
 @Entity('documents')
 @Unique('UQ_documents_tenant_key_number', ['tenantId', 'documentKey', 'number'])
@@ -180,6 +181,12 @@ export class DocumentEntity extends BaseAuditEntity {
 
   @OneToMany(() => DocumentItemEntity, (item) => item.document)
   items: DocumentItemEntity[];
+
+  @OneToMany(() => DocumentRelationEntity, (rel) => rel.fromDocument)
+  fromRelations: DocumentRelationEntity[];
+
+  @OneToMany(() => DocumentRelationEntity, (rel) => rel.toDocument)
+  toRelations: DocumentRelationEntity[];
 
   @OneToOne(() => SalesHeaderEntity, (header) => header.document)
   salesHeader: SalesHeaderEntity;

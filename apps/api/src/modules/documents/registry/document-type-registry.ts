@@ -31,6 +31,15 @@ export class DocumentTypeRegistry {
         numberingSeriesKey: DOCUMENT_TYPE_KEY.SALES_INVOICE,
         postingHandler: 'DefaultPostingHandler',
       },
+      [DOCUMENT_TYPE_KEY.SALES_CREDIT_NOTE]: {
+        key: DOCUMENT_TYPE_KEY.SALES_CREDIT_NOTE,
+        module: DocumentModule.SALES,
+        name: 'Sales Credit Note',
+        requiresItems: true,
+        approvalSteps: 1,
+        numberingSeriesKey: DOCUMENT_TYPE_KEY.SALES_CREDIT_NOTE,
+        postingHandler: 'DefaultPostingHandler',
+      },
       [DOCUMENT_TYPE_KEY.PURCHASING_PO]: {
         key: DOCUMENT_TYPE_KEY.PURCHASING_PO,
         module: DocumentModule.PURCHASE,

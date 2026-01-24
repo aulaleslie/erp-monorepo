@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SalesHeaderEntity } from '../../../database/entities/sales-header.entity';
 import { DocumentRelationEntity } from '../../../database/entities/document-relation.entity';
@@ -12,21 +12,23 @@ import { TenantsModule } from '../../tenants/tenants.module';
 import { UsersModule } from '../../users/users.module';
 import { SalesInvoicesController } from './sales-invoices.controller';
 import { SalesInvoicesService } from './sales-invoices.service';
+import { SalesCreditNotesModule } from '../credit-notes/sales-credit-notes.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       SalesHeaderEntity,
-      DocumentRelationEntity,
       DocumentEntity,
       DocumentItemEntity,
       PeopleEntity,
+      DocumentRelationEntity,
       ItemEntity,
     ]),
     DocumentsModule,
     PeopleModule,
     TenantsModule,
     UsersModule,
+    forwardRef(() => SalesCreditNotesModule),
   ],
   controllers: [SalesInvoicesController],
   providers: [SalesInvoicesService],

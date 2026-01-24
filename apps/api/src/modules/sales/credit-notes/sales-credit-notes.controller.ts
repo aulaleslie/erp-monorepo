@@ -17,9 +17,8 @@ import { PermissionGuard } from '../../users/guards/permission.guard';
 import { RequirePermissions } from '../../../common/decorators/require-permissions.decorator';
 import { CurrentTenant } from '../../../common/decorators/current-tenant.decorator';
 import { CurrentUser } from '../../../common/decorators/current-user.decorator';
-import { SalesInvoicesService } from './sales-invoices.service';
-import { CreateSalesInvoiceDto } from './dtos/create-sales-invoice.dto';
-import { UpdateSalesInvoiceDto } from './dtos/update-sales-invoice.dto';
+import { SalesCreditNotesService } from './sales-credit-notes.service';
+import { UpdateSalesCreditNoteDto } from './dtos/update-sales-credit-note.dto';
 import {
   ApproveDocumentDto,
   CancelDocumentDto,
@@ -27,26 +26,22 @@ import {
   RequestRevisionDto,
 } from '../../documents/dto/workflow-document.dto';
 
-import { SalesCreditNotesService } from '../credit-notes/sales-credit-notes.service';
-import { CreateSalesCreditNoteDto } from '../credit-notes/dtos/create-sales-credit-note.dto';
-
-@ApiTags('sales-invoices')
+@ApiTags('sales-credit-notes')
 @ApiCookieAuth('access_token')
-@Controller('sales/invoices')
+@Controller('sales/credit-notes')
 @UseGuards(
   AuthGuard('jwt'),
   ActiveTenantGuard,
   TenantMembershipGuard,
   PermissionGuard,
 )
-export class SalesInvoicesController {
+export class SalesCreditNotesController {
   constructor(
-    private readonly salesInvoicesService: SalesInvoicesService,
     private readonly salesCreditNotesService: SalesCreditNotesService,
   ) {}
 
   @Get()
-  @ApiOperation({ summary: 'List sales invoices' })
+  @ApiOperation({ summary: 'List sales credit notes' })
   @RequirePermissions(PERMISSIONS.SALES.READ)
   async findAll(
     @CurrentTenant() tenantId: string,
@@ -59,7 +54,7 @@ export class SalesInvoicesController {
     @Query('page') page?: string,
     @Query('limit') limit?: string,
   ) {
-    return this.salesInvoicesService.findAll(tenantId, {
+    return this.salesCreditNotesService.findAll(tenantId, {
       status,
       personId,
       number,
@@ -72,52 +67,41 @@ export class SalesInvoicesController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get sales invoice by ID' })
+  @ApiOperation({ summary: 'Get sales credit note by ID' })
   @RequirePermissions(PERMISSIONS.SALES.READ)
   async findOne(
     @Param('id') id: string,
     @CurrentTenant() tenantId: string,
     @CurrentUser('id') userId: string,
   ) {
-    return this.salesInvoicesService.findOne(id, tenantId, userId);
-  }
-
-  @Post()
-  @ApiOperation({ summary: 'Create sales invoice' })
-  @RequirePermissions(PERMISSIONS.SALES.CREATE)
-  async create(
-    @Body() dto: CreateSalesInvoiceDto,
-    @CurrentTenant() tenantId: string,
-    @CurrentUser('id') userId: string,
-  ) {
-    return this.salesInvoicesService.create(tenantId, dto, userId);
+    return this.salesCreditNotesService.findOne(id, tenantId, userId);
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Update sales invoice' })
+  @ApiOperation({ summary: 'Update sales credit note' })
   @RequirePermissions(PERMISSIONS.SALES.UPDATE)
   async update(
     @Param('id') id: string,
-    @Body() dto: UpdateSalesInvoiceDto,
+    @Body() dto: UpdateSalesCreditNoteDto,
     @CurrentTenant() tenantId: string,
     @CurrentUser('id') userId: string,
   ) {
-    return this.salesInvoicesService.update(id, tenantId, dto, userId);
+    return this.salesCreditNotesService.update(id, tenantId, dto, userId);
   }
 
   @Post(':id/submit')
-  @ApiOperation({ summary: 'Submit sales invoice' })
+  @ApiOperation({ summary: 'Submit sales credit note' })
   @RequirePermissions(PERMISSIONS.SALES.SUBMIT)
   async submit(
     @Param('id') id: string,
     @CurrentTenant() tenantId: string,
     @CurrentUser('id') userId: string,
   ) {
-    return this.salesInvoicesService.submit(id, tenantId, userId);
+    return this.salesCreditNotesService.submit(id, tenantId, userId);
   }
 
   @Post(':id/approve/:stepIndex')
-  @ApiOperation({ summary: 'Approve sales invoice step' })
+  @ApiOperation({ summary: 'Approve sales credit note step' })
   @RequirePermissions(PERMISSIONS.SALES.APPROVE)
   async approveStep(
     @Param('id') id: string,
@@ -126,7 +110,7 @@ export class SalesInvoicesController {
     @CurrentTenant() tenantId: string,
     @CurrentUser('id') userId: string,
   ) {
-    return this.salesInvoicesService.approveStep(
+    return this.salesCreditNotesService.approveStep(
       id,
       parseInt(stepIndex, 10),
       dto.notes || '',
@@ -136,7 +120,7 @@ export class SalesInvoicesController {
   }
 
   @Post(':id/reject')
-  @ApiOperation({ summary: 'Reject sales invoice' })
+  @ApiOperation({ summary: 'Reject sales credit note' })
   @RequirePermissions(PERMISSIONS.SALES.APPROVE)
   async reject(
     @Param('id') id: string,
@@ -144,11 +128,16 @@ export class SalesInvoicesController {
     @CurrentTenant() tenantId: string,
     @CurrentUser('id') userId: string,
   ) {
-    return this.salesInvoicesService.reject(id, dto.reason, tenantId, userId);
+    return this.salesCreditNotesService.reject(
+      id,
+      dto.reason,
+      tenantId,
+      userId,
+    );
   }
 
   @Post(':id/request-revision')
-  @ApiOperation({ summary: 'Request revision for sales invoice' })
+  @ApiOperation({ summary: 'Request revision for sales credit note' })
   @RequirePermissions(PERMISSIONS.SALES.APPROVE)
   async requestRevision(
     @Param('id') id: string,
@@ -156,7 +145,7 @@ export class SalesInvoicesController {
     @CurrentTenant() tenantId: string,
     @CurrentUser('id') userId: string,
   ) {
-    return this.salesInvoicesService.requestRevision(
+    return this.salesCreditNotesService.requestRevision(
       id,
       dto.reason,
       tenantId,
@@ -165,7 +154,7 @@ export class SalesInvoicesController {
   }
 
   @Post(':id/cancel')
-  @ApiOperation({ summary: 'Cancel sales invoice' })
+  @ApiOperation({ summary: 'Cancel sales credit note' })
   @RequirePermissions(PERMISSIONS.SALES.CANCEL)
   async cancel(
     @Param('id') id: string,
@@ -173,7 +162,7 @@ export class SalesInvoicesController {
     @CurrentTenant() tenantId: string,
     @CurrentUser('id') userId: string,
   ) {
-    return this.salesInvoicesService.cancel(
+    return this.salesCreditNotesService.cancel(
       id,
       dto.reason || '',
       tenantId,
@@ -182,30 +171,13 @@ export class SalesInvoicesController {
   }
 
   @Post(':id/post')
-  @ApiOperation({ summary: 'Post sales invoice' })
-  @RequirePermissions(PERMISSIONS.SALES.INVOICES_POST)
+  @ApiOperation({ summary: 'Post sales credit note' })
+  @RequirePermissions(PERMISSIONS.SALES.INVOICES_POST) // Assuming same permission as invoices for now, or needs new one
   async post(
     @Param('id') id: string,
     @CurrentTenant() tenantId: string,
     @CurrentUser('id') userId: string,
   ) {
-    return this.salesInvoicesService.post(id, tenantId, userId);
-  }
-
-  @Post(':id/credit-notes')
-  @ApiOperation({ summary: 'Create credit note from invoice' })
-  @RequirePermissions(PERMISSIONS.SALES.CREATE)
-  async createCreditNote(
-    @Param('id') id: string,
-    @Body() dto: CreateSalesCreditNoteDto,
-    @CurrentTenant() tenantId: string,
-    @CurrentUser('id') userId: string,
-  ) {
-    return this.salesCreditNotesService.createFromInvoice(
-      id,
-      tenantId,
-      dto,
-      userId,
-    );
+    return this.salesCreditNotesService.post(id, tenantId, userId);
   }
 }
