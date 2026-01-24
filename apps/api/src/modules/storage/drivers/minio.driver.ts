@@ -149,6 +149,27 @@ export class MinioStorageDriver implements IStorageDriver {
     return `${this.publicUrl}/${this.bucket}/${objectKey}`;
   }
 
+  async exists(objectKey: string): Promise<boolean> {
+    if (!this.minioClient) {
+      return false;
+    }
+
+    try {
+      await this.minioClient.statObject(this.bucket, objectKey);
+      return true;
+    } catch (error: unknown) {
+      if (
+        error &&
+        typeof error === 'object' &&
+        'code' in error &&
+        (error.code === 'NotFound' || error.code === 'NoSuchKey')
+      ) {
+        return false;
+      }
+      throw error;
+    }
+  }
+
   isConfigured(): boolean {
     return !!this.minioClient;
   }

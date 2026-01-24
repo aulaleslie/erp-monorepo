@@ -38,6 +38,12 @@ export interface IStorageDriver {
   getPublicUrl(objectKey: string): string;
 
   /**
+   * Check if a file exists
+   * @param objectKey Key of the file
+   */
+  exists(objectKey: string): Promise<boolean>;
+
+  /**
    * Check if driver is properly configured
    */
   isConfigured(): boolean;

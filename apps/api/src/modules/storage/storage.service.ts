@@ -152,6 +152,13 @@ export class StorageService implements OnModuleInit {
   }
 
   /**
+   * Check if an object exists in storage
+   */
+  async exists(objectKey: string): Promise<boolean> {
+    return this.driver.exists(objectKey);
+  }
+
+  /**
    * Check if storage is configured and available
    */
   isConfigured(): boolean {

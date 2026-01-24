@@ -81,6 +81,16 @@ export class LocalStorageDriver implements IStorageDriver {
     return `${this.appUrl}/uploads/${objectKey}`;
   }
 
+  async exists(objectKey: string): Promise<boolean> {
+    const filePath = path.join(this.storagePath, objectKey);
+    try {
+      await fs.access(filePath);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   isConfigured(): boolean {
     return true; // Local storage is always available if the FS works
   }
