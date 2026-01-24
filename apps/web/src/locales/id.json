@@ -385,981 +385,953 @@
             "title": "Aksi Gagal",
             "description": "Terjadi kesalahan saat memperbarui status nota kredit."
           }
-        }
-      }
-    }
-  },
-  "purchase": {
-    "title": "Pembelian",
-    "comingSoon": {
-      "title": "Modul Pembelian Segera Hadir",
-      "description": "Sederhanakan proses pengadaan Anda dengan alat manajemen pembelian kami yang akan datang."
-    }
-  },
-  "inventory": {
-    "title": "Inventaris",
-    "comingSoon": {
-      "title": "Modul Inventaris Segera Hadir",
-      "description": "Pantau stok dan pergerakan produk Anda dengan fitur inventaris canggih."
-    }
-  },
-  "memberManagement": {
-    "title": "Manajemen Anggota",
-    "members": {
-      "title": "Anggota",
-      "comingSoon": {
-        "title": "Modul Anggota Segera Hadir",
-        "description": "Kelola anggota gym, keanggotaan, dan profil Anda di satu tempat."
-      }
-    },
-    "scheduling": {
-      "title": "Penjadwalan",
-      "comingSoon": {
-        "title": "Modul Penjadwalan Segera Hadir",
-        "description": "Kelola kelas, sesi, dan jadwal pelatih dengan efisien."
-      }
-    }
-  },
-  "authGuard": {
-    "loading": "Memuat..."
-  },
-  "navbar": {
-    "selectWorkspaceButton": "Pilih Ruang Kerja",
-    "noWorkspacesTitle": "Tidak ada ruang kerja tersedia",
-    "noWorkspacesDescription": "Anda tidak memiliki akses ke ruang kerja mana pun. Silakan hubungi administrator Anda.",
-    "workspaceErrorTitle": "Kesalahan",
-    "workspaceErrorDescription": "Gagal memeriksa ketersediaan ruang kerja.",
-    "profile": "Profil",
-    "logout": "Keluar"
-  },
-  "selectTenant": {
-    "title": "Pilih Ruang Kerja",
-    "description": "Pilih organisasi yang ingin Anda akses",
-    "noWorkspaces": "Tidak ada ruang kerja ditemukan",
-    "emptyDescription": "Hubungi administrator Anda atau coba muat ulang."
-  },
-  "sidebar": {
-    "appName": "Apupu ERP",
-    "organization": "Organisasi",
-    "dashboard": "Dasbor",
-    "people": "Orang",
-    "departments": "Departemen",
-    "settings": "Pengaturan",
-    "tenant": "Tenant",
-    "tenants": "Tenant",
-    "taxes": "Pajak",
-    "auditLogs": "Log Audit",
-    "roles": "Peran",
-    "users": "Pengguna",
-    "catalog": "Katalog",
-    "items": "Item",
-    "categories": "Kategori",
-    "sales": "Penjualan",
-    "purchase": "Pembelian",
-    "inventory": "Inventaris",
-    "memberManagement": "Manajemen Anggota",
-    "members": "Anggota",
-    "scheduling": "Penjadwalan",
-    "tags": "Tag",
-    "inventorySales": "Inventaris & Penjualan",
-    "administration": "Administrasi",
-    "salesOrders": "Pesanan Penjualan",
-    "invoices": "Faktur",
-    "creditNotes": "Nota Kredit",
-    "salesApprovals": "Persetujuan",
-    "approvalOrders": "Pesanan",
-    "approvalInvoices": "Faktur",
-    "approvalConfig": "Konfigurasi"
-  },
-  "labels": {
-    "tenantSettings": {
-      "name": "Nama Tenant",
-      "slug": "Slug Tenant",
-      "type": "Tipe Tenant",
-      "language": "Bahasa Tenant",
-      "taxable": "Tenant Dikenai Pajak",
-      "taxSelection": "Pilihan Pajak",
-      "taxHint": "Pilih pajak default yang akan diterapkan untuk tenant ini.",
-      "theme": "Tema"
-    },
-    "tenants": {
-      "name": "Nama",
-      "slug": "Slug",
-      "status": "Status",
-      "language": "Bahasa",
-      "actions": "Aksi"
-    }
-  },
-  "dashboard": {
-    "title": "Dasbor",
-    "description": "Ikhtisar aktivitas Anda.",
-    "myStatsTitle": "Statistik Saya",
-    "pendingTasks": "Tugas menunggu"
-  },
-  "people": {
-    "alerts": {
-      "noAccess": "Anda tidak memiliki izin untuk mengakses data orang.",
-      "noListPermission": "Anda tidak memiliki izin untuk melihat data orang.",
-      "noCreatePermission": "Anda tidak memiliki izin untuk menambah orang.",
-      "noEditPermission": "Anda tidak memiliki izin untuk memperbarui orang."
-    },
-    "page": {
-      "title": "Orang",
-      "description": "Kelola pelanggan, pemasok, dan staf."
-    },
-    "create": {
-      "page": {
-        "title": "Tambah Orang",
-        "description": "Tambahkan orang baru ke ruang kerja ini."
-      }
-    },
-    "edit": {
-      "page": {
-        "title": "Ubah Orang",
-        "description": "Perbarui detail orang."
-      }
-    },
-    "placeholders": {
-      "listTitle": "Daftar orang segera hadir",
-      "listDescription": "Halaman ini akan memuat filter, pencarian, dan aksi untuk orang.",
-      "formTitle": "Form orang segera hadir",
-      "formDescription": "Halaman ini akan menangani alur buat dan ubah data orang."
-    },
-    "buttons": {
-      "new": "Orang Baru",
-      "invite": "Undang yang sudah ada"
-    },
-    "list": {
-      "filters": {
-        "search": "Cari",
-        "searchPlaceholder": "Cari berdasarkan kode, nama, email, atau telepon",
-        "type": "Tipe",
-        "status": "Status"
-      },
-      "table": {
-        "headers": {
-          "code": "Kode",
-          "name": "Nama",
-          "type": "Tipe",
-          "phone": "Telepon",
-          "email": "Email",
-          "tags": "Tag",
-          "status": "Status",
-          "actions": "Aksi"
         },
-        "empty": "Tidak ada orang ditemukan"
-      }
-    },
-    "types": {
-      "all": "Semua tipe",
-      "customer": "Pelanggan",
-      "supplier": "Pemasok",
-      "staff": "Staf"
-    },
-    "statuses": {
-      "any": "Semua status",
-      "active": "Aktif",
-      "inactive": "Tidak aktif"
-    },
-    "form": {
-      "labels": {
-        "fullName": "Nama Lengkap",
-        "type": "Tipe",
-        "email": "Email",
-        "phone": "Telepon",
-        "tags": "Tag",
-        "status": "Status",
-        "code": "Kode"
-      },
-      "placeholders": {
-        "fullName": "Masukkan nama lengkap",
-        "email": "email@contoh.com",
-        "phone": "+62812...",
-        "tags": "Masukkan tag dipisahkan dengan koma",
-        "type": "Pilih tipe",
-        "status": "Pilih status"
-      },
-      "validation": {
-        "fullNameRequired": "Nama lengkap wajib diisi",
-        "invalidEmail": "Silakan masukkan alamat email yang valid"
-      },
-      "buttons": {
-        "cancel": "Batal",
-        "create": "Buat Orang",
-        "save": "Simpan Perubahan"
-      }
-    },
-    "toast": {
-      "fetchError": {
-        "title": "Tidak dapat memuat orang",
-        "description": "Kami tidak dapat memuat orang sekarang. Coba lagi nanti."
-      },
-      "deactivateSuccess": {
-        "title": "Orang dinonaktifkan",
-        "description": "Orang telah ditandai tidak aktif."
-      },
-      "deactivateError": {
-        "title": "Gagal menonaktifkan",
-        "description": "Ada masalah saat memperbarui orang ini."
-      },
-      "createSuccess": {
-        "title": "Orang dibuat",
-        "description": "Orang telah berhasil ditambahkan."
-      },
-      "createError": {
-        "title": "Gagal membuat orang",
-        "description": "Terjadi kesalahan. Silakan coba lagi."
-      },
-      "updateSuccess": {
-        "title": "Orang diperbarui",
-        "description": "Perubahan telah berhasil disimpan."
-      },
-      "updateError": {
-        "title": "Gagal memperbarui orang",
-        "description": "Terjadi kesalahan. Silakan coba lagi."
-      },
-      "loadError": {
-        "title": "Gagal memuat orang",
-        "description": "Tidak dapat mengambil detail orang."
-      },
-      "duplicateEmail": "Email ini sudah digunakan.",
-      "duplicatePhone": "Nomor telepon ini sudah digunakan."
-    },
-    "confirm": {
-      "deactivate": {
-        "title": "Nonaktifkan orang?",
-        "description": "Ini akan menandai orang sebagai tidak aktif tetapi menyimpan riwayat.",
-        "confirmLabel": "Nonaktifkan"
-      }
-    },
-    "invite": {
-      "dialog": {
-        "title": "Undang orang yang sudah ada",
-        "description": "Tambahkan orang dari ruang kerja lain ke tenant ini."
-      },
-      "form": {
-        "labels": {
-          "type": "Tipe",
-          "person": "Orang"
-        },
-        "placeholders": {
-          "type": "Pilih tipe",
-          "person": "Cari orang",
-          "search": "Cari berdasarkan nama, kode, email, atau telepon"
-        },
-        "buttons": {
-          "cancel": "Batal",
-          "invite": "Undang"
-        },
-        "validation": {
-          "personRequired": "Pilih orang untuk diundang"
-        }
-      },
-      "toast": {
-        "success": {
-          "title": "Orang diundang",
-          "description": "Orang berhasil ditambahkan ke ruang kerja ini."
-        },
-        "error": {
-          "title": "Undangan gagal",
-          "description": "Kami tidak dapat mengundang orang tersebut."
-        }
-      }
-    },
-    "staff": {
-      "section": "Pengaturan Staf",
-      "noDepartment": "Tanpa departemen",
-      "labels": {
-        "department": "Departemen",
-        "userLink": "Akun Pengguna Terhubung"
-      },
-      "placeholders": {
-        "department": "Pilih departemen",
-        "searchUser": "Cari pengguna berdasarkan email..."
-      },
-      "userCard": {
-        "linkedAs": "Terhubung ke",
-        "notLinked": "Tidak ada akun pengguna yang terhubung ke staf ini.",
-        "linkButton": "Hubungkan",
-        "unlinkButton": "Putuskan",
-        "createButton": "Buat Pengguna Baru",
-        "toast": {
-          "linkSuccess": {
-            "title": "Pengguna terhubung",
-            "description": "Pengguna telah dihubungkan ke staf ini."
+        "approvals": {
+          "config": {
+            "page": {
+              "title": "Konfigurasi Persetujuan",
+              "description": "Tentukan tingkat persetujuan dan peran yang diperlukan untuk setiap jenis dokumen penjualan."
+            },
+            "tabs": {
+              "orders": "Pesanan Penjualan",
+              "invoices": "Faktur Penjualan",
+              "creditNotes": "Nota Kredit"
+            },
+            "card": {
+              "title": "Tingkat Persetujuan",
+              "description": "Persetujuan bersifat sekuensial. Setiap pengguna dengan peran yang ditugaskan dapat menyetujui di tingkat tersebut."
+            },
+            "buttons": {
+              "save": "Simpan Konfigurasi",
+              "addLevel": "Tambah Tingkat"
+            },
+            "labels": {
+              "roles": "Peran yang Ditugaskan"
+            },
+            "placeholders": {
+              "roles": "Pilih peran untuk tingkat ini..."
+            },
+            "emptyState": "Belum ada tingkat persetujuan yang ditentukan untuk jenis dokumen ini.",
+            "toast": {
+              "fetchError": {
+                "title": "Gagal memuat konfigurasi",
+                "description": "Kami tidak dapat mengambil tingkat persetujuan."
+              },
+              "saveSuccess": {
+                "title": "Konfigurasi Disimpan",
+                "description": "Tingkat persetujuan telah diperbarui."
+              },
+              "saveError": {
+                "title": "Gagal Menyimpan",
+                "description": "Terjadi kesalahan saat menyimpan konfigurasi."
+              }
+            }
           },
-          "linkError": {
-            "title": "Gagal menghubungkan",
-            "description": "Tidak dapat menghubungkan pengguna. Silakan coba lagi."
+          "queue": {
+            "page": {
+              "orderTitle": "Persetujuan Pesanan",
+              "orderDescription": "Tinjau dan tindak lanjuti pesanan penjualan yang menunggu persetujuan.",
+              "invoiceTitle": "Persetujuan Faktur",
+              "invoiceDescription": "Tinjau dan tindak lanjuti faktur penjualan yang menunggu persetujuan."
+            },
+            "table": {
+              "headers": {
+                "number": "Nomor",
+                "customer": "Pelanggan",
+                "amount": "Jumlah",
+                "date": "Tanggal",
+                "level": "Tingkat",
+                "actions": "Aksi"
+              },
+              "empty": "Tidak ada item yang menunggu persetujuan Anda."
+            },
+            "toast": {
+              "fetchError": {
+                "title": "Tidak dapat memuat antrean",
+                "description": "Terjadi kesalahan saat memuat persetujuan tertunda."
+              }
+            }
           },
-          "unlinkSuccess": {
-            "title": "Pengguna diputuskan",
-            "description": "Pengguna telah diputuskan dari staf ini."
-          },
-          "unlinkError": {
-            "title": "Gagal memutuskan",
-            "description": "Tidak dapat memutuskan pengguna. Silakan coba lagi."
+          "actionDialog": {
+            "title": {
+              "approve": "Setujui Dokumen {number}",
+              "reject": "Tolak Dokumen {number}",
+              "request-revision": "Minta Revisi untuk {number}"
+            },
+            "description": {
+              "approve": "Apakah Anda yakin ingin menyetujui dokumen ini? Ini akan memindahkannya ke tingkat berikutnya atau menandainya sebagai disetujui sepenuhnya.",
+              "reject": "Menolak dokumen ini akan menghentikan alur persetujuan dan memberi tahu pembuatnya.",
+              "request-revision": "Meminta revisi akan mengirim dokumen kembali ke pembuatnya untuk dilakukan perubahan."
+            },
+            "labels": {
+              "notes": "Komentar"
+            },
+            "placeholders": {
+              "notes": "Tambahkan komentar opsional di sini..."
+            },
+            "buttons": {
+              "cancel": "Batal",
+              "approve": "Setujui",
+              "reject": "Tolak",
+              "request-revision": "Minta Revisi"
+            }
           }
         }
+      }
+    },
+    "purchase": {
+      "title": "Pembelian",
+      "comingSoon": {
+        "title": "Modul Pembelian Segera Hadir",
+        "description": "Sederhanakan proses pengadaan Anda dengan alat manajemen pembelian kami yang akan datang."
+      }
+    },
+    "inventory": {
+      "title": "Inventaris",
+      "comingSoon": {
+        "title": "Modul Inventaris Segera Hadir",
+        "description": "Pantau stok dan pergerakan produk Anda dengan fitur inventaris canggih."
+      }
+    },
+    "memberManagement": {
+      "title": "Manajemen Anggota",
+      "members": {
+        "title": "Anggota",
+        "comingSoon": {
+          "title": "Modul Anggota Segera Hadir",
+          "description": "Kelola anggota gym, keanggotaan, dan profil Anda di satu tempat."
+        }
       },
-      "toast": {
-        "departmentsError": {
-          "title": "Gagal memuat departemen",
-          "description": "Tidak dapat mengambil daftar departemen."
+      "scheduling": {
+        "title": "Penjadwalan",
+        "comingSoon": {
+          "title": "Modul Penjadwalan Segera Hadir",
+          "description": "Kelola kelas, sesi, dan jadwal pelatih dengan efisien."
         }
       }
     },
-    "createUser": {
-      "dialog": {
-        "title": "Buat Pengguna untuk Staf",
-        "description": "Buat akun pengguna baru dan hubungkan ke staf ini."
-      },
-      "form": {
-        "labels": {
-          "email": "Email",
-          "fullName": "Nama Lengkap (opsional)",
-          "tempPassword": "Kata Sandi Sementara",
-          "role": "Peran",
-          "attachToTenant": "Tambahkan ke ruang kerja ini"
-        },
-        "placeholders": {
-          "role": "Pilih peran",
-          "searchRole": "Cari peran..."
-        },
-        "validation": {
-          "emailRequired": "Email wajib diisi",
-          "passwordRequired": "Kata sandi sementara wajib diisi",
-          "passwordMinLength": "Kata sandi harus minimal 6 karakter",
-          "roleRequired": "Peran wajib saat menambahkan ke ruang kerja"
-        },
-        "buttons": {
-          "cancel": "Batal",
-          "create": "Buat Pengguna"
-        }
-      },
-      "toast": {
-        "success": {
-          "title": "Pengguna dibuat",
-          "description": "Pengguna telah dibuat dan dihubungkan ke staf ini."
-        },
-        "error": {
-          "title": "Gagal membuat pengguna",
-          "description": "Terjadi kesalahan. Silakan coba lagi."
-        }
-      }
-    }
-  },
-  "profile": {
-    "pageTitle": "Profil Saya",
-    "pageDescription": "Lihat dan kelola detail akun Anda.",
-    "sections": {
-      "personal": "Informasi Pribadi",
-      "security": "Keamanan",
-      "organizations": "Organisasi Saya"
+    "authGuard": {
+      "loading": "Memuat..."
+    },
+    "navbar": {
+      "selectWorkspaceButton": "Pilih Ruang Kerja",
+      "noWorkspacesTitle": "Tidak ada ruang kerja tersedia",
+      "noWorkspacesDescription": "Anda tidak memiliki akses ke ruang kerja mana pun. Silakan hubungi administrator Anda.",
+      "workspaceErrorTitle": "Kesalahan",
+      "workspaceErrorDescription": "Gagal memeriksa ketersediaan ruang kerja.",
+      "profile": "Profil",
+      "logout": "Keluar",
+      "notifications": "Notifikasi",
+      "pendingOrders": "Pesanan Menunggu Persetujuan",
+      "pendingInvoices": "Faktur Menunggu Persetujuan",
+      "noNotifications": "Tidak ada notifikasi baru"
+    },
+    "selectTenant": {
+      "title": "Pilih Ruang Kerja",
+      "description": "Pilih organisasi yang ingin Anda akses",
+      "noWorkspaces": "Tidak ada ruang kerja ditemukan",
+      "emptyDescription": "Hubungi administrator Anda atau coba muat ulang."
+    },
+    "sidebar": {
+      "appName": "Apupu ERP",
+      "organization": "Organisasi",
+      "dashboard": "Dasbor",
+      "people": "Orang",
+      "departments": "Departemen",
+      "settings": "Pengaturan",
+      "tenant": "Tenant",
+      "tenants": "Tenant",
+      "taxes": "Pajak",
+      "auditLogs": "Log Audit",
+      "roles": "Peran",
+      "users": "Pengguna",
+      "catalog": "Katalog",
+      "items": "Item",
+      "categories": "Kategori",
+      "sales": "Penjualan",
+      "purchase": "Pembelian",
+      "inventory": "Inventaris",
+      "memberManagement": "Manajemen Anggota",
+      "members": "Anggota",
+      "scheduling": "Penjadwalan",
+      "tags": "Tag",
+      "inventorySales": "Inventaris & Penjualan",
+      "administration": "Administrasi",
+      "salesOrders": "Pesanan Penjualan",
+      "invoices": "Faktur",
+      "creditNotes": "Nota Kredit",
+      "salesApprovals": "Persetujuan",
+      "approvalOrders": "Pesanan",
+      "approvalInvoices": "Faktur",
+      "approvalConfig": "Konfigurasi"
     },
     "labels": {
-      "fullName": "Nama Lengkap",
-      "email": "Surel",
-      "accountType": "Tipe Akun",
-      "password": "Kata Sandi"
-    },
-    "placeholders": {
-      "fullName": "Masukkan nama Anda"
-    },
-    "securityDescription": "Ubah kata sandi Anda untuk menjaga keamanan akun.",
-    "buttons": {
-      "changePassword": "Ubah Kata Sandi"
-    },
-    "accountTypes": {
-      "superAdmin": "Super Admin",
-      "user": "Pengguna"
-    },
-    "tenants": {
-      "currentBadge": "Aktif",
-      "noRole": "Tidak Ada Peran",
-      "emptyState": "Anda tidak tergabung dalam organisasi apa pun."
-    },
-    "toast": {
-      "profileUpdated": {
-        "title": "Profil diperbarui",
-        "description": "Nama Anda berhasil diperbarui."
+      "tenantSettings": {
+        "name": "Nama Tenant",
+        "slug": "Slug Tenant",
+        "type": "Tipe Tenant",
+        "language": "Bahasa Tenant",
+        "taxable": "Tenant Dikenai Pajak",
+        "taxSelection": "Pilihan Pajak",
+        "taxHint": "Pilih pajak default yang akan diterapkan untuk tenant ini.",
+        "theme": "Tema"
       },
-      "profileUpdateError": {
-        "title": "Kesalahan",
-        "description": "Gagal memperbarui nama"
+      "tenants": {
+        "name": "Nama",
+        "slug": "Slug",
+        "status": "Status",
+        "language": "Bahasa",
+        "actions": "Aksi"
       }
     },
-    "changePassword": {
-      "dialog": {
-        "title": "Ubah Kata Sandi",
-        "description": "Masukkan kata sandi saat ini dan pilih kata sandi baru."
+    "dashboard": {
+      "title": "Dasbor",
+      "description": "Ikhtisar aktivitas Anda.",
+      "myStatsTitle": "Statistik Saya",
+      "pendingTasks": "Tugas menunggu"
+    },
+    "people": {
+      "alerts": {
+        "noAccess": "Anda tidak memiliki izin untuk mengakses data orang.",
+        "noListPermission": "Anda tidak memiliki izin untuk melihat data orang.",
+        "noCreatePermission": "Anda tidak memiliki izin untuk menambah orang.",
+        "noEditPermission": "Anda tidak memiliki izin untuk memperbarui orang."
+      },
+      "page": {
+        "title": "Orang",
+        "description": "Kelola pelanggan, pemasok, dan staf."
+      },
+      "create": {
+        "page": {
+          "title": "Tambah Orang",
+          "description": "Tambahkan orang baru ke ruang kerja ini."
+        }
+      },
+      "edit": {
+        "page": {
+          "title": "Ubah Orang",
+          "description": "Perbarui detail orang."
+        }
+      },
+      "placeholders": {
+        "listTitle": "Daftar orang segera hadir",
+        "listDescription": "Halaman ini akan memuat filter, pencarian, dan aksi untuk orang.",
+        "formTitle": "Form orang segera hadir",
+        "formDescription": "Halaman ini akan menangani alur buat dan ubah data orang."
+      },
+      "buttons": {
+        "new": "Orang Baru",
+        "invite": "Undang yang sudah ada"
+      },
+      "list": {
+        "filters": {
+          "search": "Cari",
+          "searchPlaceholder": "Cari berdasarkan kode, nama, email, atau telepon",
+          "type": "Tipe",
+          "status": "Status"
+        },
+        "table": {
+          "headers": {
+            "code": "Kode",
+            "name": "Nama",
+            "type": "Tipe",
+            "phone": "Telepon",
+            "email": "Email",
+            "tags": "Tag",
+            "status": "Status",
+            "actions": "Aksi"
+          },
+          "empty": "Tidak ada orang ditemukan"
+        }
+      },
+      "types": {
+        "all": "Semua tipe",
+        "customer": "Pelanggan",
+        "supplier": "Pemasok",
+        "staff": "Staf"
+      },
+      "statuses": {
+        "any": "Semua status",
+        "active": "Aktif",
+        "inactive": "Tidak aktif"
       },
       "form": {
         "labels": {
-          "currentPassword": "Kata Sandi Saat Ini",
-          "newPassword": "Kata Sandi Baru",
-          "confirmPassword": "Konfirmasi Kata Sandi Baru"
+          "fullName": "Nama Lengkap",
+          "type": "Tipe",
+          "email": "Email",
+          "phone": "Telepon",
+          "tags": "Tag",
+          "status": "Status",
+          "code": "Kode"
+        },
+        "placeholders": {
+          "fullName": "Masukkan nama lengkap",
+          "email": "email@contoh.com",
+          "phone": "+62812...",
+          "tags": "Masukkan tag dipisahkan dengan koma",
+          "type": "Pilih tipe",
+          "status": "Pilih status"
         },
         "validation": {
-          "currentPasswordRequired": "Kata sandi saat ini diperlukan",
-          "newPasswordRequired": "Kata sandi baru diperlukan",
-          "newPasswordMinLength": "Kata sandi harus minimal 6 karakter",
-          "confirmPasswordRequired": "Silakan konfirmasi kata sandi baru Anda",
-          "passwordsMismatch": "Kata sandi tidak cocok",
-          "currentPasswordInvalid": "Kata sandi saat ini salah"
+          "fullNameRequired": "Nama lengkap wajib diisi",
+          "invalidEmail": "Silakan masukkan alamat email yang valid"
         },
         "buttons": {
           "cancel": "Batal",
-          "update": "Perbarui Kata Sandi"
-        }
-      },
-      "toast": {
-        "success": {
-          "title": "Kata sandi diperbarui",
-          "description": "Kata sandi Anda telah berhasil diubah."
-        },
-        "error": {
-          "title": "Kesalahan",
-          "description": "Gagal memperbarui kata sandi"
-        }
-      }
-    }
-  },
-  "auditLogs": {
-    "pageTitle": "Log Audit",
-    "pageDescription": "Lihat jejak audit sistem secara menyeluruh.",
-    "alert": {
-      "noPermission": "Anda tidak memiliki izin untuk melihat log audit."
-    },
-    "info": {
-      "timestamps": "Cap waktu audit tetap dalam UTC tetapi ditampilkan sesuai zona waktu browser Anda agar filter cocok dengan jam lokal.",
-      "filters": "Terapkan beberapa filter sekaligus untuk mempersempit jendela perubahan tertentu."
-    },
-    "filters": {
-      "startTime": "Waktu mulai (lokal)",
-      "startTimePlaceholder": "Pilih waktu mulai",
-      "endTime": "Waktu selesai (lokal)",
-      "endTimePlaceholder": "Pilih waktu selesai",
-      "action": "Aksi",
-      "actionPlaceholder": "Semua aksi",
-      "entityName": "Nama entitas",
-      "entityPlaceholder": "Nama entitas",
-      "performedBy": "Dilakukan oleh",
-      "performedByPlaceholder": "ID atau nama pengguna",
-      "quickRangeLabel": "Rentang cepat",
-      "quickRangePlaceholder": "Pilih preset"
-    },
-    "quickRange": {
-      "presets": {
-        "last15": "15 menit terakhir",
-        "last60": "1 jam terakhir"
-      }
-    },
-    "buttons": {
-      "clearFilters": "Bersihkan filter",
-      "applyFilters": "Terapkan filter",
-      "viewChanges": "Lihat Perubahan"
-    },
-    "actions": {
-      "create": "Buat",
-      "update": "Perbarui",
-      "delete": "Hapus",
-      "softRemove": "Hapus Sementara"
-    },
-    "table": {
-      "timestamp": "Cap waktu",
-      "action": "Aksi",
-      "entity": "Entitas",
-      "entityId": "ID Entitas",
-      "performedBy": "Dilakukan oleh",
-      "details": "Detail",
-      "emptyState": "Tidak ada log audit yang ditemukan."
-    },
-    "systemLabel": "Sistem",
-    "detailsDialog": {
-      "title": "Detail Perubahan - {action} {entityName}",
-      "description": "Informasi detail tentang perubahan yang dilakukan pada rekaman ini.",
-      "previousValues": "Nilai Sebelumnya:",
-      "newValues": "Nilai Baru:",
-      "noChanges": "Tidak ada perubahan detail yang tersedia untuk aksi ini."
-    }
-  },
-  "taxes": {
-    "page": {
-      "title": "Pajak",
-      "description": "Kelola pajak platform."
-    },
-    "buttons": {
-      "add": "Tambah Pajak"
-    },
-    "filters": {
-      "searchPlaceholder": "Cari pajak...",
-      "statusPlaceholder": "Pilih Status",
-      "status": {
-        "all": "Semua Status",
-        "active": "Aktif",
-        "inactive": "Nonaktif"
-      },
-      "lockedAction": "Pajak ini sudah dipilih oleh tenant. Hapus dari pengaturan pajak tenant untuk mengubah atau menonaktifkannya."
-    },
-    "table": {
-      "name": "Nama",
-      "code": "Kode",
-      "type": "Tipe",
-      "typeValues": {
-        "percentage": "Persentase",
-        "fixed": "Tetap"
-      },
-      "value": "Tarif / Jumlah",
-      "status": "Status",
-      "lastUpdated": "Terakhir Diperbarui",
-      "actions": "Aksi"
-    },
-    "dialogs": {
-      "disable": {
-        "title": "Nonaktifkan Pajak",
-        "description": "Apakah Anda yakin ingin menonaktifkan \"{name}\"? Pajak ini tidak akan dapat dipilih untuk pengaturan baru.",
-        "confirmLabel": "Nonaktifkan"
-      }
-    },
-    "guards": {
-      "superAdminOnly": "Hanya Super Admin yang dapat mengelola pajak."
-    },
-    "toast": {
-      "loadError": {
-        "title": "Kesalahan",
-        "description": "Gagal memuat pajak"
-      },
-      "disableSuccess": {
-        "title": "Berhasil",
-        "description": "Pajak berhasil dinonaktifkan"
-      },
-      "disableError": {
-        "title": "Kesalahan",
-        "description": "Gagal menonaktifkan pajak"
-      }
-    },
-    "form": {
-      "dialog": {
-        "title": {
-          "create": "Buat Pajak",
-          "edit": "Ubah Pajak"
-        },
-        "description": {
-          "create": "Tambahkan pajak baru ke platform.",
-          "edit": "Perbarui detail pajak. Perubahan akan berlaku untuk transaksi berikutnya."
-        }
-      },
-      "labels": {
-        "name": "Nama",
-        "codeOptional": "Kode (Opsional)",
-        "type": "Tipe",
-        "rate": "Tarif (0 - 1)",
-        "amount": "Jumlah"
-      },
-      "placeholders": {
-        "name": "misal PPN, Biaya Servis",
-        "code": "misal VAT-11",
-        "selectType": "Pilih tipe",
-        "rate": "0.11",
-        "amount": "0.00"
-      },
-      "typeOptions": {
-        "percentage": "Persentase",
-        "fixed": "Jumlah Tetap"
-      },
-      "buttons": {
-        "cancel": "Batal",
-        "save": "Simpan"
-      },
-      "toast": {
-        "success": {
-          "title": "Berhasil",
-          "create": "Pajak berhasil dibuat",
-          "update": "Pajak berhasil diperbarui"
-        },
-        "error": {
-          "title": "Kesalahan",
-          "description": "Terjadi kesalahan saat menyimpan pajak."
-        }
-      }
-    }
-  },
-  "tenant": {
-    "page": {
-      "title": "Pengaturan Tenant",
-      "description": "Lihat dan perbarui profil tenant aktif serta pengaturan pajaknya."
-    },
-    "alerts": {
-      "noPermission": "Anda tidak memiliki izin untuk melihat pengaturan tenant.",
-      "notFound": "Tenant tidak ditemukan."
-    },
-    "toast": {
-      "loadError": {
-        "title": "Kesalahan",
-        "description": "Gagal memuat pengaturan tenant."
-      },
-      "saveSuccess": {
-        "title": "Berhasil",
-        "description": "Pengaturan tenant berhasil diperbarui."
-      },
-      "error": {
-        "title": "Kesalahan",
-        "description": "Gagal memperbarui pengaturan tenant."
-      }
-    },
-    "form": {
-      "labels": {
-        "status": "Status",
-        "tenantName": "Nama Tenant",
-        "slug": "Slug",
-        "tenantType": "Tipe Tenant",
-        "taxable": "Tenant Dikenai Pajak",
-        "taxSelection": "Pemilihan Pajak",
-        "theme": "Tema"
-      },
-      "placeholders": {
-        "tenantType": "Pilih tipe tenant",
-        "taxSelection": "Pilih pajak",
-        "searchTaxes": "Cari pajak..."
-      },
-      "descriptions": {
-        "taxSelection": "Pilih pajak default yang akan diterapkan ke tenant ini.",
-        "theme": "Pilih tema warna untuk organisasi Anda. Pratinjau berlaku segera."
-      },
-      "buttons": {
-        "save": "Simpan Perubahan"
-      },
-      "validation": {
-        "taxRequired": "Pemilihan pajak wajib untuk tenant yang dikenai pajak."
-      }
-    },
-    "taxForm": {
-      "emptyState": {
-        "title": "Pajak Tidak Diaktifkan",
-        "description": "Tenant ini tidak dikonfigurasi untuk perpajakan. Silakan hubungi Super Admin jika ini salah."
-      },
-      "card": {
-        "title": "Pengaturan Pajak",
-        "description": "Konfigurasi pajak yang berlaku dan pemilihan pajak default untuk tenant ini."
-      },
-      "form": {
-        "labels": {
-          "applicableTaxes": "Pajak yang Berlaku",
-          "defaultTax": "Pajak Default"
-        },
-        "placeholders": {
-          "selectTaxes": "Pilih pajak...",
-          "selectDefaultTax": "Pilih pajak default"
-        },
-        "descriptions": {
-          "taxesHelp": "Pilih semua pajak yang berlaku untuk produk atau layanan di tenant ini.",
-          "defaultTaxHelp": "Pajak ini akan diterapkan secara default ke produk baru."
-        },
-        "buttons": {
+          "create": "Buat Orang",
           "save": "Simpan Perubahan"
         }
       },
-      "validation": {
-        "atLeastOneTax": "Setidaknya satu pajak harus dipilih.",
-        "defaultMustBeSelected": "Pajak default harus salah satu dari pajak yang dipilih"
-      },
       "toast": {
+        "fetchError": {
+          "title": "Tidak dapat memuat orang",
+          "description": "Kami tidak dapat memuat orang sekarang. Coba lagi nanti."
+        },
+        "deactivateSuccess": {
+          "title": "Orang dinonaktifkan",
+          "description": "Orang telah ditandai tidak aktif."
+        },
+        "deactivateError": {
+          "title": "Gagal menonaktifkan",
+          "description": "Ada masalah saat memperbarui orang ini."
+        },
+        "createSuccess": {
+          "title": "Orang dibuat",
+          "description": "Orang telah berhasil ditambahkan."
+        },
+        "createError": {
+          "title": "Gagal membuat orang",
+          "description": "Terjadi kesalahan. Silakan coba lagi."
+        },
+        "updateSuccess": {
+          "title": "Orang diperbarui",
+          "description": "Perubahan telah berhasil disimpan."
+        },
+        "updateError": {
+          "title": "Gagal memperbarui orang",
+          "description": "Terjadi kesalahan. Silakan coba lagi."
+        },
         "loadError": {
-          "title": "Kesalahan",
-          "description": "Gagal memuat pengaturan pajak. Silakan coba lagi."
+          "title": "Gagal memuat orang",
+          "description": "Tidak dapat mengambil detail orang."
         },
-        "success": {
-          "title": "Berhasil",
-          "description": "Pengaturan pajak berhasil diperbarui."
-        },
-        "error": {
-          "title": "Kesalahan",
-          "description": "Gagal menyimpan pengaturan pajak."
-        }
-      }
-    }
-  },
-  "roles": {
-    "pageTitle": "Manajemen Peran",
-    "pageDescription": "Kelola peran dan izin yang terkait di sini.",
-    "alert": {
-      "noPermission": "Anda tidak memiliki izin untuk melihat peran."
-    },
-    "createPage": {
-      "title": "Buat Peran",
-      "description": "Buat peran baru dan tetapkan izin.",
-      "alert": {
-        "noPermission": "Anda tidak memiliki izin untuk membuat peran."
-      }
-    },
-    "detailPage": {
-      "alert": {
-        "notFound": "Peran tidak ditemukan."
-      },
-      "buttons": {
-        "back": "Kembali ke Peran",
-        "edit": "Ubah",
-        "delete": "Hapus"
-      },
-      "titles": {
-        "permissions": "Izin",
-        "assignedUsers": "Pengguna yang Ditugaskan"
-      },
-      "labels": {
-        "superAdmin": "Peran Super Admin",
-        "notSuperAdmin": "Bukan Super Admin",
-        "noPermissions": "Tidak ada izin yang ditetapkan.",
-        "noUsers": "Tidak ada pengguna yang ditugaskan ke peran ini."
-      },
-      "table": {
-        "email": "Surel"
+        "duplicateEmail": "Email ini sudah digunakan.",
+        "duplicatePhone": "Nomor telepon ini sudah digunakan."
       },
       "confirm": {
-        "message": "Apakah Anda yakin ingin menghapus peran ini?"
+        "deactivate": {
+          "title": "Nonaktifkan orang?",
+          "description": "Ini akan menandai orang sebagai tidak aktif tetapi menyimpan riwayat.",
+          "confirmLabel": "Nonaktifkan"
+        }
       },
-      "toast": {
-        "fetchDetailsError": {
-          "title": "Kesalahan saat memuat peran",
-          "description": "Gagal memuat detail peran."
+      "invite": {
+        "dialog": {
+          "title": "Undang orang yang sudah ada",
+          "description": "Tambahkan orang dari ruang kerja lain ke tenant ini."
+        },
+        "form": {
+          "labels": {
+            "type": "Tipe",
+            "person": "Orang"
+          },
+          "placeholders": {
+            "type": "Pilih tipe",
+            "person": "Cari orang",
+            "search": "Cari berdasarkan nama, kode, email, atau telepon"
+          },
+          "buttons": {
+            "cancel": "Batal",
+            "invite": "Undang"
+          },
+          "validation": {
+            "personRequired": "Pilih orang untuk diundang"
+          }
+        },
+        "toast": {
+          "success": {
+            "title": "Orang diundang",
+            "description": "Orang berhasil ditambahkan ke ruang kerja ini."
+          },
+          "error": {
+            "title": "Undangan gagal",
+            "description": "Kami tidak dapat mengundang orang tersebut."
+          }
+        }
+      },
+      "staff": {
+        "section": "Pengaturan Staf",
+        "noDepartment": "Tanpa departemen",
+        "labels": {
+          "department": "Departemen",
+          "userLink": "Akun Pengguna Terhubung"
+        },
+        "placeholders": {
+          "department": "Pilih departemen",
+          "searchUser": "Cari pengguna berdasarkan email..."
+        },
+        "userCard": {
+          "linkedAs": "Terhubung ke",
+          "notLinked": "Tidak ada akun pengguna yang terhubung ke staf ini.",
+          "linkButton": "Hubungkan",
+          "unlinkButton": "Putuskan",
+          "createButton": "Buat Pengguna Baru",
+          "toast": {
+            "linkSuccess": {
+              "title": "Pengguna terhubung",
+              "description": "Pengguna telah dihubungkan ke staf ini."
+            },
+            "linkError": {
+              "title": "Gagal menghubungkan",
+              "description": "Tidak dapat menghubungkan pengguna. Silakan coba lagi."
+            },
+            "unlinkSuccess": {
+              "title": "Pengguna diputuskan",
+              "description": "Pengguna telah diputuskan dari staf ini."
+            },
+            "unlinkError": {
+              "title": "Gagal memutuskan",
+              "description": "Tidak dapat memutuskan pengguna. Silakan coba lagi."
+            }
+          }
+        },
+        "toast": {
+          "departmentsError": {
+            "title": "Gagal memuat departemen",
+            "description": "Tidak dapat mengambil daftar departemen."
+          }
+        }
+      },
+      "createUser": {
+        "dialog": {
+          "title": "Buat Pengguna untuk Staf",
+          "description": "Buat akun pengguna baru dan hubungkan ke staf ini."
+        },
+        "form": {
+          "labels": {
+            "email": "Email",
+            "fullName": "Nama Lengkap (opsional)",
+            "tempPassword": "Kata Sandi Sementara",
+            "role": "Peran",
+            "attachToTenant": "Tambahkan ke ruang kerja ini"
+          },
+          "placeholders": {
+            "role": "Pilih peran",
+            "searchRole": "Cari peran..."
+          },
+          "validation": {
+            "emailRequired": "Email wajib diisi",
+            "passwordRequired": "Kata sandi sementara wajib diisi",
+            "passwordMinLength": "Kata sandi harus minimal 6 karakter",
+            "roleRequired": "Peran wajib saat menambahkan ke ruang kerja"
+          },
+          "buttons": {
+            "cancel": "Batal",
+            "create": "Buat Pengguna"
+          }
+        },
+        "toast": {
+          "success": {
+            "title": "Pengguna dibuat",
+            "description": "Pengguna telah dibuat dan dihubungkan ke staf ini."
+          },
+          "error": {
+            "title": "Gagal membuat pengguna",
+            "description": "Terjadi kesalahan. Silakan coba lagi."
+          }
         }
       }
     },
-    "editPage": {
-      "title": "Ubah Peran",
-      "description": "Ubah peran: {name}",
-      "alert": {
-        "noPermission": "Anda tidak memiliki izin untuk mengubah peran."
+    "profile": {
+      "pageTitle": "Profil Saya",
+      "pageDescription": "Lihat dan kelola detail akun Anda.",
+      "sections": {
+        "personal": "Informasi Pribadi",
+        "security": "Keamanan",
+        "organizations": "Organisasi Saya"
       },
       "labels": {
-        "superAdminHint": "Apakah Super Admin? (Tidak dapat diubah)"
+        "fullName": "Nama Lengkap",
+        "email": "Surel",
+        "accountType": "Tipe Akun",
+        "password": "Kata Sandi"
+      },
+      "placeholders": {
+        "fullName": "Masukkan nama Anda"
+      },
+      "securityDescription": "Ubah kata sandi Anda untuk menjaga keamanan akun.",
+      "buttons": {
+        "changePassword": "Ubah Kata Sandi"
+      },
+      "accountTypes": {
+        "superAdmin": "Super Admin",
+        "user": "Pengguna"
+      },
+      "tenants": {
+        "currentBadge": "Aktif",
+        "noRole": "Tidak Ada Peran",
+        "emptyState": "Anda tidak tergabung dalam organisasi apa pun."
+      },
+      "toast": {
+        "profileUpdated": {
+          "title": "Profil diperbarui",
+          "description": "Nama Anda berhasil diperbarui."
+        },
+        "profileUpdateError": {
+          "title": "Kesalahan",
+          "description": "Gagal memperbarui nama"
+        }
+      },
+      "changePassword": {
+        "dialog": {
+          "title": "Ubah Kata Sandi",
+          "description": "Masukkan kata sandi saat ini dan pilih kata sandi baru."
+        },
+        "form": {
+          "labels": {
+            "currentPassword": "Kata Sandi Saat Ini",
+            "newPassword": "Kata Sandi Baru",
+            "confirmPassword": "Konfirmasi Kata Sandi Baru"
+          },
+          "validation": {
+            "currentPasswordRequired": "Kata sandi saat ini diperlukan",
+            "newPasswordRequired": "Kata sandi baru diperlukan",
+            "newPasswordMinLength": "Kata sandi harus minimal 6 karakter",
+            "confirmPasswordRequired": "Silakan konfirmasi kata sandi baru Anda",
+            "passwordsMismatch": "Kata sandi tidak cocok",
+            "currentPasswordInvalid": "Kata sandi saat ini salah"
+          },
+          "buttons": {
+            "cancel": "Batal",
+            "update": "Perbarui Kata Sandi"
+          }
+        },
+        "toast": {
+          "success": {
+            "title": "Kata sandi diperbarui",
+            "description": "Kata sandi Anda telah berhasil diubah."
+          },
+          "error": {
+            "title": "Kesalahan",
+            "description": "Gagal memperbarui kata sandi"
+          }
+        }
+      }
+    },
+    "auditLogs": {
+      "pageTitle": "Log Audit",
+      "pageDescription": "Lihat jejak audit sistem secara menyeluruh.",
+      "alert": {
+        "noPermission": "Anda tidak memiliki izin untuk melihat log audit."
+      },
+      "info": {
+        "timestamps": "Cap waktu audit tetap dalam UTC tetapi ditampilkan sesuai zona waktu browser Anda agar filter cocok dengan jam lokal.",
+        "filters": "Terapkan beberapa filter sekaligus untuk mempersempit jendela perubahan tertentu."
+      },
+      "filters": {
+        "startTime": "Waktu mulai (lokal)",
+        "startTimePlaceholder": "Pilih waktu mulai",
+        "endTime": "Waktu selesai (lokal)",
+        "endTimePlaceholder": "Pilih waktu selesai",
+        "action": "Aksi",
+        "actionPlaceholder": "Semua aksi",
+        "entityName": "Nama entitas",
+        "entityPlaceholder": "Nama entitas",
+        "performedBy": "Dilakukan oleh",
+        "performedByPlaceholder": "ID atau nama pengguna",
+        "quickRangeLabel": "Rentang cepat",
+        "quickRangePlaceholder": "Pilih preset"
+      },
+      "quickRange": {
+        "presets": {
+          "last15": "15 menit terakhir",
+          "last60": "1 jam terakhir"
+        }
       },
       "buttons": {
-        "save": "Simpan Perubahan"
+        "clearFilters": "Bersihkan filter",
+        "applyFilters": "Terapkan filter",
+        "viewChanges": "Lihat Perubahan"
+      },
+      "actions": {
+        "create": "Buat",
+        "update": "Perbarui",
+        "delete": "Hapus",
+        "softRemove": "Hapus Sementara"
+      },
+      "table": {
+        "timestamp": "Cap waktu",
+        "action": "Aksi",
+        "entity": "Entitas",
+        "entityId": "ID Entitas",
+        "performedBy": "Dilakukan oleh",
+        "details": "Detail",
+        "emptyState": "Tidak ada log audit yang ditemukan."
+      },
+      "systemLabel": "Sistem",
+      "detailsDialog": {
+        "title": "Detail Perubahan - {action} {entityName}",
+        "description": "Informasi detail tentang perubahan yang dilakukan pada rekaman ini.",
+        "previousValues": "Nilai Sebelumnya:",
+        "newValues": "Nilai Baru:",
+        "noChanges": "Tidak ada perubahan detail yang tersedia untuk aksi ini."
+      }
+    },
+    "taxes": {
+      "page": {
+        "title": "Pajak",
+        "description": "Kelola pajak platform."
+      },
+      "buttons": {
+        "add": "Tambah Pajak"
+      },
+      "filters": {
+        "searchPlaceholder": "Cari pajak...",
+        "statusPlaceholder": "Pilih Status",
+        "status": {
+          "all": "Semua Status",
+          "active": "Aktif",
+          "inactive": "Nonaktif"
+        },
+        "lockedAction": "Pajak ini sudah dipilih oleh tenant. Hapus dari pengaturan pajak tenant untuk mengubah atau menonaktifkannya."
+      },
+      "table": {
+        "name": "Nama",
+        "code": "Kode",
+        "type": "Tipe",
+        "typeValues": {
+          "percentage": "Persentase",
+          "fixed": "Tetap"
+        },
+        "value": "Tarif / Jumlah",
+        "status": "Status",
+        "lastUpdated": "Terakhir Diperbarui",
+        "actions": "Aksi"
+      },
+      "dialogs": {
+        "disable": {
+          "title": "Nonaktifkan Pajak",
+          "description": "Apakah Anda yakin ingin menonaktifkan \"{name}\"? Pajak ini tidak akan dapat dipilih untuk pengaturan baru.",
+          "confirmLabel": "Nonaktifkan"
+        }
+      },
+      "guards": {
+        "superAdminOnly": "Hanya Super Admin yang dapat mengelola pajak."
       },
       "toast": {
         "loadError": {
           "title": "Kesalahan",
-          "description": "Gagal memuat data peran."
+          "description": "Gagal memuat pajak"
         },
-        "success": {
+        "disableSuccess": {
           "title": "Berhasil",
-          "description": "Peran berhasil diperbarui."
+          "description": "Pajak berhasil dinonaktifkan"
         },
-        "error": {
+        "disableError": {
           "title": "Kesalahan",
-          "description": "Gagal memperbarui peran."
+          "description": "Gagal menonaktifkan pajak"
+        }
+      },
+      "form": {
+        "dialog": {
+          "title": {
+            "create": "Buat Pajak",
+            "edit": "Ubah Pajak"
+          },
+          "description": {
+            "create": "Tambahkan pajak baru ke platform.",
+            "edit": "Perbarui detail pajak. Perubahan akan berlaku untuk transaksi berikutnya."
+          }
+        },
+        "labels": {
+          "name": "Nama",
+          "codeOptional": "Kode (Opsional)",
+          "type": "Tipe",
+          "rate": "Tarif (0 - 1)",
+          "amount": "Jumlah"
+        },
+        "placeholders": {
+          "name": "misal PPN, Biaya Servis",
+          "code": "misal VAT-11",
+          "selectType": "Pilih tipe",
+          "rate": "0.11",
+          "amount": "0.00"
+        },
+        "typeOptions": {
+          "percentage": "Persentase",
+          "fixed": "Jumlah Tetap"
+        },
+        "buttons": {
+          "cancel": "Batal",
+          "save": "Simpan"
+        },
+        "toast": {
+          "success": {
+            "title": "Berhasil",
+            "create": "Pajak berhasil dibuat",
+            "update": "Pajak berhasil diperbarui"
+          },
+          "error": {
+            "title": "Kesalahan",
+            "description": "Terjadi kesalahan saat menyimpan pajak."
+          }
         }
       }
     },
-    "buttons": {
-      "create": "Buat Peran",
-      "cancel": "Batal"
-    },
-    "form": {
-      "roleName": "Nama Peran",
-      "roleNamePlaceholder": "misal Manager",
-      "permissions": "Izin",
-      "selectAll": "Pilih Semua",
-      "isSuperAdmin": "Apakah Super Admin?",
-      "permissionRequired": "Silakan pilih setidaknya satu izin."
-    },
-    "table": {
-      "name": "Nama",
-      "superAdmin": "Super Admin",
-      "actions": "Aksi"
-    },
-    "permissionGroups": {
-      "Roles": "Peran",
-      "People": "Orang",
-      "Departments": "Departemen",
-      "Users": "Pengguna",
-      "Tenant": "Pengaturan Tenant",
-      "Catalog": "Katalog",
-      "Tags": "Tag"
-    },
-    "labels": {
-      "yes": "Ya",
-      "no": "Tidak"
-    },
-    "emptyState": "Tidak ada peran yang ditemukan.",
-    "toast": {
-      "fetchError": {
-        "title": "Kesalahan saat memuat peran",
-        "description": "Gagal memuat daftar peran."
-      },
-      "deleteSuccess": {
-        "title": "Peran dihapus",
-        "description": "Peran berhasil dihapus."
-      },
-      "deleteError": {
-        "title": "Kesalahan saat menghapus peran",
-        "description": "Gagal menghapus peran."
-      },
-      "loadPermissionsError": {
-        "title": "Kesalahan",
-        "description": "Gagal memuat izin."
-      },
-      "createSuccess": {
-        "title": "Berhasil",
-        "description": "Peran berhasil dibuat."
-      },
-      "createError": {
-        "title": "Kesalahan",
-        "description": "Gagal membuat peran."
-      }
-    },
-    "confirm": {
-      "title": "Apakah Anda yakin?",
-      "description": "Tindakan ini tidak dapat dibatalkan. Ini akan menghapus peran secara permanen dan menghapus izin dari pengguna yang ditugaskan.",
-      "confirmLabel": "Hapus"
-    }
-  },
-  "tenants": {
-    "alerts": {
-      "noPermission": "Anda tidak memiliki izin untuk melihat tenant."
-    },
-    "page": {
-      "title": "Manajemen Tenant",
-      "description": "Kelola semua tenant.",
-      "archivedTitle": "Tenant yang Diarsipkan",
-      "archivedDescription": "Tinjau tenant yang diarsipkan."
-    },
-    "buttons": {
-      "backToActive": "Kembali ke aktif",
-      "seeArchived": "Lihat yang diarsipkan",
-      "create": "Buat Tenant"
-    },
-    "empty": {
-      "active": "Tidak ada tenant ditemukan.",
-      "archived": "Tidak ada tenant yang diarsipkan ditemukan."
-    },
-    "toast": {
-      "fetchError": {
-        "title": "Kesalahan mengambil tenant",
-        "description": "Gagal memuat daftar tenant."
-      },
-      "archiveSuccess": {
-        "title": "Tenant diarsipkan",
-        "description": "Tenant telah diarsipkan."
-      },
-      "archiveError": {
-        "title": "Kesalahan mengarsipkan tenant",
-        "description": "Gagal mengarsipkan tenant."
-      },
-      "restoreSuccess": {
-        "title": "Tenant dipulihkan",
-        "description": "Tenant sekarang aktif."
-      },
-      "restoreError": {
-        "title": "Kesalahan memulihkan tenant",
-        "description": "Gagal memulihkan tenant."
-      }
-    },
-    "confirm": {
-      "archive": {
-        "title": "Arsipkan Tenant?",
-        "description": "Ini akan mengarsipkan tenant. Pengguna yang termasuk dalam tenant ini mungkin kehilangan akses. Anda dapat memulihkannya nanti.",
-        "confirmLabel": "Arsipkan"
-      }
-    },
-    "actions": {
-      "archive": {
-        "title": "Arsipkan tenant"
-      },
-      "restore": {
-        "title": "Pulihkan tenant"
-      }
-    },
-    "create": {
-      "alerts": {
-        "noPermission": "Anda tidak memiliki izin untuk membuat tenant."
-      },
+    "tenant": {
       "page": {
-        "title": "Buat Tenant",
-        "description": "Buat organisasi tenant baru."
+        "title": "Pengaturan Tenant",
+        "description": "Lihat dan perbarui profil tenant aktif serta pengaturan pajaknya."
+      },
+      "alerts": {
+        "noPermission": "Anda tidak memiliki izin untuk melihat pengaturan tenant.",
+        "notFound": "Tenant tidak ditemukan."
+      },
+      "toast": {
+        "loadError": {
+          "title": "Kesalahan",
+          "description": "Gagal memuat pengaturan tenant."
+        },
+        "saveSuccess": {
+          "title": "Berhasil",
+          "description": "Pengaturan tenant berhasil diperbarui."
+        },
+        "error": {
+          "title": "Kesalahan",
+          "description": "Gagal memperbarui pengaturan tenant."
+        }
       },
       "form": {
         "labels": {
-          "name": "Nama Tenant",
-          "slug": "Slug (Pengenal URL)",
-          "type": "Tipe Tenant",
-          "taxable": "Tenant Kena Pajak",
+          "status": "Status",
+          "tenantName": "Nama Tenant",
+          "slug": "Slug",
+          "tenantType": "Tipe Tenant",
+          "taxable": "Tenant Dikenai Pajak",
           "taxSelection": "Pemilihan Pajak",
           "theme": "Tema"
         },
         "placeholders": {
-          "name": "mis. Acme Corp",
-          "slug": "mis. acme-corp",
-          "type": "Pilih tipe tenant",
+          "tenantType": "Pilih tipe tenant",
           "taxSelection": "Pilih pajak",
           "searchTaxes": "Cari pajak..."
         },
         "descriptions": {
-          "slug": "Pengenal unik untuk tenant, digunakan dalam URL.",
-          "taxSelection": "Pilih pajak default yang akan berlaku untuk tenant ini.",
-          "theme": "Pilih tema warna untuk tenant ini. Pratinjau diterapkan segera."
-        },
-        "validation": {
-          "taxRequired": "Pemilihan pajak diperlukan untuk tenant kena pajak."
+          "taxSelection": "Pilih pajak default yang akan diterapkan ke tenant ini.",
+          "theme": "Pilih tema warna untuk organisasi Anda. Pratinjau berlaku segera."
         },
         "buttons": {
-          "cancel": "Batal",
-          "create": "Buat Tenant"
+          "save": "Simpan Perubahan"
+        },
+        "validation": {
+          "taxRequired": "Pemilihan pajak wajib untuk tenant yang dikenai pajak."
         }
       },
-      "toast": {
-        "success": {
-          "title": "Berhasil",
-          "description": "Tenant berhasil dibuat."
+      "taxForm": {
+        "emptyState": {
+          "title": "Pajak Tidak Diaktifkan",
+          "description": "Tenant ini tidak dikonfigurasi untuk perpajakan. Silakan hubungi Super Admin jika ini salah."
         },
-        "error": {
-          "title": "Kesalahan",
-          "description": "Gagal membuat tenant."
+        "card": {
+          "title": "Pengaturan Pajak",
+          "description": "Konfigurasi pajak yang berlaku dan pemilihan pajak default untuk tenant ini."
+        },
+        "form": {
+          "labels": {
+            "applicableTaxes": "Pajak yang Berlaku",
+            "defaultTax": "Pajak Default"
+          },
+          "placeholders": {
+            "selectTaxes": "Pilih pajak...",
+            "selectDefaultTax": "Pilih pajak default"
+          },
+          "descriptions": {
+            "taxesHelp": "Pilih semua pajak yang berlaku untuk produk atau layanan di tenant ini.",
+            "defaultTaxHelp": "Pajak ini akan diterapkan secara default ke produk baru."
+          },
+          "buttons": {
+            "save": "Simpan Perubahan"
+          }
+        },
+        "validation": {
+          "atLeastOneTax": "Setidaknya satu pajak harus dipilih.",
+          "defaultMustBeSelected": "Pajak default harus salah satu dari pajak yang dipilih"
+        },
+        "toast": {
+          "loadError": {
+            "title": "Kesalahan",
+            "description": "Gagal memuat pengaturan pajak. Silakan coba lagi."
+          },
+          "success": {
+            "title": "Berhasil",
+            "description": "Pengaturan pajak berhasil diperbarui."
+          },
+          "error": {
+            "title": "Kesalahan",
+            "description": "Gagal menyimpan pengaturan pajak."
+          }
         }
       }
     },
-    "detail": {
-      "alerts": {
-        "noPermission": "Anda tidak memiliki izin untuk melihat tenant ini.",
-        "notFound": "Tenant tidak ditemukan."
+    "roles": {
+      "pageTitle": "Manajemen Peran",
+      "pageDescription": "Kelola peran dan izin yang terkait di sini.",
+      "alert": {
+        "noPermission": "Anda tidak memiliki izin untuk melihat peran."
+      },
+      "createPage": {
+        "title": "Buat Peran",
+        "description": "Buat peran baru dan tetapkan izin.",
+        "alert": {
+          "noPermission": "Anda tidak memiliki izin untuk membuat peran."
+        }
+      },
+      "detailPage": {
+        "alert": {
+          "notFound": "Peran tidak ditemukan."
+        },
+        "buttons": {
+          "back": "Kembali ke Peran",
+          "edit": "Ubah",
+          "delete": "Hapus"
+        },
+        "titles": {
+          "permissions": "Izin",
+          "assignedUsers": "Pengguna yang Ditugaskan"
+        },
+        "labels": {
+          "superAdmin": "Peran Super Admin",
+          "notSuperAdmin": "Bukan Super Admin",
+          "noPermissions": "Tidak ada izin yang ditetapkan.",
+          "noUsers": "Tidak ada pengguna yang ditugaskan ke peran ini."
+        },
+        "table": {
+          "email": "Surel"
+        },
+        "confirm": {
+          "message": "Apakah Anda yakin ingin menghapus peran ini?"
+        },
+        "toast": {
+          "fetchDetailsError": {
+            "title": "Kesalahan saat memuat peran",
+            "description": "Gagal memuat detail peran."
+          }
+        }
+      },
+      "editPage": {
+        "title": "Ubah Peran",
+        "description": "Ubah peran: {name}",
+        "alert": {
+          "noPermission": "Anda tidak memiliki izin untuk mengubah peran."
+        },
+        "labels": {
+          "superAdminHint": "Apakah Super Admin? (Tidak dapat diubah)"
+        },
+        "buttons": {
+          "save": "Simpan Perubahan"
+        },
+        "toast": {
+          "loadError": {
+            "title": "Kesalahan",
+            "description": "Gagal memuat data peran."
+          },
+          "success": {
+            "title": "Berhasil",
+            "description": "Peran berhasil diperbarui."
+          },
+          "error": {
+            "title": "Kesalahan",
+            "description": "Gagal memperbarui peran."
+          }
+        }
       },
       "buttons": {
-        "back": "Kembali ke Tenant",
-        "edit": "Edit",
-        "archive": "Arsipkan",
-        "restore": "Pulihkan"
+        "create": "Buat Peran",
+        "cancel": "Batal"
       },
-      "status": {
-        "active": "Aktif",
-        "archived": "Diarsipkan"
+      "form": {
+        "roleName": "Nama Peran",
+        "roleNamePlaceholder": "misal Manager",
+        "permissions": "Izin",
+        "selectAll": "Pilih Semua",
+        "isSuperAdmin": "Apakah Super Admin?",
+        "permissionRequired": "Silakan pilih setidaknya satu izin."
+      },
+      "table": {
+        "name": "Nama",
+        "superAdmin": "Super Admin",
+        "actions": "Aksi"
+      },
+      "permissionGroups": {
+        "Roles": "Peran",
+        "People": "Orang",
+        "Departments": "Departemen",
+        "Users": "Pengguna",
+        "Tenant": "Pengaturan Tenant",
+        "Catalog": "Katalog",
+        "Tags": "Tag"
       },
       "labels": {
-        "createdOn": "Dibuat pada",
-        "id": "ID",
-        "slug": "Slug",
-        "taxable": "Kena Pajak",
         "yes": "Ya",
-        "no": "Tidak",
-        "tax": "Pajak",
-        "none": "Tidak ada",
-        "tenantType": "Tipe Tenant"
+        "no": "Tidak"
       },
-      "sections": {
-        "details": "Detail"
+      "emptyState": "Tidak ada peran yang ditemukan.",
+      "toast": {
+        "fetchError": {
+          "title": "Kesalahan saat memuat peran",
+          "description": "Gagal memuat daftar peran."
+        },
+        "deleteSuccess": {
+          "title": "Peran dihapus",
+          "description": "Peran berhasil dihapus."
+        },
+        "deleteError": {
+          "title": "Kesalahan saat menghapus peran",
+          "description": "Gagal menghapus peran."
+        },
+        "loadPermissionsError": {
+          "title": "Kesalahan",
+          "description": "Gagal memuat izin."
+        },
+        "createSuccess": {
+          "title": "Berhasil",
+          "description": "Peran berhasil dibuat."
+        },
+        "createError": {
+          "title": "Kesalahan",
+          "description": "Gagal membuat peran."
+        }
+      },
+      "confirm": {
+        "title": "Apakah Anda yakin?",
+        "description": "Tindakan ini tidak dapat dibatalkan. Ini akan menghapus peran secara permanen dan menghapus izin dari pengguna yang ditugaskan.",
+        "confirmLabel": "Hapus"
+      }
+    },
+    "tenants": {
+      "alerts": {
+        "noPermission": "Anda tidak memiliki izin untuk melihat tenant."
+      },
+      "page": {
+        "title": "Manajemen Tenant",
+        "description": "Kelola semua tenant.",
+        "archivedTitle": "Tenant yang Diarsipkan",
+        "archivedDescription": "Tinjau tenant yang diarsipkan."
+      },
+      "buttons": {
+        "backToActive": "Kembali ke aktif",
+        "seeArchived": "Lihat yang diarsipkan",
+        "create": "Buat Tenant"
+      },
+      "empty": {
+        "active": "Tidak ada tenant ditemukan.",
+        "archived": "Tidak ada tenant yang diarsipkan ditemukan."
       },
       "toast": {
         "fetchError": {
-          "title": "Kesalahan mengambil detail",
-          "description": "Gagal memuat detail tenant."
-        },
-        "restoreSuccess": {
-          "title": "Tenant dipulihkan",
-          "description": "Tenant sekarang aktif."
-        },
-        "restoreError": {
-          "title": "Kesalahan memulihkan tenant",
-          "description": "Gagal memulihkan tenant."
+          "title": "Kesalahan mengambil tenant",
+          "description": "Gagal memuat daftar tenant."
         },
         "archiveSuccess": {
           "title": "Tenant diarsipkan",
@@ -1368,665 +1340,787 @@
         "archiveError": {
           "title": "Kesalahan mengarsipkan tenant",
           "description": "Gagal mengarsipkan tenant."
+        },
+        "restoreSuccess": {
+          "title": "Tenant dipulihkan",
+          "description": "Tenant sekarang aktif."
+        },
+        "restoreError": {
+          "title": "Kesalahan memulihkan tenant",
+          "description": "Gagal memulihkan tenant."
         }
       },
       "confirm": {
         "archive": {
           "title": "Arsipkan Tenant?",
           "description": "Ini akan mengarsipkan tenant. Pengguna yang termasuk dalam tenant ini mungkin kehilangan akses. Anda dapat memulihkannya nanti.",
-          "cancel": "Batal",
-          "confirm": "Arsipkan"
+          "confirmLabel": "Arsipkan"
+        }
+      },
+      "actions": {
+        "archive": {
+          "title": "Arsipkan tenant"
+        },
+        "restore": {
+          "title": "Pulihkan tenant"
+        }
+      },
+      "create": {
+        "alerts": {
+          "noPermission": "Anda tidak memiliki izin untuk membuat tenant."
+        },
+        "page": {
+          "title": "Buat Tenant",
+          "description": "Buat organisasi tenant baru."
+        },
+        "form": {
+          "labels": {
+            "name": "Nama Tenant",
+            "slug": "Slug (Pengenal URL)",
+            "type": "Tipe Tenant",
+            "taxable": "Tenant Kena Pajak",
+            "taxSelection": "Pemilihan Pajak",
+            "theme": "Tema"
+          },
+          "placeholders": {
+            "name": "mis. Acme Corp",
+            "slug": "mis. acme-corp",
+            "type": "Pilih tipe tenant",
+            "taxSelection": "Pilih pajak",
+            "searchTaxes": "Cari pajak..."
+          },
+          "descriptions": {
+            "slug": "Pengenal unik untuk tenant, digunakan dalam URL.",
+            "taxSelection": "Pilih pajak default yang akan berlaku untuk tenant ini.",
+            "theme": "Pilih tema warna untuk tenant ini. Pratinjau diterapkan segera."
+          },
+          "validation": {
+            "taxRequired": "Pemilihan pajak diperlukan untuk tenant kena pajak."
+          },
+          "buttons": {
+            "cancel": "Batal",
+            "create": "Buat Tenant"
+          }
+        },
+        "toast": {
+          "success": {
+            "title": "Berhasil",
+            "description": "Tenant berhasil dibuat."
+          },
+          "error": {
+            "title": "Kesalahan",
+            "description": "Gagal membuat tenant."
+          }
+        }
+      },
+      "detail": {
+        "alerts": {
+          "noPermission": "Anda tidak memiliki izin untuk melihat tenant ini.",
+          "notFound": "Tenant tidak ditemukan."
+        },
+        "buttons": {
+          "back": "Kembali ke Tenant",
+          "edit": "Edit",
+          "archive": "Arsipkan",
+          "restore": "Pulihkan"
+        },
+        "status": {
+          "active": "Aktif",
+          "archived": "Diarsipkan"
+        },
+        "labels": {
+          "createdOn": "Dibuat pada",
+          "id": "ID",
+          "slug": "Slug",
+          "taxable": "Kena Pajak",
+          "yes": "Ya",
+          "no": "Tidak",
+          "tax": "Pajak",
+          "none": "Tidak ada",
+          "tenantType": "Tipe Tenant"
+        },
+        "sections": {
+          "details": "Detail"
+        },
+        "toast": {
+          "fetchError": {
+            "title": "Kesalahan mengambil detail",
+            "description": "Gagal memuat detail tenant."
+          },
+          "restoreSuccess": {
+            "title": "Tenant dipulihkan",
+            "description": "Tenant sekarang aktif."
+          },
+          "restoreError": {
+            "title": "Kesalahan memulihkan tenant",
+            "description": "Gagal memulihkan tenant."
+          },
+          "archiveSuccess": {
+            "title": "Tenant diarsipkan",
+            "description": "Tenant telah diarsipkan."
+          },
+          "archiveError": {
+            "title": "Kesalahan mengarsipkan tenant",
+            "description": "Gagal mengarsipkan tenant."
+          }
+        },
+        "confirm": {
+          "archive": {
+            "title": "Arsipkan Tenant?",
+            "description": "Ini akan mengarsipkan tenant. Pengguna yang termasuk dalam tenant ini mungkin kehilangan akses. Anda dapat memulihkannya nanti.",
+            "cancel": "Batal",
+            "confirm": "Arsipkan"
+          }
+        }
+      },
+      "edit": {
+        "alerts": {
+          "noPermission": "Anda tidak memiliki izin untuk mengedit tenant."
+        },
+        "page": {
+          "title": "Edit Tenant",
+          "description": "Perbarui detail tenant."
+        },
+        "form": {
+          "buttons": {
+            "save": "Simpan Perubahan"
+          }
+        },
+        "toast": {
+          "fetchError": {
+            "title": "Kesalahan",
+            "description": "Gagal memuat tenant."
+          },
+          "success": {
+            "title": "Berhasil",
+            "description": "Tenant berhasil diperbarui."
+          },
+          "error": {
+            "title": "Kesalahan",
+            "description": "Gagal memperbarui tenant."
+          }
         }
       }
     },
-    "edit": {
+    "users": {
       "alerts": {
-        "noPermission": "Anda tidak memiliki izin untuk mengedit tenant."
+        "noPermission": "Anda tidak memiliki izin untuk melihat pengguna."
       },
       "page": {
-        "title": "Edit Tenant",
-        "description": "Perbarui detail tenant."
+        "title": "Manajemen Pengguna",
+        "description": "Kelola pengguna dan tetapkan peran di sini."
+      },
+      "buttons": {
+        "invite": "Undang Pengguna",
+        "create": "Buat Pengguna"
+      },
+      "empty": {
+        "message": "Tidak ada pengguna ditemukan."
+      },
+      "table": {
+        "headers": {
+          "email": "Email",
+          "fullName": "Nama Lengkap",
+          "role": "Peran",
+          "status": "Status",
+          "actions": "Tindakan"
+        }
+      },
+      "toast": {
+        "fetchError": {
+          "title": "Kesalahan mengambil pengguna",
+          "description": "Gagal memuat daftar pengguna."
+        },
+        "removeSuccess": {
+          "title": "Pengguna dihapus",
+          "description": "Pengguna telah dihapus dari tenant ini."
+        },
+        "removeError": {
+          "title": "Kesalahan menghapus pengguna",
+          "description": "Gagal menghapus pengguna."
+        }
+      },
+      "confirm": {
+        "remove": {
+          "title": "Hapus pengguna dari tenant?",
+          "description": "Ini akan menghapus pengguna dari tenant ini. Akun pengguna masih akan ada dan dapat diundang kembali nanti.",
+          "confirmLabel": "Hapus"
+        }
+      },
+      "createUser": {
+        "alerts": {
+          "noPermission": "Anda tidak memiliki izin untuk membuat pengguna."
+        },
+        "page": {
+          "title": "Buat Pengguna",
+          "description": "Buat pengguna baru dan secara opsional tetapkan peran."
+        },
+        "form": {
+          "labels": {
+            "email": "Alamat Email *",
+            "fullName": "Nama Lengkap",
+            "password": "Kata Sandi *",
+            "confirmPassword": "Konfirmasi Kata Sandi *",
+            "role": "Peran (Opsional)"
+          },
+          "placeholders": {
+            "email": "pengguna@contoh.com",
+            "fullName": "John Doe",
+            "password": "••••••••",
+            "confirmPassword": "••••••••",
+            "role": "Pilih peran (opsional)",
+            "searchRoles": "Cari peran..."
+          },
+          "descriptions": {
+            "superAdminRole": "Super Admin Tenant",
+            "roleHelp": "Pengguna akan ditambahkan ke ruang kerja ini. Peran dapat ditetapkan nanti."
+          },
+          "validation": {
+            "emailRequired": "Email diperlukan",
+            "emailInvalid": "Silakan masukkan email yang valid",
+            "passwordRequired": "Kata sandi diperlukan",
+            "passwordMinLength": "Kata sandi harus minimal 6 karakter",
+            "confirmPasswordRequired": "Silakan konfirmasi kata sandi",
+            "passwordsMismatch": "Kata sandi tidak cocok"
+          },
+          "buttons": {
+            "cancel": "Batal",
+            "create": "Buat Pengguna"
+          }
+        },
+        "toast": {
+          "success": {
+            "title": "Pengguna dibuat",
+            "description": "Pengguna telah berhasil dibuat."
+          },
+          "error": {
+            "title": "Kesalahan",
+            "description": "Gagal membuat pengguna."
+          }
+        }
+      },
+      "invite": {
+        "dialog": {
+          "title": "Undang Pengguna yang Ada",
+          "description": "Tambahkan pengguna yang ada ke tenant ini. Hanya pengguna yang bukan super admin dan belum menjadi anggota tenant ini yang ditampilkan."
+        },
+        "form": {
+          "labels": {
+            "user": "Pengguna",
+            "role": "Peran"
+          },
+          "placeholders": {
+            "user": "Cari pengguna...",
+            "searchUser": "Ketik email atau nama...",
+            "role": "Pilih peran",
+            "searchRoles": "Cari peran..."
+          },
+          "validation": {
+            "userRequired": "Silakan pilih pengguna",
+            "roleRequired": "Peran diperlukan untuk undangan",
+            "userAlreadyMember": "Pengguna sudah menjadi anggota tenant ini"
+          },
+          "descriptions": {
+            "superAdminRole": "Super Admin Tenant"
+          },
+          "buttons": {
+            "cancel": "Batal",
+            "invite": "Undang Pengguna"
+          }
+        },
+        "toast": {
+          "success": {
+            "title": "Pengguna diundang",
+            "description": "Pengguna telah ditambahkan ke tenant ini."
+          },
+          "error": {
+            "title": "Kesalahan",
+            "description": "Gagal mengundang pengguna"
+          }
+        }
+      }
+    },
+    "departments": {
+      "page": {
+        "title": "Departemen",
+        "description": "Kelola departemen organisasi."
+      },
+      "list": {
+        "filters": {
+          "search": "Cari",
+          "searchPlaceholder": "Cari departemen...",
+          "status": "Status"
+        },
+        "table": {
+          "headers": {
+            "code": "Kode",
+            "name": "Nama",
+            "status": "Status",
+            "actions": "Aksi"
+          },
+          "empty": "Tidak ada departemen ditemukan."
+        }
+      },
+      "details": {
+        "info": "Informasi Departemen",
+        "people": {
+          "title": "Anggota Staf",
+          "empty": "Tidak ada anggota staf di departemen ini.",
+          "code": "Kode",
+          "name": "Nama",
+          "email": "Email",
+          "phone": "Telepon",
+          "status": "Status"
+        }
+      },
+      "buttons": {
+        "new": "Departemen Baru",
+        "edit": "Ubah"
+      },
+      "toast": {
+        "fetchError": {
+          "title": "Tidak dapat memuat departemen",
+          "description": "Kami tidak dapat mengambil data departemen saat ini. Coba lagi sebentar lagi."
+        },
+        "deleteSuccess": {
+          "title": "Departemen dihapus",
+          "description": "Departemen telah berhasil dihapus."
+        },
+        "deleteError": {
+          "title": "Tidak dapat menghapus",
+          "description": "Terjadi kesalahan saat menghapus departemen ini."
+        },
+        "createSuccess": {
+          "title": "Departemen dibuat",
+          "description": "Departemen telah berhasil dibuat."
+        },
+        "createError": {
+          "title": "Gagal membuat",
+          "description": "Tidak dapat membuat departemen."
+        },
+        "updateSuccess": {
+          "title": "Departemen diperbarui",
+          "description": "Departemen telah berhasil diperbarui."
+        },
+        "updateError": {
+          "title": "Gagal memperbarui",
+          "description": "Tidak dapat memperbarui departemen."
+        },
+        "loadError": {
+          "title": "Tidak dapat memuat",
+          "description": "Tidak dapat memuat detail departemen."
+        }
+      },
+      "create": {
+        "page": {
+          "title": "Departemen Baru",
+          "description": "Buat departemen baru untuk organisasi Anda."
+        }
+      },
+      "edit": {
+        "page": {
+          "title": "Edit Departemen",
+          "description": "Perbarui detail departemen."
+        }
+      },
+      "alerts": {
+        "noListPermission": "Anda tidak memiliki izin untuk melihat departemen.",
+        "noCreatePermission": "Anda tidak memiliki izin untuk membuat departemen.",
+        "noEditPermission": "Anda tidak memiliki izin untuk mengedit departemen."
+      },
+      "statuses": {
+        "any": "Semua status",
+        "active": "Aktif",
+        "inactive": "Tidak Aktif"
+      },
+      "confirm": {
+        "delete": {
+          "title": "Hapus departemen?",
+          "description": "Ini akan menghapus departemen secara permanen.",
+          "confirmLabel": "Hapus"
+        }
       },
       "form": {
+        "labels": {
+          "name": "Nama",
+          "code": "Kode",
+          "status": "Status"
+        },
+        "placeholders": {
+          "name": "mis. Penjualan",
+          "code": "Dibuat otomatis",
+          "status": "Pilih status"
+        },
+        "validation": {
+          "nameRequired": "Nama departemen diperlukan"
+        },
         "buttons": {
+          "cancel": "Batal",
+          "create": "Buat Departemen",
+          "save": "Simpan Perubahan"
+        }
+      }
+    },
+    "items": {
+      "page": {
+        "title": "Item",
+        "description": "Kelola item katalog termasuk produk dan layanan."
+      },
+      "create": {
+        "page": {
+          "title": "Item Baru",
+          "description": "Tambah item baru ke katalog."
+        }
+      },
+      "edit": {
+        "page": {
+          "title": "Ubah Item",
+          "description": "Perbarui detail item."
+        }
+      },
+      "detail": {
+        "page": {
+          "title": "Detail Item",
+          "description": "Lihat detail lengkap dari item katalog."
+        }
+      },
+      "alerts": {
+        "noListPermission": "Anda tidak memiliki izin untuk melihat item.",
+        "noCreatePermission": "Anda tidak memiliki izin untuk membuat item.",
+        "noEditPermission": "Anda tidak memiliki izin untuk mengubah item.",
+        "noReadPermission": "Anda tidak memiliki izin untuk melihat detail item."
+      },
+      "list": {
+        "table": {
+          "headers": {
+            "code": "SKU",
+            "name": "Nama",
+            "type": "Tipe",
+            "price": "Harga",
+            "status": "Status",
+            "tags": "Tag",
+            "actions": "Aksi"
+          },
+          "empty": "Item tidak ditemukan"
+        },
+        "filters": {
+          "search": "Cari",
+          "searchPlaceholder": "Cari berdasarkan SKU, nama, atau barcode",
+          "type": "Tipe",
+          "allTypes": "Semua Tipe",
+          "status": "Status",
+          "anyStatus": "Semua Status",
+          "category": "Kategori"
+        }
+      },
+      "form": {
+        "sections": {
+          "basic": "Informasi Dasar",
+          "service": "Detail Layanan",
+          "image": "Gambar Item"
+        },
+        "labels": {
+          "name": "Nama Item",
+          "type": "Tipe Item",
+          "price": "Harga",
+          "status": "Status",
+          "category": "Kategori",
+          "barcode": "Barcode / EAN",
+          "unit": "Unit (misal: pcs, botol)",
+          "tags": "Tag",
+          "description": "Deskripsi",
+          "serviceKind": "Jenis Layanan",
+          "durationValue": "Durasi",
+          "durationUnit": "Satuan Durasi",
+          "sessionCount": "Jumlah Sesi",
+          "includedPtSessions": "Termasuk Sesi PT"
+        },
+        "placeholders": {
+          "name": "misal: Air Mineral",
+          "price": "0",
+          "category": "Pilih kategori",
+          "status": "Pilih status",
+          "barcode": "Scan atau masukkan barcode",
+          "unit": "misal: pcs",
+          "tags": "Masukkan tag dipisahkan dengan koma",
+          "description": "Deskripsi item...",
+          "type": "Pilih tipe",
+          "serviceKind": "Pilih jenis layanan",
+          "durationUnit": "Pilih satuan"
+        },
+        "validation": {
+          "nameRequired": "Nama item wajib diisi",
+          "typeRequired": "Tipe item wajib diisi",
+          "priceRequired": "Harga wajib diisi",
+          "serviceKindRequired": "Jenis layanan wajib diisi untuk layanan",
+          "durationRequired": "Durasi wajib diisi",
+          "sessionCountRequired": "Jumlah sesi wajib diisi"
+        },
+        "buttons": {
+          "cancel": "Batal",
+          "create": "Tambah Item",
+          "save": "Simpan Perubahan"
+        }
+      },
+      "toast": {
+        "createSuccess": {
+          "title": "Item berhasil dibuat",
+          "description": "Item telah berhasil ditambahkan."
+        },
+        "updateSuccess": {
+          "title": "Item berhasil diperbarui",
+          "description": "Perubahan telah berhasil disimpan."
+        },
+        "deleteSuccess": {
+          "title": "Item berhasil dihapus",
+          "description": "Item telah dihapus."
+        },
+        "imageSuccess": {
+          "title": "Gambar berhasil diunggah",
+          "description": "Gambar item telah diperbarui."
+        },
+        "error": {
+          "title": "Kesalahan",
+          "description": "Terjadi kesalahan. Silakan coba lagi."
+        },
+        "loadError": {
+          "title": "Kesalahan",
+          "description": "Gagal memuat data item."
+        }
+      },
+      "confirm": {
+        "delete": {
+          "title": "Hapus Item?",
+          "description": "Apakah Anda yakin ingin menghapus item ini? Tindakan ini tidak dapat dibatalkan.",
+          "confirmLabel": "Hapus"
+        }
+      },
+      "import": {
+        "button": "Impor",
+        "dialog": {
+          "title": "Impor Item",
+          "description": "Unggah file CSV atau XLSX untuk mengimpor item. Kolom wajib: name, type, price, status.",
+          "fileLabel": "Pilih File",
+          "fileHint": "Format yang diterima: .csv, .xlsx (Maks 5MB)",
+          "downloadTemplate": "Unduh Templat",
+          "importing": "Mengimpor...",
+          "success": {
+            "title": "Impor Berhasil",
+            "description": "Item telah berhasil diimpor."
+          },
+          "error": {
+            "title": "Impor Gagal",
+            "description": "Terjadi kesalahan selama proses impor."
+          }
+        }
+      },
+      "export": {
+        "button": "Ekspor",
+        "dialog": {
+          "title": "Ekspor Item",
+          "description": "Pilih format dan kolom yang ingin Anda ekspor.",
+          "format": "Format",
+          "fields": "Kolom untuk Diekspor",
+          "exporting": "Mengekspor...",
+          "success": {
+            "title": "Ekspor Berhasil",
+            "description": "File sedang diunduh."
+          },
+          "fields_list": {
+            "code": "SKU",
+            "name": "Nama",
+            "type": "Tipe",
+            "price": "Harga",
+            "status": "Status",
+            "barcode": "Barcode",
+            "unit": "Unit",
+            "category": "Kategori",
+            "description": "Deskripsi"
+          }
+        }
+      },
+      "buttons": {
+        "new": "Item Baru",
+        "edit": "Ubah",
+        "view": "Lihat",
+        "cancel": "Batal"
+      },
+      "types": {
+        "PRODUCT": "Produk",
+        "SERVICE": "Layanan"
+      },
+      "serviceKinds": {
+        "MEMBERSHIP": "Keanggotaan",
+        "PT_SESSION": "Sesi PT"
+      }
+    },
+    "categories": {
+      "page": {
+        "title": "Kategori",
+        "description": "Kelola kategori katalog untuk mengorganisir item."
+      },
+      "create": {
+        "page": {
+          "title": "Kategori Baru",
+          "description": "Tambahkan kategori baru ke katalog."
+        }
+      },
+      "edit": {
+        "page": {
+          "title": "Edit Kategori",
+          "description": "Perbarui detail kategori."
+        }
+      },
+      "alerts": {
+        "noListPermission": "Anda tidak memiliki izin untuk melihat kategori.",
+        "noCreatePermission": "Anda tidak memiliki izin untuk membuat kategori.",
+        "noEditPermission": "Anda tidak memiliki izin untuk mengedit kategori."
+      },
+      "list": {
+        "table": {
+          "headers": {
+            "code": "Kode",
+            "name": "Nama",
+            "parent": "Induk",
+            "status": "Status",
+            "actions": "Aksi"
+          },
+          "empty": "Tidak ada kategori ditemukan"
+        },
+        "filters": {
+          "search": "Cari",
+          "searchPlaceholder": "Cari berdasarkan kode atau nama"
+        }
+      },
+      "form": {
+        "labels": {
+          "name": "Nama Kategori",
+          "parent": "Kategori Induk",
+          "status": "Status"
+        },
+        "placeholders": {
+          "name": "misal Keanggotaan",
+          "parent": "Pilih induk (opsional)",
+          "status": "Pilih status"
+        },
+        "validation": {
+          "nameRequired": "Nama kategori wajib diisi"
+        },
+        "buttons": {
+          "cancel": "Batal",
+          "create": "Buat Kategori",
+          "save": "Simpan Perubahan"
+        }
+      },
+      "toast": {
+        "createSuccess": {
+          "title": "Kategori dibuat",
+          "description": "Kategori telah berhasil ditambahkan."
+        },
+        "updateSuccess": {
+          "title": "Kategori diperbarui",
+          "description": "Perubahan telah berhasil disimpan."
+        },
+        "deleteSuccess": {
+          "title": "Kategori dihapus",
+          "description": "Kategori telah dihapus."
+        },
+        "error": {
+          "title": "Kesalahan",
+          "description": "Terjadi kesalahan. Silakan coba lagi."
+        },
+        "loadError": {
+          "title": "Kesalahan",
+          "description": "Gagal memuat data kategori."
+        }
+      },
+      "confirm": {
+        "delete": {
+          "title": "Hapus Kategori?",
+          "description": "Apakah Anda yakin ingin menghapus kategori ini? Tindakan ini tidak dapat dibatalkan.",
+          "confirmLabel": "Hapus"
+        }
+      },
+      "buttons": {
+        "new": "Kategori Baru",
+        "edit": "Edit"
+      }
+    },
+    "tags": {
+      "input": {
+        "placeholder": "Tambah tag...",
+        "searchPlaceholder": "Cari atau ketik tag baru...",
+        "noSuggestions": "Tidak ada tag cocok. Tekan Enter untuk membuat.",
+        "addNew": "Buat \"{tag}\"",
+        "loading": "Memuat..."
+      },
+      "page": {
+        "title": "Manajemen Tag",
+        "description": "Kelola tag organisasi, ubah nama, atau nonaktifkan tag yang tidak lagi digunakan."
+      },
+      "buttons": {
+        "new": "Tag Baru"
+      },
+      "filters": {
+        "searchPlaceholder": "Cari tag..."
+      },
+      "guards": {
+        "superAdminOnly": "Hanya Super Admin yang dapat mengelola tag."
+      },
+      "table": {
+        "headers": {
+          "name": "Nama",
+          "usage": "Jumlah Penggunaan",
+          "lastUsed": "Terakhir Digunakan",
+          "status": "Status",
+          "actions": "Aksi"
+        },
+        "empty": "Tidak ada tag ditemukan"
+      },
+      "dialogs": {
+        "delete": {
+          "title": "Hapus Tag",
+          "description": "Apakah Anda yakin ingin menghapus tag ini? Tindakan ini tidak dapat dibatalkan.",
+          "confirmLabel": "Hapus"
+        }
+      },
+      "form": {
+        "labels": {
+          "name": "Nama Tag",
+          "isActive": "Aktif"
+        },
+        "placeholders": {
+          "name": "Masukkan nama tag"
+        },
+        "validation": {
+          "nameRequired": "Nama tag wajib diisi"
+        },
+        "buttons": {
+          "cancel": "Batal",
           "save": "Simpan Perubahan"
         }
       },
       "toast": {
         "fetchError": {
-          "title": "Kesalahan",
-          "description": "Gagal memuat tenant."
+          "title": "Gagal memuat tag",
+          "description": "Kami tidak dapat mengambil daftar tag saat ini."
         },
-        "success": {
-          "title": "Berhasil",
-          "description": "Tenant berhasil diperbarui."
+        "updateSuccess": {
+          "title": "Tag diperbarui",
+          "description": "Tag telah berhasil diperbarui."
         },
-        "error": {
-          "title": "Kesalahan",
-          "description": "Gagal memperbarui tenant."
+        "updateError": {
+          "title": "Gagal memperbarui tag",
+          "description": "Terjadi kesalahan saat menyimpan tag."
+        },
+        "deleteSuccess": {
+          "title": "Tag dihapus",
+          "description": "Tag telah dihapus."
+        },
+        "deleteError": {
+          "title": "Gagal menghapus tag",
+          "description": "Terjadi kesalahan saat menghapus tag."
         }
       }
     }
-  },
-  "users": {
-    "alerts": {
-      "noPermission": "Anda tidak memiliki izin untuk melihat pengguna."
-    },
-    "page": {
-      "title": "Manajemen Pengguna",
-      "description": "Kelola pengguna dan tetapkan peran di sini."
-    },
-    "buttons": {
-      "invite": "Undang Pengguna",
-      "create": "Buat Pengguna"
-    },
-    "empty": {
-      "message": "Tidak ada pengguna ditemukan."
-    },
-    "table": {
-      "headers": {
-        "email": "Email",
-        "fullName": "Nama Lengkap",
-        "role": "Peran",
-        "status": "Status",
-        "actions": "Tindakan"
-      }
-    },
-    "toast": {
-      "fetchError": {
-        "title": "Kesalahan mengambil pengguna",
-        "description": "Gagal memuat daftar pengguna."
-      },
-      "removeSuccess": {
-        "title": "Pengguna dihapus",
-        "description": "Pengguna telah dihapus dari tenant ini."
-      },
-      "removeError": {
-        "title": "Kesalahan menghapus pengguna",
-        "description": "Gagal menghapus pengguna."
-      }
-    },
-    "confirm": {
-      "remove": {
-        "title": "Hapus pengguna dari tenant?",
-        "description": "Ini akan menghapus pengguna dari tenant ini. Akun pengguna masih akan ada dan dapat diundang kembali nanti.",
-        "confirmLabel": "Hapus"
-      }
-    },
-    "createUser": {
-      "alerts": {
-        "noPermission": "Anda tidak memiliki izin untuk membuat pengguna."
-      },
-      "page": {
-        "title": "Buat Pengguna",
-        "description": "Buat pengguna baru dan secara opsional tetapkan peran."
-      },
-      "form": {
-        "labels": {
-          "email": "Alamat Email *",
-          "fullName": "Nama Lengkap",
-          "password": "Kata Sandi *",
-          "confirmPassword": "Konfirmasi Kata Sandi *",
-          "role": "Peran (Opsional)"
-        },
-        "placeholders": {
-          "email": "pengguna@contoh.com",
-          "fullName": "John Doe",
-          "password": "••••••••",
-          "confirmPassword": "••••••••",
-          "role": "Pilih peran (opsional)",
-          "searchRoles": "Cari peran..."
-        },
-        "descriptions": {
-          "superAdminRole": "Super Admin Tenant",
-          "roleHelp": "Pengguna akan ditambahkan ke ruang kerja ini. Peran dapat ditetapkan nanti."
-        },
-        "validation": {
-          "emailRequired": "Email diperlukan",
-          "emailInvalid": "Silakan masukkan email yang valid",
-          "passwordRequired": "Kata sandi diperlukan",
-          "passwordMinLength": "Kata sandi harus minimal 6 karakter",
-          "confirmPasswordRequired": "Silakan konfirmasi kata sandi",
-          "passwordsMismatch": "Kata sandi tidak cocok"
-        },
-        "buttons": {
-          "cancel": "Batal",
-          "create": "Buat Pengguna"
-        }
-      },
-      "toast": {
-        "success": {
-          "title": "Pengguna dibuat",
-          "description": "Pengguna telah berhasil dibuat."
-        },
-        "error": {
-          "title": "Kesalahan",
-          "description": "Gagal membuat pengguna."
-        }
-      }
-    },
-    "invite": {
-      "dialog": {
-        "title": "Undang Pengguna yang Ada",
-        "description": "Tambahkan pengguna yang ada ke tenant ini. Hanya pengguna yang bukan super admin dan belum menjadi anggota tenant ini yang ditampilkan."
-      },
-      "form": {
-        "labels": {
-          "user": "Pengguna",
-          "role": "Peran"
-        },
-        "placeholders": {
-          "user": "Cari pengguna...",
-          "searchUser": "Ketik email atau nama...",
-          "role": "Pilih peran",
-          "searchRoles": "Cari peran..."
-        },
-        "validation": {
-          "userRequired": "Silakan pilih pengguna",
-          "roleRequired": "Peran diperlukan untuk undangan",
-          "userAlreadyMember": "Pengguna sudah menjadi anggota tenant ini"
-        },
-        "descriptions": {
-          "superAdminRole": "Super Admin Tenant"
-        },
-        "buttons": {
-          "cancel": "Batal",
-          "invite": "Undang Pengguna"
-        }
-      },
-      "toast": {
-        "success": {
-          "title": "Pengguna diundang",
-          "description": "Pengguna telah ditambahkan ke tenant ini."
-        },
-        "error": {
-          "title": "Kesalahan",
-          "description": "Gagal mengundang pengguna"
-        }
-      }
-    }
-  },
-  "departments": {
-    "page": {
-      "title": "Departemen",
-      "description": "Kelola departemen organisasi."
-    },
-    "list": {
-      "filters": {
-        "search": "Cari",
-        "searchPlaceholder": "Cari departemen...",
-        "status": "Status"
-      },
-      "table": {
-        "headers": {
-          "code": "Kode",
-          "name": "Nama",
-          "status": "Status",
-          "actions": "Aksi"
-        },
-        "empty": "Tidak ada departemen ditemukan."
-      }
-    },
-    "details": {
-      "info": "Informasi Departemen",
-      "people": {
-        "title": "Anggota Staf",
-        "empty": "Tidak ada anggota staf di departemen ini.",
-        "code": "Kode",
-        "name": "Nama",
-        "email": "Email",
-        "phone": "Telepon",
-        "status": "Status"
-      }
-    },
-    "buttons": {
-      "new": "Departemen Baru",
-      "edit": "Ubah"
-    },
-    "toast": {
-      "fetchError": {
-        "title": "Tidak dapat memuat departemen",
-        "description": "Kami tidak dapat mengambil data departemen saat ini. Coba lagi sebentar lagi."
-      },
-      "deleteSuccess": {
-        "title": "Departemen dihapus",
-        "description": "Departemen telah berhasil dihapus."
-      },
-      "deleteError": {
-        "title": "Tidak dapat menghapus",
-        "description": "Terjadi kesalahan saat menghapus departemen ini."
-      },
-      "createSuccess": {
-        "title": "Departemen dibuat",
-        "description": "Departemen telah berhasil dibuat."
-      },
-      "createError": {
-        "title": "Gagal membuat",
-        "description": "Tidak dapat membuat departemen."
-      },
-      "updateSuccess": {
-        "title": "Departemen diperbarui",
-        "description": "Departemen telah berhasil diperbarui."
-      },
-      "updateError": {
-        "title": "Gagal memperbarui",
-        "description": "Tidak dapat memperbarui departemen."
-      },
-      "loadError": {
-        "title": "Tidak dapat memuat",
-        "description": "Tidak dapat memuat detail departemen."
-      }
-    },
-    "create": {
-      "page": {
-        "title": "Departemen Baru",
-        "description": "Buat departemen baru untuk organisasi Anda."
-      }
-    },
-    "edit": {
-      "page": {
-        "title": "Edit Departemen",
-        "description": "Perbarui detail departemen."
-      }
-    },
-    "alerts": {
-      "noListPermission": "Anda tidak memiliki izin untuk melihat departemen.",
-      "noCreatePermission": "Anda tidak memiliki izin untuk membuat departemen.",
-      "noEditPermission": "Anda tidak memiliki izin untuk mengedit departemen."
-    },
-    "statuses": {
-      "any": "Semua status",
-      "active": "Aktif",
-      "inactive": "Tidak Aktif"
-    },
-    "confirm": {
-      "delete": {
-        "title": "Hapus departemen?",
-        "description": "Ini akan menghapus departemen secara permanen.",
-        "confirmLabel": "Hapus"
-      }
-    },
-    "form": {
-      "labels": {
-        "name": "Nama",
-        "code": "Kode",
-        "status": "Status"
-      },
-      "placeholders": {
-        "name": "mis. Penjualan",
-        "code": "Dibuat otomatis",
-        "status": "Pilih status"
-      },
-      "validation": {
-        "nameRequired": "Nama departemen diperlukan"
-      },
-      "buttons": {
-        "cancel": "Batal",
-        "create": "Buat Departemen",
-        "save": "Simpan Perubahan"
-      }
-    }
-  },
-  "items": {
-    "page": {
-      "title": "Item",
-      "description": "Kelola item katalog termasuk produk dan layanan."
-    },
-    "create": {
-      "page": {
-        "title": "Item Baru",
-        "description": "Tambah item baru ke katalog."
-      }
-    },
-    "edit": {
-      "page": {
-        "title": "Ubah Item",
-        "description": "Perbarui detail item."
-      }
-    },
-    "detail": {
-      "page": {
-        "title": "Detail Item",
-        "description": "Lihat detail lengkap dari item katalog."
-      }
-    },
-    "alerts": {
-      "noListPermission": "Anda tidak memiliki izin untuk melihat item.",
-      "noCreatePermission": "Anda tidak memiliki izin untuk membuat item.",
-      "noEditPermission": "Anda tidak memiliki izin untuk mengubah item.",
-      "noReadPermission": "Anda tidak memiliki izin untuk melihat detail item."
-    },
-    "list": {
-      "table": {
-        "headers": {
-          "code": "SKU",
-          "name": "Nama",
-          "type": "Tipe",
-          "price": "Harga",
-          "status": "Status",
-          "tags": "Tag",
-          "actions": "Aksi"
-        },
-        "empty": "Item tidak ditemukan"
-      },
-      "filters": {
-        "search": "Cari",
-        "searchPlaceholder": "Cari berdasarkan SKU, nama, atau barcode",
-        "type": "Tipe",
-        "allTypes": "Semua Tipe",
-        "status": "Status",
-        "anyStatus": "Semua Status",
-        "category": "Kategori"
-      }
-    },
-    "form": {
-      "sections": {
-        "basic": "Informasi Dasar",
-        "service": "Detail Layanan",
-        "image": "Gambar Item"
-      },
-      "labels": {
-        "name": "Nama Item",
-        "type": "Tipe Item",
-        "price": "Harga",
-        "status": "Status",
-        "category": "Kategori",
-        "barcode": "Barcode / EAN",
-        "unit": "Unit (misal: pcs, botol)",
-        "tags": "Tag",
-        "description": "Deskripsi",
-        "serviceKind": "Jenis Layanan",
-        "durationValue": "Durasi",
-        "durationUnit": "Satuan Durasi",
-        "sessionCount": "Jumlah Sesi",
-        "includedPtSessions": "Termasuk Sesi PT"
-      },
-      "placeholders": {
-        "name": "misal: Air Mineral",
-        "price": "0",
-        "category": "Pilih kategori",
-        "status": "Pilih status",
-        "barcode": "Scan atau masukkan barcode",
-        "unit": "misal: pcs",
-        "tags": "Masukkan tag dipisahkan dengan koma",
-        "description": "Deskripsi item...",
-        "type": "Pilih tipe",
-        "serviceKind": "Pilih jenis layanan",
-        "durationUnit": "Pilih satuan"
-      },
-      "validation": {
-        "nameRequired": "Nama item wajib diisi",
-        "typeRequired": "Tipe item wajib diisi",
-        "priceRequired": "Harga wajib diisi",
-        "serviceKindRequired": "Jenis layanan wajib diisi untuk layanan",
-        "durationRequired": "Durasi wajib diisi",
-        "sessionCountRequired": "Jumlah sesi wajib diisi"
-      },
-      "buttons": {
-        "cancel": "Batal",
-        "create": "Tambah Item",
-        "save": "Simpan Perubahan"
-      }
-    },
-    "toast": {
-      "createSuccess": {
-        "title": "Item berhasil dibuat",
-        "description": "Item telah berhasil ditambahkan."
-      },
-      "updateSuccess": {
-        "title": "Item berhasil diperbarui",
-        "description": "Perubahan telah berhasil disimpan."
-      },
-      "deleteSuccess": {
-        "title": "Item berhasil dihapus",
-        "description": "Item telah dihapus."
-      },
-      "imageSuccess": {
-        "title": "Gambar berhasil diunggah",
-        "description": "Gambar item telah diperbarui."
-      },
-      "error": {
-        "title": "Kesalahan",
-        "description": "Terjadi kesalahan. Silakan coba lagi."
-      },
-      "loadError": {
-        "title": "Kesalahan",
-        "description": "Gagal memuat data item."
-      }
-    },
-    "confirm": {
-      "delete": {
-        "title": "Hapus Item?",
-        "description": "Apakah Anda yakin ingin menghapus item ini? Tindakan ini tidak dapat dibatalkan.",
-        "confirmLabel": "Hapus"
-      }
-    },
-    "import": {
-      "button": "Impor",
-      "dialog": {
-        "title": "Impor Item",
-        "description": "Unggah file CSV atau XLSX untuk mengimpor item. Kolom wajib: name, type, price, status.",
-        "fileLabel": "Pilih File",
-        "fileHint": "Format yang diterima: .csv, .xlsx (Maks 5MB)",
-        "downloadTemplate": "Unduh Templat",
-        "importing": "Mengimpor...",
-        "success": {
-          "title": "Impor Berhasil",
-          "description": "Item telah berhasil diimpor."
-        },
-        "error": {
-          "title": "Impor Gagal",
-          "description": "Terjadi kesalahan selama proses impor."
-        }
-      }
-    },
-    "export": {
-      "button": "Ekspor",
-      "dialog": {
-        "title": "Ekspor Item",
-        "description": "Pilih format dan kolom yang ingin Anda ekspor.",
-        "format": "Format",
-        "fields": "Kolom untuk Diekspor",
-        "exporting": "Mengekspor...",
-        "success": {
-          "title": "Ekspor Berhasil",
-          "description": "File sedang diunduh."
-        },
-        "fields_list": {
-          "code": "SKU",
-          "name": "Nama",
-          "type": "Tipe",
-          "price": "Harga",
-          "status": "Status",
-          "barcode": "Barcode",
-          "unit": "Unit",
-          "category": "Kategori",
-          "description": "Deskripsi"
-        }
-      }
-    },
-    "buttons": {
-      "new": "Item Baru",
-      "edit": "Ubah",
-      "view": "Lihat",
-      "cancel": "Batal"
-    },
-    "types": {
-      "PRODUCT": "Produk",
-      "SERVICE": "Layanan"
-    },
-    "serviceKinds": {
-      "MEMBERSHIP": "Keanggotaan",
-      "PT_SESSION": "Sesi PT"
-    }
-  },
-  "categories": {
-    "page": {
-      "title": "Kategori",
-      "description": "Kelola kategori katalog untuk mengorganisir item."
-    },
-    "create": {
-      "page": {
-        "title": "Kategori Baru",
-        "description": "Tambahkan kategori baru ke katalog."
-      }
-    },
-    "edit": {
-      "page": {
-        "title": "Edit Kategori",
-        "description": "Perbarui detail kategori."
-      }
-    },
-    "alerts": {
-      "noListPermission": "Anda tidak memiliki izin untuk melihat kategori.",
-      "noCreatePermission": "Anda tidak memiliki izin untuk membuat kategori.",
-      "noEditPermission": "Anda tidak memiliki izin untuk mengedit kategori."
-    },
-    "list": {
-      "table": {
-        "headers": {
-          "code": "Kode",
-          "name": "Nama",
-          "parent": "Induk",
-          "status": "Status",
-          "actions": "Aksi"
-        },
-        "empty": "Tidak ada kategori ditemukan"
-      },
-      "filters": {
-        "search": "Cari",
-        "searchPlaceholder": "Cari berdasarkan kode atau nama"
-      }
-    },
-    "form": {
-      "labels": {
-        "name": "Nama Kategori",
-        "parent": "Kategori Induk",
-        "status": "Status"
-      },
-      "placeholders": {
-        "name": "misal Keanggotaan",
-        "parent": "Pilih induk (opsional)",
-        "status": "Pilih status"
-      },
-      "validation": {
-        "nameRequired": "Nama kategori wajib diisi"
-      },
-      "buttons": {
-        "cancel": "Batal",
-        "create": "Buat Kategori",
-        "save": "Simpan Perubahan"
-      }
-    },
-    "toast": {
-      "createSuccess": {
-        "title": "Kategori dibuat",
-        "description": "Kategori telah berhasil ditambahkan."
-      },
-      "updateSuccess": {
-        "title": "Kategori diperbarui",
-        "description": "Perubahan telah berhasil disimpan."
-      },
-      "deleteSuccess": {
-        "title": "Kategori dihapus",
-        "description": "Kategori telah dihapus."
-      },
-      "error": {
-        "title": "Kesalahan",
-        "description": "Terjadi kesalahan. Silakan coba lagi."
-      },
-      "loadError": {
-        "title": "Kesalahan",
-        "description": "Gagal memuat data kategori."
-      }
-    },
-    "confirm": {
-      "delete": {
-        "title": "Hapus Kategori?",
-        "description": "Apakah Anda yakin ingin menghapus kategori ini? Tindakan ini tidak dapat dibatalkan.",
-        "confirmLabel": "Hapus"
-      }
-    },
-    "buttons": {
-      "new": "Kategori Baru",
-      "edit": "Edit"
-    }
-  },
-  "tags": {
-    "input": {
-      "placeholder": "Tambah tag...",
-      "searchPlaceholder": "Cari atau ketik tag baru...",
-      "noSuggestions": "Tidak ada tag cocok. Tekan Enter untuk membuat.",
-      "addNew": "Buat \"{tag}\"",
-      "loading": "Memuat..."
-    },
-    "page": {
-      "title": "Manajemen Tag",
-      "description": "Kelola tag organisasi, ubah nama, atau nonaktifkan tag yang tidak lagi digunakan."
-    },
-    "buttons": {
-      "new": "Tag Baru"
-    },
-    "filters": {
-      "searchPlaceholder": "Cari tag..."
-    },
-    "guards": {
-      "superAdminOnly": "Hanya Super Admin yang dapat mengelola tag."
-    },
-    "table": {
-      "headers": {
-        "name": "Nama",
-        "usage": "Jumlah Penggunaan",
-        "lastUsed": "Terakhir Digunakan",
-        "status": "Status",
-        "actions": "Aksi"
-      },
-      "empty": "Tidak ada tag ditemukan"
-    },
-    "dialogs": {
-      "delete": {
-        "title": "Hapus Tag",
-        "description": "Apakah Anda yakin ingin menghapus tag ini? Tindakan ini tidak dapat dibatalkan.",
-        "confirmLabel": "Hapus"
-      }
-    },
-    "form": {
-      "labels": {
-        "name": "Nama Tag",
-        "isActive": "Aktif"
-      },
-      "placeholders": {
-        "name": "Masukkan nama tag"
-      },
-      "validation": {
-        "nameRequired": "Nama tag wajib diisi"
-      },
-      "buttons": {
-        "cancel": "Batal",
-        "save": "Simpan Perubahan"
-      }
-    },
-    "toast": {
-      "fetchError": {
-        "title": "Gagal memuat tag",
-        "description": "Kami tidak dapat mengambil daftar tag saat ini."
-      },
-      "updateSuccess": {
-        "title": "Tag diperbarui",
-        "description": "Tag telah berhasil diperbarui."
-      },
-      "updateError": {
-        "title": "Gagal memperbarui tag",
-        "description": "Terjadi kesalahan saat menyimpan tag."
-      },
-      "deleteSuccess": {
-        "title": "Tag dihapus",
-        "description": "Tag telah dihapus."
-      },
-      "deleteError": {
-        "title": "Gagal menghapus tag",
-        "description": "Terjadi kesalahan saat menghapus tag."
-      }
-    }
-  }
-}
+  }}
