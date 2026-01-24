@@ -134,6 +134,7 @@ export class DocumentNumberService {
     const DEFAULTS: Record<string, { prefix: string }> = {
       'sales.order': { prefix: 'SO' },
       'sales.invoice': { prefix: 'INV' },
+      'sales.credit_note': { prefix: 'CN' },
       'purchasing.po': { prefix: 'PO' },
       'purchasing.grn': { prefix: 'GRN' },
       'accounting.journal': { prefix: 'JE' },

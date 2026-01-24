@@ -224,6 +224,21 @@ describe('DocumentNumberService', () => {
       });
     });
 
+    it('findOneSetting should return defaults for sales.credit_note', async () => {
+      findOneMock.mockResolvedValue(null);
+      const result = await service.findOneSetting(
+        tenantId,
+        'sales.credit_note',
+      );
+
+      expect(result).toMatchObject({
+        documentKey: 'sales.credit_note',
+        prefix: 'CN',
+        paddingLength: 6,
+        includePeriod: true,
+      });
+    });
+
     it('updateSetting should update existing settings', async () => {
       const existing = { documentKey: 'type-1', prefix: 'OLD', tenantId };
       findOneMock.mockResolvedValue(existing);
