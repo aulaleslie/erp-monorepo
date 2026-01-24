@@ -36,6 +36,9 @@ import { TagLinkEntity } from './tag-link.entity';
 import { SalesHeaderEntity } from './sales-header.entity';
 import { DocumentRelationEntity } from './document-relation.entity';
 import { SalesAttachmentEntity } from './sales-attachment.entity';
+import { SalesApprovalLevelEntity } from './sales-approval-level.entity';
+import { SalesApprovalLevelRoleEntity } from './sales-approval-level-role.entity';
+import { SalesApprovalEntity } from './sales-approval.entity';
 
 export {
   AuditLogEntity,
@@ -75,6 +78,9 @@ export {
   SalesHeaderEntity,
   DocumentRelationEntity,
   SalesAttachmentEntity,
+  SalesApprovalLevelEntity,
+  SalesApprovalLevelRoleEntity,
+  SalesApprovalEntity,
 };
 
 export const ALL_ENTITIES = [
@@ -110,4 +116,7 @@ export const ALL_ENTITIES = [
   SalesHeaderEntity,
   DocumentRelationEntity,
   SalesAttachmentEntity,
+  SalesApprovalLevelEntity,
+  SalesApprovalLevelRoleEntity,
+  SalesApprovalEntity,
 ];
