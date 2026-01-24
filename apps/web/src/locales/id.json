@@ -301,6 +301,92 @@
           }
         }
       }
+    },
+    "creditNotes": {
+      "page": {
+        "title": "Nota Kredit Penjualan",
+        "description": "Kelola nota kredit dan pembatalan untuk faktur penjualan."
+      },
+      "buttons": {
+        "new": "Nota Kredit Baru"
+      },
+      "filters": {
+        "status": "Status",
+        "statusPlaceholder": "Semua status",
+        "customer": "Pelanggan",
+        "customerPlaceholder": "Pilih pelanggan",
+        "number": "Nomor nota kredit",
+        "numberPlaceholder": "Filter berdasarkan nomor",
+        "search": "Cari",
+        "searchPlaceholder": "Cari berdasarkan nomor, nama, atau catatan",
+        "dateFrom": "Dari",
+        "dateTo": "Sampai",
+        "datePlaceholder": "Pilih tanggal",
+        "tag": "Tag",
+        "tagPlaceholder": "Cari tag",
+        "tagHelper": "Ketik tag lalu pilih untuk memfilter",
+        "clear": "Hapus filter",
+        "any": "Semua"
+      },
+      "list": {
+        "toast": {
+          "fetchError": {
+            "title": "Tidak dapat memuat nota kredit",
+            "description": "Terjadi kesalahan saat memuat nota kredit."
+          }
+        },
+        "table": {
+          "headers": {
+            "number": "Nomor",
+            "status": "Status",
+            "customer": "Pelanggan",
+            "salesperson": "Tenaga Penjualan",
+            "date": "Tanggal",
+            "invoice": "Faktur",
+            "total": "Total",
+            "actions": "Aksi"
+          },
+          "empty": "Tidak ada nota kredit ditemukan."
+        }
+      },
+      "detail": {
+        "title": "Nota Kredit {number}",
+        "sections": {
+          "actions": "Aksi",
+          "header": "Informasi Header",
+          "items": "Item Nota Kredit",
+          "history": "Riwayat Status",
+          "attachments": "Lampiran",
+          "relations": "Dokumen Terkait"
+        },
+        "buttons": {
+          "edit": "Ubah",
+          "submit": "Ajukan",
+          "approve": "Setujui",
+          "reject": "Tolak",
+          "requestRevision": "Minta Revisi",
+          "cancel": "Batalkan",
+          "post": "Bukukan",
+          "downloadPdf": "Unduh PDF"
+        },
+        "history": {
+          "status": "Status berubah menjadi {status}",
+          "by": "oleh {user}",
+          "at": "{time}",
+          "notes": "Catatan: {notes}",
+          "empty": "Riwayat status tidak ditemukan."
+        },
+        "toast": {
+          "actionSuccess": {
+            "title": "Aksi Berhasil",
+            "description": "Status nota kredit telah diperbarui."
+          },
+          "actionError": {
+            "title": "Aksi Gagal",
+            "description": "Terjadi kesalahan saat memperbarui status nota kredit."
+          }
+        }
+      }
     }
   },
   "purchase": {

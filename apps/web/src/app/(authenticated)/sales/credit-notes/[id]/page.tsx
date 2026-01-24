@@ -1,10 +1,365 @@
-export default function SalesCreditNoteDetailPage({ params }: { params: { id: string } }) {
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { format } from "date-fns";
+import {
+    ChevronLeft,
+    Download,
+    Send,
+    CheckCircle2,
+    Clock,
+    SendHorizonal,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+import { StatusBadge } from "@/components/common/StatusBadge";
+import { LoadingState } from "@/components/common/LoadingState";
+import { ConfirmDialog } from "@/components/common/ConfirmDialog";
+import { SalesAttachments } from "@/components/sales/SalesAttachments";
+import {
+    salesCreditNotesService,
+    SalesCreditNoteDetail,
+} from "@/services/sales-credit-notes";
+import {
+    documentsService,
+    DocumentStatusHistoryEntry,
+    DocumentRelation,
+} from "@/services/documents";
+import { useToast } from "@/hooks/use-toast";
+import { DocumentStatus } from "@gym-monorepo/shared";
+
+export default function CreditNoteDetailPage() {
+    const { id } = useParams() as { id: string };
+    const t = useTranslations("sales.creditNotes.detail");
+    const ts = useTranslations("sales.statusLabels");
+    const router = useRouter();
+    const { toast } = useToast();
+
+    const [creditNote, setCreditNote] = useState<SalesCreditNoteDetail | null>(null);
+    const [history, setHistory] = useState<DocumentStatusHistoryEntry[]>([]);
+    const [relations, setRelations] = useState<DocumentRelation[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [processing, setProcessing] = useState(false);
+
+    // Dialog states
+    const [confirmSubmit, setConfirmSubmit] = useState(false);
+    const [confirmApprove, setConfirmApprove] = useState(false);
+    const [confirmPost, setConfirmPost] = useState(false);
+
+    const loadData = async () => {
+        try {
+            const [cnData, historyData, relationData] = await Promise.all([
+                salesCreditNotesService.get(id),
+                documentsService.getStatusHistory(id),
+                documentsService.getRelations(id),
+            ]);
+            setCreditNote(cnData);
+            setHistory(historyData);
+            setRelations(relationData);
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "Failed to load credit note data.",
+                variant: "destructive",
+            });
+            router.push("/sales/credit-notes");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadData();
+    }, [id]);
+
+    const handleAction = async (action: string, notes?: string) => {
+        setProcessing(true);
+        try {
+            switch (action) {
+                case "submit":
+                    await salesCreditNotesService.submit(id);
+                    break;
+                case "approve":
+                    await salesCreditNotesService.approve(id, notes);
+                    break;
+                case "post":
+                    await salesCreditNotesService.post(id);
+                    break;
+            }
+            toast({
+                title: t("toast.actionSuccess.title"),
+                description: t("toast.actionSuccess.description"),
+            });
+            loadData();
+        } catch (error) {
+            toast({
+                title: t("toast.actionError.title"),
+                description: t("toast.actionError.description"),
+                variant: "destructive",
+            });
+        } finally {
+            setProcessing(false);
+        }
+    };
+
+    if (loading) return <LoadingState />;
+    if (!creditNote) return null;
+
+    const relatedInvoice = relations.find(r => r.relationType === "INVOICE_TO_CREDIT" && r.toDocumentId === id);
+
     return (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold mb-4">Sales Credit Note Details</h1>
-            <div className="p-4 border rounded shadow bg-white">
-                <p>Details for credit note ID: {params.id}</p>
+        <div className="space-y-6">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <Button variant="ghost" size="sm" onClick={() => router.back()}>
+                        <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <h2 className="text-2xl font-bold">
+                        {t("title", { number: creditNote.number })}
+                    </h2>
+                    <StatusBadge status={creditNote.status}>{ts(creditNote.status)}</StatusBadge>
+                </div>
+                <div className="flex gap-2">
+                    {(creditNote.status === DocumentStatus.DRAFT || creditNote.status === DocumentStatus.REVISION_REQUESTED) && (
+                        <Button onClick={() => setConfirmSubmit(true)} disabled={processing}>
+                            <Send className="mr-2 h-4 w-4" />
+                            {t("buttons.submit")}
+                        </Button>
+                    )}
+
+                    {creditNote.status === DocumentStatus.SUBMITTED && (
+                        <Button onClick={() => setConfirmApprove(true)} disabled={processing}>
+                            <CheckCircle2 className="mr-2 h-4 w-4" />
+                            {t("buttons.approve")}
+                        </Button>
+                    )}
+
+                    {creditNote.status === DocumentStatus.APPROVED && (
+                        <Button onClick={() => setConfirmPost(true)} disabled={processing} variant="default">
+                            <SendHorizonal className="mr-2 h-4 w-4" />
+                            {t("buttons.post")}
+                        </Button>
+                    )}
+
+                    <Button variant="outline">
+                        <Download className="mr-2 h-4 w-4" />
+                        {t("buttons.downloadPdf")}
+                    </Button>
+                </div>
             </div>
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                <div className="space-y-6 lg:col-span-2">
+                    {/* Header Info */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+                                {t("sections.header")}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid grid-cols-2 gap-y-4 sm:grid-cols-3">
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Customer</p>
+                                    <p className="font-medium">{creditNote.personName}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Date</p>
+                                    <p className="font-medium">
+                                        {format(new Date(creditNote.documentDate), "dd MMM yyyy")}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Salesperson</p>
+                                    <p className="font-medium">
+                                        {creditNote.salesHeader?.salesperson?.fullName || "-"}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Tax Mode</p>
+                                    <p className="font-medium">
+                                        {creditNote.salesHeader?.taxPricingMode}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-muted-foreground">External Ref</p>
+                                    <p className="font-medium">{creditNote.salesHeader?.externalRef || "-"}</p>
+                                </div>
+                                {relatedInvoice && (
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Related Invoice</p>
+                                        <Button
+                                            variant="link"
+                                            className="h-auto p-0 font-medium"
+                                            onClick={() => router.push(`/sales/invoices/${relatedInvoice.fromDocumentId}`)}
+                                        >
+                                            {relatedInvoice.fromDocument?.number || "View Invoice"}
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Items */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+                                {t("sections.items")}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="pl-6">Item</TableHead>
+                                        <TableHead>Qty</TableHead>
+                                        <TableHead>Price</TableHead>
+                                        <TableHead className="pr-6 text-right">Total</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {creditNote.items.map((item) => (
+                                        <TableRow key={item.id}>
+                                            <TableCell className="pl-6 font-medium">
+                                                {item.itemName}
+                                                {item.description && (
+                                                    <p className="text-xs font-normal text-muted-foreground">
+                                                        {item.description}
+                                                    </p>
+                                                )}
+                                            </TableCell>
+                                            <TableCell>{item.quantity}</TableCell>
+                                            <TableCell>{item.unitPrice.toLocaleString()}</TableCell>
+                                            <TableCell className="pr-6 text-right font-medium">
+                                                {item.lineTotal.toLocaleString()}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                            <div className="flex flex-col items-end gap-2 border-t p-6">
+                                <div className="flex w-40 justify-between text-sm">
+                                    <span className="text-muted-foreground">Subtotal</span>
+                                    <span>{creditNote.total.toLocaleString()}</span>
+                                </div>
+                                <div className="flex w-40 justify-between text-lg font-bold">
+                                    <span>Total</span>
+                                    <span>{creditNote.total.toLocaleString()}</span>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Attachments */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+                                {t("sections.attachments")}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <SalesAttachments documentId={id} />
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <div className="space-y-6">
+                    {/* Notes */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+                                Notes
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="whitespace-pre-wrap text-sm">
+                                {creditNote.notes || "No notes provided."}
+                            </p>
+                        </CardContent>
+                    </Card>
+
+                    {/* History */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+                                {t("sections.history")}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-4">
+                                {history.map((entry) => (
+                                    <div key={entry.id} className="relative flex gap-3 pb-4 last:pb-0">
+                                        <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted">
+                                            <Clock className="h-3 w-3 text-muted-foreground" />
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                            <p className="text-sm font-medium">
+                                                {t("history.status", { status: ts(entry.toStatus) })}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">
+                                                {t("history.by", { user: entry.changedByUser?.fullName || "System" })} •{" "}
+                                                {format(new Date(entry.changedAt), "dd MMM HH:mm")}
+                                            </p>
+                                            {entry.reason && (
+                                                <p className="mt-1 text-xs italic text-muted-foreground border-l-2 pl-2">
+                                                    {entry.reason}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+
+            <ConfirmDialog
+                open={confirmSubmit}
+                onOpenChange={setConfirmSubmit}
+                title="Submit Credit Note"
+                description="Are you sure you want to submit this credit note for approval?"
+                onConfirm={() => {
+                    setConfirmSubmit(false);
+                    handleAction("submit");
+                }}
+                confirmLabel="Submit"
+            />
+
+            <ConfirmDialog
+                open={confirmApprove}
+                onOpenChange={setConfirmApprove}
+                title="Approve Credit Note"
+                description="Are you sure you want to approve this credit note?"
+                onConfirm={() => {
+                    setConfirmApprove(false);
+                    handleAction("approve");
+                }}
+                confirmLabel="Approve"
+            />
+
+            <ConfirmDialog
+                open={confirmPost}
+                onOpenChange={setConfirmPost}
+                title="Post Credit Note"
+                description="Are you sure you want to post this credit note? This will lock the credit note for further changes."
+                onConfirm={() => {
+                    setConfirmPost(false);
+                    handleAction("post");
+                }}
+                confirmLabel="Post"
+            />
         </div>
     );
 }

@@ -301,6 +301,92 @@
           }
         }
       }
+    },
+    "creditNotes": {
+      "page": {
+        "title": "Sales Credit Notes",
+        "description": "Manage credit notes and reversals for sales invoices."
+      },
+      "buttons": {
+        "new": "New Credit Note"
+      },
+      "filters": {
+        "status": "Status",
+        "statusPlaceholder": "All statuses",
+        "customer": "Customer",
+        "customerPlaceholder": "Select a customer",
+        "number": "Credit note number",
+        "numberPlaceholder": "Filter by number",
+        "search": "Search",
+        "searchPlaceholder": "Search by number, name, or notes",
+        "dateFrom": "From",
+        "dateTo": "To",
+        "datePlaceholder": "Select a date",
+        "tag": "Tag",
+        "tagPlaceholder": "Search tags",
+        "tagHelper": "Type a tag and select it to filter",
+        "clear": "Clear filters",
+        "any": "Any"
+      },
+      "list": {
+        "toast": {
+          "fetchError": {
+            "title": "Unable to load credit notes",
+            "description": "Something went wrong while loading credit notes."
+          }
+        },
+        "table": {
+          "headers": {
+            "number": "Number",
+            "status": "Status",
+            "customer": "Customer",
+            "salesperson": "Salesperson",
+            "date": "Date",
+            "invoice": "Invoice",
+            "total": "Total",
+            "actions": "Actions"
+          },
+          "empty": "No credit notes found."
+        }
+      },
+      "detail": {
+        "title": "Credit Note {number}",
+        "sections": {
+          "actions": "Actions",
+          "header": "Header Information",
+          "items": "Credit Note Items",
+          "history": "Status History",
+          "attachments": "Attachments",
+          "relations": "Related Documents"
+        },
+        "buttons": {
+          "edit": "Edit",
+          "submit": "Submit",
+          "approve": "Approve",
+          "reject": "Reject",
+          "requestRevision": "Request Revision",
+          "cancel": "Cancel",
+          "post": "Post",
+          "downloadPdf": "Download PDF"
+        },
+        "history": {
+          "status": "Status changed to {status}",
+          "by": "by {user}",
+          "at": "{time}",
+          "notes": "Notes: {notes}",
+          "empty": "No status history found."
+        },
+        "toast": {
+          "actionSuccess": {
+            "title": "Action Successful",
+            "description": "The credit note status has been updated."
+          },
+          "actionError": {
+            "title": "Action Failed",
+            "description": "Something went wrong while updating the credit note status."
+          }
+        }
+      }
     }
   },
   "purchase": {

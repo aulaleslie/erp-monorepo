@@ -35,6 +35,7 @@ import {
     salesInvoicesService,
     SalesInvoiceDetail,
 } from "@/services/sales-invoices";
+import { salesCreditNotesService } from "@/services/sales-credit-notes";
 import {
     documentsService,
     DocumentStatusHistoryEntry,
@@ -58,6 +59,7 @@ export default function InvoiceDetailPage() {
     const [confirmSubmit, setConfirmSubmit] = useState(false);
     const [confirmApprove, setConfirmApprove] = useState(false);
     const [confirmPost, setConfirmPost] = useState(false);
+    const [confirmCreditNote, setConfirmCreditNote] = useState(false);
 
     const loadData = async () => {
         try {
@@ -99,6 +101,14 @@ export default function InvoiceDetailPage() {
                 case "post":
                     await salesInvoicesService.post(id);
                     break;
+                case "credit-note":
+                    const result = await salesCreditNotesService.createFromInvoice(id);
+                    toast({
+                        title: t("toast.actionSuccess.title"),
+                        description: "Credit note created successfully.",
+                    });
+                    router.push(`/sales/credit-notes/${result.id}`);
+                    return;
             }
             toast({
                 title: t("toast.actionSuccess.title"),
@@ -159,12 +169,20 @@ export default function InvoiceDetailPage() {
                         </Button>
                     )}
 
+                    {invoice.status === DocumentStatus.POSTED && (
+                        <Button onClick={() => setConfirmCreditNote(true)} disabled={processing} variant="outline">
+                            <RotateCcw className="mr-2 h-4 w-4" />
+                            {t("buttons.createCreditNote")}
+                        </Button>
+                    )}
+
                     <Button variant="outline">
                         <Download className="mr-2 h-4 w-4" />
                         {t("buttons.downloadPdf")}
                     </Button>
                 </div>
             </div>
+
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 <div className="space-y-6 lg:col-span-2">
@@ -369,6 +387,19 @@ export default function InvoiceDetailPage() {
                 }}
                 confirmLabel="Post"
             />
+
+            <ConfirmDialog
+                open={confirmCreditNote}
+                onOpenChange={setConfirmCreditNote}
+                title="Create Credit Note"
+                description="Are you sure you want to create a credit note for this invoice?"
+                onConfirm={() => {
+                    setConfirmCreditNote(false);
+                    handleAction("credit-note");
+                }}
+                confirmLabel="Create"
+            />
         </div>
     );
 }
+
