@@ -5,11 +5,12 @@ type StatusType = 'ACTIVE' | 'DISABLED' | 'PENDING' | 'INACTIVE' | string;
 
 interface StatusBadgeProps {
     status: StatusType;
+    children?: React.ReactNode;
     className?: string;
     variantMap?: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'>;
 }
 
-export function StatusBadge({ status, className, variantMap }: StatusBadgeProps) {
+export function StatusBadge({ status, children, className, variantMap }: StatusBadgeProps) {
     const getVariant = (s: string) => {
         if (variantMap && variantMap[s]) return variantMap[s];
 
@@ -32,7 +33,7 @@ export function StatusBadge({ status, className, variantMap }: StatusBadgeProps)
 
     return (
         <Badge variant={getVariant(status)} className={className}>
-            {status}
+            {children || status}
         </Badge>
     );
 }

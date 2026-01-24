@@ -20,6 +20,15 @@
       "title": "Modul Penjualan Segera Hadir",
       "description": "Kami sedang membangun sistem penjualan yang komprehensif untuk membantu Anda mengelola pesanan dan pelanggan secara efisien."
     },
+    "statusLabels": {
+      "DRAFT": "Draft",
+      "SUBMITTED": "Diajukan",
+      "APPROVED": "Disetujui",
+      "REJECTED": "Ditolak",
+      "REVISION_REQUESTED": "Revisi Diminta",
+      "CANCELLED": "Dibatalkan",
+      "POSTED": "Dibukukan"
+    },
     "orders": {
       "page": {
         "title": "Pesanan Penjualan",
@@ -116,6 +125,43 @@
       },
       "alerts": {
         "noPermission": "Anda tidak memiliki izin untuk melihat pesanan penjualan."
+      },
+      "detail": {
+        "title": "Pesanan {number}",
+        "sections": {
+          "actions": "Aksi",
+          "header": "Informasi Header",
+          "items": "Item Pesanan",
+          "history": "Riwayat Status",
+          "attachments": "Lampiran",
+          "relations": "Dokumen Terkait"
+        },
+        "buttons": {
+          "edit": "Ubah",
+          "submit": "Ajukan",
+          "approve": "Setujui",
+          "reject": "Tolak",
+          "requestRevision": "Minta Revisi",
+          "cancel": "Batalkan",
+          "downloadPdf": "Unduh PDF"
+        },
+        "history": {
+          "status": "Status berubah menjadi {status}",
+          "by": "oleh {user}",
+          "at": "{time}",
+          "notes": "Catatan: {notes}",
+          "empty": "Riwayat status tidak ditemukan."
+        },
+        "toast": {
+          "actionSuccess": {
+            "title": "Aksi Berhasil",
+            "description": "Status pesanan telah diperbarui."
+          },
+          "actionError": {
+            "title": "Aksi Gagal",
+            "description": "Terjadi kesalahan saat memperbarui status pesanan."
+          }
+        }
       }
     }
   },

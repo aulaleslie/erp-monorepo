@@ -20,6 +20,15 @@
       "title": "Sales Module Coming Soon",
       "description": "We're building a comprehensive sales system to help you manage orders and customers efficiently."
     },
+    "statusLabels": {
+      "DRAFT": "Draft",
+      "SUBMITTED": "Submitted",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected",
+      "REVISION_REQUESTED": "Revision Requested",
+      "CANCELLED": "Cancelled",
+      "POSTED": "Posted"
+    },
     "orders": {
       "page": {
         "title": "Sales Orders",
@@ -116,6 +125,43 @@
       },
       "alerts": {
         "noPermission": "You do not have permission to view sales orders."
+      },
+      "detail": {
+        "title": "Order {number}",
+        "sections": {
+          "actions": "Actions",
+          "header": "Header Information",
+          "items": "Order Items",
+          "history": "Status History",
+          "attachments": "Attachments",
+          "relations": "Related Documents"
+        },
+        "buttons": {
+          "edit": "Edit",
+          "submit": "Submit",
+          "approve": "Approve",
+          "reject": "Reject",
+          "requestRevision": "Request Revision",
+          "cancel": "Cancel",
+          "downloadPdf": "Download PDF"
+        },
+        "history": {
+          "status": "Status changed to {status}",
+          "by": "by {user}",
+          "at": "{time}",
+          "notes": "Notes: {notes}",
+          "empty": "No status history found."
+        },
+        "toast": {
+          "actionSuccess": {
+            "title": "Action Successful",
+            "description": "The order status has been updated."
+          },
+          "actionError": {
+            "title": "Action Failed",
+            "description": "Something went wrong while updating the order status."
+          }
+        }
       }
     }
   },
