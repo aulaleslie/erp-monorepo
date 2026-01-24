@@ -88,8 +88,8 @@ export class DocumentNumberService {
     let settings = await repository
       .createQueryBuilder('settings')
       .setLock('pessimistic_write')
-      .where('settings.tenant_id = :tenantId', { tenantId })
-      .andWhere('settings.document_key = :documentKey', { documentKey })
+      .where('settings.tenantId = :tenantId', { tenantId })
+      .andWhere('settings.documentKey = :documentKey', { documentKey })
       .getOne();
 
     if (!settings) {
@@ -111,8 +111,8 @@ export class DocumentNumberService {
       settings = await repository
         .createQueryBuilder('settings')
         .setLock('pessimistic_write')
-        .where('settings.tenant_id = :tenantId', { tenantId })
-        .andWhere('settings.document_key = :documentKey', { documentKey })
+        .where('settings.tenantId = :tenantId', { tenantId })
+        .andWhere('settings.documentKey = :documentKey', { documentKey })
         .getOne();
     }
 
