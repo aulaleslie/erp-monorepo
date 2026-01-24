@@ -1,12 +1,13 @@
-
-import { INestApplication, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { AppModule } from '../../src/app.module';
 import { PERMISSIONS } from '@gym-monorepo/shared';
 import { JwtService } from '@nestjs/jwt';
-import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
-import { ConfigService } from '@nestjs/config';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { JwtStrategy } from '../../src/modules/auth/jwt.strategy';
@@ -20,23 +21,27 @@ export class MockJwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: any) => {
-           // Try cookie
-           if (request?.cookies?.access_token) return request.cookies.access_token;
-           // Try header (fallback for easier testing)
-           if (request?.headers?.authorization) {
-               const [type, token] = request.headers.authorization.split(' ');
-               if (type === 'Bearer') return token;
-           }
-           return null;
-        }
+        (request: {
+          cookies?: Record<string, string>;
+          headers?: Record<string, string>;
+        }) => {
+          // Try cookie
+          if (request?.cookies?.['access_token'])
+            return request.cookies['access_token'];
+          // Try header (fallback for easier testing)
+          if (request?.headers?.['authorization']) {
+            const [type, token] = request.headers['authorization'].split(' ');
+            if (type === 'Bearer') return token;
+          }
+          return null;
+        },
       ]),
       ignoreExpiration: true,
       secretOrKey: 'secret', // Use hardcoded secret for mock
     });
   }
 
-  validate(payload: any) {
+  validate(payload: { sub: string; email: string; isSuperAdmin: boolean }) {
     return {
       id: payload.sub,
       email: payload.email,
@@ -46,34 +51,45 @@ export class MockJwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 }
 
 // Helper to create a mock JWT for a user with specific permissions
-const createMockToken = (jwtService: JwtService, secret: string, userId: string, tenantId: string, permissions: string[]) => {
-  return jwtService.sign({
-    sub: userId,
-    email: 'test@example.com',
-    tenants: [
-      {
-        tenantId,
-        roleId: 'role-1',
-        permissions,
-      },
-    ],
-    activeTenantId: tenantId,
-  }, { secret });
+const createMockToken = (
+  jwtService: JwtService,
+  secret: string,
+  userId: string,
+  tenantId: string,
+  permissions: string[],
+) => {
+  return jwtService.sign(
+    {
+      sub: userId,
+      email: 'test@example.com',
+      tenants: [
+        {
+          tenantId,
+          roleId: 'role-1',
+          permissions,
+        },
+      ],
+      activeTenantId: tenantId,
+    },
+    { secret },
+  );
 };
 
 describe('SalesApprovalsController (e2e)', () => {
   let app: NestFastifyApplication;
   let jwtService: JwtService;
   let secret: string = 'secret';
-  
+
   // Mutable permissions for mocking
   let mockUserPermissions: string[] = [];
 
   const mockUsersService = {
-    getPermissions: jest.fn().mockImplementation(() => Promise.resolve({
-      permissions: mockUserPermissions,
-      superAdmin: false,
-    })),
+    getPermissions: jest.fn().mockImplementation(() =>
+      Promise.resolve({
+        permissions: mockUserPermissions,
+        superAdmin: false,
+      }),
+    ),
   };
 
   const mockTenantsService = {
@@ -93,20 +109,20 @@ describe('SalesApprovalsController (e2e)', () => {
       const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [AppModule],
       })
-      .overrideProvider(JwtStrategy)
-      .useClass(MockJwtStrategy)
-      .overrideProvider(UsersService)
-      .useValue(mockUsersService)
-      .overrideProvider(TenantsService)
-      .useValue(mockTenantsService)
-      .overrideProvider(SalesApprovalsService)
-      .useValue(mockSalesApprovalsService)
-      .compile();
+        .overrideProvider(JwtStrategy)
+        .useClass(MockJwtStrategy)
+        .overrideProvider(UsersService)
+        .useValue(mockUsersService)
+        .overrideProvider(TenantsService)
+        .useValue(mockTenantsService)
+        .overrideProvider(SalesApprovalsService)
+        .useValue(mockSalesApprovalsService)
+        .compile();
 
       app = moduleFixture.createNestApplication<NestFastifyApplication>(
         new FastifyAdapter(),
       );
-      
+
       // Register cookie plugin as in main.ts
       const cookiePlugin = (await import('@fastify/cookie')).default;
       await app.register(cookiePlugin);
@@ -115,7 +131,7 @@ describe('SalesApprovalsController (e2e)', () => {
       await app.getHttpAdapter().getInstance().ready();
 
       jwtService = moduleFixture.get<JwtService>(JwtService);
-      
+
       // We use 'secret' because MockJwtStrategy uses 'secret'.
       secret = 'secret';
     } catch (e) {
@@ -138,9 +154,15 @@ describe('SalesApprovalsController (e2e)', () => {
 
     it('should return 403 if missing permission', async () => {
       // Token without SALES.APPROVE
-      const token = createMockToken(jwtService, secret, mockUserId, mockTenantId, []);
+      const token = createMockToken(
+        jwtService,
+        secret,
+        mockUserId,
+        mockTenantId,
+        [],
+      );
       mockUserPermissions = []; // Set permissions for this test
-      
+
       await request(app.getHttpServer())
         .get('/sales/approvals/config')
         .query({ documentKey: 'sales.order' })
@@ -150,7 +172,13 @@ describe('SalesApprovalsController (e2e)', () => {
     });
 
     it('should return 200 and config if authorized', async () => {
-      const token = createMockToken(jwtService, secret, mockUserId, mockTenantId, [PERMISSIONS.SALES.APPROVE]);
+      const token = createMockToken(
+        jwtService,
+        secret,
+        mockUserId,
+        mockTenantId,
+        [PERMISSIONS.SALES.APPROVE],
+      );
       mockUserPermissions = [PERMISSIONS.SALES.APPROVE];
 
       await request(app.getHttpServer())
@@ -163,34 +191,49 @@ describe('SalesApprovalsController (e2e)', () => {
   });
 
   describe('PUT /sales/approvals/config', () => {
-     it('should return 403 if missing UPDATE permission', async () => {
-       const token = createMockToken(jwtService, secret, mockUserId, mockTenantId, [PERMISSIONS.SALES.APPROVE]);
-       mockUserPermissions = [PERMISSIONS.SALES.APPROVE];
-       
-       await request(app.getHttpServer())
+    it('should return 403 if missing UPDATE permission', async () => {
+      const token = createMockToken(
+        jwtService,
+        secret,
+        mockUserId,
+        mockTenantId,
+        [PERMISSIONS.SALES.APPROVE],
+      );
+      mockUserPermissions = [PERMISSIONS.SALES.APPROVE];
+
+      await request(app.getHttpServer())
         .put('/sales/approvals/config')
         .send({
-            documentKey: 'sales.order',
-            levels: []
+          documentKey: 'sales.order',
+          levels: [],
         })
         .set('Cookie', [`access_token=${token}; active_tenant=${mockTenantId}`])
         .set('x-tenant-id', mockTenantId)
         .expect(403);
-     });
+    });
 
-      it('should return 200 if authorized', async () => {
-       const token = createMockToken(jwtService, secret, mockUserId, mockTenantId, [PERMISSIONS.SALES.APPROVE, PERMISSIONS.SALES.UPDATE]);
-       mockUserPermissions = [PERMISSIONS.SALES.APPROVE, PERMISSIONS.SALES.UPDATE];
-       
-       await request(app.getHttpServer())
+    it('should return 200 if authorized', async () => {
+      const token = createMockToken(
+        jwtService,
+        secret,
+        mockUserId,
+        mockTenantId,
+        [PERMISSIONS.SALES.APPROVE, PERMISSIONS.SALES.UPDATE],
+      );
+      mockUserPermissions = [
+        PERMISSIONS.SALES.APPROVE,
+        PERMISSIONS.SALES.UPDATE,
+      ];
+
+      await request(app.getHttpServer())
         .put('/sales/approvals/config')
         .send({
-            documentKey: 'sales.order',
-            levels: []
+          documentKey: 'sales.order',
+          levels: [],
         })
         .set('Cookie', [`access_token=${token}; active_tenant=${mockTenantId}`])
         .set('x-tenant-id', mockTenantId)
         .expect(200);
-     });
+    });
   });
 });

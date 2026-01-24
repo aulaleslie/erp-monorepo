@@ -253,7 +253,7 @@ describe('SalesApprovalsService', () => {
     it('should return levels with roles', async () => {
       const mockResult = [
         { levelIndex: 0, roles: [{ role: { name: 'Admin' } }] },
-      ] as any;
+      ] as unknown as SalesApprovalLevelEntity[];
       jest.spyOn(levelRepo, 'find').mockResolvedValue(mockResult);
 
       const result = await service.getConfig(mockTenantId, 'sales.order');
@@ -282,7 +282,9 @@ describe('SalesApprovalsService', () => {
           .fn()
           .mockResolvedValue([{ id: 'level-old-1' }, { id: 'level-old-2' }]),
         delete: jest.fn(),
-        create: jest.fn((entity, data) => ({ ...data, id: 'new-id' })),
+        create: jest.fn(
+          (entity, data) => ({ ...data, id: 'new-id' }) as unknown,
+        ),
         save: jest.fn(),
       };
 
@@ -291,7 +293,9 @@ describe('SalesApprovalsService', () => {
       );
 
       // Mock getConfig to return result
-      jest.spyOn(service, 'getConfig').mockResolvedValue([] as any);
+      jest
+        .spyOn(service, 'getConfig')
+        .mockResolvedValue([] as SalesApprovalLevelEntity[]);
 
       await service.updateConfig(mockTenantId, dto, mockUserId);
 

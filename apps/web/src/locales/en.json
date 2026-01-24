@@ -192,7 +192,14 @@
     "members": "Members",
     "scheduling": "Scheduling",
     "inventorySales": "Inventory & Sales",
-    "administration": "Administration"
+    "administration": "Administration",
+    "salesOrders": "Sales Orders",
+    "invoices": "Invoices",
+    "creditNotes": "Credit Notes",
+    "salesApprovals": "Approvals",
+    "approvalOrders": "Orders",
+    "approvalInvoices": "Invoices",
+    "approvalConfig": "Configuration"
   },
   "labels": {
     "tenantSettings": {
