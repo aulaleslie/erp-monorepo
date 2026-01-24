@@ -14,6 +14,7 @@ import { TenantsModule } from '../../tenants/tenants.module';
 import { UsersModule } from '../../users/users.module';
 import { SalesOrdersService } from './sales-orders.service';
 import { SalesOrdersController } from './sales-orders.controller';
+import { SalesApprovalsModule } from '../approvals/sales-approvals.module';
 
 @Module({
   imports: [
@@ -30,7 +31,9 @@ import { SalesOrdersController } from './sales-orders.controller';
     DocumentsModule,
     PeopleModule,
     TenantsModule,
+    TenantsModule,
     UsersModule,
+    SalesApprovalsModule,
   ],
   controllers: [SalesOrdersController],
   providers: [SalesOrdersService],

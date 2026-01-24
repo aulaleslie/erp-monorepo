@@ -16,6 +16,7 @@ import { SalesCreditNotesService } from './sales-credit-notes.service';
 import { TenantsModule } from '../../tenants/tenants.module';
 import { UsersModule } from '../../users/users.module';
 import { PeopleModule } from '../../people/people.module';
+import { SalesApprovalsModule } from '../approvals/sales-approvals.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { PeopleModule } from '../../people/people.module';
     TenantsModule,
     UsersModule,
     PeopleModule,
+    SalesApprovalsModule,
   ],
   controllers: [SalesCreditNotesController],
   providers: [SalesCreditNotesService],

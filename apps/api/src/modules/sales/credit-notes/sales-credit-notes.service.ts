@@ -24,6 +24,7 @@ import {
 import { DocumentsService } from '../../documents/documents.service';
 import { UpdateSalesCreditNoteDto } from './dtos/update-sales-credit-note.dto';
 import { CreateSalesCreditNoteDto } from './dtos/create-sales-credit-note.dto';
+import { SalesApprovalsService } from '../approvals/sales-approvals.service';
 
 @Injectable()
 export class SalesCreditNotesService {
@@ -39,6 +40,7 @@ export class SalesCreditNotesService {
     @InjectRepository(ItemEntity)
     private readonly itemRepository: Repository<ItemEntity>,
     private readonly documentsService: DocumentsService,
+    private readonly salesApprovalsService: SalesApprovalsService,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -382,29 +384,22 @@ export class SalesCreditNotesService {
     });
   }
 
-  // Helper methods to delegate to DocumentsService
+  // Approval actions delegated to SalesApprovalsService
   async submit(id: string, tenantId: string, userId: string) {
-    return this.documentsService.submit(id, tenantId, userId);
+    return this.salesApprovalsService.submit(id, tenantId, userId);
   }
 
-  async approveStep(
+  async approve(
     id: string,
-    stepIndex: number,
-    notes: string,
+    notes: string | null,
     tenantId: string,
     userId: string,
   ) {
-    return this.documentsService.approveStep(
-      id,
-      stepIndex,
-      notes,
-      tenantId,
-      userId,
-    );
+    return this.salesApprovalsService.approve(id, notes, tenantId, userId);
   }
 
   async reject(id: string, notes: string, tenantId: string, userId: string) {
-    return this.documentsService.reject(id, notes, tenantId, userId);
+    return this.salesApprovalsService.reject(id, notes, tenantId, userId);
   }
 
   async requestRevision(
@@ -413,7 +408,12 @@ export class SalesCreditNotesService {
     tenantId: string,
     userId: string,
   ) {
-    return this.documentsService.requestRevision(id, notes, tenantId, userId);
+    return this.salesApprovalsService.requestRevision(
+      id,
+      notes,
+      tenantId,
+      userId,
+    );
   }
 
   async cancel(id: string, notes: string, tenantId: string, userId: string) {

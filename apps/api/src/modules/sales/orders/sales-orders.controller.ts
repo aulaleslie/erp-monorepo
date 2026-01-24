@@ -112,19 +112,17 @@ export class SalesOrdersController {
     return this.salesOrdersService.submit(id, tenantId, userId);
   }
 
-  @Post(':id/approve/:stepIndex')
-  @ApiOperation({ summary: 'Approve sales order step' })
+  @Post(':id/approve')
+  @ApiOperation({ summary: 'Approve sales order' })
   @RequirePermissions(PERMISSIONS.SALES.APPROVE)
-  async approveStep(
+  async approve(
     @Param('id') id: string,
-    @Param('stepIndex') stepIndex: string,
     @Body() dto: ApproveDocumentDto,
     @CurrentTenant() tenantId: string,
     @CurrentUser('id') userId: string,
   ) {
-    return this.salesOrdersService.approveStep(
+    return this.salesOrdersService.approve(
       id,
-      parseInt(stepIndex, 10),
       dto.notes || '',
       tenantId,
       userId,

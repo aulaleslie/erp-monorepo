@@ -9,6 +9,10 @@ import { SalesPdfService } from './pdf/sales-pdf.service';
 import { SalesDocumentsController } from './sales-documents.controller';
 import { DocumentEntity, TenantEntity } from '../../database/entities';
 
+import { SalesApprovalsModule } from './approvals/sales-approvals.module';
+import { TenantsModule } from '../tenants/tenants.module';
+import { UsersModule } from '../users/users.module';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([SalesHeaderEntity, DocumentEntity, TenantEntity]),
@@ -16,6 +20,9 @@ import { DocumentEntity, TenantEntity } from '../../database/entities';
     SalesInvoicesModule,
     SalesCreditNotesModule,
     SalesAttachmentsModule,
+    SalesApprovalsModule,
+    TenantsModule,
+    UsersModule,
   ],
   controllers: [SalesDocumentsController],
   providers: [SalesPdfService],

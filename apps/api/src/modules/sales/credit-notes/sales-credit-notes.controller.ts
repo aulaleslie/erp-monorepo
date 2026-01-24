@@ -102,19 +102,17 @@ export class SalesCreditNotesController {
     return this.salesCreditNotesService.submit(id, tenantId, userId);
   }
 
-  @Post(':id/approve/:stepIndex')
-  @ApiOperation({ summary: 'Approve sales credit note step' })
+  @Post(':id/approve')
+  @ApiOperation({ summary: 'Approve sales credit note' })
   @RequirePermissions(PERMISSIONS.SALES.APPROVE)
-  async approveStep(
+  async approve(
     @Param('id') id: string,
-    @Param('stepIndex') stepIndex: string,
     @Body() dto: ApproveDocumentDto,
     @CurrentTenant() tenantId: string,
     @CurrentUser('id') userId: string,
   ) {
-    return this.salesCreditNotesService.approveStep(
+    return this.salesCreditNotesService.approve(
       id,
-      parseInt(stepIndex, 10),
       dto.notes || '',
       tenantId,
       userId,
