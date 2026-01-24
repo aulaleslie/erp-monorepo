@@ -18,6 +18,9 @@ import {
     ShoppingCart,
     CreditCard,
     Tag,
+    FileText,
+    FileMinus,
+    CheckCircle2,
 } from "lucide-react";
 
 export interface SidebarItem {
@@ -101,10 +104,53 @@ export const sidebarConfig: SidebarItem[] = [
                 href: "/inventory",
             },
             {
-                label: "Sales",
-                labelKey: "sales",
+                label: "Sales Orders",
+                labelKey: "salesOrders",
                 icon: ShoppingCart,
-                href: "/sales",
+                href: "/sales/orders",
+                permissions: ["sales.read"],
+            },
+            {
+                label: "Invoices",
+                labelKey: "invoices",
+                icon: FileText,
+                href: "/sales/invoices",
+                permissions: ["sales.read"],
+            },
+            {
+                label: "Credit Notes",
+                labelKey: "creditNotes",
+                icon: FileMinus,
+                href: "/sales/credit-notes",
+                permissions: ["sales.read"],
+            },
+            {
+                label: "Approvals",
+                labelKey: "salesApprovals",
+                icon: CheckCircle2,
+                children: [
+                    {
+                        label: "Orders",
+                        labelKey: "approvalOrders",
+                        icon: ShoppingCart,
+                        href: "/sales/orders/approvals",
+                        permissions: ["sales.read"], // Or specific approval permission
+                    },
+                    {
+                        label: "Invoices",
+                        labelKey: "approvalInvoices",
+                        icon: FileText,
+                        href: "/sales/invoices/approvals",
+                        permissions: ["sales.read"],
+                    },
+                     {
+                        label: "Configuration",
+                        labelKey: "approvalConfig",
+                        icon: Settings,
+                        href: "/sales/approvals/config",
+                        permissions: ["sales.approve", "sales.update"],
+                    },
+                ]
             },
             {
                 label: "Purchase",
