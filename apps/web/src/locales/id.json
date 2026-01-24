@@ -163,6 +163,144 @@
           }
         }
       }
+    },
+    "invoices": {
+      "page": {
+        "title": "Faktur Penjualan",
+        "description": "Kelola tagihan Anda dan lacak status pembayaran."
+      },
+      "buttons": {
+        "new": "Faktur Baru"
+      },
+      "filters": {
+        "status": "Status",
+        "statusPlaceholder": "Semua status",
+        "customer": "Pelanggan",
+        "customerPlaceholder": "Pilih pelanggan",
+        "number": "Nomor faktur",
+        "numberPlaceholder": "Filter berdasarkan nomor",
+        "search": "Cari",
+        "searchPlaceholder": "Cari berdasarkan nomor, nama, atau catatan",
+        "dateFrom": "Dari",
+        "dateTo": "Sampai",
+        "datePlaceholder": "Pilih tanggal",
+        "tag": "Tag",
+        "tagPlaceholder": "Cari tag",
+        "tagHelper": "Ketik tag lalu pilih untuk memfilter",
+        "clear": "Hapus filter",
+        "any": "Semua"
+      },
+      "list": {
+        "toast": {
+          "fetchError": {
+            "title": "Tidak dapat memuat faktur",
+            "description": "Terjadi kesalahan saat memuat faktur."
+          }
+        },
+        "table": {
+          "headers": {
+            "number": "Nomor",
+            "status": "Status",
+            "customer": "Pelanggan",
+            "salesperson": "Tenaga Penjualan",
+            "dueDate": "Jatuh Tempo",
+            "total": "Total",
+            "actions": "Aksi"
+          },
+          "empty": "Tidak ada faktur ditemukan."
+        }
+      },
+      "form": {
+        "generalHeader": "Informasi umum",
+        "documentDate": "Tanggal Terbit",
+        "dueDate": "Tanggal Jatuh Tempo",
+        "customerLabel": "Pelanggan",
+        "customerPlaceholder": "Pilih pelanggan",
+        "salespersonLabel": "Tenaga Penjualan",
+        "salespersonPlaceholder": "Pilih tenaga penjualan",
+        "notSet": "Belum diatur",
+        "externalRefLabel": "Referensi Eksternal",
+        "externalRefPlaceholder": "Masukkan referensi eksternal",
+        "paymentTermsLabel": "Syarat Pembayaran",
+        "paymentTermsPlaceholder": "Masukkan syarat pembayaran",
+        "taxModeLabel": "Mode Penetapan Pajak",
+        "taxModePlaceholder": "Pilih mode pajak",
+        "taxModeInclusive": "Termasuk pajak",
+        "taxModeExclusive": "Belum termasuk pajak",
+        "itemsHeader": "Item Faktur",
+        "itemsTable": {
+          "headers": {
+            "item": "Item",
+            "description": "Deskripsi",
+            "quantity": "Kuantitas",
+            "price": "Harga",
+            "tax": "Pajak",
+            "lineTotal": "Total Baris"
+          }
+        },
+        "itemPlaceholder": "Pilih item",
+        "descriptionPlaceholder": "Tambahkan deskripsi item",
+        "addItem": "Tambah item",
+        "toast": {
+          "error": {
+            "title": "Tidak dapat memuat data referensi",
+            "description": "Segarkan halaman untuk mencoba lagi."
+          },
+          "success": {
+            "title": "Faktur Disimpan",
+            "description": "Faktur telah berhasil diperbarui."
+          },
+          "createSuccess": {
+            "title": "Faktur Dibuat",
+            "description": "Faktur telah berhasil dibuat."
+          }
+        },
+        "summary": {
+          "subtotal": "Subtotal",
+          "tax": "Pajak",
+          "total": "Total",
+          "notesPlaceholder": "Tambahkan catatan faktur (opsional)"
+        }
+      },
+      "detail": {
+        "title": "Faktur {number}",
+        "sections": {
+          "actions": "Aksi",
+          "header": "Informasi Header",
+          "items": "Item Faktur",
+          "history": "Riwayat Status",
+          "attachments": "Lampiran",
+          "relations": "Dokumen Terkait"
+        },
+        "buttons": {
+          "edit": "Ubah",
+          "submit": "Ajukan",
+          "approve": "Setujui",
+          "reject": "Tolak",
+          "requestRevision": "Minta Revisi",
+          "cancel": "Batalkan",
+          "post": "Bukukan",
+          "downloadPdf": "Unduh PDF",
+          "createCreditNote": "Buat Nota Kredit"
+        },
+        "history": {
+          "status": "Status berubah menjadi {status}",
+          "by": "oleh {user}",
+          "at": "{time}",
+          "notes": "Catatan: {notes}",
+          "empty": "Riwayat status tidak ditemukan."
+        },
+        "toast": {
+          "actionSuccess": {
+            "title": "Aksi Berhasil",
+            "description": "Status faktur telah diperbarui."
+          },
+          "actionError": {
+            "title": "Aksi Gagal",
+            "description": "Terjadi kesalahan saat memperbarui status faktur."
+          }
+        }
+      }
     }
   },
   "purchase": {

@@ -163,6 +163,144 @@
           }
         }
       }
+    },
+    "invoices": {
+      "page": {
+        "title": "Sales Invoices",
+        "description": "Manage your billings and track payment statuses."
+      },
+      "buttons": {
+        "new": "New Invoice"
+      },
+      "filters": {
+        "status": "Status",
+        "statusPlaceholder": "All statuses",
+        "customer": "Customer",
+        "customerPlaceholder": "Select a customer",
+        "number": "Invoice number",
+        "numberPlaceholder": "Filter by number",
+        "search": "Search",
+        "searchPlaceholder": "Search by number, name, or notes",
+        "dateFrom": "From",
+        "dateTo": "To",
+        "datePlaceholder": "Select a date",
+        "tag": "Tag",
+        "tagPlaceholder": "Search tags",
+        "tagHelper": "Type a tag and select it to filter",
+        "clear": "Clear filters",
+        "any": "Any"
+      },
+      "list": {
+        "toast": {
+          "fetchError": {
+            "title": "Unable to load invoices",
+            "description": "Something went wrong while loading invoices."
+          }
+        },
+        "table": {
+          "headers": {
+            "number": "Number",
+            "status": "Status",
+            "customer": "Customer",
+            "salesperson": "Salesperson",
+            "dueDate": "Due Date",
+            "total": "Total",
+            "actions": "Actions"
+          },
+          "empty": "No invoices found."
+        }
+      },
+      "form": {
+        "generalHeader": "General information",
+        "documentDate": "Issue Date",
+        "dueDate": "Due Date",
+        "customerLabel": "Customer",
+        "customerPlaceholder": "Select a customer",
+        "salespersonLabel": "Salesperson",
+        "salespersonPlaceholder": "Select a salesperson",
+        "notSet": "Not set",
+        "externalRefLabel": "External Reference",
+        "externalRefPlaceholder": "Enter external reference",
+        "paymentTermsLabel": "Payment Terms",
+        "paymentTermsPlaceholder": "Enter payment terms",
+        "taxModeLabel": "Tax Pricing Mode",
+        "taxModePlaceholder": "Choose a tax mode",
+        "taxModeInclusive": "Inclusive",
+        "taxModeExclusive": "Exclusive",
+        "itemsHeader": "Invoice Items",
+        "itemsTable": {
+          "headers": {
+            "item": "Item",
+            "description": "Description",
+            "quantity": "Quantity",
+            "price": "Price",
+            "tax": "Tax",
+            "lineTotal": "Line total"
+          }
+        },
+        "itemPlaceholder": "Select an item",
+        "descriptionPlaceholder": "Add item description",
+        "addItem": "Add item",
+        "toast": {
+          "error": {
+            "title": "Unable to load reference data",
+            "description": "Refresh the page to try again."
+          },
+          "success": {
+            "title": "Invoice Saved",
+            "description": "The invoice has been updated successfully."
+          },
+          "createSuccess": {
+            "title": "Invoice Created",
+            "description": "The invoice has been created successfully."
+          }
+        },
+        "summary": {
+          "subtotal": "Subtotal",
+          "tax": "Tax",
+          "total": "Total",
+          "notesPlaceholder": "Add invoice notes (optional)"
+        }
+      },
+      "detail": {
+        "title": "Invoice {number}",
+        "sections": {
+          "actions": "Actions",
+          "header": "Header Information",
+          "items": "Invoice Items",
+          "history": "Status History",
+          "attachments": "Attachments",
+          "relations": "Related Documents"
+        },
+        "buttons": {
+          "edit": "Edit",
+          "submit": "Submit",
+          "approve": "Approve",
+          "reject": "Reject",
+          "requestRevision": "Request Revision",
+          "cancel": "Cancel",
+          "post": "Post",
+          "downloadPdf": "Download PDF",
+          "createCreditNote": "Create Credit Note"
+        },
+        "history": {
+          "status": "Status changed to {status}",
+          "by": "by {user}",
+          "at": "{time}",
+          "notes": "Notes: {notes}",
+          "empty": "No status history found."
+        },
+        "toast": {
+          "actionSuccess": {
+            "title": "Action Successful",
+            "description": "The invoice status has been updated."
+          },
+          "actionError": {
+            "title": "Action Failed",
+            "description": "Something went wrong while updating the invoice status."
+          }
+        }
+      }
     }
   },
   "purchase": {
