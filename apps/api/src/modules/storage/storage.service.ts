@@ -10,6 +10,8 @@ import {
   MAX_FILE_SIZE,
   ALLOWED_IMAGE_MIME_TYPES,
   AllowedImageMimeType,
+  ALLOWED_DOCUMENT_MIME_TYPES,
+  AllowedDocumentMimeType,
 } from './storage.constants';
 import { IStorageDriver } from './drivers/storage.driver.interface';
 import { MinioStorageDriver } from './drivers/minio.driver';
@@ -71,6 +73,25 @@ export class StorageService implements OnModuleInit {
   }
 
   /**
+   * Validate document type and size before upload
+   */
+  validateDocument(mimeType: string, size: number): void {
+    if (
+      !ALLOWED_DOCUMENT_MIME_TYPES.includes(mimeType as AllowedDocumentMimeType)
+    ) {
+      throw new BadRequestException(
+        `Invalid file type: ${mimeType}. Allowed types: ${ALLOWED_DOCUMENT_MIME_TYPES.join(', ')}`,
+      );
+    }
+
+    if (size > MAX_FILE_SIZE) {
+      throw new BadRequestException(
+        `File size ${size} bytes exceeds maximum allowed size of ${MAX_FILE_SIZE} bytes (1MB)`,
+      );
+    }
+  }
+
+  /**
    * Generate a unique object key with prefix
    */
   generateObjectKey(prefix: string, originalFilename: string): string {
@@ -90,6 +111,21 @@ export class StorageService implements OnModuleInit {
     size: number,
   ): Promise<string> {
     this.validateFile(mimeType, size);
+
+    return this.driver.uploadFile(buffer, objectKey, mimeType, size);
+  }
+
+  /**
+   * Upload a document
+   * @returns The public URL of the uploaded document
+   */
+  async uploadDocument(
+    buffer: Buffer,
+    objectKey: string,
+    mimeType: string,
+    size: number,
+  ): Promise<string> {
+    this.validateDocument(mimeType, size);
 
     return this.driver.uploadFile(buffer, objectKey, mimeType, size);
   }

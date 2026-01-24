@@ -4,6 +4,7 @@ import { SalesHeaderEntity } from '../../database/entities/sales-header.entity';
 import { SalesOrdersModule } from './orders/sales-orders.module';
 import { SalesInvoicesModule } from './invoices/sales-invoices.module';
 import { SalesCreditNotesModule } from './credit-notes/sales-credit-notes.module';
+import { SalesAttachmentsModule } from './attachments/sales-attachments.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { SalesCreditNotesModule } from './credit-notes/sales-credit-notes.module
     SalesOrdersModule,
     SalesInvoicesModule,
     SalesCreditNotesModule,
+    SalesAttachmentsModule,
   ],
   controllers: [],
   providers: [],
@@ -19,6 +21,7 @@ import { SalesCreditNotesModule } from './credit-notes/sales-credit-notes.module
     SalesOrdersModule,
     SalesInvoicesModule,
     SalesCreditNotesModule,
+    SalesAttachmentsModule,
   ],
 })
 export class SalesModule {}
