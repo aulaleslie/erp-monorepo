@@ -245,4 +245,42 @@ describe('MembersService', () => {
       expect(memberRepository.save).toHaveBeenCalled();
     });
   });
+
+  describe('computeMemberExpiry', () => {
+    it('should update currentExpiryDate to null', async () => {
+      const memberId = 'member-1';
+      const member = {
+        id: memberId,
+        tenantId,
+        currentExpiryDate: new Date(),
+      };
+
+      memberRepository.findOne!.mockResolvedValue(member);
+      memberRepository.save!.mockResolvedValue(member);
+
+      await service.computeMemberExpiry(tenantId, memberId);
+
+      expect(memberRepository.findOne).toHaveBeenCalledWith({
+        where: { id: memberId, tenantId },
+        relations: { person: true },
+      });
+      expect(member.currentExpiryDate).toBeNull();
+      expect(memberRepository.save).toHaveBeenCalled();
+    });
+
+    it('should not save if currentExpiryDate is already null', async () => {
+      const memberId = 'member-1';
+      const member = {
+        id: memberId,
+        tenantId,
+        currentExpiryDate: null,
+      };
+
+      memberRepository.findOne!.mockResolvedValue(member);
+
+      await service.computeMemberExpiry(tenantId, memberId);
+
+      expect(memberRepository.save).not.toHaveBeenCalled();
+    });
+  });
 });

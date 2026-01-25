@@ -205,4 +205,24 @@ export class MembersService {
       throw new BadRequestException(ERROR_CODES.MEMBER.PROFILE_INCOMPLETE);
     }
   }
+
+  /**
+   * Computes and updates the member's current expiry date based on active memberships.
+   *
+   * @todo Implement full logic when Memberships module (C6B) is available.
+   * Current implementation assumes no active memberships (always null).
+   */
+  async computeMemberExpiry(tenantId: string, id: string): Promise<void> {
+    const member = await this.findOne(tenantId, id);
+
+    // TODO: Cycle 6B - Query active memberships and find max end_date
+    // const maxExpiry = ...
+
+    const maxExpiry = null; // Default to null for now
+
+    if (member.currentExpiryDate !== maxExpiry) {
+      member.currentExpiryDate = maxExpiry;
+      await this.memberRepository.save(member);
+    }
+  }
 }
