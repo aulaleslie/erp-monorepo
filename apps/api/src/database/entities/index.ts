@@ -42,6 +42,7 @@ import { SalesAttachmentEntity } from './sales-attachment.entity';
 import { SalesApprovalLevelEntity } from './sales-approval-level.entity';
 import { SalesApprovalLevelRoleEntity } from './sales-approval-level-role.entity';
 import { SalesApprovalEntity } from './sales-approval.entity';
+import { PtPackageEntity } from './pt-package.entity';
 
 export {
   AuditLogEntity,
@@ -87,6 +88,7 @@ export {
   MemberEntity,
   MembershipEntity,
   MembershipHistoryEntity,
+  PtPackageEntity,
 };
 
 export const ALL_ENTITIES = [
@@ -128,4 +130,5 @@ export const ALL_ENTITIES = [
   MemberEntity,
   MembershipEntity,
   MembershipHistoryEntity,
+  PtPackageEntity,
 ];
