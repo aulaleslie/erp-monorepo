@@ -203,4 +203,21 @@ export const corePermissions: SeedPermission[] = [
   },
   { code: PERMISSIONS.TAGS.ASSIGN, name: 'Assign Tags', group: 'Tags' },
   { code: PERMISSIONS.TAGS.MANAGE, name: 'Manage Tags', group: 'Tags' },
+  // Members
+  { code: PERMISSIONS.MEMBERS.READ, name: 'Read Members', group: 'Members' },
+  {
+    code: PERMISSIONS.MEMBERS.CREATE,
+    name: 'Create Members',
+    group: 'Members',
+  },
+  {
+    code: PERMISSIONS.MEMBERS.UPDATE,
+    name: 'Update Members',
+    group: 'Members',
+  },
+  {
+    code: PERMISSIONS.MEMBERS.DELETE,
+    name: 'Delete Members',
+    group: 'Members',
+  },
 ];

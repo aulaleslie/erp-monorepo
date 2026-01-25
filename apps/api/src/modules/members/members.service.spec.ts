@@ -220,10 +220,13 @@ describe('MembersService', () => {
         fail('Should have thrown BadRequestException');
       } catch (error) {
         expect(error).toBeInstanceOf(BadRequestException);
-        const response = (error as BadRequestException).getResponse() as any;
+        const response = (error as BadRequestException).getResponse() as {
+          code: string;
+          details?: { missingFields: string[] };
+        };
         expect(response.code).toBe('MEMBER_PROFILE_INCOMPLETE');
         expect(response.details).toBeDefined();
-        expect(response.details.missingFields).toContain('agreesToTerms');
+        expect(response.details?.missingFields).toContain('agreesToTerms');
       }
     });
   });

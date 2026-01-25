@@ -20,6 +20,7 @@ import { TenantUserEntity } from './tenant-user.entity';
 import { TenantEntity } from './tenant.entity';
 import { UserEntity } from './user.entity';
 import { MemberEntity } from './member.entity';
+import { MembershipEntity } from './membership.entity';
 import { ChartOfAccountsEntity } from './chart-of-accounts.entity';
 import { CostCenterEntity } from './cost-center.entity';
 import { DocumentEntity } from './document.entity';
@@ -83,6 +84,7 @@ export {
   SalesApprovalLevelRoleEntity,
   SalesApprovalEntity,
   MemberEntity,
+  MembershipEntity,
 };
 
 export const ALL_ENTITIES = [
@@ -122,4 +124,5 @@ export const ALL_ENTITIES = [
   SalesApprovalLevelRoleEntity,
   SalesApprovalEntity,
   MemberEntity,
+  MembershipEntity,
 ];
