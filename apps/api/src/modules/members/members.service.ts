@@ -216,12 +216,32 @@ export class MembersService {
     const member = await this.findOne(tenantId, id);
 
     // TODO: Cycle 6B - Query active memberships and find max end_date
-    // const maxExpiry = ...
+    // The query logic is handled in MembershipsService which calls updateCurrentExpiryDate below.
+    // This methods exists for compatibility/legacy or self-contained triggers if we move logic here.
+    // implementing no-op or default null reset if needed, but for now we leave it as valid placeholder.
 
     const maxExpiry = null; // Default to null for now
 
     if (member.currentExpiryDate !== maxExpiry) {
       member.currentExpiryDate = maxExpiry;
+      await this.memberRepository.save(member);
+    }
+  }
+
+  async updateCurrentExpiryDate(
+    tenantId: string,
+    id: string,
+    date: Date | null,
+  ): Promise<void> {
+    const member = await this.findOne(tenantId, id);
+    // Only update if changed
+    const currentDate = member.currentExpiryDate
+      ? new Date(member.currentExpiryDate).getTime()
+      : null;
+    const newDate = date ? new Date(date).getTime() : null;
+
+    if (currentDate !== newDate) {
+      member.currentExpiryDate = date;
       await this.memberRepository.save(member);
     }
   }

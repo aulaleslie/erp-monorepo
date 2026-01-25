@@ -10,28 +10,14 @@ import {
 import { BaseAuditEntity } from '../../common/entities/base-audit.entity';
 import { TenantEntity } from './tenant.entity';
 import { CategoryEntity } from './category.entity';
+import {
+  ItemDurationUnit,
+  ItemServiceKind,
+  ItemStatus,
+  ItemType,
+} from '@gym-monorepo/shared';
 
-export enum ItemType {
-  PRODUCT = 'PRODUCT',
-  SERVICE = 'SERVICE',
-}
-
-export enum ItemServiceKind {
-  MEMBERSHIP = 'MEMBERSHIP',
-  PT_SESSION = 'PT_SESSION',
-}
-
-export enum ItemDurationUnit {
-  DAY = 'DAY',
-  WEEK = 'WEEK',
-  MONTH = 'MONTH',
-  YEAR = 'YEAR',
-}
-
-export enum ItemStatus {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-}
+export { ItemDurationUnit, ItemServiceKind, ItemStatus, ItemType };
 
 @Entity('items')
 @Unique('UQ_items_tenant_code', ['tenantId', 'code'])

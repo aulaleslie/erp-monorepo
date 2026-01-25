@@ -527,6 +527,17 @@ export const MEMBER_ERRORS = {
 } as const;
 
 // ============================================================================
+// Membership Errors
+// ============================================================================
+
+export const MEMBERSHIP_ERRORS = {
+  NOT_FOUND: {
+    code: 'MEMBERSHIP_NOT_FOUND',
+    message: 'Membership not found',
+  },
+} as const;
+
+// ============================================================================
 // Aggregated Error Codes
 // ============================================================================
 
@@ -549,6 +560,7 @@ export const ERROR_CODES = {
   OUTBOX: OUTBOX_ERRORS,
   SALES: SALES_ERRORS,
   MEMBER: MEMBER_ERRORS,
+  MEMBERSHIP: MEMBERSHIP_ERRORS,
 } as const;
 
 // ============================================================================
@@ -573,6 +585,7 @@ export type TagErrorCode = typeof TAG_ERRORS[keyof typeof TAG_ERRORS];
 export type OutboxErrorCode = typeof OUTBOX_ERRORS[keyof typeof OUTBOX_ERRORS];
 export type SalesErrorCode = typeof SALES_ERRORS[keyof typeof SALES_ERRORS];
 export type MemberErrorCode = typeof MEMBER_ERRORS[keyof typeof MEMBER_ERRORS];
+export type MembershipErrorCode = typeof MEMBERSHIP_ERRORS[keyof typeof MEMBERSHIP_ERRORS];
 
 export type AnyErrorCode = 
   | AuthErrorCode 
@@ -592,4 +605,5 @@ export type AnyErrorCode =
   | TagErrorCode
   | OutboxErrorCode
   | SalesErrorCode
-  | MemberErrorCode;
+  | MemberErrorCode
+  | MembershipErrorCode;
