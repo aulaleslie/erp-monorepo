@@ -521,6 +521,28 @@ export const ERROR_CODES = {
   TAG: TAG_ERRORS,
   OUTBOX: OUTBOX_ERRORS,
   SALES: SALES_ERRORS,
+  MEMBER: {
+    NOT_FOUND: {
+      code: 'MEMBER_NOT_FOUND',
+      message: 'Member not found',
+    },
+    ALREADY_EXISTS: {
+      code: 'MEMBER_ALREADY_EXISTS',
+      message: 'Person already has a member record in this tenant',
+    },
+    PERSON_NOT_CUSTOMER: {
+      code: 'MEMBER_PERSON_NOT_CUSTOMER',
+      message: 'Linked person must be a customer',
+    },
+    PROFILE_INCOMPLETE: {
+      code: 'MEMBER_PROFILE_INCOMPLETE',
+      message: 'Member profile is incomplete',
+    },
+    TERMS_NOT_AGREED: {
+      code: 'MEMBER_TERMS_NOT_AGREED',
+      message: 'Member must agree to terms before activation',
+    },
+  },
 } as const;
 
 // ============================================================================
@@ -544,6 +566,7 @@ export type DocumentErrorCode = typeof DOCUMENT_ERRORS[keyof typeof DOCUMENT_ERR
 export type TagErrorCode = typeof TAG_ERRORS[keyof typeof TAG_ERRORS];
 export type OutboxErrorCode = typeof OUTBOX_ERRORS[keyof typeof OUTBOX_ERRORS];
 export type SalesErrorCode = typeof SALES_ERRORS[keyof typeof SALES_ERRORS];
+export type MemberErrorCode = typeof ERROR_CODES.MEMBER[keyof typeof ERROR_CODES.MEMBER];
 
 export type AnyErrorCode = 
   | AuthErrorCode 
@@ -562,4 +585,5 @@ export type AnyErrorCode =
   | DocumentErrorCode
   | TagErrorCode
   | OutboxErrorCode
-  | SalesErrorCode;
+  | SalesErrorCode
+  | MemberErrorCode;

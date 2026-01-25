@@ -28,5 +28,6 @@ import { TagsModule } from '../tags/tags.module';
   ],
   controllers: [PeopleController],
   providers: [PeopleService],
+  exports: [PeopleService],
 })
 export class PeopleModule {}

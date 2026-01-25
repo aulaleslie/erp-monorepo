@@ -104,6 +104,12 @@ export const PERMISSIONS = {
     ASSIGN: 'tags.assign',
     MANAGE: 'tags.manage',
   },
+  MEMBERS: {
+    READ: 'members.read',
+    CREATE: 'members.create',
+    UPDATE: 'members.update',
+    DELETE: 'members.delete',
+  },
 } as const;
 
 // Type-safe permission values
@@ -122,7 +128,8 @@ export type PermissionCode =
   | typeof PERMISSIONS.PURCHASING[keyof typeof PERMISSIONS.PURCHASING]
   | typeof PERMISSIONS.ACCOUNTING[keyof typeof PERMISSIONS.ACCOUNTING]
   | typeof PERMISSIONS.INVENTORY[keyof typeof PERMISSIONS.INVENTORY]
-  | typeof PERMISSIONS.TAGS[keyof typeof PERMISSIONS.TAGS];
+  | typeof PERMISSIONS.TAGS[keyof typeof PERMISSIONS.TAGS]
+  | typeof PERMISSIONS.MEMBERS[keyof typeof PERMISSIONS.MEMBERS];
 
 // All permission codes as a flat array (useful for validation)
 export const ALL_PERMISSION_CODES: PermissionCode[] = [
@@ -194,4 +201,8 @@ export const ALL_PERMISSION_CODES: PermissionCode[] = [
   PERMISSIONS.INVENTORY.DELETE,
   PERMISSIONS.TAGS.ASSIGN,
   PERMISSIONS.TAGS.MANAGE,
+  PERMISSIONS.MEMBERS.READ,
+  PERMISSIONS.MEMBERS.CREATE,
+  PERMISSIONS.MEMBERS.UPDATE,
+  PERMISSIONS.MEMBERS.DELETE,
 ];

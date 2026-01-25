@@ -22,6 +22,7 @@ import { QueueModule } from './modules/queue/queue.module';
 import { TagsModule } from './modules/tags/tags.module';
 import { RedisCacheModule } from './common/redis/redis-cache.module';
 import { SalesModule } from './modules/sales/sales.module';
+import { MembersModule } from './modules/members/members.module';
 
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { UserContextInterceptor } from './common/interceptors/user-context.interceptor';
@@ -52,6 +53,7 @@ import { UserContextInterceptor } from './common/interceptors/user-context.inter
     TagsModule,
     RedisCacheModule,
     SalesModule,
+    MembersModule,
   ],
   controllers: [AppController],
   providers: [

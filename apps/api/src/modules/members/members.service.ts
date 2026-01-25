@@ -1,0 +1,178 @@
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { MemberEntity } from '../../database/entities';
+import { ERROR_CODES, MemberStatus, PeopleType } from '@gym-monorepo/shared';
+import {
+  PaginatedResponse,
+  calculateSkip,
+  paginate,
+} from '../../common/dto/pagination.dto';
+import { TenantCountersService } from '../tenant-counters/tenant-counters.service';
+import { PeopleService } from '../people/people.service';
+import { CreateMemberDto } from './dto/create-member.dto';
+import { UpdateMemberDto } from './dto/update-member.dto';
+import { MemberQueryDto } from './dto/member-query.dto';
+
+@Injectable()
+export class MembersService {
+  constructor(
+    @InjectRepository(MemberEntity)
+    private readonly memberRepository: Repository<MemberEntity>,
+    private readonly peopleService: PeopleService,
+    private readonly tenantCountersService: TenantCountersService,
+  ) {}
+
+  async findAll(
+    tenantId: string,
+    query: MemberQueryDto,
+  ): Promise<PaginatedResponse<MemberEntity>> {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 10;
+    const status = query.status;
+    const search = query.search?.trim();
+
+    const qb = this.memberRepository.createQueryBuilder('member');
+    qb.leftJoinAndSelect('member.person', 'person');
+    qb.where('member.tenantId = :tenantId', { tenantId });
+
+    if (status) {
+      qb.andWhere('member.status = :status', { status });
+    }
+
+    if (search) {
+      qb.andWhere(
+        '(member.memberCode ILIKE :search OR person.fullName ILIKE :search OR person.email ILIKE :search OR person.phone ILIKE :search)',
+        { search: `%${search}%` },
+      );
+    }
+
+    qb.orderBy('member.createdAt', 'DESC')
+      .skip(calculateSkip(page, limit))
+      .take(limit);
+
+    const [items, total] = await qb.getManyAndCount();
+
+    return paginate(items, total, page, limit);
+  }
+
+  async findOne(tenantId: string, id: string): Promise<MemberEntity> {
+    const member = await this.memberRepository.findOne({
+      where: { id, tenantId },
+      relations: { person: true },
+    });
+
+    if (!member) {
+      throw new NotFoundException(ERROR_CODES.MEMBER.NOT_FOUND.message);
+    }
+
+    return member;
+  }
+
+  async create(tenantId: string, dto: CreateMemberDto): Promise<MemberEntity> {
+    let personId = dto.personId;
+
+    if (!personId) {
+      // Create new person
+      if (!dto.firstName || !dto.lastName || !dto.email) {
+        throw new BadRequestException(
+          'Person details (firstName, lastName, email) are required if personId is not provided',
+        );
+      }
+
+      const person = await this.peopleService.create(tenantId, {
+        fullName: `${dto.firstName} ${dto.lastName}`,
+        email: dto.email,
+        phone: dto.phone,
+        type: PeopleType.CUSTOMER,
+      });
+      personId = person.id;
+    } else {
+      // Validate existing person
+      const person = await this.peopleService.findOne(tenantId, personId);
+      if (person.type !== PeopleType.CUSTOMER) {
+        throw new BadRequestException(
+          ERROR_CODES.MEMBER.PERSON_NOT_CUSTOMER.message,
+        );
+      }
+    }
+
+    // Check if member already exists for this person in this tenant
+    const existing = await this.memberRepository.findOne({
+      where: { tenantId, personId },
+    });
+
+    if (existing) {
+      throw new ConflictException(ERROR_CODES.MEMBER.ALREADY_EXISTS.message);
+    }
+
+    const memberCode =
+      await this.tenantCountersService.getNextMemberCode(tenantId);
+
+    const member = this.memberRepository.create({
+      tenantId,
+      personId,
+      memberCode,
+      status: MemberStatus.NEW,
+      agreesToTerms: dto.agreesToTerms,
+      termsAgreedAt: dto.agreesToTerms ? new Date() : null,
+      notes: dto.notes,
+      profileCompletionPercent: this.calculateProfileCompletion(
+        dto.agreesToTerms,
+      ),
+    });
+
+    return this.memberRepository.save(member);
+  }
+
+  async update(
+    tenantId: string,
+    id: string,
+    dto: UpdateMemberDto,
+  ): Promise<MemberEntity> {
+    const member = await this.findOne(tenantId, id);
+
+    if (dto.status !== undefined) {
+      if (dto.status === MemberStatus.ACTIVE) {
+        if (!member.agreesToTerms && !dto.agreesToTerms) {
+          throw new BadRequestException(
+            ERROR_CODES.MEMBER.TERMS_NOT_AGREED.message,
+          );
+        }
+      }
+      member.status = dto.status;
+      if (dto.status === MemberStatus.ACTIVE && !member.memberSince) {
+        member.memberSince = new Date();
+      }
+    }
+
+    if (dto.agreesToTerms !== undefined) {
+      member.agreesToTerms = dto.agreesToTerms;
+      member.termsAgreedAt = dto.agreesToTerms ? new Date() : null;
+      member.profileCompletionPercent = this.calculateProfileCompletion(
+        dto.agreesToTerms,
+      );
+    }
+
+    if (dto.notes !== undefined) {
+      member.notes = dto.notes;
+    }
+
+    return this.memberRepository.save(member);
+  }
+
+  async remove(tenantId: string, id: string): Promise<void> {
+    const member = await this.findOne(tenantId, id);
+    member.status = MemberStatus.INACTIVE;
+    await this.memberRepository.save(member);
+  }
+
+  private calculateProfileCompletion(agreesToTerms: boolean): number {
+    return agreesToTerms ? 100 : 0;
+  }
+}
