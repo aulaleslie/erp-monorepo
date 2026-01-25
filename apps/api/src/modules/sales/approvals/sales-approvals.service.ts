@@ -17,6 +17,7 @@ import {
   DocumentEntity,
   SalesApprovalEntity,
   SalesApprovalLevelEntity,
+  SalesApprovalLevelRoleEntity,
   UserEntity,
   TenantUserEntity,
 } from '../../../database/entities';
@@ -298,5 +299,57 @@ export class SalesApprovalsService {
 
       return this.getConfig(tenantId, dto.documentKey);
     });
+  }
+
+  async getMyPendingCount(
+    tenantId: string,
+    userId: string,
+  ): Promise<{ count: number }> {
+    // 1. Get user and their role in this tenant
+    const [user, tenantUser] = await Promise.all([
+      this.userRepository.findOne({ where: { id: userId } }),
+      this.userRepository.manager.findOne(TenantUserEntity, {
+        where: { tenantId, userId },
+      }),
+    ]);
+
+    if (!user) {
+      return { count: 0 };
+    }
+
+    // 2. Build query for pending approvals
+    const query = this.salesApprovalRepository
+      .createQueryBuilder('approval')
+      .innerJoin('approval.document', 'document')
+      .innerJoin(
+        SalesApprovalLevelEntity,
+        'level',
+        'level.tenantId = document.tenantId AND level.documentKey = document.documentKey AND level.levelIndex = approval.levelIndex',
+      )
+      .innerJoin(
+        SalesApprovalLevelRoleEntity,
+        'levelRole',
+        'levelRole.salesApprovalLevelId = level.id',
+      )
+      .where('document.tenantId = :tenantId', { tenantId })
+      .andWhere('approval.status = :status', { status: ApprovalStatus.PENDING })
+      .andWhere('level.isActive = true');
+
+    // 3. Filter by role or allow all if super admin
+    if (!user.isSuperAdmin) {
+      if (!tenantUser || !tenantUser.roleId) {
+        return { count: 0 };
+      }
+      query.andWhere('levelRole.roleId = :roleId', {
+        roleId: tenantUser.roleId,
+      });
+    }
+
+    // 4. Count unique documents
+    const result = await query
+      .select('COUNT(DISTINCT approval.documentId)', 'count')
+      .getRawOne();
+
+    return { count: parseInt(result?.count || '0', 10) || 0 };
   }
 }

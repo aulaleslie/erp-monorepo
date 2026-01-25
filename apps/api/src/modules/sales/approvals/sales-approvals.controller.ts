@@ -13,7 +13,7 @@ import { UpdateApprovalConfigDto } from './dtos/update-approval-config.dto';
 
 @ApiTags('sales-approvals')
 @ApiCookieAuth('access_token')
-@Controller('sales/approvals/config')
+@Controller('sales/approvals')
 @UseGuards(
   AuthGuard('jwt'),
   ActiveTenantGuard,
@@ -23,7 +23,16 @@ import { UpdateApprovalConfigDto } from './dtos/update-approval-config.dto';
 export class SalesApprovalsController {
   constructor(private readonly salesApprovalsService: SalesApprovalsService) {}
 
-  @Get()
+  @Get('pending-count')
+  @ApiOperation({ summary: 'Get my pending approvals count' })
+  async getMyPendingCount(
+    @CurrentTenant() tenantId: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.salesApprovalsService.getMyPendingCount(tenantId, userId);
+  }
+
+  @Get('config')
   @ApiOperation({ summary: 'Get sales approval config' })
   @RequirePermissions(PERMISSIONS.SALES.APPROVE)
   async getConfig(
@@ -33,7 +42,7 @@ export class SalesApprovalsController {
     return this.salesApprovalsService.getConfig(tenantId, documentKey);
   }
 
-  @Put()
+  @Put('config')
   @ApiOperation({ summary: 'Update sales approval config' })
   @RequirePermissions(PERMISSIONS.SALES.APPROVE, PERMISSIONS.SALES.UPDATE)
   async updateConfig(

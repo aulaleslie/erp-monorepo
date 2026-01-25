@@ -33,6 +33,7 @@ describe('SalesApprovalsService', () => {
           useValue: {
             create: jest.fn(),
             save: jest.fn(),
+            createQueryBuilder: jest.fn(),
           },
         },
         {
@@ -53,6 +54,9 @@ describe('SalesApprovalsService', () => {
           provide: getRepositoryToken(UserEntity),
           useValue: {
             findOne: jest.fn(),
+            manager: {
+              findOne: jest.fn(),
+            },
           },
         },
         {
@@ -264,6 +268,65 @@ describe('SalesApprovalsService', () => {
         relations: { roles: { role: true } },
       });
       expect(result).toBe(mockResult);
+    });
+  });
+
+  describe('getMyPendingCount', () => {
+    let mockQueryBuilder: Record<string, jest.Mock>;
+
+    beforeEach(() => {
+      mockQueryBuilder = {
+        innerJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        getRawOne: jest.fn().mockResolvedValue({ count: '5' }),
+      };
+      jest
+        .spyOn(service['salesApprovalRepository'], 'createQueryBuilder')
+        .mockReturnValue(mockQueryBuilder as any);
+    });
+
+    it('should return count for super admin', async () => {
+      jest
+        .spyOn(service['userRepository'], 'findOne')
+        .mockResolvedValue({ isSuperAdmin: true } as UserEntity);
+      jest
+        .spyOn(service['userRepository'].manager, 'findOne')
+        .mockResolvedValue({ roleId: 'any-role' } as TenantUserEntity);
+
+      const result = await service.getMyPendingCount(mockTenantId, mockUserId);
+
+      expect(result).toEqual({ count: 5 });
+      expect(mockQueryBuilder.andWhere).not.toHaveBeenCalledWith(
+        'levelRole.roleId = :roleId',
+        expect.anything(),
+      );
+    });
+
+    it('should return count for regular user with role', async () => {
+      jest
+        .spyOn(service['userRepository'], 'findOne')
+        .mockResolvedValue({ isSuperAdmin: false } as UserEntity);
+      jest
+        .spyOn(service['userRepository'].manager, 'findOne')
+        .mockResolvedValue({ roleId: 'role-1' } as TenantUserEntity);
+
+      const result = await service.getMyPendingCount(mockTenantId, mockUserId);
+
+      expect(result).toEqual({ count: 5 });
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'levelRole.roleId = :roleId',
+        { roleId: 'role-1' },
+      );
+    });
+
+    it('should return 0 if user not found', async () => {
+      jest.spyOn(service['userRepository'], 'findOne').mockResolvedValue(null);
+
+      const result = await service.getMyPendingCount(mockTenantId, mockUserId);
+
+      expect(result).toEqual({ count: 0 });
     });
   });
 
