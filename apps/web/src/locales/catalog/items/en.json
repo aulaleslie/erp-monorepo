@@ -1,0 +1,193 @@
+{
+  "page": {
+    "title": "Items",
+    "description": "Manage catalog items including products and services."
+  },
+  "create": {
+    "page": {
+      "title": "New Item",
+      "description": "Add a new item to the catalog."
+    }
+  },
+  "edit": {
+    "page": {
+      "title": "Edit Item",
+      "description": "Update item details."
+    }
+  },
+  "detail": {
+    "page": {
+      "title": "Item Details",
+      "description": "View full details of the catalog item."
+    }
+  },
+  "alerts": {
+    "noListPermission": "You do not have permission to view items.",
+    "noCreatePermission": "You do not have permission to create items.",
+    "noEditPermission": "You do not have permission to edit items.",
+    "noReadPermission": "You do not have permission to view item details."
+  },
+  "list": {
+    "table": {
+      "headers": {
+        "code": "SKU",
+        "name": "Name",
+        "type": "Type",
+        "price": "Price",
+        "status": "Status",
+        "tags": "Tags",
+        "actions": "Actions"
+      },
+      "empty": "No items found"
+    },
+    "filters": {
+      "search": "Search",
+      "searchPlaceholder": "Search by SKU, name, or barcode",
+      "type": "Type",
+      "allTypes": "All Types",
+      "status": "Status",
+      "anyStatus": "Any Status",
+      "category": "Category"
+    }
+  },
+  "form": {
+    "sections": {
+      "basic": "Basic Information",
+      "service": "Service Details",
+      "image": "Item Image"
+    },
+    "labels": {
+      "name": "Item Name",
+      "type": "Item Type",
+      "price": "Price",
+      "status": "Status",
+      "category": "Category",
+      "barcode": "Barcode / EAN",
+      "unit": "Unit (e.g. pcs, bottle)",
+      "tags": "Tags",
+      "description": "Description",
+      "serviceKind": "Service Kind",
+      "durationValue": "Duration",
+      "durationUnit": "Duration Unit",
+      "sessionCount": "Session Count",
+      "includedPtSessions": "Included PT Sessions"
+    },
+    "placeholders": {
+      "name": "e.g. Mineral Water",
+      "price": "0",
+      "category": "Select category",
+      "status": "Select status",
+      "barcode": "Scan or enter barcode",
+      "unit": "e.g. pcs",
+      "tags": "Enter tags separated by commas",
+      "description": "Item description...",
+      "type": "Select type",
+      "serviceKind": "Select service kind",
+      "durationUnit": "Select unit"
+    },
+    "validation": {
+      "nameRequired": "Item name is required",
+      "typeRequired": "Item type is required",
+      "priceRequired": "Price is required",
+      "serviceKindRequired": "Service kind is required for services",
+      "durationRequired": "Duration is required",
+      "sessionCountRequired": "Session count is required"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "create": "Create Item",
+      "save": "Save Changes"
+    }
+  },
+  "toast": {
+    "createSuccess": {
+      "title": "Item created",
+      "description": "The item has been added successfully."
+    },
+    "updateSuccess": {
+      "title": "Item updated",
+      "description": "Changes have been saved successfully."
+    },
+    "deleteSuccess": {
+      "title": "Item deleted",
+      "description": "The item has been removed."
+    },
+    "imageSuccess": {
+      "title": "Image uploaded",
+      "description": "Item image has been updated."
+    },
+    "error": {
+      "title": "Error",
+      "description": "Something went wrong. Please try again."
+    },
+    "loadError": {
+      "title": "Error",
+      "description": "Failed to load item data."
+    }
+  },
+  "confirm": {
+    "delete": {
+      "title": "Delete Item?",
+      "description": "Are you sure you want to delete this item? This action cannot be undone.",
+      "confirmLabel": "Delete"
+    }
+  },
+  "import": {
+    "button": "Import",
+    "dialog": {
+      "title": "Import Items",
+      "description": "Upload a CSV or XLSX file to import items. Mandatory columns: name, type, price, status.",
+      "fileLabel": "Select File",
+      "fileHint": "Accepted formats: .csv, .xlsx (Max 5MB)",
+      "downloadTemplate": "Download Template",
+      "importing": "Importing...",
+      "success": {
+        "title": "Import Successful",
+        "description": "Items have been imported successfully."
+      },
+      "error": {
+        "title": "Import Failed",
+        "description": "There were errors during the import process."
+      }
+    }
+  },
+  "export": {
+    "button": "Export",
+    "dialog": {
+      "title": "Export Items",
+      "description": "Select the format and fields you want to export.",
+      "format": "Format",
+      "fields": "Fields to Export",
+      "exporting": "Exporting...",
+      "success": {
+        "title": "Export Successful",
+        "description": "The file is being downloaded."
+      },
+      "fields_list": {
+        "code": "SKU",
+        "name": "Name",
+        "type": "Type",
+        "price": "Price",
+        "status": "Status",
+        "barcode": "Barcode",
+        "unit": "Unit",
+        "category": "Category",
+        "description": "Description"
+      }
+    }
+  },
+  "buttons": {
+    "new": "New Item",
+    "edit": "Edit",
+    "view": "View",
+    "cancel": "Cancel"
+  },
+  "types": {
+    "PRODUCT": "Product",
+    "SERVICE": "Service"
+  },
+  "serviceKinds": {
+    "MEMBERSHIP": "Membership",
+    "PT_SESSION": "PT Session"
+  }
+}

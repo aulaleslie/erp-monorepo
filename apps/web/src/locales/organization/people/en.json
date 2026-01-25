@@ -1,0 +1,253 @@
+{
+  "alerts": {
+    "noAccess": "You do not have permission to access people.",
+    "noListPermission": "You do not have permission to view people.",
+    "noCreatePermission": "You do not have permission to create people.",
+    "noEditPermission": "You do not have permission to update people."
+  },
+  "page": {
+    "title": "People",
+    "description": "Manage customers, suppliers, and staff."
+  },
+  "create": {
+    "page": {
+      "title": "New Person",
+      "description": "Add a new person to this workspace."
+    }
+  },
+  "edit": {
+    "page": {
+      "title": "Edit Person",
+      "description": "Update person details."
+    }
+  },
+  "placeholders": {
+    "listTitle": "People list coming soon",
+    "listDescription": "This page will include filters, search, and actions for people.",
+    "formTitle": "People form coming soon",
+    "formDescription": "This page will handle create and edit flows for people."
+  },
+  "buttons": {
+    "new": "New Person",
+    "invite": "Invite Existing"
+  },
+  "list": {
+    "filters": {
+      "search": "Search",
+      "searchPlaceholder": "Search by code, name, email, or phone",
+      "type": "Type",
+      "status": "Status"
+    },
+    "table": {
+      "headers": {
+        "code": "Code",
+        "name": "Name",
+        "type": "Type",
+        "phone": "Phone",
+        "email": "Email",
+        "tags": "Tags",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "empty": "No people found"
+    }
+  },
+  "types": {
+    "all": "All types",
+    "customer": "Customer",
+    "supplier": "Supplier",
+    "staff": "Staff"
+  },
+  "statuses": {
+    "any": "Any status",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "form": {
+    "labels": {
+      "fullName": "Full Name",
+      "type": "Type",
+      "email": "Email",
+      "phone": "Phone",
+      "tags": "Tags",
+      "status": "Status",
+      "code": "Code"
+    },
+    "placeholders": {
+      "fullName": "Enter full name",
+      "email": "email@example.com",
+      "phone": "+62812...",
+      "tags": "Enter tags separated by commas",
+      "type": "Select type",
+      "status": "Select status"
+    },
+    "validation": {
+      "fullNameRequired": "Full name is required",
+      "invalidEmail": "Please enter a valid email address"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "create": "Create Person",
+      "save": "Save Changes"
+    }
+  },
+  "toast": {
+    "fetchError": {
+      "title": "Unable to load people",
+      "description": "We couldn’t fetch people right now. Try again shortly."
+    },
+    "deactivateSuccess": {
+      "title": "Person deactivated",
+      "description": "Person is now inactive."
+    },
+    "deactivateError": {
+      "title": "Could not deactivate",
+      "description": "Something went wrong while updating this person."
+    },
+    "createSuccess": {
+      "title": "Person created",
+      "description": "The person has been added successfully."
+    },
+    "createError": {
+      "title": "Failed to create person",
+      "description": "Something went wrong. Please try again."
+    },
+    "updateSuccess": {
+      "title": "Person updated",
+      "description": "Changes have been saved successfully."
+    },
+    "updateError": {
+      "title": "Failed to update person",
+      "description": "Something went wrong. Please try again."
+    },
+    "loadError": {
+      "title": "Failed to load person",
+      "description": "Could not fetch person details."
+    },
+    "duplicateEmail": "This email is already in use.",
+    "duplicatePhone": "This phone number is already in use."
+  },
+  "confirm": {
+    "deactivate": {
+      "title": "Deactivate person?",
+      "description": "This will mark the person as inactive while preserving their history.",
+      "confirmLabel": "Deactivate"
+    }
+  },
+  "invite": {
+    "dialog": {
+      "title": "Invite existing person",
+      "description": "Add a person from another workspace into this tenant."
+    },
+    "form": {
+      "labels": {
+        "type": "Type",
+        "person": "Person"
+      },
+      "placeholders": {
+        "type": "Select a type",
+        "person": "Search for a person",
+        "search": "Search by name, code, email, or phone"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "invite": "Invite"
+      },
+      "validation": {
+        "personRequired": "Choose a person to invite"
+      }
+    },
+    "toast": {
+      "success": {
+        "title": "Person invited",
+        "description": "The person was copied into this workspace."
+      },
+      "error": {
+        "title": "Invite failed",
+        "description": "We could not invite that person."
+      }
+    }
+  },
+  "staff": {
+    "section": "Staff Settings",
+    "noDepartment": "No department",
+    "labels": {
+      "department": "Department",
+      "userLink": "Linked User Account"
+    },
+    "placeholders": {
+      "department": "Select department",
+      "searchUser": "Search user by email..."
+    },
+    "userCard": {
+      "linkedAs": "Linked to",
+      "notLinked": "No user account linked to this staff member.",
+      "linkButton": "Link",
+      "unlinkButton": "Unlink",
+      "createButton": "Create New User",
+      "toast": {
+        "linkSuccess": {
+          "title": "User linked",
+          "description": "User has been linked to this staff member."
+        },
+        "linkError": {
+          "title": "Link failed",
+          "description": "Could not link user. Please try again."
+        },
+        "unlinkSuccess": {
+          "title": "User unlinked",
+          "description": "User has been unlinked from this staff member."
+        },
+        "unlinkError": {
+          "title": "Unlink failed",
+          "description": "Could not unlink user. Please try again."
+        }
+      }
+    },
+    "toast": {
+      "departmentsError": {
+        "title": "Failed to load departments",
+        "description": "Could not fetch departments list."
+      }
+    }
+  },
+  "createUser": {
+    "dialog": {
+      "title": "Create User for Staff",
+      "description": "Create a new user account and link it to this staff member."
+    },
+    "form": {
+      "labels": {
+        "email": "Email",
+        "fullName": "Full Name (optional)",
+        "tempPassword": "Temporary Password",
+        "role": "Role",
+        "attachToTenant": "Add to this workspace"
+      },
+      "placeholders": {
+        "role": "Select a role",
+        "searchRole": "Search roles..."
+      },
+      "validation": {
+        "emailRequired": "Email is required",
+        "passwordRequired": "Temporary password is required",
+        "passwordMinLength": "Password must be at least 6 characters",
+        "roleRequired": "Role is required when adding to workspace"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "create": "Create User"
+      }
+    },
+    "toast": {
+      "success": {
+        "title": "User created",
+        "description": "User has been created and linked to this staff member."
+      },
+      "error": {
+        "title": "Failed to create user",
+        "description": "Something went wrong. Please try again."
+      }
+    }
+  }
+}

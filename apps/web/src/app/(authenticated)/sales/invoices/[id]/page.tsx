@@ -1,15 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { format } from "date-fns";
 import {
-    FileText,
-    Clock,
     CheckCircle2,
-    XCircle,
-    AlertCircle,
+    Clock,
     ChevronLeft,
     Download,
     Send,
@@ -61,7 +58,7 @@ export default function InvoiceDetailPage() {
     const [confirmPost, setConfirmPost] = useState(false);
     const [confirmCreditNote, setConfirmCreditNote] = useState(false);
 
-    const loadData = async () => {
+    const loadData = useCallback(async () => {
         try {
             const [invoiceData, historyData] = await Promise.all([
                 salesInvoicesService.get(id),
@@ -69,7 +66,7 @@ export default function InvoiceDetailPage() {
             ]);
             setInvoice(invoiceData);
             setHistory(historyData);
-        } catch (error) {
+        } catch {
             toast({
                 title: "Error",
                 description: "Failed to load invoice data.",
@@ -79,11 +76,11 @@ export default function InvoiceDetailPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id, router, toast]);
 
     useEffect(() => {
         loadData();
-    }, [id]);
+    }, [loadData]);
 
     const handleAction = async (action: string, notes?: string) => {
         setProcessing(true);
@@ -115,7 +112,7 @@ export default function InvoiceDetailPage() {
                 description: t("toast.actionSuccess.description"),
             });
             loadData();
-        } catch (error) {
+        } catch {
             toast({
                 title: t("toast.actionError.title"),
                 description: t("toast.actionError.description"),

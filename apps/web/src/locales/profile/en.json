@@ -1,0 +1,76 @@
+{
+  "pageTitle": "My Profile",
+  "pageDescription": "View and manage your account details.",
+  "sections": {
+    "personal": "Personal Information",
+    "security": "Security",
+    "organizations": "My Organizations"
+  },
+  "labels": {
+    "fullName": "Full Name",
+    "email": "Email",
+    "accountType": "Account Type",
+    "password": "Password"
+  },
+  "placeholders": {
+    "fullName": "Enter your name"
+  },
+  "securityDescription": "Change your password to keep your account secure.",
+  "buttons": {
+    "changePassword": "Change Password"
+  },
+  "accountTypes": {
+    "superAdmin": "Super Admin",
+    "user": "User"
+  },
+  "tenants": {
+    "currentBadge": "Current",
+    "noRole": "No Role",
+    "emptyState": "You are not a member of any organization."
+  },
+  "toast": {
+    "profileUpdated": {
+      "title": "Profile updated",
+      "description": "Your name has been updated successfully."
+    },
+    "profileUpdateError": {
+      "title": "Error",
+      "description": "Failed to update name"
+    }
+  },
+  "changePassword": {
+    "dialog": {
+      "title": "Change Password",
+      "description": "Enter your current password and choose a new password."
+    },
+    "form": {
+      "labels": {
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm New Password"
+      },
+      "validation": {
+        "currentPasswordRequired": "Current password is required",
+        "newPasswordRequired": "New password is required",
+        "newPasswordMinLength": "Password must be at least 6 characters",
+        "confirmPasswordRequired": "Please confirm your new password",
+        "passwordsMismatch": "Passwords do not match",
+        "currentPasswordInvalid": "Current password is incorrect"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "update": "Update Password"
+      }
+    },
+    "toast": {
+      "success": {
+        "title": "Password updated",
+        "description": "Your password has been changed successfully."
+      },
+      "error": {
+        "title": "Error",
+        "description": "Failed to update password"
+      }
+    }
+  }
+}

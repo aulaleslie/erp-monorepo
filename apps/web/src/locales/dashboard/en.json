@@ -1,0 +1,8 @@
+{
+  "page": {
+    "title": "Dashboard",
+    "description": "Overview of your activity.",
+    "myStatsTitle": "My Stats",
+    "pendingTasks": "Pending tasks"
+  }
+}

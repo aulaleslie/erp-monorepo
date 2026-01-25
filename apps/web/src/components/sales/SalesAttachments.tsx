@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Upload, Trash2, FileText, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,7 +17,7 @@ export function SalesAttachments({ documentId }: SalesAttachmentsProps) {
     const [uploading, setUploading] = useState(false);
     const { toast } = useToast();
 
-    const loadAttachments = async () => {
+    const loadAttachments = useCallback(async () => {
         try {
             const data = await salesAttachmentsService.list(documentId);
             setAttachments(data);
@@ -26,11 +26,11 @@ export function SalesAttachments({ documentId }: SalesAttachmentsProps) {
         } finally {
             setLoading(false);
         }
-    };
+    }, [documentId]);
 
     useEffect(() => {
         loadAttachments();
-    }, [documentId]);
+    }, [loadAttachments]);
 
     const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -50,7 +50,7 @@ export function SalesAttachments({ documentId }: SalesAttachmentsProps) {
             await salesAttachmentsService.upload(documentId, file);
             toast({ title: "Success", description: "File uploaded successfully." });
             loadAttachments();
-        } catch (error) {
+        } catch {
             toast({
                 title: "Upload failed",
                 description: "Failed to upload file. Max 1MB allowed for specific types.",
@@ -66,7 +66,7 @@ export function SalesAttachments({ documentId }: SalesAttachmentsProps) {
             await salesAttachmentsService.remove(documentId, attachmentId);
             toast({ title: "Deleted", description: "Attachment removed." });
             loadAttachments();
-        } catch (error) {
+        } catch {
             toast({
                 title: "Error",
                 description: "Failed to remove attachment.",

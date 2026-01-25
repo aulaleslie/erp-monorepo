@@ -1,0 +1,59 @@
+{
+  "pageTitle": "Log Audit",
+  "pageDescription": "Lihat jejak audit sistem secara menyeluruh.",
+  "alert": {
+    "noPermission": "Anda tidak memiliki izin untuk melihat log audit."
+  },
+  "info": {
+    "timestamps": "Cap waktu audit tetap dalam UTC tetapi ditampilkan sesuai zona waktu browser Anda agar filter cocok dengan jam lokal.",
+    "filters": "Terapkan beberapa filter sekaligus untuk mempersempit jendela perubahan tertentu."
+  },
+  "filters": {
+    "startTime": "Waktu mulai (lokal)",
+    "startTimePlaceholder": "Pilih waktu mulai",
+    "endTime": "Waktu selesai (lokal)",
+    "endTimePlaceholder": "Pilih waktu selesai",
+    "action": "Aksi",
+    "actionPlaceholder": "Semua aksi",
+    "entityName": "Nama entitas",
+    "entityPlaceholder": "Nama entitas",
+    "performedBy": "Dilakukan oleh",
+    "performedByPlaceholder": "ID atau nama pengguna",
+    "quickRangeLabel": "Rentang cepat",
+    "quickRangePlaceholder": "Pilih preset"
+  },
+  "quickRange": {
+    "presets": {
+      "last15": "15 menit terakhir",
+      "last60": "1 jam terakhir"
+    }
+  },
+  "buttons": {
+    "clearFilters": "Bersihkan filter",
+    "applyFilters": "Terapkan filter",
+    "viewChanges": "Lihat Perubahan"
+  },
+  "actions": {
+    "create": "Buat",
+    "update": "Perbarui",
+    "delete": "Hapus",
+    "softRemove": "Hapus Sementara"
+  },
+  "table": {
+    "timestamp": "Cap waktu",
+    "action": "Aksi",
+    "entity": "Entitas",
+    "entityId": "ID Entitas",
+    "performedBy": "Dilakukan oleh",
+    "details": "Detail",
+    "emptyState": "Tidak ada log audit yang ditemukan."
+  },
+  "systemLabel": "Sistem",
+  "detailsDialog": {
+    "title": "Detail Perubahan - {action} {entityName}",
+    "description": "Informasi detail tentang perubahan yang dilakukan pada rekaman ini.",
+    "previousValues": "Nilai Sebelumnya:",
+    "newValues": "Nilai Baru:",
+    "noChanges": "Tidak ada perubahan detail yang tersedia untuk aksi ini."
+  }
+}

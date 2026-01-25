@@ -1,0 +1,101 @@
+{
+  "page": {
+    "title": "Pajak",
+    "description": "Kelola pajak platform."
+  },
+  "buttons": {
+    "add": "Tambah Pajak"
+  },
+  "filters": {
+    "searchPlaceholder": "Cari pajak...",
+    "statusPlaceholder": "Pilih Status",
+    "status": {
+      "all": "Semua Status",
+      "active": "Aktif",
+      "inactive": "Nonaktif"
+    },
+    "lockedAction": "Pajak ini sudah dipilih oleh tenant. Hapus dari pengaturan pajak tenant untuk mengubah atau menonaktifkannya."
+  },
+  "table": {
+    "name": "Nama",
+    "code": "Kode",
+    "type": "Tipe",
+    "typeValues": {
+      "percentage": "Persentase",
+      "fixed": "Tetap"
+    },
+    "value": "Tarif / Jumlah",
+    "status": "Status",
+    "lastUpdated": "Terakhir Diperbarui",
+    "actions": "Aksi"
+  },
+  "dialogs": {
+    "disable": {
+      "title": "Nonaktifkan Pajak",
+      "description": "Apakah Anda yakin ingin menonaktifkan \"{name}\"? Pajak ini tidak akan dapat dipilih untuk pengaturan baru.",
+      "confirmLabel": "Nonaktifkan"
+    }
+  },
+  "guards": {
+    "superAdminOnly": "Hanya Super Admin yang dapat mengelola pajak."
+  },
+  "toast": {
+    "loadError": {
+      "title": "Kesalahan",
+      "description": "Gagal memuat pajak"
+    },
+    "disableSuccess": {
+      "title": "Berhasil",
+      "description": "Pajak berhasil dinonaktifkan"
+    },
+    "disableError": {
+      "title": "Kesalahan",
+      "description": "Gagal menonaktifkan pajak"
+    }
+  },
+  "form": {
+    "dialog": {
+      "title": {
+        "create": "Buat Pajak",
+        "edit": "Ubah Pajak"
+      },
+      "description": {
+        "create": "Tambahkan pajak baru ke platform.",
+        "edit": "Perbarui detail pajak. Perubahan akan berlaku untuk transaksi berikutnya."
+      }
+    },
+    "labels": {
+      "name": "Nama",
+      "codeOptional": "Kode (Opsional)",
+      "type": "Tipe",
+      "rate": "Tarif (0 - 1)",
+      "amount": "Jumlah"
+    },
+    "placeholders": {
+      "name": "misal PPN, Biaya Servis",
+      "code": "misal VAT-11",
+      "selectType": "Pilih tipe",
+      "rate": "0.11",
+      "amount": "0.00"
+    },
+    "typeOptions": {
+      "percentage": "Persentase",
+      "fixed": "Jumlah Tetap"
+    },
+    "buttons": {
+      "cancel": "Batal",
+      "save": "Simpan"
+    },
+    "toast": {
+      "success": {
+        "title": "Berhasil",
+        "create": "Pajak berhasil dibuat",
+        "update": "Pajak berhasil diperbarui"
+      },
+      "error": {
+        "title": "Kesalahan",
+        "description": "Terjadi kesalahan saat menyimpan pajak."
+      }
+    }
+  }
+}

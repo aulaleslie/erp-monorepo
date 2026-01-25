@@ -20,7 +20,7 @@ export interface DocumentRelation {
   fromDocumentId: string;
   toDocumentId: string;
   relationType: string;
-  metadata: any | null;
+  metadata: Record<string, unknown> | null;
   fromDocument?: {
     id: string;
     number: string | null;

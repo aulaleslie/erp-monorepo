@@ -1,0 +1,77 @@
+{
+  "input": {
+    "placeholder": "Tambah tag...",
+    "searchPlaceholder": "Cari atau ketik tag baru...",
+    "noSuggestions": "Tidak ada tag cocok. Tekan Enter untuk membuat.",
+    "addNew": "Buat \"{tag}\"",
+    "loading": "Memuat..."
+  },
+  "page": {
+    "title": "Manajemen Tag",
+    "description": "Kelola tag organisasi, ubah nama, atau nonaktifkan tag yang tidak lagi digunakan."
+  },
+  "buttons": {
+    "new": "Tag Baru"
+  },
+  "filters": {
+    "searchPlaceholder": "Cari tag..."
+  },
+  "guards": {
+    "superAdminOnly": "Hanya Super Admin yang dapat mengelola tag."
+  },
+  "table": {
+    "headers": {
+      "name": "Nama",
+      "usage": "Jumlah Penggunaan",
+      "lastUsed": "Terakhir Digunakan",
+      "status": "Status",
+      "actions": "Aksi"
+    },
+    "empty": "Tidak ada tag ditemukan"
+  },
+  "dialogs": {
+    "delete": {
+      "title": "Hapus Tag",
+      "description": "Apakah Anda yakin ingin menghapus tag ini? Tindakan ini tidak dapat dibatalkan.",
+      "confirmLabel": "Hapus"
+    }
+  },
+  "form": {
+    "labels": {
+      "name": "Nama Tag",
+      "isActive": "Aktif"
+    },
+    "placeholders": {
+      "name": "Masukkan nama tag"
+    },
+    "validation": {
+      "nameRequired": "Nama tag wajib diisi"
+    },
+    "buttons": {
+      "cancel": "Batal",
+      "save": "Simpan Perubahan"
+    }
+  },
+  "toast": {
+    "fetchError": {
+      "title": "Gagal memuat tag",
+      "description": "Kami tidak dapat mengambil daftar tag saat ini."
+    },
+    "updateSuccess": {
+      "title": "Tag diperbarui",
+      "description": "Tag telah berhasil diperbarui."
+    },
+    "updateError": {
+      "title": "Gagal memperbarui tag",
+      "description": "Terjadi kesalahan saat menyimpan tag."
+    },
+    "deleteSuccess": {
+      "title": "Tag dihapus",
+      "description": "Tag telah dihapus."
+    },
+    "deleteError": {
+      "title": "Gagal menghapus tag",
+      "description": "Terjadi kesalahan saat menghapus tag."
+    }
+  }
+}

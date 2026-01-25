@@ -15,7 +15,7 @@ import {
 import { SearchableSelect } from "@/components/common/SearchableSelect";
 import { TagInput } from "@/components/common/TagInput";
 import { peopleService, PersonListItem } from "@/services/people";
-import { DocumentStatus } from "@gym-monorepo/shared";
+import { DocumentStatus, PeopleType, PeopleStatus } from "@gym-monorepo/shared";
 import { SalesOrderListParams } from "@/services/sales-orders";
 
 interface OrderListFiltersProps {
@@ -32,7 +32,7 @@ export function OrderListFilters({
     const t = useTranslations("sales.orders.filters");
     const ts = useTranslations("sales.statusLabels");
 
-    const handleFieldChange = (field: keyof SalesOrderListParams, value: any) => {
+    const handleFieldChange = (field: keyof SalesOrderListParams, value: unknown) => {
         onFilterChange({
             ...filters,
             [field]: value,
@@ -47,8 +47,8 @@ export function OrderListFilters({
     }) => {
         const result = await peopleService.list({
             ...params,
-            type: "CUSTOMER",
-            status: "ACTIVE",
+            type: PeopleType.CUSTOMER,
+            status: PeopleStatus.ACTIVE,
         });
         return {
             items: result.items,
@@ -151,7 +151,6 @@ export function OrderListFilters({
                         value={filters.tag ? [filters.tag] : []}
                         onChange={(tags) => handleFieldChange("tag", tags[0] || undefined)}
                         placeholder={t("tagPlaceholder")}
-                        maxTags={1}
                     />
                 </div>
             </div>

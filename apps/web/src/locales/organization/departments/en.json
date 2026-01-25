@@ -1,0 +1,121 @@
+{
+  "page": {
+    "title": "Departments",
+    "description": "Manage organization departments."
+  },
+  "list": {
+    "filters": {
+      "search": "Search",
+      "searchPlaceholder": "Search departments...",
+      "status": "Status"
+    },
+    "table": {
+      "headers": {
+        "code": "Code",
+        "name": "Name",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "empty": "No departments found."
+    }
+  },
+  "details": {
+    "info": "Department Information",
+    "people": {
+      "title": "Staff Members",
+      "empty": "No staff members in this department.",
+      "code": "Code",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "status": "Status"
+    }
+  },
+  "buttons": {
+    "new": "New Department",
+    "edit": "Edit"
+  },
+  "toast": {
+    "fetchError": {
+      "title": "Unable to load departments",
+      "description": "We couldn’t fetch departments right now. Try again shortly."
+    },
+    "deleteSuccess": {
+      "title": "Department deleted",
+      "description": "Department has been deleted successfully."
+    },
+    "deleteError": {
+      "title": "Could not delete",
+      "description": "Something went wrong while deleting this department."
+    },
+    "createSuccess": {
+      "title": "Department created",
+      "description": "Department has been created successfully."
+    },
+    "createError": {
+      "title": "Failed to create",
+      "description": "Could not create department."
+    },
+    "updateSuccess": {
+      "title": "Department updated",
+      "description": "Department has been updated successfully."
+    },
+    "updateError": {
+      "title": "Failed to update",
+      "description": "Could not update department."
+    },
+    "loadError": {
+      "title": "Unable to load",
+      "description": "Could not load department details."
+    }
+  },
+  "create": {
+    "page": {
+      "title": "New Department",
+      "description": "Create a new department for your organization."
+    }
+  },
+  "edit": {
+    "page": {
+      "title": "Edit Department",
+      "description": "Update department details."
+    }
+  },
+  "alerts": {
+    "noListPermission": "You do not have permission to view departments.",
+    "noCreatePermission": "You do not have permission to create departments.",
+    "noEditPermission": "You do not have permission to edit departments."
+  },
+  "statuses": {
+    "any": "Any status",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "confirm": {
+    "delete": {
+      "title": "Delete department?",
+      "description": "This will permanently delete the department.",
+      "confirmLabel": "Delete"
+    }
+  },
+  "form": {
+    "labels": {
+      "name": "Name",
+      "code": "Code",
+      "status": "Status"
+    },
+    "placeholders": {
+      "name": "e.g. Sales",
+      "code": "Auto-generated",
+      "status": "Select status"
+    },
+    "validation": {
+      "nameRequired": "Department name is required"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "create": "Create Department",
+      "save": "Save Changes"
+    }
+  }
+}

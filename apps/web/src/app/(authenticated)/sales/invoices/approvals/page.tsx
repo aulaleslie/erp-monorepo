@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { Eye, CheckCircle, XCircle, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -30,7 +30,7 @@ export default function SalesInvoiceApprovalsPage() {
         total: total,
     });
 
-    const loadQueue = async () => {
+    const loadQueue = useCallback(async () => {
         setLoading(true);
         try {
             const result = await salesApprovalsService.getPendingInvoices({
@@ -40,7 +40,7 @@ export default function SalesInvoiceApprovalsPage() {
             setItems(result.items);
             setTotal(result.total);
             pagination.setTotal(result.total);
-        } catch (error) {
+        } catch {
             toast({
                 title: t("toast.fetchError.title"),
                 description: t("toast.fetchError.description"),
@@ -49,11 +49,11 @@ export default function SalesInvoiceApprovalsPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [pagination, t, toast]);
 
     useEffect(() => {
         loadQueue();
-    }, [pagination.page]);
+    }, [loadQueue]);
 
     const handleAction = async (action: ApprovalAction, notes: string) => {
         if (!actionItem) return;
@@ -64,7 +64,7 @@ export default function SalesInvoiceApprovalsPage() {
                 description: `The invoice ${actionItem.number} has been ${action}ed.`,
             });
             loadQueue();
-        } catch (error) {
+        } catch {
             toast({
                 title: "Action Failed",
                 description: "Something went wrong while processing the approval.",

@@ -29,7 +29,7 @@ export default function EditInvoicePage() {
                     return;
                 }
                 setInvoice(data);
-            } catch (error) {
+            } catch {
                 toast({
                     title: "Error",
                     description: "Failed to load invoice data.",
@@ -42,7 +42,7 @@ export default function EditInvoicePage() {
         };
 
         loadInvoice();
-    }, [id]);
+    }, [id, router, toast]);
 
     if (loading) return <LoadingState />;
     if (!invoice) return null;

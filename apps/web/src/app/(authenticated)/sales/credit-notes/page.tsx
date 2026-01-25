@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { Eye } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -39,14 +39,14 @@ export default function CreditNotesPage() {
         setFilters(f => ({ ...f, page: pagination.page }));
     }, [pagination.page]);
 
-    const loadCreditNotes = async () => {
+    const loadCreditNotes = useCallback(async () => {
         setLoading(true);
         try {
             const result = await salesCreditNotesService.list(filters);
             setCreditNotes(result.items);
             setTotal(result.total);
             pagination.setTotal(result.total);
-        } catch (error) {
+        } catch {
             toast({
                 title: t("list.toast.fetchError.title"),
                 description: t("list.toast.fetchError.description"),
@@ -55,11 +55,11 @@ export default function CreditNotesPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [filters, pagination, t, toast]);
 
     useEffect(() => {
         loadCreditNotes();
-    }, [filters]);
+    }, [loadCreditNotes]);
 
     const columns: Column<SalesCreditNoteListItem>[] = [
         {

@@ -41,7 +41,7 @@ export function ApprovalActionDialog({
             await onConfirm(action, notes);
             setNotes('');
             onClose();
-        } catch (error) {
+        } catch {
             // Error handling is usually done by the caller
         } finally {
             setLoading(false);

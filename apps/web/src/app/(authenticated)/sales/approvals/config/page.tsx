@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { Plus, Trash2, Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { salesApprovalsService, SalesApprovalLevel } from "@/services/sales-approvals";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { salesApprovalsService } from "@/services/sales-approvals";
 import { rolesService, Role } from "@/services/roles";
 import { MultiSearchableSelect } from "@/components/common/MultiSearchableSelect";
 import { useToast } from "@/hooks/use-toast";
@@ -22,7 +22,7 @@ export default function SalesApprovalConfigPage() {
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
 
-    const loadConfig = async (docKey: string) => {
+    const loadConfig = useCallback(async (docKey: string) => {
         setLoading(true);
         try {
             const data = await salesApprovalsService.getConfig(docKey);
@@ -32,7 +32,7 @@ export default function SalesApprovalConfigPage() {
                 levelIndex: l.levelIndex,
                 roleIds: l.roles.map(r => r.roleId)
             })));
-        } catch (error) {
+        } catch {
             toast({
                 title: t("toast.fetchError.title"),
                 description: t("toast.fetchError.description"),
@@ -42,11 +42,11 @@ export default function SalesApprovalConfigPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [t, toast]);
 
     useEffect(() => {
         loadConfig(activeTab);
-    }, [activeTab]);
+    }, [activeTab, loadConfig]);
 
     const handleAddLevel = () => {
         const nextIndex = levels.length > 0 ? Math.max(...levels.map(l => l.levelIndex)) + 1 : 1;
@@ -73,7 +73,7 @@ export default function SalesApprovalConfigPage() {
                 title: t("toast.saveSuccess.title"),
                 description: t("toast.saveSuccess.description"),
             });
-        } catch (error) {
+        } catch {
             toast({
                 title: t("toast.saveError.title"),
                 description: t("toast.saveError.description"),

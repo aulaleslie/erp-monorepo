@@ -1,0 +1,177 @@
+{
+  "page": {
+    "title": "Nota Kredit Penjualan",
+    "description": "Kelola nota kredit dan pembatalan untuk faktur penjualan."
+  },
+  "buttons": {
+    "new": "Nota Kredit Baru"
+  },
+  "filters": {
+    "status": "Status",
+    "statusPlaceholder": "Semua status",
+    "customer": "Pelanggan",
+    "customerPlaceholder": "Pilih pelanggan",
+    "number": "Nomor nota kredit",
+    "numberPlaceholder": "Filter berdasarkan nomor",
+    "search": "Cari",
+    "searchPlaceholder": "Cari berdasarkan nomor, nama, atau catatan",
+    "dateFrom": "Dari",
+    "dateTo": "Sampai",
+    "datePlaceholder": "Pilih tanggal",
+    "tag": "Tag",
+    "tagPlaceholder": "Cari tag",
+    "tagHelper": "Ketik tag lalu pilih untuk memfilter",
+    "clear": "Hapus filter",
+    "any": "Semua"
+  },
+  "list": {
+    "toast": {
+      "fetchError": {
+        "title": "Tidak dapat memuat nota kredit",
+        "description": "Terjadi kesalahan saat memuat nota kredit."
+      }
+    },
+    "table": {
+      "headers": {
+        "number": "Nomor",
+        "status": "Status",
+        "customer": "Pelanggan",
+        "salesperson": "Tenaga Penjualan",
+        "date": "Tanggal",
+        "invoice": "Faktur",
+        "total": "Total",
+        "actions": "Aksi"
+      },
+      "empty": "Tidak ada nota kredit ditemukan."
+    }
+  },
+  "detail": {
+    "title": "Nota Kredit {number}",
+    "sections": {
+      "actions": "Aksi",
+      "header": "Informasi Header",
+      "items": "Item Nota Kredit",
+      "history": "Riwayat Status",
+      "attachments": "Lampiran",
+      "relations": "Dokumen Terkait"
+    },
+    "buttons": {
+      "edit": "Ubah",
+      "submit": "Ajukan",
+      "approve": "Setujui",
+      "reject": "Tolak",
+      "requestRevision": "Minta Revisi",
+      "cancel": "Batalkan",
+      "post": "Bukukan",
+      "downloadPdf": "Unduh PDF"
+    },
+    "history": {
+      "status": "Status berubah menjadi {status}",
+      "by": "oleh {user}",
+      "at": "{time}",
+      "notes": "Catatan: {notes}",
+      "empty": "Riwayat status tidak ditemukan."
+    },
+    "toast": {
+      "actionSuccess": {
+        "title": "Aksi Berhasil",
+        "description": "Status nota kredit telah diperbarui."
+      },
+      "actionError": {
+        "title": "Aksi Gagal",
+        "description": "Terjadi kesalahan saat memperbarui status nota kredit."
+      }
+    },
+    "approvals": {
+      "config": {
+        "page": {
+          "title": "Konfigurasi Persetujuan",
+          "description": "Tentukan tingkat persetujuan dan peran yang diperlukan untuk setiap jenis dokumen penjualan."
+        },
+        "tabs": {
+          "orders": "Pesanan Penjualan",
+          "invoices": "Faktur Penjualan",
+          "creditNotes": "Nota Kredit"
+        },
+        "card": {
+          "title": "Tingkat Persetujuan",
+          "description": "Persetujuan bersifat sekuensial. Setiap pengguna dengan peran yang ditugaskan dapat menyetujui di tingkat tersebut."
+        },
+        "buttons": {
+          "save": "Simpan Konfigurasi",
+          "addLevel": "Tambah Tingkat"
+        },
+        "labels": {
+          "roles": "Peran yang Ditugaskan"
+        },
+        "placeholders": {
+          "roles": "Pilih peran untuk tingkat ini..."
+        },
+        "emptyState": "Belum ada tingkat persetujuan yang ditentukan untuk jenis dokumen ini.",
+        "toast": {
+          "fetchError": {
+            "title": "Gagal memuat konfigurasi",
+            "description": "Kami tidak dapat mengambil tingkat persetujuan."
+          },
+          "saveSuccess": {
+            "title": "Konfigurasi Disimpan",
+            "description": "Tingkat persetujuan telah diperbarui."
+          },
+          "saveError": {
+            "title": "Gagal Menyimpan",
+            "description": "Terjadi kesalahan saat menyimpan konfigurasi."
+          }
+        }
+      },
+      "queue": {
+        "page": {
+          "orderTitle": "Persetujuan Pesanan",
+          "orderDescription": "Tinjau dan tindak lanjuti pesanan penjualan yang menunggu persetujuan.",
+          "invoiceTitle": "Persetujuan Faktur",
+          "invoiceDescription": "Tinjau dan tindak lanjuti faktur penjualan yang menunggu persetujuan."
+        },
+        "table": {
+          "headers": {
+            "number": "Nomor",
+            "customer": "Pelanggan",
+            "amount": "Jumlah",
+            "date": "Tanggal",
+            "level": "Tingkat",
+            "actions": "Aksi"
+          },
+          "empty": "Tidak ada item yang menunggu persetujuan Anda."
+        },
+        "toast": {
+          "fetchError": {
+            "title": "Tidak dapat memuat antrean",
+            "description": "Terjadi kesalahan saat memuat persetujuan tertunda."
+          }
+        }
+      },
+      "actionDialog": {
+        "title": {
+          "approve": "Setujui Dokumen {number}",
+          "reject": "Tolak Dokumen {number}",
+          "request-revision": "Minta Revisi untuk {number}"
+        },
+        "description": {
+          "approve": "Apakah Anda yakin ingin menyetujui dokumen ini? Ini akan memindahkannya ke tingkat berikutnya atau menandainya sebagai disetujui sepenuhnya.",
+          "reject": "Menolak dokumen ini akan menghentikan alur persetujuan dan memberi tahu pembuatnya.",
+          "request-revision": "Meminta revisi akan mengirim dokumen kembali ke pembuatnya untuk dilakukan perubahan."
+        },
+        "labels": {
+          "notes": "Komentar"
+        },
+        "placeholders": {
+          "notes": "Tambahkan komentar opsional di sini..."
+        },
+        "buttons": {
+          "cancel": "Batal",
+          "approve": "Setujui",
+          "reject": "Tolak",
+          "request-revision": "Minta Revisi"
+        }
+      }
+    }
+  }
+}

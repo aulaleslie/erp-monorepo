@@ -28,7 +28,7 @@ export default function EditOrderPage() {
                     return;
                 }
                 setOrder(data);
-            } catch (error) {
+            } catch {
                 toast({
                     title: "Error",
                     description: "Failed to load order.",

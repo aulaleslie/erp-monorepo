@@ -1,0 +1,200 @@
+{
+  "alerts": {
+    "noPermission": "You do not have permission to view tenants."
+  },
+  "page": {
+    "title": "Tenants Management",
+    "description": "Manage all tenants.",
+    "archivedTitle": "Archived Tenants",
+    "archivedDescription": "Review archived tenants."
+  },
+  "buttons": {
+    "backToActive": "Back to active",
+    "seeArchived": "See archived",
+    "create": "Create Tenant"
+  },
+  "empty": {
+    "active": "No tenants found.",
+    "archived": "No archived tenants found."
+  },
+  "toast": {
+    "fetchError": {
+      "title": "Error fetching tenants",
+      "description": "Failed to load tenants list."
+    },
+    "archiveSuccess": {
+      "title": "Tenant archived",
+      "description": "The tenant has been archived."
+    },
+    "archiveError": {
+      "title": "Error archiving tenant",
+      "description": "Failed to archive the tenant."
+    },
+    "restoreSuccess": {
+      "title": "Tenant restored",
+      "description": "The tenant is now active."
+    },
+    "restoreError": {
+      "title": "Error restoring tenant",
+      "description": "Failed to restore the tenant."
+    }
+  },
+  "confirm": {
+    "archive": {
+      "title": "Archive Tenant?",
+      "description": "This will archive the tenant. Users belonging to this tenant may lose access. You can restore it later.",
+      "confirmLabel": "Archive"
+    }
+  },
+  "actions": {
+    "archive": {
+      "title": "Archive tenant"
+    },
+    "restore": {
+      "title": "Restore tenant"
+    }
+  },
+  "create": {
+    "alerts": {
+      "noPermission": "You do not have permission to create tenants."
+    },
+    "page": {
+      "title": "Create Tenant",
+      "description": "Create a new tenant organization."
+    },
+    "form": {
+      "labels": {
+        "name": "Tenant Name",
+        "slug": "Slug (URL Identifier)",
+        "type": "Tenant Type",
+        "taxable": "Taxable Tenant",
+        "taxSelection": "Tax Selection",
+        "theme": "Theme"
+      },
+      "placeholders": {
+        "name": "e.g. Acme Corp",
+        "slug": "e.g. acme-corp",
+        "type": "Select a tenant type",
+        "taxSelection": "Select a tax",
+        "searchTaxes": "Search taxes..."
+      },
+      "descriptions": {
+        "slug": "Unique identifier for the tenant, used in URLs.",
+        "taxSelection": "Select the default tax that will apply to this tenant.",
+        "theme": "Select a color theme for this tenant. The preview applies immediately."
+      },
+      "validation": {
+        "taxRequired": "Tax selection is required for taxable tenants."
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "create": "Create Tenant"
+      }
+    },
+    "toast": {
+      "success": {
+        "title": "Success",
+        "description": "Tenant created successfully."
+      },
+      "error": {
+        "title": "Error",
+        "description": "Failed to create tenant."
+      }
+    }
+  },
+  "detail": {
+    "alerts": {
+      "noPermission": "You do not have permission to view this tenant.",
+      "notFound": "Tenant not found."
+    },
+    "buttons": {
+      "back": "Back to Tenants",
+      "edit": "Edit",
+      "archive": "Archive",
+      "restore": "Restore"
+    },
+    "status": {
+      "active": "Active",
+      "archived": "Archived"
+    },
+    "labels": {
+      "createdOn": "Created on",
+      "id": "ID",
+      "slug": "Slug",
+      "taxable": "Taxable",
+      "yes": "Yes",
+      "no": "No",
+      "tax": "Tax",
+      "none": "None",
+      "tenantType": "Tenant Type"
+    },
+    "sections": {
+      "details": "Details"
+    },
+    "toast": {
+      "fetchError": {
+        "title": "Error fetching details",
+        "description": "Failed to load tenant details."
+      },
+      "restoreSuccess": {
+        "title": "Tenant restored",
+        "description": "The tenant is now active."
+      },
+      "restoreError": {
+        "title": "Error restoring tenant",
+        "description": "Failed to restore the tenant."
+      },
+      "archiveSuccess": {
+        "title": "Tenant archived",
+        "description": "The tenant has been archived."
+      },
+      "archiveError": {
+        "title": "Error archiving tenant",
+        "description": "Failed to archive the tenant."
+      }
+    },
+    "confirm": {
+      "archive": {
+        "title": "Archive Tenant?",
+        "description": "This will archive the tenant. Users belonging to this tenant may lose access. You can restore it later.",
+        "cancel": "Cancel",
+        "confirm": "Archive"
+      }
+    }
+  },
+  "edit": {
+    "alerts": {
+      "noPermission": "You do not have permission to edit tenants."
+    },
+    "page": {
+      "title": "Edit Tenant",
+      "description": "Update tenant details."
+    },
+    "form": {
+      "buttons": {
+        "save": "Save Changes"
+      }
+    },
+    "toast": {
+      "fetchError": {
+        "title": "Error",
+        "description": "Failed to load tenant."
+      },
+      "success": {
+        "title": "Success",
+        "description": "Tenant updated successfully."
+      },
+      "error": {
+        "title": "Error",
+        "description": "Failed to update tenant."
+      }
+    }
+  },
+  "labels": {
+    "name": "Name",
+    "slug": "Slug",
+    "status": "Status",
+    "language": "Language",
+    "actions": "Actions"
+  }
+}

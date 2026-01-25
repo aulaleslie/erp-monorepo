@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { format } from "date-fns";
@@ -56,7 +56,7 @@ export default function CreditNoteDetailPage() {
     const [confirmApprove, setConfirmApprove] = useState(false);
     const [confirmPost, setConfirmPost] = useState(false);
 
-    const loadData = async () => {
+    const loadData = useCallback(async () => {
         try {
             const [cnData, historyData, relationData] = await Promise.all([
                 salesCreditNotesService.get(id),
@@ -66,7 +66,7 @@ export default function CreditNoteDetailPage() {
             setCreditNote(cnData);
             setHistory(historyData);
             setRelations(relationData);
-        } catch (error) {
+        } catch {
             toast({
                 title: "Error",
                 description: "Failed to load credit note data.",
@@ -76,11 +76,11 @@ export default function CreditNoteDetailPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id, router, toast]);
 
     useEffect(() => {
         loadData();
-    }, [id]);
+    }, [loadData]);
 
     const handleAction = async (action: string, notes?: string) => {
         setProcessing(true);
@@ -101,7 +101,7 @@ export default function CreditNoteDetailPage() {
                 description: t("toast.actionSuccess.description"),
             });
             loadData();
-        } catch (error) {
+        } catch {
             toast({
                 title: t("toast.actionError.title"),
                 description: t("toast.actionError.description"),

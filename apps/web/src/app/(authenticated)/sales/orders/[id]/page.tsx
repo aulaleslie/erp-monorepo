@@ -1,21 +1,16 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { format } from "date-fns";
 import {
-    FileText,
-    Clock,
-    Paperclip,
     CheckCircle2,
-    XCircle,
-    AlertCircle,
+    Clock,
     ChevronLeft,
     Download,
     Send,
     Edit,
-    RotateCcw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -58,7 +53,7 @@ export default function OrderDetailPage() {
     const [confirmSubmit, setConfirmSubmit] = useState(false);
     const [confirmApprove, setConfirmApprove] = useState(false);
 
-    const loadData = async () => {
+    const loadData = useCallback(async () => {
         try {
             const [orderData, historyData] = await Promise.all([
                 salesOrdersService.get(id),
@@ -66,7 +61,7 @@ export default function OrderDetailPage() {
             ]);
             setOrder(orderData);
             setHistory(historyData);
-        } catch (error) {
+        } catch {
             toast({
                 title: "Error",
                 description: "Failed to load order data.",
@@ -76,11 +71,11 @@ export default function OrderDetailPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id, router, toast]);
 
     useEffect(() => {
         loadData();
-    }, [id]);
+    }, [loadData]);
 
     const handleAction = async (action: string, notes?: string) => {
         setProcessing(true);
@@ -102,7 +97,7 @@ export default function OrderDetailPage() {
                 description: t("toast.actionSuccess.description"),
             });
             loadData();
-        } catch (error) {
+        } catch {
             toast({
                 title: t("toast.actionError.title"),
                 description: t("toast.actionError.description"),

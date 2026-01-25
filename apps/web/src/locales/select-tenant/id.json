@@ -1,0 +1,8 @@
+{
+  "page": {
+    "title": "Pilih Ruang Kerja",
+    "description": "Pilih organisasi yang ingin Anda akses",
+    "noWorkspaces": "Tidak ada ruang kerja ditemukan",
+    "emptyDescription": "Hubungi administrator Anda atau coba muat ulang."
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "page": {
+    "title": "Categories",
+    "description": "Manage catalog categories for organizing items."
+  },
+  "create": {
+    "page": {
+      "title": "New Category",
+      "description": "Add a new category to the catalog."
+    }
+  },
+  "edit": {
+    "page": {
+      "title": "Edit Category",
+      "description": "Update category details."
+    }
+  },
+  "alerts": {
+    "noListPermission": "You do not have permission to view categories.",
+    "noCreatePermission": "You do not have permission to create categories.",
+    "noEditPermission": "You do not have permission to edit categories."
+  },
+  "list": {
+    "table": {
+      "headers": {
+        "code": "Code",
+        "name": "Name",
+        "parent": "Parent",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "empty": "No categories found"
+    },
+    "filters": {
+      "search": "Search",
+      "searchPlaceholder": "Search by code or name"
+    }
+  },
+  "form": {
+    "labels": {
+      "name": "Category Name",
+      "parent": "Parent Category",
+      "status": "Status"
+    },
+    "placeholders": {
+      "name": "e.g. Memberships",
+      "parent": "Select a parent (optional)",
+      "status": "Select status"
+    },
+    "validation": {
+      "nameRequired": "Category name is required"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "create": "Create Category",
+      "save": "Save Changes"
+    }
+  },
+  "toast": {
+    "createSuccess": {
+      "title": "Category created",
+      "description": "The category has been added successfully."
+    },
+    "updateSuccess": {
+      "title": "Category updated",
+      "description": "Changes have been saved successfully."
+    },
+    "deleteSuccess": {
+      "title": "Category deleted",
+      "description": "The category has been removed."
+    },
+    "error": {
+      "title": "Error",
+      "description": "Something went wrong. Please try again."
+    },
+    "loadError": {
+      "title": "Error",
+      "description": "Failed to load category data."
+    }
+  },
+  "confirm": {
+    "delete": {
+      "title": "Delete Category?",
+      "description": "Are you sure you want to delete this category? This action cannot be undone.",
+      "confirmLabel": "Delete"
+    }
+  },
+  "buttons": {
+    "new": "New Category",
+    "edit": "Edit"
+  }
+}

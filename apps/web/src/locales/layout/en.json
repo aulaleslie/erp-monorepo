@@ -1,0 +1,15 @@
+{
+  "navbar": {
+    "selectWorkspaceButton": "Select Workspace",
+    "noWorkspacesTitle": "No workspaces available",
+    "noWorkspacesDescription": "You don't have access to any workspaces. Please contact your administrator.",
+    "workspaceErrorTitle": "Error",
+    "workspaceErrorDescription": "Failed to check workspace availability.",
+    "profile": "Profile",
+    "logout": "Log out",
+    "notifications": "Notifications",
+    "pendingOrders": "Orders Pending Approval",
+    "pendingInvoices": "Invoices Pending Approval",
+    "noNotifications": "No new notifications"
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "pageTitle": "Profil Saya",
+  "pageDescription": "Lihat dan kelola detail akun Anda.",
+  "sections": {
+    "personal": "Informasi Pribadi",
+    "security": "Keamanan",
+    "organizations": "Organisasi Saya"
+  },
+  "labels": {
+    "fullName": "Nama Lengkap",
+    "email": "Surel",
+    "accountType": "Tipe Akun",
+    "password": "Kata Sandi"
+  },
+  "placeholders": {
+    "fullName": "Masukkan nama Anda"
+  },
+  "securityDescription": "Ubah kata sandi Anda untuk menjaga keamanan akun.",
+  "buttons": {
+    "changePassword": "Ubah Kata Sandi"
+  },
+  "accountTypes": {
+    "superAdmin": "Super Admin",
+    "user": "Pengguna"
+  },
+  "tenants": {
+    "currentBadge": "Aktif",
+    "noRole": "Tidak Ada Peran",
+    "emptyState": "Anda tidak tergabung dalam organisasi apa pun."
+  },
+  "toast": {
+    "profileUpdated": {
+      "title": "Profil diperbarui",
+      "description": "Nama Anda berhasil diperbarui."
+    },
+    "profileUpdateError": {
+      "title": "Kesalahan",
+      "description": "Gagal memperbarui nama"
+    }
+  },
+  "changePassword": {
+    "dialog": {
+      "title": "Ubah Kata Sandi",
+      "description": "Masukkan kata sandi saat ini dan pilih kata sandi baru."
+    },
+    "form": {
+      "labels": {
+        "currentPassword": "Kata Sandi Saat Ini",
+        "newPassword": "Kata Sandi Baru",
+        "confirmPassword": "Konfirmasi Kata Sandi Baru"
+      },
+      "validation": {
+        "currentPasswordRequired": "Kata sandi saat ini diperlukan",
+        "newPasswordRequired": "Kata sandi baru diperlukan",
+        "newPasswordMinLength": "Kata sandi harus minimal 6 karakter",
+        "confirmPasswordRequired": "Silakan konfirmasi kata sandi baru Anda",
+        "passwordsMismatch": "Kata sandi tidak cocok",
+        "currentPasswordInvalid": "Kata sandi saat ini salah"
+      },
+      "buttons": {
+        "cancel": "Batal",
+        "update": "Perbarui Kata Sandi"
+      }
+    },
+    "toast": {
+      "success": {
+        "title": "Kata sandi diperbarui",
+        "description": "Kata sandi Anda telah berhasil diubah."
+      },
+      "error": {
+        "title": "Kesalahan",
+        "description": "Gagal memperbarui kata sandi"
+      }
+    }
+  }
+}

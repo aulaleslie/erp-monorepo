@@ -1,0 +1,138 @@
+{
+  "alerts": {
+    "noPermission": "You do not have permission to view users."
+  },
+  "page": {
+    "title": "User Management",
+    "description": "Manage users and assign roles here."
+  },
+  "buttons": {
+    "invite": "Invite User",
+    "create": "Create User"
+  },
+  "empty": {
+    "message": "No users found."
+  },
+  "table": {
+    "headers": {
+      "email": "Email",
+      "fullName": "Full Name",
+      "role": "Role",
+      "status": "Status",
+      "actions": "Actions"
+    }
+  },
+  "toast": {
+    "fetchError": {
+      "title": "Error fetching users",
+      "description": "Failed to load users list."
+    },
+    "removeSuccess": {
+      "title": "User removed",
+      "description": "The user has been removed from this tenant."
+    },
+    "removeError": {
+      "title": "Error removing user",
+      "description": "Failed to remove the user."
+    }
+  },
+  "confirm": {
+    "remove": {
+      "title": "Remove user from tenant?",
+      "description": "This will remove the user from this tenant. The user account will still exist and can be invited back later.",
+      "confirmLabel": "Remove"
+    }
+  },
+  "createUser": {
+    "alerts": {
+      "noPermission": "You do not have permission to create users."
+    },
+    "page": {
+      "title": "Create User",
+      "description": "Create a new user and optionally assign a role."
+    },
+    "form": {
+      "labels": {
+        "email": "Email Address *",
+        "fullName": "Full Name",
+        "password": "Password *",
+        "confirmPassword": "Confirm Password *",
+        "role": "Role (Optional)"
+      },
+      "placeholders": {
+        "email": "user@example.com",
+        "fullName": "John Doe",
+        "password": "••••••••",
+        "confirmPassword": "••••••••",
+        "role": "Select a role (optional)",
+        "searchRoles": "Search roles..."
+      },
+      "descriptions": {
+        "superAdminRole": "Tenant Super Admin",
+        "roleHelp": "The user will be added to this workspace. Role can be assigned later."
+      },
+      "validation": {
+        "emailRequired": "Email is required",
+        "emailInvalid": "Please enter a valid email",
+        "passwordRequired": "Password is required",
+        "passwordMinLength": "Password must be at least 6 characters",
+        "confirmPasswordRequired": "Please confirm the password",
+        "passwordsMismatch": "Passwords do not match"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "create": "Create User"
+      }
+    },
+    "toast": {
+      "success": {
+        "title": "User created",
+        "description": "The user has been created successfully."
+      },
+      "error": {
+        "title": "Error",
+        "description": "Failed to create user."
+      }
+    }
+  },
+  "invite": {
+    "dialog": {
+      "title": "Invite Existing User",
+      "description": "Add an existing user to this tenant. Only users who are not super admins and not already members of this tenant are shown."
+    },
+    "form": {
+      "labels": {
+        "user": "User",
+        "role": "Role"
+      },
+      "placeholders": {
+        "user": "Search for a user...",
+        "searchUser": "Type email or name...",
+        "role": "Select a role",
+        "searchRoles": "Search roles..."
+      },
+      "validation": {
+        "userRequired": "Please select a user",
+        "roleRequired": "Role is required for invitation",
+        "userAlreadyMember": "User is already a member of this tenant"
+      },
+      "descriptions": {
+        "superAdminRole": "Tenant Super Admin"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "invite": "Invite User"
+      }
+    },
+    "toast": {
+      "success": {
+        "title": "User invited",
+        "description": "The user has been added to this tenant."
+      },
+      "error": {
+        "title": "Error",
+        "description": "Failed to invite user"
+      }
+    }
+  }
+}

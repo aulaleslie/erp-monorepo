@@ -4,8 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { useMemo } from "react";
 import { Locale, DEFAULT_LOCALE } from "@gym-monorepo/shared";
 import { useAuth } from "@/contexts/AuthContext";
-import en from "@/locales/en.json";
-import id from "@/locales/id.json";
+import { en, id } from "@/locales/locales";
 
 const MESSAGES: Record<Locale, Record<string, unknown>> = {
   [Locale.EN]: en,

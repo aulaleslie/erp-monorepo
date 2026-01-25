@@ -1,0 +1,59 @@
+{
+  "pageTitle": "Audit Logs",
+  "pageDescription": "View system-wide audit trails.",
+  "alert": {
+    "noPermission": "You do not have permission to view audit logs."
+  },
+  "info": {
+    "timestamps": "Audit timestamps stay in UTC but render in your browser’s timezone so filters match your local clock.",
+    "filters": "Apply multiple filters at once to narrow down a specific change window."
+  },
+  "filters": {
+    "startTime": "Start time (local)",
+    "startTimePlaceholder": "Select start time",
+    "endTime": "End time (local)",
+    "endTimePlaceholder": "Select end time",
+    "action": "Action",
+    "actionPlaceholder": "Any action",
+    "entityName": "Entity name",
+    "entityPlaceholder": "Entity name",
+    "performedBy": "Performed by",
+    "performedByPlaceholder": "User ID or name",
+    "quickRangeLabel": "Quick range",
+    "quickRangePlaceholder": "Pick a preset"
+  },
+  "quickRange": {
+    "presets": {
+      "last15": "Last 15 minutes",
+      "last60": "Last 1 hour"
+    }
+  },
+  "buttons": {
+    "clearFilters": "Clear filters",
+    "applyFilters": "Apply filters",
+    "viewChanges": "View Changes"
+  },
+  "actions": {
+    "create": "Create",
+    "update": "Update",
+    "delete": "Delete",
+    "softRemove": "Soft Remove"
+  },
+  "table": {
+    "timestamp": "Timestamp",
+    "action": "Action",
+    "entity": "Entity",
+    "entityId": "Entity ID",
+    "performedBy": "Performed By",
+    "details": "Details",
+    "emptyState": "No audit logs found."
+  },
+  "systemLabel": "System",
+  "detailsDialog": {
+    "title": "Change Details - {action} {entityName}",
+    "description": "Detailed information about the changes made to this record.",
+    "previousValues": "Previous Values:",
+    "newValues": "New Values:",
+    "noChanges": "No detailed changes available for this action."
+  }
+}

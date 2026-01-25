@@ -1,0 +1,101 @@
+{
+  "page": {
+    "title": "Taxes",
+    "description": "Manage platform taxes."
+  },
+  "buttons": {
+    "add": "Add Tax"
+  },
+  "filters": {
+    "searchPlaceholder": "Search taxes...",
+    "statusPlaceholder": "Filter Status",
+    "status": {
+      "all": "All Status",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "lockedAction": "This tax is already selected by a tenant. Remove it from tenant tax settings to edit or disable."
+  },
+  "table": {
+    "name": "Name",
+    "code": "Code",
+    "type": "Type",
+    "typeValues": {
+      "percentage": "Percentage",
+      "fixed": "Fixed"
+    },
+    "value": "Rate / Amount",
+    "status": "Status",
+    "lastUpdated": "Last Updated",
+    "actions": "Actions"
+  },
+  "dialogs": {
+    "disable": {
+      "title": "Disable Tax",
+      "description": "Are you sure you want to disable \"{name}\"? It will no longer be selectable for new settings.",
+      "confirmLabel": "Disable"
+    }
+  },
+  "guards": {
+    "superAdminOnly": "Only Super Admins can manage taxes."
+  },
+  "toast": {
+    "loadError": {
+      "title": "Error",
+      "description": "Failed to load taxes"
+    },
+    "disableSuccess": {
+      "title": "Success",
+      "description": "Tax disabled successfully"
+    },
+    "disableError": {
+      "title": "Error",
+      "description": "Failed to disable tax"
+    }
+  },
+  "form": {
+    "dialog": {
+      "title": {
+        "create": "Create Tax",
+        "edit": "Edit Tax"
+      },
+      "description": {
+        "create": "Add a new tax to the platform.",
+        "edit": "Update the tax details. Changes will apply to future transactions."
+      }
+    },
+    "labels": {
+      "name": "Name",
+      "codeOptional": "Code (Optional)",
+      "type": "Type",
+      "rate": "Rate (0 - 1)",
+      "amount": "Amount"
+    },
+    "placeholders": {
+      "name": "e.g. VAT, Service Charge",
+      "code": "e.g. VAT-11",
+      "selectType": "Select type",
+      "rate": "0.11",
+      "amount": "0.00"
+    },
+    "typeOptions": {
+      "percentage": "Percentage",
+      "fixed": "Fixed Amount"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "toast": {
+      "success": {
+        "title": "Success",
+        "create": "Tax created successfully",
+        "update": "Tax updated successfully"
+      },
+      "error": {
+        "title": "Error",
+        "description": "Something went wrong while saving the tax."
+      }
+    }
+  }
+}

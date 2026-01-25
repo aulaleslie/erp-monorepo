@@ -1,0 +1,77 @@
+{
+  "input": {
+    "placeholder": "Add tags...",
+    "searchPlaceholder": "Search or type a new tag...",
+    "noSuggestions": "No matching tags. Press Enter to create.",
+    "addNew": "Create \"{tag}\"",
+    "loading": "Loading..."
+  },
+  "page": {
+    "title": "Tags Management",
+    "description": "Manage organization tags, rename them, or deactivate those no longer used."
+  },
+  "buttons": {
+    "new": "New Tag"
+  },
+  "filters": {
+    "searchPlaceholder": "Search tags..."
+  },
+  "guards": {
+    "superAdminOnly": "Only Super Admins can manage tags."
+  },
+  "table": {
+    "headers": {
+      "name": "Name",
+      "usage": "Usage Count",
+      "lastUsed": "Last Used",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "empty": "No tags found"
+  },
+  "dialogs": {
+    "delete": {
+      "title": "Delete Tag",
+      "description": "Are you sure you want to delete this tag? This action cannot be undone.",
+      "confirmLabel": "Delete"
+    }
+  },
+  "form": {
+    "labels": {
+      "name": "Tag Name",
+      "isActive": "Active"
+    },
+    "placeholders": {
+      "name": "Enter tag name"
+    },
+    "validation": {
+      "nameRequired": "Tag name is required"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "save": "Save Changes"
+    }
+  },
+  "toast": {
+    "fetchError": {
+      "title": "Unable to load tags",
+      "description": "We couldn't fetch tags right now."
+    },
+    "updateSuccess": {
+      "title": "Tag updated",
+      "description": "The tag has been updated successfully."
+    },
+    "updateError": {
+      "title": "Failed to update tag",
+      "description": "Something went wrong while saving the tag."
+    },
+    "deleteSuccess": {
+      "title": "Tag deleted",
+      "description": "The tag has been removed."
+    },
+    "deleteError": {
+      "title": "Failed to delete tag",
+      "description": "Something went wrong while deleting the tag."
+    }
+  }
+}

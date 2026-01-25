@@ -1,0 +1,15 @@
+{
+  "navbar": {
+    "selectWorkspaceButton": "Pilih Ruang Kerja",
+    "noWorkspacesTitle": "Tidak ada ruang kerja tersedia",
+    "noWorkspacesDescription": "Anda tidak memiliki akses ke ruang kerja mana pun. Silakan hubungi administrator Anda.",
+    "workspaceErrorTitle": "Kesalahan",
+    "workspaceErrorDescription": "Gagal memeriksa ketersediaan ruang kerja.",
+    "profile": "Profil",
+    "logout": "Keluar",
+    "notifications": "Notifikasi",
+    "pendingOrders": "Pesanan Menunggu Persetujuan",
+    "pendingInvoices": "Faktur Menunggu Persetujuan",
+    "noNotifications": "Tidak ada notifikasi baru"
+  }
+}

@@ -3,7 +3,7 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "../../ui/textarea";
 import {
-    Form,
     FormControl,
     FormField,
     FormItem,
@@ -92,7 +91,7 @@ export function InvoiceForm({ initialData, isEdit = false }: InvoiceFormProps) {
         },
     });
 
-    const { handleSubmit, control, watch, setValue } = methods;
+    const { handleSubmit, control } = methods;
 
     const onSubmit = async (values: InvoiceFormValues) => {
         try {
@@ -111,7 +110,7 @@ export function InvoiceForm({ initialData, isEdit = false }: InvoiceFormProps) {
                 });
                 router.push(`/sales/invoices/${result.id}`);
             }
-        } catch (error) {
+        } catch {
             toast({
                 title: "Error",
                 description: "Failed to save invoice. Please try again.",
@@ -139,7 +138,8 @@ export function InvoiceForm({ initialData, isEdit = false }: InvoiceFormProps) {
     };
 
     // Summary calculations
-    const watchItems = watch("items");
+    // Summary calculations
+    const watchItems = useWatch({ control, name: "items" }) || [];
     const subtotal = watchItems.reduce((acc, item) => acc + (item.quantity * item.unitPrice), 0);
     const total = subtotal;
 

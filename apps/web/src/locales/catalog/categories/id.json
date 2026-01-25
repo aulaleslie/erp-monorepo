@@ -1,0 +1,92 @@
+{
+  "page": {
+    "title": "Kategori",
+    "description": "Kelola kategori katalog untuk mengorganisir item."
+  },
+  "create": {
+    "page": {
+      "title": "Kategori Baru",
+      "description": "Tambahkan kategori baru ke katalog."
+    }
+  },
+  "edit": {
+    "page": {
+      "title": "Edit Kategori",
+      "description": "Perbarui detail kategori."
+    }
+  },
+  "alerts": {
+    "noListPermission": "Anda tidak memiliki izin untuk melihat kategori.",
+    "noCreatePermission": "Anda tidak memiliki izin untuk membuat kategori.",
+    "noEditPermission": "Anda tidak memiliki izin untuk mengedit kategori."
+  },
+  "list": {
+    "table": {
+      "headers": {
+        "code": "Kode",
+        "name": "Nama",
+        "parent": "Induk",
+        "status": "Status",
+        "actions": "Aksi"
+      },
+      "empty": "Tidak ada kategori ditemukan"
+    },
+    "filters": {
+      "search": "Cari",
+      "searchPlaceholder": "Cari berdasarkan kode atau nama"
+    }
+  },
+  "form": {
+    "labels": {
+      "name": "Nama Kategori",
+      "parent": "Kategori Induk",
+      "status": "Status"
+    },
+    "placeholders": {
+      "name": "misal Keanggotaan",
+      "parent": "Pilih induk (opsional)",
+      "status": "Pilih status"
+    },
+    "validation": {
+      "nameRequired": "Nama kategori wajib diisi"
+    },
+    "buttons": {
+      "cancel": "Batal",
+      "create": "Buat Kategori",
+      "save": "Simpan Perubahan"
+    }
+  },
+  "toast": {
+    "createSuccess": {
+      "title": "Kategori dibuat",
+      "description": "Kategori telah berhasil ditambahkan."
+    },
+    "updateSuccess": {
+      "title": "Kategori diperbarui",
+      "description": "Perubahan telah berhasil disimpan."
+    },
+    "deleteSuccess": {
+      "title": "Kategori dihapus",
+      "description": "Kategori telah dihapus."
+    },
+    "error": {
+      "title": "Kesalahan",
+      "description": "Terjadi kesalahan. Silakan coba lagi."
+    },
+    "loadError": {
+      "title": "Kesalahan",
+      "description": "Gagal memuat data kategori."
+    }
+  },
+  "confirm": {
+    "delete": {
+      "title": "Hapus Kategori?",
+      "description": "Apakah Anda yakin ingin menghapus kategori ini? Tindakan ini tidak dapat dibatalkan.",
+      "confirmLabel": "Hapus"
+    }
+  },
+  "buttons": {
+    "new": "Kategori Baru",
+    "edit": "Edit"
+  }
+}

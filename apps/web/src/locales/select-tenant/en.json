@@ -1,0 +1,8 @@
+{
+  "page": {
+    "title": "Select Workspace",
+    "description": "Choose which organization you want to access",
+    "noWorkspaces": "No workspaces found",
+    "emptyDescription": "Please contact your administrator or try reloading."
+  }
+}

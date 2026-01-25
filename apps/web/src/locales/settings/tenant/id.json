@@ -1,0 +1,105 @@
+{
+  "page": {
+    "title": "Pengaturan Tenant",
+    "description": "Lihat dan perbarui profil tenant aktif serta pengaturan pajaknya."
+  },
+  "alerts": {
+    "noPermission": "Anda tidak memiliki izin untuk melihat pengaturan tenant.",
+    "notFound": "Tenant tidak ditemukan."
+  },
+  "toast": {
+    "loadError": {
+      "title": "Kesalahan",
+      "description": "Gagal memuat pengaturan tenant."
+    },
+    "saveSuccess": {
+      "title": "Berhasil",
+      "description": "Pengaturan tenant berhasil diperbarui."
+    },
+    "error": {
+      "title": "Kesalahan",
+      "description": "Gagal memperbarui pengaturan tenant."
+    }
+  },
+  "form": {
+    "labels": {
+      "status": "Status",
+      "tenantName": "Nama Tenant",
+      "slug": "Slug",
+      "tenantType": "Tipe Tenant",
+      "taxable": "Tenant Dikenai Pajak",
+      "taxSelection": "Pemilihan Pajak",
+      "theme": "Tema"
+    },
+    "placeholders": {
+      "tenantType": "Pilih tipe tenant",
+      "taxSelection": "Pilih pajak",
+      "searchTaxes": "Cari pajak..."
+    },
+    "descriptions": {
+      "taxSelection": "Pilih pajak default yang akan diterapkan ke tenant ini.",
+      "theme": "Pilih tema warna untuk organisasi Anda. Pratinjau berlaku segera."
+    },
+    "buttons": {
+      "save": "Simpan Perubahan"
+    },
+    "validation": {
+      "taxRequired": "Pemilihan pajak wajib untuk tenant yang dikenai pajak."
+    }
+  },
+  "taxForm": {
+    "emptyState": {
+      "title": "Pajak Tidak Diaktifkan",
+      "description": "Tenant ini tidak dikonfigurasi untuk perpajakan. Silakan hubungi Super Admin jika ini salah."
+    },
+    "card": {
+      "title": "Pengaturan Pajak",
+      "description": "Konfigurasi pajak yang berlaku dan pemilihan pajak default untuk tenant ini."
+    },
+    "form": {
+      "labels": {
+        "applicableTaxes": "Pajak yang Berlaku",
+        "defaultTax": "Pajak Default"
+      },
+      "placeholders": {
+        "selectTaxes": "Pilih pajak...",
+        "selectDefaultTax": "Pilih pajak default"
+      },
+      "descriptions": {
+        "taxesHelp": "Pilih semua pajak yang berlaku untuk produk atau layanan di tenant ini.",
+        "defaultTaxHelp": "Pajak ini akan diterapkan secara default ke produk baru."
+      },
+      "buttons": {
+        "save": "Simpan Perubahan"
+      }
+    },
+    "validation": {
+      "atLeastOneTax": "Setidaknya satu pajak harus dipilih.",
+      "defaultMustBeSelected": "Pajak default harus salah satu dari pajak yang dipilih"
+    },
+    "toast": {
+      "loadError": {
+        "title": "Kesalahan",
+        "description": "Gagal memuat pengaturan pajak. Silakan coba lagi."
+      },
+      "success": {
+        "title": "Berhasil",
+        "description": "Pengaturan pajak berhasil diperbarui."
+      },
+      "error": {
+        "title": "Kesalahan",
+        "description": "Gagal menyimpan pengaturan pajak."
+      }
+    }
+  },
+  "labels": {
+    "name": "Nama Tenant",
+    "slug": "Slug Tenant",
+    "type": "Tipe Tenant",
+    "language": "Bahasa Tenant",
+    "taxable": "Tenant Dikenai Pajak",
+    "taxSelection": "Pilihan Pajak",
+    "taxHint": "Pilih pajak default yang akan diterapkan untuk tenant ini.",
+    "theme": "Tema"
+  }
+}

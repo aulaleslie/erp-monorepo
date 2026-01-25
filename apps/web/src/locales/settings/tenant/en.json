@@ -1,0 +1,105 @@
+{
+  "page": {
+    "title": "Tenant Settings",
+    "description": "View and update the active tenant profile and tax settings."
+  },
+  "alerts": {
+    "noPermission": "You do not have permission to view tenant settings.",
+    "notFound": "Tenant not found."
+  },
+  "toast": {
+    "loadError": {
+      "title": "Error",
+      "description": "Failed to load tenant settings."
+    },
+    "saveSuccess": {
+      "title": "Success",
+      "description": "Tenant settings updated."
+    },
+    "error": {
+      "title": "Error",
+      "description": "Failed to update tenant settings."
+    }
+  },
+  "form": {
+    "labels": {
+      "status": "Status",
+      "tenantName": "Tenant Name",
+      "slug": "Slug",
+      "tenantType": "Tenant Type",
+      "taxable": "Taxable Tenant",
+      "taxSelection": "Tax Selection",
+      "theme": "Theme"
+    },
+    "placeholders": {
+      "tenantType": "Select a tenant type",
+      "taxSelection": "Select a tax",
+      "searchTaxes": "Search taxes..."
+    },
+    "descriptions": {
+      "taxSelection": "Select the default tax that will apply to this tenant.",
+      "theme": "Select a color theme for your organization. The preview applies immediately."
+    },
+    "buttons": {
+      "save": "Save Changes"
+    },
+    "validation": {
+      "taxRequired": "Tax selection is required for taxable tenants."
+    }
+  },
+  "taxForm": {
+    "emptyState": {
+      "title": "Taxation Not Enabled",
+      "description": "This tenant is not configured for taxation. Please contact a Super Admin if this is incorrect."
+    },
+    "card": {
+      "title": "Tax Settings",
+      "description": "Configure applicable taxes and default tax selection for this tenant."
+    },
+    "form": {
+      "labels": {
+        "applicableTaxes": "Applicable Taxes",
+        "defaultTax": "Default Tax"
+      },
+      "placeholders": {
+        "selectTaxes": "Select taxes...",
+        "selectDefaultTax": "Select default tax"
+      },
+      "descriptions": {
+        "taxesHelp": "Select all taxes that apply to products or services in this tenant.",
+        "defaultTaxHelp": "This tax will be applied by default to new products."
+      },
+      "buttons": {
+        "save": "Save Changes"
+      }
+    },
+    "validation": {
+      "atLeastOneTax": "At least one tax must be selected.",
+      "defaultMustBeSelected": "Default tax must be one of the selected taxes"
+    },
+    "toast": {
+      "loadError": {
+        "title": "Error",
+        "description": "Failed to load tax settings. Please try again."
+      },
+      "success": {
+        "title": "Success",
+        "description": "Tax settings updated successfully."
+      },
+      "error": {
+        "title": "Error",
+        "description": "Failed to save tax settings."
+      }
+    }
+  },
+  "labels": {
+    "name": "Tenant Name",
+    "slug": "Tenant Slug",
+    "type": "Tenant Type",
+    "language": "Tenant Language",
+    "taxable": "Taxable Tenant",
+    "taxSelection": "Tax Selection",
+    "taxHint": "Select the default tax that will apply to this tenant.",
+    "theme": "Theme"
+  }
+}

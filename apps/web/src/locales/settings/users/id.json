@@ -1,0 +1,138 @@
+{
+  "alerts": {
+    "noPermission": "Anda tidak memiliki izin untuk melihat pengguna."
+  },
+  "page": {
+    "title": "Manajemen Pengguna",
+    "description": "Kelola pengguna dan tetapkan peran di sini."
+  },
+  "buttons": {
+    "invite": "Undang Pengguna",
+    "create": "Buat Pengguna"
+  },
+  "empty": {
+    "message": "Tidak ada pengguna ditemukan."
+  },
+  "table": {
+    "headers": {
+      "email": "Email",
+      "fullName": "Nama Lengkap",
+      "role": "Peran",
+      "status": "Status",
+      "actions": "Tindakan"
+    }
+  },
+  "toast": {
+    "fetchError": {
+      "title": "Kesalahan mengambil pengguna",
+      "description": "Gagal memuat daftar pengguna."
+    },
+    "removeSuccess": {
+      "title": "Pengguna dihapus",
+      "description": "Pengguna telah dihapus dari tenant ini."
+    },
+    "removeError": {
+      "title": "Kesalahan menghapus pengguna",
+      "description": "Gagal menghapus pengguna."
+    }
+  },
+  "confirm": {
+    "remove": {
+      "title": "Hapus pengguna dari tenant?",
+      "description": "Ini akan menghapus pengguna dari tenant ini. Akun pengguna masih akan ada dan dapat diundang kembali nanti.",
+      "confirmLabel": "Hapus"
+    }
+  },
+  "createUser": {
+    "alerts": {
+      "noPermission": "Anda tidak memiliki izin untuk membuat pengguna."
+    },
+    "page": {
+      "title": "Buat Pengguna",
+      "description": "Buat pengguna baru dan secara opsional tetapkan peran."
+    },
+    "form": {
+      "labels": {
+        "email": "Alamat Email *",
+        "fullName": "Nama Lengkap",
+        "password": "Kata Sandi *",
+        "confirmPassword": "Konfirmasi Kata Sandi *",
+        "role": "Peran (Opsional)"
+      },
+      "placeholders": {
+        "email": "pengguna@contoh.com",
+        "fullName": "John Doe",
+        "password": "••••••••",
+        "confirmPassword": "••••••••",
+        "role": "Pilih peran (opsional)",
+        "searchRoles": "Cari peran..."
+      },
+      "descriptions": {
+        "superAdminRole": "Super Admin Tenant",
+        "roleHelp": "Pengguna akan ditambahkan ke ruang kerja ini. Peran dapat ditetapkan nanti."
+      },
+      "validation": {
+        "emailRequired": "Email diperlukan",
+        "emailInvalid": "Silakan masukkan email yang valid",
+        "passwordRequired": "Kata sandi diperlukan",
+        "passwordMinLength": "Kata sandi harus minimal 6 karakter",
+        "confirmPasswordRequired": "Silakan konfirmasi kata sandi",
+        "passwordsMismatch": "Kata sandi tidak cocok"
+      },
+      "buttons": {
+        "cancel": "Batal",
+        "create": "Buat Pengguna"
+      }
+    },
+    "toast": {
+      "success": {
+        "title": "Pengguna dibuat",
+        "description": "Pengguna telah berhasil dibuat."
+      },
+      "error": {
+        "title": "Kesalahan",
+        "description": "Gagal membuat pengguna."
+      }
+    }
+  },
+  "invite": {
+    "dialog": {
+      "title": "Undang Pengguna yang Ada",
+      "description": "Tambahkan pengguna yang ada ke tenant ini. Hanya pengguna yang bukan super admin dan belum menjadi anggota tenant ini yang ditampilkan."
+    },
+    "form": {
+      "labels": {
+        "user": "Pengguna",
+        "role": "Peran"
+      },
+      "placeholders": {
+        "user": "Cari pengguna...",
+        "searchUser": "Ketik email atau nama...",
+        "role": "Pilih peran",
+        "searchRoles": "Cari peran..."
+      },
+      "validation": {
+        "userRequired": "Silakan pilih pengguna",
+        "roleRequired": "Peran diperlukan untuk undangan",
+        "userAlreadyMember": "Pengguna sudah menjadi anggota tenant ini"
+      },
+      "descriptions": {
+        "superAdminRole": "Super Admin Tenant"
+      },
+      "buttons": {
+        "cancel": "Batal",
+        "invite": "Undang Pengguna"
+      }
+    },
+    "toast": {
+      "success": {
+        "title": "Pengguna diundang",
+        "description": "Pengguna telah ditambahkan ke tenant ini."
+      },
+      "error": {
+        "title": "Kesalahan",
+        "description": "Gagal mengundang pengguna"
+      }
+    }
+  }
+}

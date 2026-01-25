@@ -1,0 +1,253 @@
+{
+  "alerts": {
+    "noAccess": "Anda tidak memiliki izin untuk mengakses data orang.",
+    "noListPermission": "Anda tidak memiliki izin untuk melihat data orang.",
+    "noCreatePermission": "Anda tidak memiliki izin untuk menambah orang.",
+    "noEditPermission": "Anda tidak memiliki izin untuk memperbarui orang."
+  },
+  "page": {
+    "title": "Orang",
+    "description": "Kelola pelanggan, pemasok, dan staf."
+  },
+  "create": {
+    "page": {
+      "title": "Tambah Orang",
+      "description": "Tambahkan orang baru ke ruang kerja ini."
+    }
+  },
+  "edit": {
+    "page": {
+      "title": "Ubah Orang",
+      "description": "Perbarui detail orang."
+    }
+  },
+  "placeholders": {
+    "listTitle": "Daftar orang segera hadir",
+    "listDescription": "Halaman ini akan memuat filter, pencarian, dan aksi untuk orang.",
+    "formTitle": "Form orang segera hadir",
+    "formDescription": "Halaman ini akan menangani alur buat dan ubah data orang."
+  },
+  "buttons": {
+    "new": "Orang Baru",
+    "invite": "Undang yang sudah ada"
+  },
+  "list": {
+    "filters": {
+      "search": "Cari",
+      "searchPlaceholder": "Cari berdasarkan kode, nama, email, atau telepon",
+      "type": "Tipe",
+      "status": "Status"
+    },
+    "table": {
+      "headers": {
+        "code": "Kode",
+        "name": "Nama",
+        "type": "Tipe",
+        "phone": "Telepon",
+        "email": "Email",
+        "tags": "Tag",
+        "status": "Status",
+        "actions": "Aksi"
+      },
+      "empty": "Tidak ada orang ditemukan"
+    }
+  },
+  "types": {
+    "all": "Semua tipe",
+    "customer": "Pelanggan",
+    "supplier": "Pemasok",
+    "staff": "Staf"
+  },
+  "statuses": {
+    "any": "Semua status",
+    "active": "Aktif",
+    "inactive": "Tidak aktif"
+  },
+  "form": {
+    "labels": {
+      "fullName": "Nama Lengkap",
+      "type": "Tipe",
+      "email": "Email",
+      "phone": "Telepon",
+      "tags": "Tag",
+      "status": "Status",
+      "code": "Kode"
+    },
+    "placeholders": {
+      "fullName": "Masukkan nama lengkap",
+      "email": "email@contoh.com",
+      "phone": "+62812...",
+      "tags": "Masukkan tag dipisahkan dengan koma",
+      "type": "Pilih tipe",
+      "status": "Pilih status"
+    },
+    "validation": {
+      "fullNameRequired": "Nama lengkap wajib diisi",
+      "invalidEmail": "Silakan masukkan alamat email yang valid"
+    },
+    "buttons": {
+      "cancel": "Batal",
+      "create": "Buat Orang",
+      "save": "Simpan Perubahan"
+    }
+  },
+  "toast": {
+    "fetchError": {
+      "title": "Tidak dapat memuat orang",
+      "description": "Kami tidak dapat memuat orang sekarang. Coba lagi nanti."
+    },
+    "deactivateSuccess": {
+      "title": "Orang dinonaktifkan",
+      "description": "Orang telah ditandai tidak aktif."
+    },
+    "deactivateError": {
+      "title": "Gagal menonaktifkan",
+      "description": "Ada masalah saat memperbarui orang ini."
+    },
+    "createSuccess": {
+      "title": "Orang dibuat",
+      "description": "Orang telah berhasil ditambahkan."
+    },
+    "createError": {
+      "title": "Gagal membuat orang",
+      "description": "Terjadi kesalahan. Silakan coba lagi."
+    },
+    "updateSuccess": {
+      "title": "Orang diperbarui",
+      "description": "Perubahan telah berhasil disimpan."
+    },
+    "updateError": {
+      "title": "Gagal memperbarui orang",
+      "description": "Terjadi kesalahan. Silakan coba lagi."
+    },
+    "loadError": {
+      "title": "Gagal memuat orang",
+      "description": "Tidak dapat mengambil detail orang."
+    },
+    "duplicateEmail": "Email ini sudah digunakan.",
+    "duplicatePhone": "Nomor telepon ini sudah digunakan."
+  },
+  "confirm": {
+    "deactivate": {
+      "title": "Nonaktifkan orang?",
+      "description": "Ini akan menandai orang sebagai tidak aktif tetapi menyimpan riwayat.",
+      "confirmLabel": "Nonaktifkan"
+    }
+  },
+  "invite": {
+    "dialog": {
+      "title": "Undang orang yang sudah ada",
+      "description": "Tambahkan orang dari ruang kerja lain ke tenant ini."
+    },
+    "form": {
+      "labels": {
+        "type": "Tipe",
+        "person": "Orang"
+      },
+      "placeholders": {
+        "type": "Pilih tipe",
+        "person": "Cari orang",
+        "search": "Cari berdasarkan nama, kode, email, atau telepon"
+      },
+      "buttons": {
+        "cancel": "Batal",
+        "invite": "Undang"
+      },
+      "validation": {
+        "personRequired": "Pilih orang untuk diundang"
+      }
+    },
+    "toast": {
+      "success": {
+        "title": "Orang diundang",
+        "description": "Orang berhasil ditambahkan ke ruang kerja ini."
+      },
+      "error": {
+        "title": "Undangan gagal",
+        "description": "Kami tidak dapat mengundang orang tersebut."
+      }
+    }
+  },
+  "staff": {
+    "section": "Pengaturan Staf",
+    "noDepartment": "Tanpa departemen",
+    "labels": {
+      "department": "Departemen",
+      "userLink": "Akun Pengguna Terhubung"
+    },
+    "placeholders": {
+      "department": "Pilih departemen",
+      "searchUser": "Cari pengguna berdasarkan email..."
+    },
+    "userCard": {
+      "linkedAs": "Terhubung ke",
+      "notLinked": "Tidak ada akun pengguna yang terhubung ke staf ini.",
+      "linkButton": "Hubungkan",
+      "unlinkButton": "Putuskan",
+      "createButton": "Buat Pengguna Baru",
+      "toast": {
+        "linkSuccess": {
+          "title": "Pengguna terhubung",
+          "description": "Pengguna telah dihubungkan ke staf ini."
+        },
+        "linkError": {
+          "title": "Gagal menghubungkan",
+          "description": "Tidak dapat menghubungkan pengguna. Silakan coba lagi."
+        },
+        "unlinkSuccess": {
+          "title": "Pengguna diputuskan",
+          "description": "Pengguna telah diputuskan dari staf ini."
+        },
+        "unlinkError": {
+          "title": "Gagal memutuskan",
+          "description": "Tidak dapat memutuskan pengguna. Silakan coba lagi."
+        }
+      }
+    },
+    "toast": {
+      "departmentsError": {
+        "title": "Gagal memuat departemen",
+        "description": "Tidak dapat mengambil daftar departemen."
+      }
+    }
+  },
+  "createUser": {
+    "dialog": {
+      "title": "Buat Pengguna untuk Staf",
+      "description": "Buat akun pengguna baru dan hubungkan ke staf ini."
+    },
+    "form": {
+      "labels": {
+        "email": "Email",
+        "fullName": "Nama Lengkap (opsional)",
+        "tempPassword": "Kata Sandi Sementara",
+        "role": "Peran",
+        "attachToTenant": "Tambahkan ke ruang kerja ini"
+      },
+      "placeholders": {
+        "role": "Pilih peran",
+        "searchRole": "Cari peran..."
+      },
+      "validation": {
+        "emailRequired": "Email wajib diisi",
+        "passwordRequired": "Kata sandi sementara wajib diisi",
+        "passwordMinLength": "Kata sandi harus minimal 6 karakter",
+        "roleRequired": "Peran wajib saat menambahkan ke ruang kerja"
+      },
+      "buttons": {
+        "cancel": "Batal",
+        "create": "Buat Pengguna"
+      }
+    },
+    "toast": {
+      "success": {
+        "title": "Pengguna dibuat",
+        "description": "Pengguna telah dibuat dan dihubungkan ke staf ini."
+      },
+      "error": {
+        "title": "Gagal membuat pengguna",
+        "description": "Terjadi kesalahan. Silakan coba lagi."
+      }
+    }
+  }
+}

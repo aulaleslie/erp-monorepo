@@ -1,0 +1,177 @@
+{
+  "page": {
+    "title": "Sales Credit Notes",
+    "description": "Manage credit notes and reversals for sales invoices."
+  },
+  "buttons": {
+    "new": "New Credit Note"
+  },
+  "filters": {
+    "status": "Status",
+    "statusPlaceholder": "All statuses",
+    "customer": "Customer",
+    "customerPlaceholder": "Select a customer",
+    "number": "Credit note number",
+    "numberPlaceholder": "Filter by number",
+    "search": "Search",
+    "searchPlaceholder": "Search by number, name, or notes",
+    "dateFrom": "From",
+    "dateTo": "To",
+    "datePlaceholder": "Select a date",
+    "tag": "Tag",
+    "tagPlaceholder": "Search tags",
+    "tagHelper": "Type a tag and select it to filter",
+    "clear": "Clear filters",
+    "any": "Any"
+  },
+  "list": {
+    "toast": {
+      "fetchError": {
+        "title": "Unable to load credit notes",
+        "description": "Something went wrong while loading credit notes."
+      }
+    },
+    "table": {
+      "headers": {
+        "number": "Number",
+        "status": "Status",
+        "customer": "Customer",
+        "salesperson": "Salesperson",
+        "date": "Date",
+        "invoice": "Invoice",
+        "total": "Total",
+        "actions": "Actions"
+      },
+      "empty": "No credit notes found."
+    }
+  },
+  "detail": {
+    "title": "Credit Note {number}",
+    "sections": {
+      "actions": "Actions",
+      "header": "Header Information",
+      "items": "Credit Note Items",
+      "history": "Status History",
+      "attachments": "Attachments",
+      "relations": "Related Documents"
+    },
+    "buttons": {
+      "edit": "Edit",
+      "submit": "Submit",
+      "approve": "Approve",
+      "reject": "Reject",
+      "requestRevision": "Request Revision",
+      "cancel": "Cancel",
+      "post": "Post",
+      "downloadPdf": "Download PDF"
+    },
+    "history": {
+      "status": "Status changed to {status}",
+      "by": "by {user}",
+      "at": "{time}",
+      "notes": "Notes: {notes}",
+      "empty": "No status history found."
+    },
+    "toast": {
+      "actionSuccess": {
+        "title": "Action Successful",
+        "description": "The credit note status has been updated."
+      },
+      "actionError": {
+        "title": "Action Failed",
+        "description": "Something went wrong while updating the credit note status."
+      }
+    },
+    "approvals": {
+      "config": {
+        "page": {
+          "title": "Approval Configuration",
+          "description": "Define approval levels and required roles for each sales document type."
+        },
+        "tabs": {
+          "orders": "Sales Orders",
+          "invoices": "Sales Invoices",
+          "creditNotes": "Credit Notes"
+        },
+        "card": {
+          "title": "Approval Levels",
+          "description": "Approvals are sequential. Any user with the assigned role can approve at that level."
+        },
+        "buttons": {
+          "save": "Save Configuration",
+          "addLevel": "Add Level"
+        },
+        "labels": {
+          "roles": "Assigned Roles"
+        },
+        "placeholders": {
+          "roles": "Select roles for this level..."
+        },
+        "emptyState": "No approval levels defined for this document type.",
+        "toast": {
+          "fetchError": {
+            "title": "Failed to load configuration",
+            "description": "We couldn't retrieve the approval levels."
+          },
+          "saveSuccess": {
+            "title": "Configuration Saved",
+            "description": "Approval levels have been updated."
+          },
+          "saveError": {
+            "title": "Save Failed",
+            "description": "Something went wrong while saving the configuration."
+          }
+        }
+      },
+      "queue": {
+        "page": {
+          "orderTitle": "Order Approvals",
+          "orderDescription": "Review and act on sales orders pending approval.",
+          "invoiceTitle": "Invoice Approvals",
+          "invoiceDescription": "Review and act on sales invoices pending approval."
+        },
+        "table": {
+          "headers": {
+            "number": "Number",
+            "customer": "Customer",
+            "amount": "Amount",
+            "date": "Date",
+            "level": "Level",
+            "actions": "Actions"
+          },
+          "empty": "No items pending your approval."
+        },
+        "toast": {
+          "fetchError": {
+            "title": "Unable to load queue",
+            "description": "Something went wrong while loading pending approvals."
+          }
+        }
+      },
+      "actionDialog": {
+        "title": {
+          "approve": "Approve Document {number}",
+          "reject": "Reject Document {number}",
+          "request-revision": "Request Revision for {number}"
+        },
+        "description": {
+          "approve": "Are you sure you want to approve this document? This will move it to the next level or mark it as fully approved.",
+          "reject": "Rejecting this document will stop the approval flow and notify the creator.",
+          "request-revision": "Requesting a revision will send the document back to the creator for changes."
+        },
+        "labels": {
+          "notes": "Comments"
+        },
+        "placeholders": {
+          "notes": "Add optional comments here..."
+        },
+        "buttons": {
+          "cancel": "Cancel",
+          "approve": "Approve",
+          "reject": "Reject",
+          "request-revision": "Request Revision"
+        }
+      }
+    }
+  }
+}

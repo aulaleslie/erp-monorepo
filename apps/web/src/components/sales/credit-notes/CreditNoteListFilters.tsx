@@ -32,7 +32,7 @@ export function CreditNoteListFilters({
     const t = useTranslations("sales.creditNotes.filters");
     const ts = useTranslations("sales.statusLabels");
 
-    const handleFieldChange = (field: keyof SalesCreditNoteListParams, value: any) => {
+    const handleFieldChange = (field: keyof SalesCreditNoteListParams, value: unknown) => {
         onFilterChange({
             ...filters,
             [field]: value,
@@ -47,8 +47,9 @@ export function CreditNoteListFilters({
     }) => {
         const result = await peopleService.list({
             ...params,
-            type: "CUSTOMER" as PeopleType,
-            status: "ACTIVE" as PeopleStatus,
+            ...params,
+            type: PeopleType.CUSTOMER,
+            status: PeopleStatus.ACTIVE,
         });
         return {
             items: result.items,

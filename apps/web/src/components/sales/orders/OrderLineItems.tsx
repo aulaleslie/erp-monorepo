@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/table";
 import { SearchableSelect } from "@/components/common/SearchableSelect";
 import { itemsService } from "@/services/items";
-import { ItemListItem } from "@gym-monorepo/shared";
+import { ItemListItem, ItemStatus } from "@gym-monorepo/shared";
 
 export function OrderLineItems() {
     const t = useTranslations("sales.orders.form");
@@ -27,7 +27,6 @@ export function OrderLineItems() {
     });
 
     const watchItems = watch("items");
-    const taxPricingMode = watch("taxPricingMode");
 
     const fetchItems = async (params: {
         search: string;
@@ -36,7 +35,7 @@ export function OrderLineItems() {
     }) => {
         const result = await itemsService.list({
             ...params,
-            status: "ACTIVE",
+            status: ItemStatus.ACTIVE,
         });
         return {
             items: result.items,
@@ -112,7 +111,7 @@ export function OrderLineItems() {
                                     <TableCell>
                                         <SearchableSelect<ItemListItem>
                                             value={watchItems?.[index]?.itemId}
-                                            onValueChange={(val) => { }}
+                                            onValueChange={() => { }}
                                             onSelectionChange={(item) => handleItemSelect(index, item)}
                                             placeholder={t("itemPlaceholder")}
                                             fetchItems={fetchItems}

@@ -3,7 +3,7 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "../../ui/textarea";
 import {
-    Form,
     FormControl,
     FormField,
     FormItem,
@@ -92,7 +91,7 @@ export function OrderForm({ initialData, isEdit = false }: OrderFormProps) {
         },
     });
 
-    const { handleSubmit, control, watch, setValue } = methods;
+    const { handleSubmit, control } = methods;
 
     const onSubmit = async (values: OrderFormValues) => {
         try {
@@ -110,7 +109,7 @@ export function OrderForm({ initialData, isEdit = false }: OrderFormProps) {
                 });
                 router.push(`/sales/orders/${result.id}`);
             }
-        } catch (error) {
+        } catch {
             toast({
                 title: "Error",
                 description: "Failed to save order. Please try again.",
@@ -138,7 +137,7 @@ export function OrderForm({ initialData, isEdit = false }: OrderFormProps) {
     };
 
     // Summary calculations
-    const watchItems = watch("items");
+    const watchItems = useWatch({ control, name: "items" }) || [];
     const subtotal = watchItems.reduce((acc, item) => acc + (item.quantity * item.unitPrice), 0);
     // Simplistic tax preview for UI (actual tax might be line-based and complex on backend)
     const total = subtotal;
@@ -170,7 +169,7 @@ export function OrderForm({ initialData, isEdit = false }: OrderFormProps) {
                             <FormField
                                 control={control}
                                 name="personId"
-                                render={({ field }: { field: any }) => (
+                                render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>{t("customerLabel")}</FormLabel>
                                         <FormControl>
@@ -193,7 +192,7 @@ export function OrderForm({ initialData, isEdit = false }: OrderFormProps) {
                             <FormField
                                 control={control}
                                 name="documentDate"
-                                render={({ field }: { field: any }) => (
+                                render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>{t("documentDate")}</FormLabel>
                                         <FormControl>
@@ -207,7 +206,7 @@ export function OrderForm({ initialData, isEdit = false }: OrderFormProps) {
                             <FormField
                                 control={control}
                                 name="deliveryDate"
-                                render={({ field }: { field: any }) => (
+                                render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>{t("deliveryDate")}</FormLabel>
                                         <FormControl>
@@ -221,7 +220,7 @@ export function OrderForm({ initialData, isEdit = false }: OrderFormProps) {
                             <FormField
                                 control={control}
                                 name="salespersonPersonId"
-                                render={({ field }: { field: any }) => (
+                                render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>{t("salespersonLabel")}</FormLabel>
                                         <FormControl>
@@ -244,7 +243,7 @@ export function OrderForm({ initialData, isEdit = false }: OrderFormProps) {
                             <FormField
                                 control={control}
                                 name="taxPricingMode"
-                                render={({ field }: { field: any }) => (
+                                render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>{t("taxModeLabel")}</FormLabel>
                                         <Select onValueChange={field.onChange} value={field.value}>
@@ -270,7 +269,7 @@ export function OrderForm({ initialData, isEdit = false }: OrderFormProps) {
                             <FormField
                                 control={control}
                                 name="externalRef"
-                                render={({ field }: { field: any }) => (
+                                render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>{t("externalRefLabel")}</FormLabel>
                                         <FormControl>
@@ -296,7 +295,7 @@ export function OrderForm({ initialData, isEdit = false }: OrderFormProps) {
                             <FormField
                                 control={control}
                                 name="notes"
-                                render={({ field }: { field: any }) => (
+                                render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Notes</FormLabel>
                                         <FormControl>

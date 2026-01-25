@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { Eye, CheckCircle, XCircle, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { DataTable, Column } from "@/components/common/DataTable";
 import { PageHeader } from "@/components/common/PageHeader";
 import { ApprovalActionDialog, ApprovalAction } from "@/components/sales/approvals/ApprovalActionDialog";
-import { ApprovalStatusBadge } from "@/components/sales/approvals/ApprovalStatusBadge";
 import { salesApprovalsService, PendingApprovalListItem } from "@/services/sales-approvals";
 import { usePagination } from "@/hooks/use-pagination";
 import { format } from "date-fns";
@@ -31,7 +30,7 @@ export default function SalesOrderApprovalsPage() {
         total: total,
     });
 
-    const loadQueue = async () => {
+    const loadQueue = useCallback(async () => {
         setLoading(true);
         try {
             const result = await salesApprovalsService.getPendingOrders({
@@ -41,7 +40,7 @@ export default function SalesOrderApprovalsPage() {
             setItems(result.items);
             setTotal(result.total);
             pagination.setTotal(result.total);
-        } catch (error) {
+        } catch {
             toast({
                 title: t("toast.fetchError.title"),
                 description: t("toast.fetchError.description"),
@@ -50,11 +49,11 @@ export default function SalesOrderApprovalsPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [pagination, t, toast]);
 
     useEffect(() => {
         loadQueue();
-    }, [pagination.page]);
+    }, [loadQueue]);
 
     const handleAction = async (action: ApprovalAction, notes: string) => {
         if (!actionItem) return;
@@ -65,7 +64,7 @@ export default function SalesOrderApprovalsPage() {
                 description: `The order ${actionItem.number} has been ${action}ed.`,
             });
             loadQueue();
-        } catch (error) {
+        } catch {
             toast({
                 title: "Action Failed",
                 description: "Something went wrong while processing the approval.",
