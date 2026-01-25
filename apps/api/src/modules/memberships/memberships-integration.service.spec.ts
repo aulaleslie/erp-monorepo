@@ -9,15 +9,22 @@ import {
 import { DocumentRelationType } from '@gym-monorepo/shared';
 import { MembershipHistoryService } from './membership-history.service';
 import { MembershipHistoryAction } from '@gym-monorepo/shared';
+import { PtSessionPackagesIntegrationService } from '../pt-session-packages/pt-session-packages-integration.service';
 
 describe('MembershipsIntegrationService', () => {
   let service: MembershipsIntegrationService;
   let manager: Partial<EntityManager>;
   let historyService: Partial<MembershipHistoryService>;
+  let ptIntegrationService: Partial<PtSessionPackagesIntegrationService>;
 
   beforeEach(async () => {
     historyService = {
       logHistory: jest.fn(),
+    };
+    ptIntegrationService = {
+      createIncludedPackage: jest.fn(),
+      processSalesInvoice: jest.fn(),
+      processCreditNote: jest.fn(),
     };
     manager = {
       find: jest.fn(),
@@ -32,6 +39,10 @@ describe('MembershipsIntegrationService', () => {
       providers: [
         MembershipsIntegrationService,
         { provide: MembershipHistoryService, useValue: historyService },
+        {
+          provide: PtSessionPackagesIntegrationService,
+          useValue: ptIntegrationService,
+        },
       ],
     }).compile();
 
