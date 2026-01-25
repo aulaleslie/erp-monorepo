@@ -179,4 +179,32 @@ describe('TenantCountersService', () => {
       expect.objectContaining({ value: 13 }),
     );
   });
+
+  it('should generate the next member code', async () => {
+    const tenantId = 'tenant-5';
+    const counter = {
+      id: 'counter-5',
+      tenantId,
+      key: 'members',
+      value: 0,
+    } as TenantCounterEntity;
+    const selectBuilder = buildSelectBuilder([counter]);
+
+    repository.createQueryBuilder.mockReturnValue(selectBuilder);
+    repository.save.mockResolvedValue({ ...counter, value: 1 });
+
+    dataSource.transaction.mockImplementation((cb: TransactionCallback) =>
+      cb({
+        getRepository: () =>
+          repository as unknown as Repository<TenantCounterEntity>,
+      }),
+    );
+
+    const code = await service.getNextMemberCode(tenantId);
+
+    expect(code).toBe('MBR-000001');
+    expect(repository.save).toHaveBeenCalledWith(
+      expect.objectContaining({ value: 1 }),
+    );
+  });
 });

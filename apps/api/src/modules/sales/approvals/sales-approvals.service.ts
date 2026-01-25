@@ -348,8 +348,8 @@ export class SalesApprovalsService {
     // 4. Count unique documents
     const result = await query
       .select('COUNT(DISTINCT approval.documentId)', 'count')
-      .getRawOne();
+      .getRawOne<{ count: string | number }>();
 
-    return { count: parseInt(result?.count || '0', 10) || 0 };
+    return { count: parseInt(String(result?.count || '0'), 10) || 0 };
   }
 }

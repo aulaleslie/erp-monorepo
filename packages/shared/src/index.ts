@@ -62,6 +62,13 @@ export enum PeopleStatus {
   INACTIVE = 'INACTIVE',
 }
 
+export enum MemberStatus {
+  NEW = 'NEW',
+  ACTIVE = 'ACTIVE',
+  EXPIRED = 'EXPIRED',
+  INACTIVE = 'INACTIVE',
+}
+
 // ============================================================================
 // Department Types
 // ============================================================================

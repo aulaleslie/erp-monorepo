@@ -12,10 +12,21 @@ const PEOPLE_COUNTERS: Record<PeopleType, { key: string; prefix: string }> = {
 const DEPARTMENT_COUNTER = { key: 'departments', prefix: 'DEP-' };
 const CATEGORY_COUNTER = { key: 'categories', prefix: 'CAT-' };
 const ITEM_COUNTER = { key: 'items', prefix: 'SKU-' };
+const MEMBER_COUNTER = { key: 'members', prefix: 'MBR-' };
 
 @Injectable()
 export class TenantCountersService {
   constructor(private readonly dataSource: DataSource) {}
+
+  async getNextMemberCode(tenantId: string): Promise<string> {
+    const nextValue = await this.nextValue(
+      tenantId,
+      MEMBER_COUNTER.key,
+      MEMBER_COUNTER.prefix,
+    );
+
+    return this.formatCode(MEMBER_COUNTER.prefix, nextValue);
+  }
 
   async getNextPeopleCode(tenantId: string, type: PeopleType): Promise<string> {
     const counterConfig = PEOPLE_COUNTERS[type];

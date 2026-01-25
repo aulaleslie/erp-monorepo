@@ -284,7 +284,9 @@ describe('SalesApprovalsService', () => {
       };
       jest
         .spyOn(service['salesApprovalRepository'], 'createQueryBuilder')
-        .mockReturnValue(mockQueryBuilder as any);
+        .mockReturnValue(
+          mockQueryBuilder as unknown as import('typeorm').SelectQueryBuilder<SalesApprovalEntity>,
+        );
     });
 
     it('should return count for super admin', async () => {
