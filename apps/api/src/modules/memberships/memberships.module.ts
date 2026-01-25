@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MembershipEntity } from '../../database/entities/membership.entity';
 import { MembershipsService } from './memberships.service';
+import { MembershipsIntegrationService } from './memberships-integration.service';
 import { MembersModule } from '../members/members.module';
 import { ItemsModule } from '../catalog/items/items.module';
 
@@ -14,7 +15,7 @@ import { MembershipsController } from './memberships.controller';
     ItemsModule,
   ],
   controllers: [MembershipsController],
-  providers: [MembershipsService],
-  exports: [MembershipsService],
+  providers: [MembershipsService, MembershipsIntegrationService],
+  exports: [MembershipsService, MembershipsIntegrationService],
 })
 export class MembershipsModule {}

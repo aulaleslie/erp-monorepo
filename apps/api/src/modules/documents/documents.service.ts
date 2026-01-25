@@ -373,6 +373,7 @@ export class DocumentsService {
     id: string,
     tenantId: string,
     userId: string,
+    customHandler?: PostingHandler,
   ): Promise<DocumentEntity> {
     return this.dataSource.transaction(async (manager) => {
       const document = await this.findOne(id, tenantId, userId);
@@ -389,7 +390,10 @@ export class DocumentsService {
 
       // In a real system, we'd use a factory or injection to get the handler
       let handler: PostingHandler;
-      if (typeDef.postingHandler === 'DefaultPostingHandler') {
+
+      if (customHandler) {
+        handler = customHandler;
+      } else if (typeDef.postingHandler === 'DefaultPostingHandler') {
         handler = new DefaultPostingHandler();
       } else {
         handler = new DefaultPostingHandler(); // Fallback

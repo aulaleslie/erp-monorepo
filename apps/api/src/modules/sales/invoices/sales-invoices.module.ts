@@ -16,6 +16,7 @@ import { SalesInvoicesController } from './sales-invoices.controller';
 import { SalesInvoicesService } from './sales-invoices.service';
 import { SalesCreditNotesModule } from '../credit-notes/sales-credit-notes.module';
 import { SalesApprovalsModule } from '../approvals/sales-approvals.module';
+import { MembershipsModule } from '../../memberships/memberships.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { SalesApprovalsModule } from '../approvals/sales-approvals.module';
     UsersModule,
     forwardRef(() => SalesCreditNotesModule),
     SalesApprovalsModule,
+    MembershipsModule,
   ],
   controllers: [SalesInvoicesController],
   providers: [SalesInvoicesService],

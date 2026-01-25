@@ -28,6 +28,8 @@ import { DocumentsService } from '../../documents/documents.service';
 import { CreateSalesInvoiceDto } from './dtos/create-sales-invoice.dto';
 import { UpdateSalesInvoiceDto } from './dtos/update-sales-invoice.dto';
 import { SalesApprovalsService } from '../approvals/sales-approvals.service';
+import { MembershipsIntegrationService } from '../../memberships/memberships-integration.service';
+import { SalesInvoicePostingHandler } from './posting/sales-invoice-posting-handler';
 
 @Injectable()
 export class SalesInvoicesService {
@@ -46,6 +48,7 @@ export class SalesInvoicesService {
     private readonly itemRepository: Repository<ItemEntity>,
     private readonly documentsService: DocumentsService,
     private readonly salesApprovalsService: SalesApprovalsService,
+    private readonly membershipsIntegrationService: MembershipsIntegrationService,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -420,6 +423,11 @@ export class SalesInvoicesService {
       throw new BadRequestException('Only invoices can be posted');
     }
 
-    return this.documentsService.post(id, tenantId, userId);
+    // Instantiate custom handler
+    const handler = new SalesInvoicePostingHandler(
+      this.membershipsIntegrationService,
+    );
+
+    return this.documentsService.post(id, tenantId, userId, handler);
   }
 }
