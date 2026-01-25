@@ -1,10 +1,12 @@
 import { DefaultPostingHandler } from '../../../documents/posting/default-posting-handler';
 import { PostingContext } from '../../../documents/posting/posting-handler.interface';
 import { MembershipsIntegrationService } from '../../../memberships/memberships-integration.service';
+import { PtSessionPackagesIntegrationService } from '../../../pt-session-packages/pt-session-packages-integration.service';
 
 export class SalesInvoicePostingHandler extends DefaultPostingHandler {
   constructor(
     private readonly membershipsIntegrationService: MembershipsIntegrationService,
+    private readonly ptSessionPackagesIntegrationService: PtSessionPackagesIntegrationService,
   ) {
     super();
   }
@@ -15,6 +17,14 @@ export class SalesInvoicePostingHandler extends DefaultPostingHandler {
 
     // 2. Run Membership integration
     await this.membershipsIntegrationService.processSalesInvoice(
+      context.document,
+      context.manager,
+      context.tenantId,
+      context.userId,
+    );
+
+    // 3. Run PT package integration
+    await this.ptSessionPackagesIntegrationService.processSalesInvoice(
       context.document,
       context.manager,
       context.tenantId,

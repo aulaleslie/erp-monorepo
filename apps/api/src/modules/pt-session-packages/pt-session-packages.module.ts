@@ -11,6 +11,8 @@ import { TenantsModule } from '../tenants/tenants.module';
 import { UsersModule } from '../users/users.module';
 import { PeopleModule } from '../people/people.module';
 
+import { PtSessionPackagesIntegrationService } from './pt-session-packages-integration.service';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([PtPackageEntity]),
@@ -21,7 +23,7 @@ import { PeopleModule } from '../people/people.module';
     PeopleModule,
   ],
   controllers: [PtSessionPackagesController],
-  providers: [PtSessionPackagesService],
-  exports: [PtSessionPackagesService],
+  providers: [PtSessionPackagesService, PtSessionPackagesIntegrationService],
+  exports: [PtSessionPackagesService, PtSessionPackagesIntegrationService],
 })
 export class PtSessionPackagesModule {}

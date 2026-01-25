@@ -17,12 +17,16 @@ import { calculateMembershipEndDate } from './utils/membership-dates.util';
 import { addDays } from 'date-fns';
 import { MembershipHistoryService } from './membership-history.service';
 import { MembershipHistoryAction } from '@gym-monorepo/shared';
+import { PtSessionPackagesIntegrationService } from '../pt-session-packages/pt-session-packages-integration.service';
 
 @Injectable()
 export class MembershipsIntegrationService {
   private readonly logger = new Logger(MembershipsIntegrationService.name);
 
-  constructor(private readonly historyService: MembershipHistoryService) {}
+  constructor(
+    private readonly historyService: MembershipHistoryService,
+    private readonly ptIntegrationService: PtSessionPackagesIntegrationService,
+  ) {}
 
   async processSalesInvoice(
     document: DocumentEntity,
@@ -284,9 +288,15 @@ export class MembershipsIntegrationService {
 
     // Check included PT sessions
     if (item.includedPtSessions && item.includedPtSessions > 0) {
-      // TODO: C6C-BE-04 Create PT Package
-      this.logger.log(
-        `TODO: Create PT Package for ${item.includedPtSessions} sessions`,
+      await this.ptIntegrationService.createIncludedPackage(
+        manager,
+        tenantId,
+        member.id,
+        membership,
+        item.includedPtSessions,
+        membership.endDate instanceof Date
+          ? membership.endDate
+          : new Date(membership.endDate),
       );
     }
   }
