@@ -24,6 +24,7 @@ import { RedisCacheModule } from './common/redis/redis-cache.module';
 import { SalesModule } from './modules/sales/sales.module';
 import { MembersModule } from './modules/members/members.module';
 import { MembershipsModule } from './modules/memberships/memberships.module';
+import { PtSessionPackagesModule } from './modules/pt-session-packages/pt-session-packages.module';
 import { TrainerModule } from './modules/trainer/trainer.module';
 
 import { APP_INTERCEPTOR } from '@nestjs/core';
@@ -57,6 +58,7 @@ import { UserContextInterceptor } from './common/interceptors/user-context.inter
     SalesModule,
     MembersModule,
     MembershipsModule,
+    PtSessionPackagesModule,
     TrainerModule,
   ],
   controllers: [AppController],

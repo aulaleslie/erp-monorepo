@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, forwardRef, Inject } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import {
   DocumentEntity,
@@ -25,6 +25,7 @@ export class MembershipsIntegrationService {
 
   constructor(
     private readonly historyService: MembershipHistoryService,
+    @Inject(forwardRef(() => PtSessionPackagesIntegrationService))
     private readonly ptIntegrationService: PtSessionPackagesIntegrationService,
   ) {}
 

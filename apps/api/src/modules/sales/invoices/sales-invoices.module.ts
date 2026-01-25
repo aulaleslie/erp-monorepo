@@ -17,6 +17,7 @@ import { SalesInvoicesService } from './sales-invoices.service';
 import { SalesCreditNotesModule } from '../credit-notes/sales-credit-notes.module';
 import { SalesApprovalsModule } from '../approvals/sales-approvals.module';
 import { MembershipsModule } from '../../memberships/memberships.module';
+import { PtSessionPackagesModule } from '../../pt-session-packages/pt-session-packages.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { MembershipsModule } from '../../memberships/memberships.module';
     forwardRef(() => SalesCreditNotesModule),
     SalesApprovalsModule,
     MembershipsModule,
+    PtSessionPackagesModule,
   ],
   controllers: [SalesInvoicesController],
   providers: [SalesInvoicesService],

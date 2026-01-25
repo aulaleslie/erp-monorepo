@@ -18,6 +18,7 @@ import { TenantMembershipGuard } from '../tenants/guards/tenant-membership.guard
 import { PermissionGuard } from '../users/guards/permission.guard';
 import { RequirePermissions } from '../../common/decorators/require-permissions.decorator';
 import { CurrentTenant } from '../../common/decorators/current-tenant.decorator';
+import { PERMISSIONS } from '@gym-monorepo/shared';
 import { TrainerAvailabilityService } from './trainer-availability.service';
 import { UpdateTrainerAvailabilityDto } from './dto/update-trainer-availability.dto';
 import { CreateTrainerAvailabilityOverrideDto } from './dto/create-trainer-availability-override.dto';
@@ -38,7 +39,7 @@ export class TrainerAvailabilityController {
   ) {}
 
   @Get()
-  @RequirePermissions('trainer_availability.read')
+  @RequirePermissions(PERMISSIONS.TRAINER_AVAILABILITY.READ)
   async getWeeklyTemplate(
     @CurrentTenant() tenantId: string,
     @Query('trainerId') trainerId: string,
@@ -47,7 +48,7 @@ export class TrainerAvailabilityController {
   }
 
   @Put(':trainerId')
-  @RequirePermissions('trainer_availability.update')
+  @RequirePermissions(PERMISSIONS.TRAINER_AVAILABILITY.UPDATE)
   async updateWeeklyTemplate(
     @CurrentTenant() tenantId: string,
     @Param('trainerId') trainerId: string,
@@ -61,7 +62,7 @@ export class TrainerAvailabilityController {
   }
 
   @Get(':trainerId/overrides')
-  @RequirePermissions('trainer_availability.read')
+  @RequirePermissions(PERMISSIONS.TRAINER_AVAILABILITY.READ)
   async getOverrides(
     @CurrentTenant() tenantId: string,
     @Param('trainerId') trainerId: string,
@@ -76,7 +77,7 @@ export class TrainerAvailabilityController {
   }
 
   @Post(':trainerId/overrides')
-  @RequirePermissions('trainer_availability.update')
+  @RequirePermissions(PERMISSIONS.TRAINER_AVAILABILITY.UPDATE)
   async createOverride(
     @CurrentTenant() tenantId: string,
     @Param('trainerId') trainerId: string,
@@ -87,7 +88,7 @@ export class TrainerAvailabilityController {
 
   @Delete(':trainerId/overrides/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @RequirePermissions('trainer_availability.update')
+  @RequirePermissions(PERMISSIONS.TRAINER_AVAILABILITY.UPDATE)
   async deleteOverride(
     @CurrentTenant() tenantId: string,
     @Param('trainerId') trainerId: string,
@@ -97,7 +98,7 @@ export class TrainerAvailabilityController {
   }
 
   @Get(':trainerId/slots')
-  @RequirePermissions('trainer_availability.read')
+  @RequirePermissions(PERMISSIONS.TRAINER_AVAILABILITY.READ)
   async getAvailableSlots(
     @CurrentTenant() tenantId: string,
     @Param('trainerId') trainerId: string,

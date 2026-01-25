@@ -18,6 +18,7 @@ import { UsersModule } from '../../users/users.module';
 import { PeopleModule } from '../../people/people.module';
 import { SalesApprovalsModule } from '../approvals/sales-approvals.module';
 import { MembershipsModule } from '../../memberships/memberships.module';
+import { PtSessionPackagesModule } from '../../pt-session-packages/pt-session-packages.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { MembershipsModule } from '../../memberships/memberships.module';
     PeopleModule,
     SalesApprovalsModule,
     MembershipsModule,
+    PtSessionPackagesModule,
   ],
   controllers: [SalesCreditNotesController],
   providers: [SalesCreditNotesService],
