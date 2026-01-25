@@ -9,10 +9,12 @@ import { MembershipEntity } from '../../database/entities/membership.entity';
 import {
   ERROR_CODES,
   ItemServiceKind,
+  MembershipHistoryAction,
   MembershipStatus,
 } from '@gym-monorepo/shared';
-import { addDays } from 'date-fns';
+import { addDays, isAfter } from 'date-fns';
 import { calculateMembershipEndDate } from './utils/membership-dates.util';
+import { MembershipHistoryService } from './membership-history.service';
 import { CreateMembershipDto } from './dto/create-membership.dto';
 import { UpdateMembershipDto } from './dto/update-membership.dto';
 import { MembershipQueryDto } from './dto/membership-query.dto';
@@ -31,6 +33,7 @@ export class MembershipsService {
     private readonly membershipRepo: Repository<MembershipEntity>,
     private readonly itemsService: ItemsService,
     private readonly membersService: MembersService,
+    private readonly historyService: MembershipHistoryService,
   ) {}
 
   async findAll(
@@ -130,6 +133,16 @@ export class MembershipsService {
 
     const saved = await this.membershipRepo.save(membership);
 
+    // Record History
+    await this.historyService.logHistory(
+      saved.id,
+      MembershipHistoryAction.CREATED,
+      {
+        toStatus: saved.status,
+        notes: saved.notes,
+      },
+    );
+
     // Trigger member expiry recomputation
     await this.updateMemberExpiry(tenantId, dto.memberId);
 
@@ -142,6 +155,8 @@ export class MembershipsService {
     dto: UpdateMembershipDto,
   ): Promise<MembershipEntity> {
     const membership = await this.findOne(tenantId, id);
+    const oldEndDate = membership.endDate;
+    const oldStatus = membership.status;
 
     if (dto.notes !== undefined) {
       membership.notes = dto.notes;
@@ -155,14 +170,22 @@ export class MembershipsService {
       if (dto.endDate) {
         membership.endDate = new Date(dto.endDate);
       }
-      // If start date changed, should we recompute end date?
-      // Requirement: "PUT /memberships/:id (update notes, dates if not from sales)"
-      // Usually if user edits start date, they might want end date to shift or stay.
-      // Since endDate is optional in DTO, if they pass it, we use it. If not, and they changed StartDate, we might leave EndDate as is or recompute.
-      // For now, let's assume specific updates. If they want to shift both, they send both.
     }
 
     const saved = await this.membershipRepo.save(membership);
+
+    // Record History if end date changed (extension)
+    if (dto.endDate && isAfter(new Date(dto.endDate), new Date(oldEndDate))) {
+      await this.historyService.logHistory(
+        saved.id,
+        MembershipHistoryAction.EXTENDED,
+        {
+          fromStatus: oldStatus,
+          toStatus: saved.status,
+          notes: `End date updated from ${String(oldEndDate)} to ${String(saved.endDate)}`,
+        },
+      );
+    }
 
     // Recompute member expiry if dates changed
     if (dto.endDate) {
@@ -179,12 +202,24 @@ export class MembershipsService {
       return membership;
     }
 
+    const oldStatus = membership.status;
     membership.status = MembershipStatus.CANCELLED;
     membership.cancelledAt = new Date();
     // membership.cancelledReason = ... // Need to accept reason in DTO?
     // Requirement: "POST /memberships/:id/cancel (sets status=CANCELLED)"
 
     const saved = await this.membershipRepo.save(membership);
+
+    // Record History
+    await this.historyService.logHistory(
+      saved.id,
+      MembershipHistoryAction.CANCELLED,
+      {
+        fromStatus: oldStatus,
+        toStatus: saved.status,
+        notes: saved.cancelledReason,
+      },
+    );
 
     // Trigger member expiry recomputation
     await this.updateMemberExpiry(tenantId, membership.memberId);
@@ -199,6 +234,7 @@ export class MembershipsService {
     reason?: string,
   ): Promise<MembershipEntity> {
     let membership = await this.findOne(tenantId, id);
+    const oldStatus = membership.status;
 
     if (action === 'CANCEL') {
       // Use existing cancel logic
@@ -224,7 +260,20 @@ export class MembershipsService {
       membership.cancelledReason = reason;
     }
 
-    return this.membershipRepo.save(membership);
+    const saved = await this.membershipRepo.save(membership);
+
+    // Record History
+    await this.historyService.logHistory(
+      saved.id,
+      MembershipHistoryAction.CLEARED,
+      {
+        fromStatus: oldStatus,
+        toStatus: saved.status,
+        notes: `Action: ${action}. Reason: ${reason ?? 'N/A'}`,
+      },
+    );
+
+    return saved;
   }
 
   /**

@@ -3,3 +3,12 @@ export enum MembershipStatus {
   EXPIRED = 'EXPIRED',
   CANCELLED = 'CANCELLED',
 }
+
+export enum MembershipHistoryAction {
+  CREATED = 'CREATED',
+  EXTENDED = 'EXTENDED',
+  CANCELLED = 'CANCELLED',
+  EXPIRED = 'EXPIRED',
+  FLAGGED = 'FLAGGED',
+  CLEARED = 'CLEARED',
+}

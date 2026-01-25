@@ -15,7 +15,7 @@ import { PeopleEntity } from './src/database/entities/people.entity';
 import { DepartmentEntity } from './src/database/entities/department.entity';
 import { CategoryEntity } from './src/database/entities/category.entity';
 import { ItemEntity } from './src/database/entities/item.entity';
-import { ALL_ENTITIES } from './src/database/entities';
+import { ALL_ENTITIES } from './src/database/entities/index';
 
 dotenv.config();
 

@@ -7,20 +7,32 @@ import {
   DocumentRelationEntity,
 } from '../../database/entities';
 import { DocumentRelationType } from '@gym-monorepo/shared';
+import { MembershipHistoryService } from './membership-history.service';
+import { MembershipHistoryAction } from '@gym-monorepo/shared';
 
 describe('MembershipsIntegrationService', () => {
   let service: MembershipsIntegrationService;
   let manager: Partial<EntityManager>;
+  let historyService: Partial<MembershipHistoryService>;
 
   beforeEach(async () => {
+    historyService = {
+      logHistory: jest.fn(),
+    };
     manager = {
       find: jest.fn(),
       save: jest.fn(),
       findOne: jest.fn(),
+      getRepository: jest.fn().mockReturnValue({
+        create: (data: unknown) => data,
+      }),
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [MembershipsIntegrationService],
+      providers: [
+        MembershipsIntegrationService,
+        { provide: MembershipHistoryService, useValue: historyService },
+      ],
     }).compile();
 
     service = module.get<MembershipsIntegrationService>(
@@ -72,6 +84,16 @@ describe('MembershipsIntegrationService', () => {
 
       expect(manager.save).toHaveBeenCalledWith(
         expect.objectContaining({ id: 'mem-1', requiresReview: true }),
+      );
+
+      expect(historyService.logHistory).toHaveBeenCalledWith(
+        'mem-1',
+        MembershipHistoryAction.FLAGGED,
+        expect.objectContaining({
+          toStatus: 'ACTIVE',
+          notes: expect.stringContaining('CN-001') as unknown as string,
+        }),
+        manager,
       );
     });
   });

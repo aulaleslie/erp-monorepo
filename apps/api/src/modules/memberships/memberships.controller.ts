@@ -17,7 +17,9 @@ import { PermissionGuard } from '../users/guards/permission.guard';
 import { RequirePermissions } from '../../common/decorators/require-permissions.decorator';
 import { CurrentTenant } from '../../common/decorators/current-tenant.decorator';
 import { MembershipsService } from './memberships.service';
+import { MembershipHistoryService } from './membership-history.service';
 import { MembershipEntity } from '../../database/entities/membership.entity';
+import { MembershipHistoryEntity } from '../../database/entities/membership-history.entity';
 import { CreateMembershipDto } from './dto/create-membership.dto';
 import { ClearMembershipReviewDto } from './dto/clear-membership-review.dto';
 import { UpdateMembershipDto } from './dto/update-membership.dto';
@@ -34,7 +36,10 @@ import { PaginatedResponse } from '../../common/dto/pagination.dto';
   PermissionGuard,
 )
 export class MembershipsController {
-  constructor(private readonly membershipsService: MembershipsService) {}
+  constructor(
+    private readonly membershipsService: MembershipsService,
+    private readonly historyService: MembershipHistoryService,
+  ) {}
 
   @Get()
   @RequirePermissions(PERMISSIONS.MEMBERSHIPS.READ)
@@ -95,5 +100,13 @@ export class MembershipsController {
       dto.action,
       dto.reason,
     );
+  }
+
+  @Get(':id/history')
+  @RequirePermissions(PERMISSIONS.MEMBERSHIPS.READ)
+  async findHistory(
+    @Param('id') id: string,
+  ): Promise<MembershipHistoryEntity[]> {
+    return this.historyService.findByMembershipId(id);
   }
 }

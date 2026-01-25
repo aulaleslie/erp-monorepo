@@ -15,10 +15,14 @@ import {
 } from '@gym-monorepo/shared';
 import { calculateMembershipEndDate } from './utils/membership-dates.util';
 import { addDays } from 'date-fns';
+import { MembershipHistoryService } from './membership-history.service';
+import { MembershipHistoryAction } from '@gym-monorepo/shared';
 
 @Injectable()
 export class MembershipsIntegrationService {
   private readonly logger = new Logger(MembershipsIntegrationService.name);
+
+  constructor(private readonly historyService: MembershipHistoryService) {}
 
   async processSalesInvoice(
     document: DocumentEntity,
@@ -179,8 +183,21 @@ export class MembershipsIntegrationService {
       // 3. Flag for review
       for (const membership of memberships) {
         // Do NOT auto-cancel (C6B-BE-05 requirement)
+        const oldStatus = membership.status;
         membership.requiresReview = true;
         await manager.save(membership);
+
+        // Record History
+        await this.historyService.logHistory(
+          membership.id,
+          MembershipHistoryAction.FLAGGED,
+          {
+            fromStatus: oldStatus,
+            toStatus: membership.status,
+            notes: `Flagged for review due to Credit Note: ${document.number}`,
+          },
+          manager,
+        );
       }
 
       this.logger.log(
@@ -253,6 +270,17 @@ export class MembershipsIntegrationService {
 
     await manager.save(membership);
     this.logger.log(`Created membership for member ${member.memberCode}`);
+
+    // Record History
+    await this.historyService.logHistory(
+      membership.id,
+      MembershipHistoryAction.CREATED,
+      {
+        toStatus: membership.status,
+        notes: `Created from Invoice ${document.number}`,
+      },
+      manager,
+    );
 
     // Check included PT sessions
     if (item.includedPtSessions && item.includedPtSessions > 0) {
