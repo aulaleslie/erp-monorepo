@@ -19,6 +19,7 @@ import { CurrentTenant } from '../../common/decorators/current-tenant.decorator'
 import { MembershipsService } from './memberships.service';
 import { MembershipEntity } from '../../database/entities/membership.entity';
 import { CreateMembershipDto } from './dto/create-membership.dto';
+import { ClearMembershipReviewDto } from './dto/clear-membership-review.dto';
 import { UpdateMembershipDto } from './dto/update-membership.dto';
 import { MembershipQueryDto } from './dto/membership-query.dto';
 import { PaginatedResponse } from '../../common/dto/pagination.dto';
@@ -79,5 +80,20 @@ export class MembershipsController {
     @Param('id') id: string,
   ): Promise<MembershipEntity> {
     return this.membershipsService.cancel(tenantId, id);
+  }
+
+  @Post(':id/clear-review')
+  @RequirePermissions(PERMISSIONS.MEMBERSHIPS.UPDATE)
+  async clearReview(
+    @CurrentTenant() tenantId: string,
+    @Param('id') id: string,
+    @Body() dto: ClearMembershipReviewDto,
+  ): Promise<MembershipEntity> {
+    return this.membershipsService.clearReview(
+      tenantId,
+      id,
+      dto.action,
+      dto.reason,
+    );
   }
 }

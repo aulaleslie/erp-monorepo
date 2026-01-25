@@ -25,6 +25,8 @@ import { DocumentsService } from '../../documents/documents.service';
 import { UpdateSalesCreditNoteDto } from './dtos/update-sales-credit-note.dto';
 import { CreateSalesCreditNoteDto } from './dtos/create-sales-credit-note.dto';
 import { SalesApprovalsService } from '../approvals/sales-approvals.service';
+import { MembershipsIntegrationService } from '../../memberships/memberships-integration.service';
+import { SalesCreditNotePostingHandler } from './posting/sales-credit-note-posting-handler';
 
 @Injectable()
 export class SalesCreditNotesService {
@@ -41,6 +43,7 @@ export class SalesCreditNotesService {
     private readonly itemRepository: Repository<ItemEntity>,
     private readonly documentsService: DocumentsService,
     private readonly salesApprovalsService: SalesApprovalsService,
+    private readonly membershipsIntegrationService: MembershipsIntegrationService,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -433,6 +436,10 @@ export class SalesCreditNotesService {
 
     // Future: Accounting Journal Entry creation here
 
-    return this.documentsService.post(id, tenantId, userId);
+    // Future: Accounting Journal Entry creation here
+    const handler = new SalesCreditNotePostingHandler(
+      this.membershipsIntegrationService,
+    );
+    return this.documentsService.post(id, tenantId, userId, handler);
   }
 }

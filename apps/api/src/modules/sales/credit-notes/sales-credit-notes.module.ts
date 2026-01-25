@@ -17,6 +17,7 @@ import { TenantsModule } from '../../tenants/tenants.module';
 import { UsersModule } from '../../users/users.module';
 import { PeopleModule } from '../../people/people.module';
 import { SalesApprovalsModule } from '../approvals/sales-approvals.module';
+import { MembershipsModule } from '../../memberships/memberships.module';
 
 @Module({
   imports: [
@@ -34,7 +35,9 @@ import { SalesApprovalsModule } from '../approvals/sales-approvals.module';
     TenantsModule,
     UsersModule,
     PeopleModule,
+    PeopleModule,
     SalesApprovalsModule,
+    MembershipsModule,
   ],
   controllers: [SalesCreditNotesController],
   providers: [SalesCreditNotesService],

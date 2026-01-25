@@ -192,6 +192,41 @@ export class MembershipsService {
     return saved;
   }
 
+  async clearReview(
+    tenantId: string,
+    id: string,
+    action: 'KEEP' | 'CANCEL',
+    reason?: string,
+  ): Promise<MembershipEntity> {
+    let membership = await this.findOne(tenantId, id);
+
+    if (action === 'CANCEL') {
+      // Use existing cancel logic
+      membership = await this.cancel(tenantId, id);
+      if (reason) {
+        membership.cancelledReason = reason;
+        // Optimization: handled within this save or updated object
+      }
+    }
+
+    // Always clear the flag (and save reason if updated)
+    // If we cancelled, we need to make sure we update the object we have
+    // cancel() returns the saved entity.
+
+    // We need to re-fetch or trust the return? cancel() returns saved.
+    // requiresReview might still be true on it (from DB).
+    // So we explicitly set false.
+    membership.requiresReview = false;
+
+    // If reason provided and we cancelled, make sure it's set (if cancel didn't take reason)
+    // cancel() above doesn't take reason in my implementation earlier, so I set it here.
+    if (action === 'CANCEL' && reason) {
+      membership.cancelledReason = reason;
+    }
+
+    return this.membershipRepo.save(membership);
+  }
+
   /**
    * Determines the start date for a new membership.
    * If the member has an active membership ending in the future (relative to requested start date),

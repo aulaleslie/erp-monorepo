@@ -5,11 +5,13 @@ import {
   MemberEntity,
   MembershipEntity,
   DocumentItemEntity,
+  DocumentRelationEntity,
 } from '../../database/entities';
 import {
   ItemServiceKind,
   MembershipStatus,
   MemberStatus,
+  DocumentRelationType,
 } from '@gym-monorepo/shared';
 import { calculateMembershipEndDate } from './utils/membership-dates.util';
 import { addDays } from 'date-fns';
@@ -138,6 +140,52 @@ export class MembershipsIntegrationService {
     if (activeMemberships.length > 0) {
       member.currentExpiryDate = new Date(activeMemberships[0].endDate);
       await manager.save(member);
+    }
+  }
+
+  async processCreditNote(
+    document: DocumentEntity,
+    manager: EntityManager,
+  ): Promise<void> {
+    const tenantId = document.tenantId;
+
+    // 1. Find the related Invoices
+    const relations = await manager.find(DocumentRelationEntity, {
+      where: {
+        toDocumentId: document.id,
+        tenantId,
+        relationType: DocumentRelationType.INVOICE_TO_CREDIT,
+      },
+    });
+
+    if (relations.length === 0) {
+      return;
+    }
+
+    // 2. Process each related invoice
+    for (const relation of relations) {
+      const invoiceId = relation.fromDocumentId;
+
+      // Find memberships linked to this invoice
+      const memberships = await manager.find(MembershipEntity, {
+        where: {
+          sourceDocumentId: invoiceId,
+          tenantId,
+        },
+      });
+
+      if (memberships.length === 0) continue;
+
+      // 3. Flag for review
+      for (const membership of memberships) {
+        // Do NOT auto-cancel (C6B-BE-05 requirement)
+        membership.requiresReview = true;
+        await manager.save(membership);
+      }
+
+      this.logger.log(
+        `Flagged ${memberships.length} memberships for review due to Credit Note ${document.number}`,
+      );
     }
   }
 
