@@ -6,5 +6,6 @@ export * from './item';
 export * from './member';
 export * from './membership';
 export * from './pt-package';
+export * from './trainer-availability';
 // export * from './sales';
 

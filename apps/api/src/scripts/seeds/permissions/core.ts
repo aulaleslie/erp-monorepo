@@ -220,4 +220,25 @@ export const corePermissions: SeedPermission[] = [
     name: 'Delete Members',
     group: 'Members',
   },
+  // PT Sessions
+  {
+    code: PERMISSIONS.PT_SESSIONS.READ,
+    name: 'Read PT Packages',
+    group: 'PT Sessions',
+  },
+  {
+    code: PERMISSIONS.PT_SESSIONS.CREATE,
+    name: 'Create PT Packages',
+    group: 'PT Sessions',
+  },
+  {
+    code: PERMISSIONS.PT_SESSIONS.UPDATE,
+    name: 'Update PT Packages',
+    group: 'PT Sessions',
+  },
+  {
+    code: PERMISSIONS.PT_SESSIONS.CANCEL,
+    name: 'Cancel PT Packages',
+    group: 'PT Sessions',
+  },
 ];

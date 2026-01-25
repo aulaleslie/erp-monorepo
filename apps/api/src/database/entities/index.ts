@@ -43,6 +43,8 @@ import { SalesApprovalLevelEntity } from './sales-approval-level.entity';
 import { SalesApprovalLevelRoleEntity } from './sales-approval-level-role.entity';
 import { SalesApprovalEntity } from './sales-approval.entity';
 import { PtPackageEntity } from './pt-package.entity';
+import { TrainerAvailabilityEntity } from './trainer-availability.entity';
+import { TrainerAvailabilityOverrideEntity } from './trainer-availability-override.entity';
 
 export {
   AuditLogEntity,
@@ -89,6 +91,8 @@ export {
   MembershipEntity,
   MembershipHistoryEntity,
   PtPackageEntity,
+  TrainerAvailabilityEntity,
+  TrainerAvailabilityOverrideEntity,
 };
 
 export const ALL_ENTITIES = [
@@ -131,4 +135,6 @@ export const ALL_ENTITIES = [
   MembershipEntity,
   MembershipHistoryEntity,
   PtPackageEntity,
+  TrainerAvailabilityEntity,
+  TrainerAvailabilityOverrideEntity,
 ];
