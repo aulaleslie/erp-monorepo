@@ -2,13 +2,55 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PtSessionPackagesService } from './pt-session-packages.service';
 import { ItemDurationUnit } from '@gym-monorepo/shared';
 import { format } from 'date-fns';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { PtPackageEntity } from '../../database/entities/pt-package.entity';
+import { MembersService } from '../members/members.service';
+import { ItemsService } from '../catalog/items/items.service';
+import { PeopleService } from '../people/people.service';
 
 describe('PtSessionPackagesService', () => {
   let service: PtSessionPackagesService;
 
+  const mockRepository = {
+    createQueryBuilder: jest.fn(),
+    findOne: jest.fn(),
+    create: jest.fn(),
+    save: jest.fn(),
+  };
+
+  const mockMembersService = {
+    findOne: jest.fn(),
+  };
+
+  const mockItemsService = {
+    findOne: jest.fn(),
+  };
+
+  const mockPeopleService = {
+    findOne: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [PtSessionPackagesService],
+      providers: [
+        PtSessionPackagesService,
+        {
+          provide: getRepositoryToken(PtPackageEntity),
+          useValue: mockRepository,
+        },
+        {
+          provide: MembersService,
+          useValue: mockMembersService,
+        },
+        {
+          provide: ItemsService,
+          useValue: mockItemsService,
+        },
+        {
+          provide: PeopleService,
+          useValue: mockPeopleService,
+        },
+      ],
     }).compile();
 
     service = module.get<PtSessionPackagesService>(PtSessionPackagesService);
