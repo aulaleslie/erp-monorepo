@@ -30,6 +30,7 @@ import {
     salesCreditNotesService,
     SalesCreditNoteDetail,
 } from "@/services/sales-credit-notes";
+import { salesPdfService } from "@/services/sales-pdf";
 import {
     documentsService,
     DocumentStatusHistoryEntry,
@@ -112,6 +113,22 @@ export default function CreditNoteDetailPage() {
         }
     };
 
+    const handleDownloadPdf = async () => {
+        setProcessing(true);
+        try {
+            const url = await salesPdfService.regenerate(id);
+            window.open(url, "_blank");
+        } catch {
+            toast({
+                title: "Error",
+                description: "Failed to generate PDF.",
+                variant: "destructive",
+            });
+        } finally {
+            setProcessing(false);
+        }
+    };
+
     if (loading) return <LoadingState />;
     if (!creditNote) return null;
 
@@ -151,7 +168,7 @@ export default function CreditNoteDetailPage() {
                         </Button>
                     )}
 
-                    <Button variant="outline">
+                    <Button variant="outline" onClick={handleDownloadPdf} disabled={processing}>
                         <Download className="mr-2 h-4 w-4" />
                         {t("buttons.downloadPdf")}
                     </Button>

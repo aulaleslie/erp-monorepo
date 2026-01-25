@@ -32,6 +32,7 @@ import {
     salesInvoicesService,
     SalesInvoiceDetail,
 } from "@/services/sales-invoices";
+import { salesPdfService } from "@/services/sales-pdf";
 import { salesCreditNotesService } from "@/services/sales-credit-notes";
 import {
     documentsService,
@@ -123,6 +124,22 @@ export default function InvoiceDetailPage() {
         }
     };
 
+    const handleDownloadPdf = async () => {
+        setProcessing(true);
+        try {
+            const url = await salesPdfService.regenerate(id);
+            window.open(url, "_blank");
+        } catch {
+            toast({
+                title: "Error",
+                description: "Failed to generate PDF.",
+                variant: "destructive",
+            });
+        } finally {
+            setProcessing(false);
+        }
+    };
+
     if (loading) return <LoadingState />;
     if (!invoice) return null;
 
@@ -173,7 +190,7 @@ export default function InvoiceDetailPage() {
                         </Button>
                     )}
 
-                    <Button variant="outline">
+                    <Button variant="outline" onClick={handleDownloadPdf} disabled={processing}>
                         <Download className="mr-2 h-4 w-4" />
                         {t("buttons.downloadPdf")}
                     </Button>

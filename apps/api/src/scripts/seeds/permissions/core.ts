@@ -125,6 +125,19 @@ export const corePermissions: SeedPermission[] = [
   { code: PERMISSIONS.SALES.CREATE, name: 'Create Sales', group: 'Sales' },
   { code: PERMISSIONS.SALES.UPDATE, name: 'Update Sales', group: 'Sales' },
   { code: PERMISSIONS.SALES.DELETE, name: 'Delete Sales', group: 'Sales' },
+  { code: PERMISSIONS.SALES.SUBMIT, name: 'Submit Sales', group: 'Sales' },
+  { code: PERMISSIONS.SALES.APPROVE, name: 'Approve Sales', group: 'Sales' },
+  { code: PERMISSIONS.SALES.CANCEL, name: 'Cancel Sales', group: 'Sales' },
+  {
+    code: PERMISSIONS.SALES.ORDERS_CONVERT,
+    name: 'Convert Orders',
+    group: 'Sales',
+  },
+  {
+    code: PERMISSIONS.SALES.INVOICES_POST,
+    name: 'Post Invoices',
+    group: 'Sales',
+  },
   // Purchasing
   {
     code: PERMISSIONS.PURCHASING.READ,

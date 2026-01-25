@@ -184,12 +184,96 @@ const seedWalkInCustomers = async (dataSource: DataSource): Promise<void> => {
   }
 };
 
+const seedSuppliers = async (dataSource: DataSource): Promise<void> => {
+  console.log('Seeding Suppliers...');
+  const tenantRepo = dataSource.getRepository(TenantEntity);
+  const tenants = await tenantRepo.find();
+
+  if (tenants.length === 0) {
+    console.log('No tenants found. Skipping suppliers.');
+    return;
+  }
+
+  const peopleRepo = dataSource.getRepository(PeopleEntity);
+  const tenantCountersService = new TenantCountersService(dataSource);
+
+  for (const tenant of tenants) {
+    const existingSupplier = await peopleRepo.findOne({
+      where: {
+        tenantId: tenant.id,
+        type: PeopleType.SUPPLIER,
+        fullName: 'General Supplier',
+      },
+    });
+
+    if (existingSupplier) {
+      continue;
+    }
+
+    const code = await tenantCountersService.getNextPeopleCode(
+      tenant.id,
+      PeopleType.SUPPLIER,
+    );
+    await peopleRepo.save(
+      peopleRepo.create({
+        tenantId: tenant.id,
+        type: PeopleType.SUPPLIER,
+        code,
+        fullName: 'General Supplier',
+      }),
+    );
+  }
+};
+
+const seedStaff = async (dataSource: DataSource): Promise<void> => {
+  console.log('Seeding Staff...');
+  const tenantRepo = dataSource.getRepository(TenantEntity);
+  const tenants = await tenantRepo.find();
+
+  if (tenants.length === 0) {
+    console.log('No tenants found. Skipping staff.');
+    return;
+  }
+
+  const peopleRepo = dataSource.getRepository(PeopleEntity);
+  const tenantCountersService = new TenantCountersService(dataSource);
+
+  for (const tenant of tenants) {
+    const existingStaff = await peopleRepo.findOne({
+      where: {
+        tenantId: tenant.id,
+        type: PeopleType.STAFF,
+        fullName: 'General Staff',
+      },
+    });
+
+    if (existingStaff) {
+      continue;
+    }
+
+    const code = await tenantCountersService.getNextPeopleCode(
+      tenant.id,
+      PeopleType.STAFF,
+    );
+    await peopleRepo.save(
+      peopleRepo.create({
+        tenantId: tenant.id,
+        type: PeopleType.STAFF,
+        code,
+        fullName: 'General Staff',
+      }),
+    );
+  }
+};
+
 const SEEDERS: Seeder[] = [
   { name: 'permissions', run: seedPermissions },
   { name: 'tenants', run: seedTenants },
   { name: 'admin', run: seedAdminUser },
   { name: 'roles', run: seedRolesAndAssignments },
   { name: 'walk-in', run: seedWalkInCustomers },
+  { name: 'suppliers', run: seedSuppliers },
+  { name: 'staff', run: seedStaff },
   { name: 'catalog', run: seedCatalog },
   { name: 'document-engine', run: seedDocumentEngine },
 ];
