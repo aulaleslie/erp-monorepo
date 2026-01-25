@@ -137,14 +137,16 @@ export class MembersService {
   ): Promise<MemberEntity> {
     const member = await this.findOne(tenantId, id);
 
-    if (dto.status !== undefined) {
-      if (dto.status === MemberStatus.ACTIVE) {
-        if (!member.agreesToTerms && !dto.agreesToTerms) {
-          throw new BadRequestException(
-            ERROR_CODES.MEMBER.TERMS_NOT_AGREED.message,
-          );
-        }
+    if (dto.status !== undefined && dto.status === MemberStatus.ACTIVE) {
+      if (member.status !== MemberStatus.ACTIVE) {
+        // transitioning to ACTIVE
+        // Use current member state merged with updates to validate
+        const updatedMemberHelper = { ...member, ...dto };
+        this.validateProfileCompletion(updatedMemberHelper);
       }
+    }
+
+    if (dto.status !== undefined) {
       member.status = dto.status;
       if (dto.status === MemberStatus.ACTIVE && !member.memberSince) {
         member.memberSince = new Date();
@@ -173,6 +175,34 @@ export class MembersService {
   }
 
   private calculateProfileCompletion(agreesToTerms: boolean): number {
-    return agreesToTerms ? 100 : 0;
+    let completed = 0;
+    const total = 1; // Currently only agreesToTerms is required
+
+    if (agreesToTerms) {
+      completed++;
+    }
+
+    return Math.round((completed / total) * 100);
+  }
+
+  private validateProfileCompletion(member: Partial<MemberEntity>): void {
+    const missingFields: string[] = [];
+
+    if (!member.agreesToTerms) {
+      missingFields.push('agreesToTerms');
+    }
+
+    if (missingFields.length > 0) {
+      throw new BadRequestException({
+        ...ERROR_CODES.MEMBER.PROFILE_INCOMPLETE,
+        details: { missingFields },
+      });
+    }
+
+    // Double check percent
+    const percent = this.calculateProfileCompletion(!!member.agreesToTerms);
+    if (percent < 100) {
+      throw new BadRequestException(ERROR_CODES.MEMBER.PROFILE_INCOMPLETE);
+    }
   }
 }

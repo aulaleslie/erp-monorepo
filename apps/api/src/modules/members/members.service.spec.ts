@@ -215,9 +215,16 @@ describe('MembersService', () => {
 
       memberRepository.findOne!.mockResolvedValue(member);
 
-      await expect(service.update(tenantId, memberId, dto)).rejects.toThrow(
-        BadRequestException,
-      );
+      try {
+        await service.update(tenantId, memberId, dto);
+        fail('Should have thrown BadRequestException');
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        const response = (error as BadRequestException).getResponse() as any;
+        expect(response.code).toBe('MEMBER_PROFILE_INCOMPLETE');
+        expect(response.details).toBeDefined();
+        expect(response.details.missingFields).toContain('agreesToTerms');
+      }
     });
   });
 
