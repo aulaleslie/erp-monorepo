@@ -45,6 +45,7 @@ import { SalesApprovalEntity } from './sales-approval.entity';
 import { PtPackageEntity } from './pt-package.entity';
 import { TrainerAvailabilityEntity } from './trainer-availability.entity';
 import { TrainerAvailabilityOverrideEntity } from './trainer-availability-override.entity';
+import { TenantSchedulingSettingsEntity } from './tenant-scheduling-settings.entity';
 
 export {
   AuditLogEntity,
@@ -93,6 +94,7 @@ export {
   PtPackageEntity,
   TrainerAvailabilityEntity,
   TrainerAvailabilityOverrideEntity,
+  TenantSchedulingSettingsEntity,
 };
 
 export const ALL_ENTITIES = [
@@ -137,4 +139,5 @@ export const ALL_ENTITIES = [
   PtPackageEntity,
   TrainerAvailabilityEntity,
   TrainerAvailabilityOverrideEntity,
+  TenantSchedulingSettingsEntity,
 ];
