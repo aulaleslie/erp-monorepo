@@ -26,6 +26,7 @@ import { MembersModule } from './modules/members/members.module';
 import { MembershipsModule } from './modules/memberships/memberships.module';
 import { PtSessionPackagesModule } from './modules/pt-session-packages/pt-session-packages.module';
 import { TrainerModule } from './modules/trainer/trainer.module';
+import { ScheduleBookingsModule } from './modules/schedule-bookings/schedule-bookings.module';
 
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { UserContextInterceptor } from './common/interceptors/user-context.interceptor';
@@ -60,6 +61,7 @@ import { UserContextInterceptor } from './common/interceptors/user-context.inter
     MembershipsModule,
     PtSessionPackagesModule,
     TrainerModule,
+    ScheduleBookingsModule,
   ],
   controllers: [AppController],
   providers: [
