@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Put, Body, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { PERMISSIONS } from '@gym-monorepo/shared';
 import { ScheduleBookingsService } from './schedule-bookings.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
@@ -6,13 +17,22 @@ import { QueryBookingDto } from './dto/query-booking.dto';
 import { CalendarQueryDto } from './dto/calendar-query.dto';
 import { CurrentTenant } from '../../common/decorators/current-tenant.decorator';
 import { RequirePermissions } from '../../common/decorators/require-permissions.decorator';
+import { ActiveTenantGuard } from '../tenants/guards/active-tenant.guard';
+import { TenantMembershipGuard } from '../tenants/guards/tenant-membership.guard';
+import { PermissionGuard } from '../users/guards/permission.guard';
 
 @Controller('bookings')
+@UseGuards(
+  AuthGuard('jwt'),
+  ActiveTenantGuard,
+  TenantMembershipGuard,
+  PermissionGuard,
+)
 export class ScheduleBookingsController {
   constructor(private readonly service: ScheduleBookingsService) {}
 
   @Get('calendar')
-  @RequirePermissions('schedules.read')
+  @RequirePermissions(PERMISSIONS.SCHEDULES.READ)
   async getCalendar(
     @CurrentTenant('id') tenantId: string,
     @Query() query: CalendarQueryDto,
@@ -21,7 +41,7 @@ export class ScheduleBookingsController {
   }
 
   @Post()
-  @RequirePermissions('schedules.create')
+  @RequirePermissions(PERMISSIONS.SCHEDULES.CREATE)
   async create(
     @CurrentTenant('id') tenantId: string,
     @Body() dto: CreateBookingDto,
@@ -30,7 +50,7 @@ export class ScheduleBookingsController {
   }
 
   @Get()
-  @RequirePermissions('schedules.read')
+  @RequirePermissions(PERMISSIONS.SCHEDULES.READ)
   async findAll(
     @CurrentTenant('id') tenantId: string,
     @Query() query: QueryBookingDto,
@@ -39,7 +59,7 @@ export class ScheduleBookingsController {
   }
 
   @Get(':id')
-  @RequirePermissions('schedules.read')
+  @RequirePermissions(PERMISSIONS.SCHEDULES.READ)
   async findOne(
     @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
@@ -48,7 +68,7 @@ export class ScheduleBookingsController {
   }
 
   @Put(':id')
-  @RequirePermissions('schedules.update')
+  @RequirePermissions(PERMISSIONS.SCHEDULES.UPDATE)
   async update(
     @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
@@ -58,7 +78,7 @@ export class ScheduleBookingsController {
   }
 
   @Post(':id/complete')
-  @RequirePermissions('schedules.update')
+  @RequirePermissions(PERMISSIONS.SCHEDULES.UPDATE)
   async complete(
     @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
@@ -67,7 +87,7 @@ export class ScheduleBookingsController {
   }
 
   @Post(':id/cancel')
-  @RequirePermissions('schedules.update')
+  @RequirePermissions(PERMISSIONS.SCHEDULES.UPDATE)
   async cancel(
     @CurrentTenant('id') tenantId: string,
     @Param('id') id: string,
@@ -77,7 +97,7 @@ export class ScheduleBookingsController {
   }
 
   @Post(':id/no-show')
-  @RequirePermissions('schedules.update')
+  @RequirePermissions(PERMISSIONS.SCHEDULES.UPDATE)
   async noShow(@CurrentTenant('id') tenantId: string, @Param('id') id: string) {
     return await this.service.noShow(tenantId, id);
   }

@@ -4,6 +4,10 @@ export class CreateScheduleBookingsTable1769424000000 implements MigrationInterf
   name = 'CreateScheduleBookingsTable1769424000000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
+    const tableExists = await queryRunner.hasTable('schedule_bookings');
+    if (tableExists) {
+      return;
+    }
     await queryRunner.query(
       `CREATE TYPE "public"."schedule_bookings_booking_type_enum" AS ENUM('PT_SESSION', 'GROUP_SESSION')`,
     );

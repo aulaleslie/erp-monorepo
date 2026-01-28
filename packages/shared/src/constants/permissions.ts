@@ -126,10 +126,16 @@ export const PERMISSIONS = {
     READ: 'trainer_availability.read',
     UPDATE: 'trainer_availability.update',
   },
+  SCHEDULES: {
+    READ: 'schedules.read',
+    CREATE: 'schedules.create',
+    UPDATE: 'schedules.update',
+    DELETE: 'schedules.delete',
+  },
 } as const;
 
 // Type-safe permission values
-export type PermissionCode = 
+export type PermissionCode =
   | typeof PERMISSIONS.ROLES[keyof typeof PERMISSIONS.ROLES]
   | typeof PERMISSIONS.PEOPLE[keyof typeof PERMISSIONS.PEOPLE]
   | typeof PERMISSIONS.DEPARTMENTS[keyof typeof PERMISSIONS.DEPARTMENTS]
@@ -148,7 +154,8 @@ export type PermissionCode =
   | typeof PERMISSIONS.MEMBERS[keyof typeof PERMISSIONS.MEMBERS]
   | typeof PERMISSIONS.MEMBERSHIPS[keyof typeof PERMISSIONS.MEMBERSHIPS]
   | typeof PERMISSIONS.PT_SESSIONS[keyof typeof PERMISSIONS.PT_SESSIONS]
-  | typeof PERMISSIONS.TRAINER_AVAILABILITY[keyof typeof PERMISSIONS.TRAINER_AVAILABILITY];
+  | typeof PERMISSIONS.TRAINER_AVAILABILITY[keyof typeof PERMISSIONS.TRAINER_AVAILABILITY]
+  | typeof PERMISSIONS.SCHEDULES[keyof typeof PERMISSIONS.SCHEDULES];
 
 // All permission codes as a flat array (useful for validation)
 export const ALL_PERMISSION_CODES: PermissionCode[] = [
@@ -234,4 +241,8 @@ export const ALL_PERMISSION_CODES: PermissionCode[] = [
   PERMISSIONS.PT_SESSIONS.CANCEL,
   PERMISSIONS.TRAINER_AVAILABILITY.READ,
   PERMISSIONS.TRAINER_AVAILABILITY.UPDATE,
+  PERMISSIONS.SCHEDULES.READ,
+  PERMISSIONS.SCHEDULES.CREATE,
+  PERMISSIONS.SCHEDULES.UPDATE,
+  PERMISSIONS.SCHEDULES.DELETE,
 ];
