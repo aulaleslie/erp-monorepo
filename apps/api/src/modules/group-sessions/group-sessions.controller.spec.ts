@@ -1,7 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GroupSessionsController } from './group-sessions.controller';
 import { GroupSessionsService } from './group-sessions.service';
-import { GroupSessionStatus } from '@gym-monorepo/shared';
+import { GroupSessionStatus, PaginatedResponse } from '@gym-monorepo/shared';
+import {
+  GroupSessionEntity,
+  GroupSessionParticipantEntity,
+} from '../../database/entities';
 
 import { Reflector } from '@nestjs/core';
 import { UsersService } from '../users/users.service';
@@ -63,7 +67,9 @@ describe('GroupSessionsController', () => {
       };
       jest
         .spyOn(service, 'findAll')
-        .mockResolvedValue(mockResult as unknown as any);
+        .mockResolvedValue(
+          mockResult as unknown as PaginatedResponse<GroupSessionEntity>,
+        );
 
       const result = await controller.findAll(mockTenantId, query);
 
@@ -77,7 +83,7 @@ describe('GroupSessionsController', () => {
       const mockResult = { id: mockSessionId };
       jest
         .spyOn(service, 'findOne')
-        .mockResolvedValue(mockResult as unknown as any);
+        .mockResolvedValue(mockResult as unknown as GroupSessionEntity);
 
       const result = await controller.findOne(mockTenantId, mockSessionId);
 
@@ -97,7 +103,7 @@ describe('GroupSessionsController', () => {
       const mockResult = { id: 'new-id', ...dto };
       jest
         .spyOn(service, 'create')
-        .mockResolvedValue(mockResult as unknown as any);
+        .mockResolvedValue(mockResult as unknown as GroupSessionEntity);
 
       const result = await controller.create(mockTenantId, dto);
 
@@ -112,7 +118,7 @@ describe('GroupSessionsController', () => {
       const mockResult = { id: mockSessionId, ...dto };
       jest
         .spyOn(service, 'update')
-        .mockResolvedValue(mockResult as unknown as any);
+        .mockResolvedValue(mockResult as unknown as GroupSessionEntity);
 
       const result = await controller.update(mockTenantId, mockSessionId, dto);
 
@@ -133,7 +139,7 @@ describe('GroupSessionsController', () => {
       };
       jest
         .spyOn(service, 'cancel')
-        .mockResolvedValue(mockResult as unknown as any);
+        .mockResolvedValue(mockResult as unknown as GroupSessionEntity);
 
       const result = await controller.cancel(mockTenantId, mockSessionId);
 
@@ -147,7 +153,7 @@ describe('GroupSessionsController', () => {
       const mockResult = [];
       jest
         .spyOn(service, 'getParticipants')
-        .mockResolvedValue(mockResult as any);
+        .mockResolvedValue(mockResult as GroupSessionParticipantEntity[]);
 
       const result = await controller.getParticipants(
         mockTenantId,
@@ -168,7 +174,9 @@ describe('GroupSessionsController', () => {
       const mockResult = { id: 'p1' };
       jest
         .spyOn(service, 'addParticipant')
-        .mockResolvedValue(mockResult as any);
+        .mockResolvedValue(
+          mockResult as unknown as GroupSessionParticipantEntity,
+        );
 
       const result = await controller.addParticipant(
         mockTenantId,

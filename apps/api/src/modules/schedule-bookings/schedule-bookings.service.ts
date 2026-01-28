@@ -189,7 +189,7 @@ export class ScheduleBookingsService {
 
     const [items, total] = await this.bookingRepo.findAndCount({
       where,
-      relations: ['member', 'trainer', 'ptPackage'],
+      relations: ['member', 'trainer', 'ptPackage', 'groupSession'],
       order: { bookingDate: 'DESC', startTime: 'ASC' },
       skip,
       take: parseInt(limit),
@@ -201,7 +201,7 @@ export class ScheduleBookingsService {
   async findOne(tenantId: string, id: string) {
     const booking = await this.bookingRepo.findOne({
       where: { id, tenantId },
-      relations: ['member', 'trainer', 'ptPackage'],
+      relations: ['member', 'trainer', 'ptPackage', 'groupSession'],
     });
     if (!booking) throw new NotFoundException(BOOKING_ERRORS.NOT_FOUND);
     return booking;

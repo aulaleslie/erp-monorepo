@@ -13,6 +13,7 @@ import {
   OverrideType,
   BOOKING_ERRORS,
   ConflictType,
+  GroupSessionStatus,
 } from '@gym-monorepo/shared';
 import { GroupSessionEntity } from '../../database/entities/group-session.entity';
 import { BadRequestException } from '@nestjs/common';
@@ -80,13 +81,21 @@ describe('ScheduleBookingsService', () => {
         console.error('getRepository failed to match entity:', name);
         return null;
       }),
-      createQueryBuilder: jest.fn().mockReturnValue({
-        select: jest.fn().mockReturnThis(),
-        from: jest.fn().mockReturnThis(),
-        where: jest.fn().mockReturnThis(),
-        setLock: jest.fn().mockReturnThis(),
-        getOne: jest.fn().mockResolvedValue(null),
-      }),
+      createQueryBuilder: jest
+        .fn()
+        .mockImplementation((_entityOrMetadata, _alias) => {
+          const qb = {
+            select: jest.fn().mockReturnThis(),
+            from: jest.fn().mockReturnThis(),
+            leftJoin: jest.fn().mockReturnThis(),
+            where: jest.fn().mockReturnThis(),
+            andWhere: jest.fn().mockReturnThis(),
+            orderBy: jest.fn().mockReturnThis(),
+            setLock: jest.fn().mockReturnThis(),
+            getOne: jest.fn().mockResolvedValue(null),
+          };
+          return qb;
+        }),
     };
 
     const mockDataSource = {
@@ -440,6 +449,147 @@ describe('ScheduleBookingsService', () => {
 
       await service.create(tenantId, dto);
       expect(managerMock.save).toHaveBeenCalled();
+    });
+
+    describe('group sessions', () => {
+      const groupDto = {
+        ...dto,
+        bookingType: BookingType.GROUP_SESSION,
+        groupSessionId: 'gs-1',
+      };
+
+      it('should validate group session balance when groupSessionId is provided', async () => {
+        (managerMock.findOne as jest.Mock).mockImplementation((entity) => {
+          if (entity === TenantSchedulingSettingsEntity)
+            return { slotDurationMinutes: 60 };
+          if (entity === GroupSessionEntity)
+            return {
+              id: 'gs-1',
+              status: GroupSessionStatus.ACTIVE,
+              remainingSessions: 5,
+            };
+          return null;
+        });
+
+        await service.create(tenantId, groupDto);
+        expect(managerMock.save).toHaveBeenCalled();
+      });
+
+      it('should throw if group session is insufficient', async () => {
+        (managerMock.findOne as jest.Mock).mockImplementation((entity) => {
+          if (entity === TenantSchedulingSettingsEntity)
+            return { slotDurationMinutes: 60 };
+          if (entity === GroupSessionEntity)
+            return {
+              id: 'gs-1',
+              status: GroupSessionStatus.ACTIVE,
+              remainingSessions: 0,
+            };
+          return null;
+        });
+
+        await expect(service.create(tenantId, groupDto)).rejects.toThrow(
+          'Insufficient group sessions',
+        );
+      });
+
+      it('should auto-find group session if not provided', async () => {
+        const dtoNoId = { ...groupDto, groupSessionId: undefined };
+
+        const mockGs = { id: 'gs-auto', status: GroupSessionStatus.ACTIVE };
+        const qbGsSearchMock = {
+          leftJoin: jest.fn().mockReturnThis(),
+          where: jest.fn().mockReturnThis(),
+          andWhere: jest.fn().mockReturnThis(),
+          orderBy: jest.fn().mockReturnThis(),
+          getOne: jest.fn().mockResolvedValue(mockGs),
+        };
+
+        const qbLockMock = {
+          select: jest.fn().mockReturnThis(),
+          from: jest.fn().mockReturnThis(),
+          where: jest.fn().mockReturnThis(),
+          setLock: jest.fn().mockReturnThis(),
+          getOne: jest.fn().mockResolvedValue(null),
+        };
+
+        (managerMock.createQueryBuilder as jest.Mock).mockImplementation(
+          (_entityOrMetadata) => {
+            if (_entityOrMetadata === GroupSessionEntity) return qbGsSearchMock;
+            return qbLockMock;
+          },
+        );
+
+        (managerMock.findOne as jest.Mock).mockImplementation((entity) => {
+          if (entity === TenantSchedulingSettingsEntity)
+            return { slotDurationMinutes: 60 };
+          return null;
+        });
+
+        await service.create(tenantId, dtoNoId);
+        expect(qbGsSearchMock.getOne).toHaveBeenCalled();
+        expect(managerMock.save).toHaveBeenCalledWith(
+          ScheduleBookingEntity,
+          expect.objectContaining({ groupSessionId: 'gs-auto' }),
+        );
+      });
+    });
+  });
+
+  describe('complete and no-show group sessions', () => {
+    const tenantId = 'tenant-1';
+    const bookingId = 'booking-1';
+    const groupSessionId = 'gs-1';
+
+    beforeEach(() => {
+      jest.spyOn(service, 'findOne').mockResolvedValue({
+        id: bookingId,
+        tenantId,
+        status: BookingStatus.SCHEDULED,
+        bookingType: BookingType.GROUP_SESSION,
+        groupSessionId,
+      } as unknown as ScheduleBookingEntity);
+
+      (managerMock.save as jest.Mock).mockImplementation((entity) =>
+        Promise.resolve(entity),
+      );
+    });
+
+    it('should deduct group session on complete', async () => {
+      const mockGs = {
+        id: groupSessionId,
+        remainingSessions: 5,
+        usedSessions: 2,
+        status: GroupSessionStatus.ACTIVE,
+      };
+      (
+        managerMock.getRepository!(GroupSessionEntity).findOne as jest.Mock
+      ).mockResolvedValue(mockGs);
+
+      await service.complete(tenantId, bookingId);
+
+      expect(mockGs.remainingSessions).toBe(4);
+      expect(mockGs.usedSessions).toBe(3);
+      expect(
+        managerMock.getRepository!(GroupSessionEntity).save,
+      ).toHaveBeenCalledWith(mockGs);
+    });
+
+    it('should deduct group session on no-show', async () => {
+      const mockGs = {
+        id: groupSessionId,
+        remainingSessions: 1,
+        usedSessions: 9,
+        status: GroupSessionStatus.ACTIVE,
+      };
+      (
+        managerMock.getRepository!(GroupSessionEntity).findOne as jest.Mock
+      ).mockResolvedValue(mockGs);
+
+      await service.noShow(tenantId, bookingId);
+
+      expect(mockGs.remainingSessions).toBe(0);
+      expect(mockGs.status).toBe(GroupSessionStatus.EXHAUSTED);
     });
   });
 });

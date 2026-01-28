@@ -14,6 +14,12 @@ import { GroupSessionParticipantEntity } from '../../database/entities/group-ses
 import { MembersService } from '../members/members.service';
 import { ItemsService } from '../catalog/items/items.service';
 import { PeopleService } from '../people/people.service';
+import {
+  MemberEntity,
+  ItemEntity,
+  PeopleEntity,
+} from '../../database/entities';
+import { DeepPartial } from 'typeorm';
 
 describe('GroupSessionsService', () => {
   let service: GroupSessionsService;
@@ -109,19 +115,20 @@ describe('GroupSessionsService', () => {
 
       jest
         .spyOn(membersService, 'findOne')
-        .mockResolvedValue({} as unknown as any);
+        .mockResolvedValue({} as unknown as MemberEntity);
       jest
         .spyOn(itemsService, 'findOne')
-        .mockResolvedValue(mockItem as unknown as any);
+        .mockResolvedValue(mockItem as unknown as ItemEntity);
       jest
         .spyOn(peopleService, 'findOne')
-        .mockResolvedValue(mockInstructor as unknown as any);
+        .mockResolvedValue(mockInstructor as unknown as PeopleEntity);
       jest
         .spyOn(groupSessionRepository, 'create')
-        .mockReturnValue(dto as unknown as any);
-      jest
-        .spyOn(groupSessionRepository, 'save')
-        .mockResolvedValue({ id: 'new-id', ...dto } as unknown as any);
+        .mockReturnValue(dto as unknown as GroupSessionEntity);
+      jest.spyOn(groupSessionRepository, 'save').mockResolvedValue({
+        id: 'new-id',
+        ...dto,
+      } as unknown as DeepPartial<GroupSessionEntity> & GroupSessionEntity);
 
       const result = await service.create(mockTenantId, dto);
 
@@ -139,10 +146,10 @@ describe('GroupSessionsService', () => {
 
       jest
         .spyOn(membersService, 'findOne')
-        .mockResolvedValue({} as unknown as any);
+        .mockResolvedValue({} as unknown as MemberEntity);
       jest.spyOn(itemsService, 'findOne').mockResolvedValue({
         serviceKind: ItemServiceKind.MEMBERSHIP,
-      } as unknown as any);
+      } as unknown as ItemEntity);
 
       await expect(service.create(mockTenantId, dto)).rejects.toThrow(
         BadRequestException,
@@ -158,16 +165,19 @@ describe('GroupSessionsService', () => {
         participants: [],
       };
 
-      jest.spyOn(service, 'findOne').mockResolvedValue(mockSession as any);
+      jest
+        .spyOn(service, 'findOne')
+        .mockResolvedValue(mockSession as unknown as GroupSessionEntity);
       jest
         .spyOn(membersService, 'findOne')
-        .mockResolvedValue({} as unknown as any);
+        .mockResolvedValue({} as unknown as MemberEntity);
       jest
         .spyOn(participantRepository, 'create')
-        .mockReturnValue({} as unknown as any);
-      jest
-        .spyOn(participantRepository, 'save')
-        .mockResolvedValue({ id: 'p-id' } as unknown as any);
+        .mockReturnValue({} as unknown as GroupSessionParticipantEntity);
+      jest.spyOn(participantRepository, 'save').mockResolvedValue({
+        id: 'p-id',
+      } as unknown as DeepPartial<GroupSessionParticipantEntity> &
+        GroupSessionParticipantEntity);
 
       const result = await service.addParticipant(mockTenantId, mockSessionId, {
         memberId: 'new-member',
@@ -184,7 +194,9 @@ describe('GroupSessionsService', () => {
         participants: [{ memberId: 'existing', isActive: true }],
       };
 
-      jest.spyOn(service, 'findOne').mockResolvedValue(mockSession as any);
+      jest
+        .spyOn(service, 'findOne')
+        .mockResolvedValue(mockSession as unknown as GroupSessionEntity);
 
       await expect(
         service.addParticipant(mockTenantId, mockSessionId, {
@@ -203,7 +215,7 @@ describe('GroupSessionsService', () => {
 
       jest
         .spyOn(service, 'findOne')
-        .mockResolvedValue(mockSession as unknown as any);
+        .mockResolvedValue(mockSession as unknown as GroupSessionEntity);
       jest
         .spyOn(groupSessionRepository, 'save')
         .mockImplementation((s) => Promise.resolve(s as GroupSessionEntity));
