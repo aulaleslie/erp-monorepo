@@ -3,12 +3,22 @@ import { ScheduleBookingsService } from './schedule-bookings.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { QueryBookingDto } from './dto/query-booking.dto';
+import { CalendarQueryDto } from './dto/calendar-query.dto';
 import { CurrentTenant } from '../../common/decorators/current-tenant.decorator';
 import { RequirePermissions } from '../../common/decorators/require-permissions.decorator';
 
 @Controller('bookings')
 export class ScheduleBookingsController {
   constructor(private readonly service: ScheduleBookingsService) {}
+
+  @Get('calendar')
+  @RequirePermissions('schedules.read')
+  async getCalendar(
+    @CurrentTenant('id') tenantId: string,
+    @Query() query: CalendarQueryDto,
+  ) {
+    return await this.service.getCalendarData(tenantId, query);
+  }
 
   @Post()
   @RequirePermissions('schedules.create')

@@ -11,6 +11,7 @@ import {
   MoreThanOrEqual,
   In,
   Not,
+  FindOptionsWhere,
 } from 'typeorm';
 import {
   BookingStatus,
@@ -23,6 +24,7 @@ import { ScheduleBookingEntity } from '../../database/entities/schedule-booking.
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { QueryBookingDto } from './dto/query-booking.dto';
+import { CalendarQueryDto } from './dto/calendar-query.dto';
 import { TrainerAvailabilityEntity } from '../../database/entities/trainer-availability.entity';
 import { TrainerAvailabilityOverrideEntity } from '../../database/entities/trainer-availability-override.entity';
 import { PtPackageEntity } from '../../database/entities/pt-package.entity';
@@ -332,5 +334,162 @@ export class ScheduleBookingsService {
     e2: string,
   ): boolean {
     return s1 < e2 && s2 < e1;
+  }
+
+  async getCalendarData(tenantId: string, query: CalendarQueryDto) {
+    const { dateFrom, dateTo, trainerIds } = query;
+    const trainerIdList = trainerIds
+      ? trainerIds.split(',').filter(Boolean)
+      : [];
+
+    // 1. Fetch bookings
+    const bookingWhere: FindOptionsWhere<ScheduleBookingEntity> = {
+      tenantId,
+      bookingDate: Between(dateFrom, dateTo),
+      status: In([BookingStatus.SCHEDULED, BookingStatus.COMPLETED]),
+    };
+    if (trainerIdList.length > 0) {
+      bookingWhere.trainerId = In(trainerIdList);
+    }
+
+    const bookings = await this.bookingRepo.find({
+      where: bookingWhere,
+      relations: ['member', 'ptPackage'],
+      order: { bookingDate: 'ASC', startTime: 'ASC' },
+    });
+
+    // 2. Fetch availability templates & overrides
+    // If trainer list provided, filter. Else fetch all relevant.
+    const commonWhere: FindOptionsWhere<TrainerAvailabilityEntity> = {
+      tenantId,
+    };
+    if (trainerIdList.length > 0) {
+      commonWhere.trainerId = In(trainerIdList);
+    }
+
+    const templates = await this.availabilityRepo.find({
+      where: { ...commonWhere, isActive: true },
+      order: { dayOfWeek: 'ASC', startTime: 'ASC' },
+    });
+
+    const overrides = await this.overrideRepo.find({
+      where: {
+        ...commonWhere,
+        date: Between(dateFrom, dateTo),
+      },
+    });
+
+    // 3. Identify all trainers involved (from templates or bookings)
+    const involvedTrainerIds = new Set<string>();
+    if (trainerIdList.length > 0) {
+      trainerIdList.forEach((id) => involvedTrainerIds.add(id));
+    } else {
+      templates.forEach((t) => involvedTrainerIds.add(t.trainerId));
+      bookings.forEach((b) => involvedTrainerIds.add(b.trainerId));
+    }
+
+    // 4. Compute slots
+    const availability: Record<
+      string,
+      Record<string, { startTime: string; endTime: string }[]>
+    > = {};
+
+    const start = new Date(dateFrom);
+    const end = new Date(dateTo);
+
+    for (const trainerId of involvedTrainerIds) {
+      availability[trainerId] = {};
+      const trainerTemplates = templates.filter(
+        (t) => t.trainerId === trainerId,
+      );
+      const trainerOverrides = overrides.filter(
+        (o) => o.trainerId === trainerId,
+      );
+
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const dateStr = d.toISOString().split('T')[0];
+        const dayOfWeek = d.getDay();
+
+        // 4a. Base Template
+        let slots = trainerTemplates
+          .filter((t) => t.dayOfWeek === dayOfWeek)
+          .map((t) => ({ startTime: t.startTime, endTime: t.endTime }));
+
+        // 4b. Overrides
+        const dayOverrides = trainerOverrides.filter((o) => o.date === dateStr);
+
+        // Full day block?
+        const fullBlock = dayOverrides.find(
+          (o) => o.overrideType === OverrideType.BLOCKED && !o.startTime,
+        );
+        if (fullBlock) {
+          availability[trainerId][dateStr] = [];
+          continue;
+        }
+
+        // Modified overrides replace template?
+        // Assumption: Modified overrides define the new working hours for the day.
+        const modified = dayOverrides.filter(
+          (o) => o.overrideType === OverrideType.MODIFIED,
+        );
+        if (modified.length > 0) {
+          slots = modified.map((o) => ({
+            startTime: o.startTime!,
+            endTime: o.endTime!,
+          }));
+        }
+
+        // Partial blocks
+        const partialBlocks = dayOverrides.filter(
+          (o) => o.overrideType === OverrideType.BLOCKED && o.startTime,
+        );
+        for (const block of partialBlocks) {
+          slots = this.subtractWindow(slots, block.startTime!, block.endTime!);
+        }
+
+        availability[trainerId][dateStr] = slots;
+      }
+    }
+
+    return {
+      bookings,
+      availability,
+    };
+  }
+
+  private subtractWindow(
+    windows: { startTime: string; endTime: string }[],
+    blockStart: string,
+    blockEnd: string,
+  ) {
+    const result: { startTime: string; endTime: string }[] = [];
+
+    for (const window of windows) {
+      if (blockEnd <= window.startTime || blockStart >= window.endTime) {
+        result.push(window);
+        continue;
+      }
+
+      if (blockStart <= window.startTime && blockEnd >= window.endTime) {
+        continue;
+      }
+
+      if (blockStart > window.startTime && blockEnd < window.endTime) {
+        result.push({ startTime: window.startTime, endTime: blockStart });
+        result.push({ startTime: blockEnd, endTime: window.endTime });
+        continue;
+      }
+
+      if (blockStart <= window.startTime && blockEnd < window.endTime) {
+        result.push({ startTime: blockEnd, endTime: window.endTime });
+        continue;
+      }
+
+      if (blockStart > window.startTime && blockEnd >= window.endTime) {
+        result.push({ startTime: window.startTime, endTime: blockStart });
+        continue;
+      }
+    }
+    return result;
   }
 }

@@ -56,9 +56,9 @@ describe('TenantSchedulingSettingsService', () => {
 
   describe('getSettings', () => {
     it('should return settings if they exist', async () => {
-      jest
-        .spyOn(repository, 'findOne')
-        .mockResolvedValue({ ...mockSettings } as any);
+      jest.spyOn(repository, 'findOne').mockResolvedValue({
+        ...mockSettings,
+      } as unknown as TenantSchedulingSettingsEntity);
 
       const result = await service.getSettings(mockTenantId);
 
@@ -86,11 +86,13 @@ describe('TenantSchedulingSettingsService', () => {
     it('should update existing settings', async () => {
       jest
         .spyOn(tenantRepository, 'findOne')
-        .mockResolvedValue({ id: mockTenantId } as any);
+        .mockResolvedValue({ id: mockTenantId } as unknown as TenantEntity);
+      jest.spyOn(repository, 'findOne').mockResolvedValue({
+        ...mockSettings,
+      } as unknown as TenantSchedulingSettingsEntity);
       jest
-        .spyOn(repository, 'findOne')
-        .mockResolvedValue({ ...mockSettings } as any);
-      jest.spyOn(repository, 'save').mockImplementation(async (s) => s as any);
+        .spyOn(repository, 'save')
+        .mockImplementation((s) => Promise.resolve(s as any));
 
       const result = await service.updateSettings(mockTenantId, {
         slotDurationMinutes: 45,
@@ -102,12 +104,14 @@ describe('TenantSchedulingSettingsService', () => {
     it('should create new settings if they do not exist', async () => {
       jest
         .spyOn(tenantRepository, 'findOne')
-        .mockResolvedValue({ id: mockTenantId } as any);
+        .mockResolvedValue({ id: mockTenantId } as unknown as TenantEntity);
       jest.spyOn(repository, 'findOne').mockResolvedValue(null);
+      jest.spyOn(repository, 'create').mockReturnValue({
+        ...mockSettings,
+      } as unknown as TenantSchedulingSettingsEntity);
       jest
-        .spyOn(repository, 'create')
-        .mockReturnValue({ ...mockSettings } as any);
-      jest.spyOn(repository, 'save').mockImplementation(async (s) => s as any);
+        .spyOn(repository, 'save')
+        .mockImplementation((s) => Promise.resolve(s as any));
 
       const result = await service.updateSettings(mockTenantId, {
         ...mockSettings,
