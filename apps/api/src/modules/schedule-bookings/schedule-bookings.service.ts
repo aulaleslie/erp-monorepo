@@ -7,10 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import {
   Repository,
   Between,
-  LessThanOrEqual,
   MoreThanOrEqual,
   In,
-  Not,
   FindOptionsWhere,
 } from 'typeorm';
 import {
@@ -29,6 +27,9 @@ import { TrainerAvailabilityEntity } from '../../database/entities/trainer-avail
 import { TrainerAvailabilityOverrideEntity } from '../../database/entities/trainer-availability-override.entity';
 import { PtPackageEntity } from '../../database/entities/pt-package.entity';
 import { TenantSchedulingSettingsEntity } from '../../database/entities/tenant-scheduling-settings.entity';
+import { ConflictType } from '@gym-monorepo/shared';
+import { ConflictDetail } from './dto/conflict-check.dto';
+import { DataSource, EntityManager } from 'typeorm';
 
 @Injectable()
 export class ScheduleBookingsService {
@@ -43,84 +44,81 @@ export class ScheduleBookingsService {
     private readonly ptPackageRepo: Repository<PtPackageEntity>,
     @InjectRepository(TenantSchedulingSettingsEntity)
     private readonly settingsRepo: Repository<TenantSchedulingSettingsEntity>,
+    private readonly dataSource: DataSource,
   ) {}
 
   async create(tenantId: string, dto: CreateBookingDto) {
-    // 1. Validate slot duration
-    const settings = await this.settingsRepo.findOne({ where: { tenantId } });
-    const slotDuration = settings?.slotDurationMinutes || 60;
-    if (dto.durationMinutes % slotDuration !== 0) {
-      throw new BadRequestException(BOOKING_ERRORS.INVALID_DURATION);
-    }
+    return await this.dataSource.transaction(async (manager) => {
+      // 1. Validate slot duration
+      const settings = await manager.findOne(TenantSchedulingSettingsEntity, {
+        where: { tenantId },
+      });
+      const slotDuration = settings?.slotDurationMinutes || 60;
+      if (dto.durationMinutes % slotDuration !== 0) {
+        throw new BadRequestException(BOOKING_ERRORS.INVALID_DURATION);
+      }
 
-    // 2. Validate trainer availability
-    await this.validateTrainerAvailability(tenantId, dto);
-
-    // 3. Check for conflicts
-    const conflict = await this.bookingRepo.findOne({
-      where: {
+      // 2. Check for conflicts (availability + overlaps) with locking
+      const conflict = await this.checkForConflicts(
         tenantId,
-        trainerId: dto.trainerId,
-        bookingDate: dto.bookingDate,
-        status: In([BookingStatus.SCHEDULED, BookingStatus.COMPLETED]),
-        startTime: LessThanOrEqual(dto.endTime),
-        endTime: MoreThanOrEqual(dto.startTime),
-      },
-    });
+        {
+          trainerId: dto.trainerId,
+          bookingDate: dto.bookingDate,
+          startTime: dto.startTime,
+          endTime: dto.endTime,
+        },
+        undefined,
+        manager,
+      );
 
-    if (conflict) {
-      // Deep overlap check
-      if (
-        this.isOverlapping(
-          dto.startTime,
-          dto.endTime,
-          conflict.startTime,
-          conflict.endTime,
-        )
-      ) {
-        throw new BadRequestException(BOOKING_ERRORS.CONFLICT);
-      }
-    }
-
-    // 4. Validate member PT sessions if PT_SESSION
-    let ptPackageId = dto.ptPackageId;
-    if (dto.bookingType === BookingType.PT_SESSION) {
-      if (ptPackageId) {
-        const pkg = await this.ptPackageRepo.findOne({
-          where: { id: ptPackageId, tenantId, memberId: dto.memberId },
+      if (conflict) {
+        throw new BadRequestException({
+          message: BOOKING_ERRORS.CONFLICT,
+          error: BOOKING_ERRORS.CONFLICT_DETAIL,
+          detail: conflict,
         });
-        if (
-          !pkg ||
-          pkg.status !== PtPackageStatus.ACTIVE ||
-          pkg.remainingSessions <= 0
-        ) {
-          throw new BadRequestException(BOOKING_ERRORS.INSUFFICIENT_SESSIONS);
-        }
-      } else {
-        // Find oldest active package
-        const pkg = await this.ptPackageRepo.findOne({
-          where: {
-            tenantId,
-            memberId: dto.memberId,
-            status: PtPackageStatus.ACTIVE,
-            remainingSessions: MoreThanOrEqual(1),
-          },
-          order: { createdAt: 'ASC' },
-        });
-        if (!pkg) {
-          throw new BadRequestException(BOOKING_ERRORS.INSUFFICIENT_SESSIONS);
-        }
-        ptPackageId = pkg.id;
       }
-    }
 
-    const booking = this.bookingRepo.create({
-      ...dto,
-      tenantId,
-      ptPackageId,
+      // 3. Validate member PT sessions if PT_SESSION
+      let ptPackageId = dto.ptPackageId;
+      if (dto.bookingType === BookingType.PT_SESSION) {
+        if (ptPackageId) {
+          const pkg = await manager.findOne(PtPackageEntity, {
+            where: { id: ptPackageId, tenantId, memberId: dto.memberId },
+          });
+          if (
+            !pkg ||
+            pkg.status !== PtPackageStatus.ACTIVE ||
+            pkg.remainingSessions <= 0
+          ) {
+            throw new BadRequestException(BOOKING_ERRORS.INSUFFICIENT_SESSIONS);
+          }
+        } else {
+          // Find oldest active package
+          const pkg = await manager.findOne(PtPackageEntity, {
+            where: {
+              tenantId,
+              memberId: dto.memberId,
+              status: PtPackageStatus.ACTIVE,
+              remainingSessions: MoreThanOrEqual(1),
+            },
+            order: { createdAt: 'ASC' },
+          });
+          if (!pkg) {
+            throw new BadRequestException(BOOKING_ERRORS.INSUFFICIENT_SESSIONS);
+          }
+          ptPackageId = pkg.id;
+        }
+      }
+
+      const booking = this.bookingRepo.create({
+        ...dto,
+        tenantId,
+        ptPackageId,
+      });
+
+      return await manager.save(ScheduleBookingEntity, booking);
     });
-
-    return await this.bookingRepo.save(booking);
   }
 
   async findAll(tenantId: string, query: QueryBookingDto) {
@@ -168,44 +166,38 @@ export class ScheduleBookingsService {
   }
 
   async update(tenantId: string, id: string, dto: UpdateBookingDto) {
-    const booking = await this.findOne(tenantId, id);
-
-    if (dto.bookingDate || dto.startTime || dto.endTime) {
-      // Re-validate availability and conflicts if time changed
-      await this.validateTrainerAvailability(tenantId, {
-        trainerId: booking.trainerId,
-        bookingDate: dto.bookingDate || booking.bookingDate,
-        startTime: dto.startTime || booking.startTime,
-        endTime: dto.endTime || booking.endTime,
+    return await this.dataSource.transaction(async (manager) => {
+      const booking = await manager.findOne(ScheduleBookingEntity, {
+        where: { id, tenantId },
       });
+      if (!booking) throw new NotFoundException(BOOKING_ERRORS.NOT_FOUND);
 
-      const conflict = await this.bookingRepo.findOne({
-        where: {
+      if (dto.bookingDate || dto.startTime || dto.endTime) {
+        // Re-validate availability and conflicts with locking
+        const conflict = await this.checkForConflicts(
           tenantId,
-          id: Not(id),
-          trainerId: booking.trainerId,
-          bookingDate: dto.bookingDate || booking.bookingDate,
-          status: In([BookingStatus.SCHEDULED, BookingStatus.COMPLETED]),
-          startTime: LessThanOrEqual(dto.endTime || booking.endTime),
-          endTime: MoreThanOrEqual(dto.startTime || booking.startTime),
-        },
-      });
+          {
+            trainerId: booking.trainerId, // Trainer cannot be changed in update currently, if so need dto.trainerId
+            bookingDate: dto.bookingDate || booking.bookingDate,
+            startTime: dto.startTime || booking.startTime,
+            endTime: dto.endTime || booking.endTime,
+          },
+          id, // Exclude self
+          manager,
+        );
 
-      if (
-        conflict &&
-        this.isOverlapping(
-          dto.startTime || booking.startTime,
-          dto.endTime || booking.endTime,
-          conflict.startTime,
-          conflict.endTime,
-        )
-      ) {
-        throw new BadRequestException(BOOKING_ERRORS.CONFLICT);
+        if (conflict) {
+          throw new BadRequestException({
+            message: BOOKING_ERRORS.CONFLICT,
+            error: BOOKING_ERRORS.CONFLICT_DETAIL,
+            detail: conflict,
+          });
+        }
       }
-    }
 
-    Object.assign(booking, dto);
-    return await this.bookingRepo.save(booking);
+      Object.assign(booking, dto);
+      return await manager.save(ScheduleBookingEntity, booking);
+    });
   }
 
   async complete(tenantId: string, id: string) {
@@ -251,7 +243,7 @@ export class ScheduleBookingsService {
     return await this.bookingRepo.save(booking);
   }
 
-  private async validateTrainerAvailability(
+  private async checkForConflicts(
     tenantId: string,
     dto: {
       trainerId: string;
@@ -259,16 +251,33 @@ export class ScheduleBookingsService {
       startTime: string;
       endTime: string;
     },
-  ) {
+    excludeBookingId?: string,
+    manager?: EntityManager,
+  ): Promise<ConflictDetail | null> {
     const date = new Date(dto.bookingDate);
     const dayOfWeek = date.getUTCDay();
+    const bookingDateStr =
+      dto.bookingDate instanceof Date
+        ? dto.bookingDate.toISOString().split('T')[0]
+        : dto.bookingDate;
 
-    // Check overrides
-    const overrides = await this.overrideRepo.find({
+    // Use provided manager or default repositories
+    const overrideRepo = manager
+      ? manager.getRepository(TrainerAvailabilityOverrideEntity)
+      : this.overrideRepo;
+    const availabilityRepo = manager
+      ? manager.getRepository(TrainerAvailabilityEntity)
+      : this.availabilityRepo;
+    const bookingRepo = manager
+      ? manager.getRepository(ScheduleBookingEntity)
+      : this.bookingRepo;
+
+    // 1. Check Overrides (BLOCKED/MODIFIED)
+    const overrides = await overrideRepo.find({
       where: {
         tenantId,
         trainerId: dto.trainerId,
-        date: dto.bookingDate as string,
+        date: bookingDateStr,
       },
     });
 
@@ -283,32 +292,114 @@ export class ScheduleBookingsService {
             o.endTime!,
           )),
     );
-    if (blocked)
-      throw new BadRequestException(BOOKING_ERRORS.TRAINER_UNAVAILABLE);
+    if (blocked) {
+      return {
+        type: ConflictType.BLOCKED_OVERRIDE,
+        message: 'Trainer has blocked time during this slot',
+        conflictingTimeSlot: blocked.startTime
+          ? { startTime: blocked.startTime, endTime: blocked.endTime! }
+          : undefined,
+      };
+    }
 
+    // 2. Check Availability (Template + Modified Overrides)
     const modified = overrides.filter(
       (o) => o.overrideType === OverrideType.MODIFIED,
     );
+    let isAvailable = false;
+
     if (modified.length > 0) {
-      const isAvailable = modified.some(
+      isAvailable = modified.some(
         (o) => o.startTime! <= dto.startTime && o.endTime! >= dto.endTime,
       );
-      if (!isAvailable)
-        throw new BadRequestException(BOOKING_ERRORS.TRAINER_UNAVAILABLE);
-      return; // Modified override takes precedence over template
+    } else {
+      const template = await availabilityRepo.find({
+        where: {
+          tenantId,
+          trainerId: dto.trainerId,
+          dayOfWeek,
+          isActive: true,
+        },
+      });
+      isAvailable = template.some(
+        (t) => t.startTime <= dto.startTime && t.endTime >= dto.endTime,
+      );
     }
 
-    // Check template
-    const template = await this.availabilityRepo.find({
-      where: { tenantId, trainerId: dto.trainerId, dayOfWeek, isActive: true },
-    });
-
-    const isAvailableInTemplate = template.some(
-      (t) => t.startTime <= dto.startTime && t.endTime >= dto.endTime,
-    );
-    if (!isAvailableInTemplate) {
-      throw new BadRequestException(BOOKING_ERRORS.TRAINER_UNAVAILABLE);
+    if (!isAvailable) {
+      return {
+        type: ConflictType.OUTSIDE_AVAILABILITY,
+        message: 'Booking time is outside trainer working hours',
+      };
     }
+
+    // 3. Check Double Booking (pessimistic lock if manager provided)
+    // We lock the range of bookings for this trainer on this day to prevent concurrent inserts
+    const conflictQuery = bookingRepo
+      .createQueryBuilder('booking')
+      .where('booking.tenantId = :tenantId', { tenantId })
+      .andWhere('booking.trainerId = :trainerId', { trainerId: dto.trainerId })
+      .andWhere('booking.bookingDate = :bookingDate', {
+        bookingDate: bookingDateStr,
+      })
+      .andWhere('booking.status IN (:...statuses)', {
+        statuses: [BookingStatus.SCHEDULED, BookingStatus.COMPLETED],
+      })
+      .andWhere('booking.startTime < :endTime', { endTime: dto.endTime })
+      .andWhere('booking.endTime > :startTime', { startTime: dto.startTime });
+
+    if (excludeBookingId) {
+      conflictQuery.andWhere('booking.id != :excludeId', {
+        excludeId: excludeBookingId,
+      });
+    }
+
+    if (manager) {
+      // Apply pessimistic lock to prevent race conditions
+      // Note: 'pessimistic_write' locks the selected rows.
+      // To strictly prevent inserts, we ideally need range locks or table locks, which are database specific.
+      // In Postgres, 'pessimistic_write' (FOR UPDATE) on a SELECT of potentially conflicting rows
+      // will block other transactions trying to update/delete those rows.
+      // However, it doesn't block INSERTs of new non-conflicting rows, but it DOES block
+      // INSERTs if they would match a predicate in serializable isolation, OR if we lock a parent resource.
+      // A common simple approach is to lock the Trainer (PeopleEntity) row for the duration of the check.
+      // But here, we'll rely on the fact that if there IS a conflict, we catch it.
+      // If there IS NOT a conflict, we might have a race.
+      // To fix the gap, we should lock the Trainer entity.
+      await manager
+        .createQueryBuilder()
+        .select('p')
+        .from('people', 'p')
+        .where('p.id = :id', { id: dto.trainerId })
+        .setLock('pessimistic_write')
+        .getOne();
+    }
+
+    const conflict = await conflictQuery.getOne();
+
+    if (conflict) {
+      // Double check overlap just in case logic above has edge cases (it shouldn't due to query construction)
+      if (
+        this.isOverlapping(
+          dto.startTime,
+          dto.endTime,
+          conflict.startTime,
+          conflict.endTime,
+        )
+      ) {
+        return {
+          type: ConflictType.TRAINER_DOUBLE_BOOKED,
+          message: 'Trainer already has a booking at this time',
+          conflictingBookingId: conflict.id,
+          conflictingTimeSlot: {
+            startTime: conflict.startTime,
+            endTime: conflict.endTime,
+          },
+        };
+      }
+    }
+
+    return null;
   }
 
   private async deductSession(tenantId: string, ptPackageId: string) {
