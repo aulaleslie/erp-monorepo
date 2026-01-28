@@ -30,6 +30,7 @@ import { UpdateSalesInvoiceDto } from './dtos/update-sales-invoice.dto';
 import { SalesApprovalsService } from '../approvals/sales-approvals.service';
 import { MembershipsIntegrationService } from '../../memberships/memberships-integration.service';
 import { PtSessionPackagesIntegrationService } from '../../pt-session-packages/pt-session-packages-integration.service';
+import { GroupSessionsIntegrationService } from '../../group-sessions/group-sessions-integration.service';
 import { SalesInvoicePostingHandler } from './posting/sales-invoice-posting-handler';
 
 @Injectable()
@@ -51,6 +52,7 @@ export class SalesInvoicesService {
     private readonly salesApprovalsService: SalesApprovalsService,
     private readonly membershipsIntegrationService: MembershipsIntegrationService,
     private readonly ptSessionPackagesIntegrationService: PtSessionPackagesIntegrationService,
+    private readonly groupSessionsIntegrationService: GroupSessionsIntegrationService,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -429,6 +431,7 @@ export class SalesInvoicesService {
     const handler = new SalesInvoicePostingHandler(
       this.membershipsIntegrationService,
       this.ptSessionPackagesIntegrationService,
+      this.groupSessionsIntegrationService,
     );
 
     return this.documentsService.post(id, tenantId, userId, handler);

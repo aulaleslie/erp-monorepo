@@ -8,5 +8,6 @@ export * from './membership';
 export * from './pt-package';
 export * from './trainer-availability';
 export * from './booking';
+export * from './group-session';
 // export * from './sales';
 

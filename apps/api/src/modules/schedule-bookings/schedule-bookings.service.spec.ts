@@ -14,6 +14,7 @@ import {
   BOOKING_ERRORS,
   ConflictType,
 } from '@gym-monorepo/shared';
+import { GroupSessionEntity } from '../../database/entities/group-session.entity';
 import { BadRequestException } from '@nestjs/common';
 import { ConflictDetail } from './dto/conflict-check.dto';
 
@@ -43,6 +44,11 @@ describe('ScheduleBookingsService', () => {
     const overrideRepoMock = { find: jest.fn() };
     const ptPackageRepoMock = { findOne: jest.fn(), save: jest.fn() };
     const settingsRepoMock = { findOne: jest.fn() };
+    const groupSessionRepoMock = {
+      findOne: jest.fn(),
+      save: jest.fn(),
+      createQueryBuilder: jest.fn(),
+    };
 
     managerMock = {
       findOne: jest.fn(),
@@ -69,6 +75,8 @@ describe('ScheduleBookingsService', () => {
           return overrideRepoMock;
         if (entity === PtPackageEntity || name === 'PtPackageEntity')
           return ptPackageRepoMock;
+        if (entity === GroupSessionEntity || name === 'GroupSessionEntity')
+          return groupSessionRepoMock;
         console.error('getRepository failed to match entity:', name);
         return null;
       }),
@@ -113,6 +121,10 @@ describe('ScheduleBookingsService', () => {
         {
           provide: getRepositoryToken(TenantSchedulingSettingsEntity),
           useValue: settingsRepoMock,
+        },
+        {
+          provide: getRepositoryToken(GroupSessionEntity),
+          useValue: groupSessionRepoMock,
         },
         {
           provide: DataSource,

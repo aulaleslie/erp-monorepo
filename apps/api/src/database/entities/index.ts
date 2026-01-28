@@ -47,6 +47,8 @@ import { TrainerAvailabilityEntity } from './trainer-availability.entity';
 import { TrainerAvailabilityOverrideEntity } from './trainer-availability-override.entity';
 import { TenantSchedulingSettingsEntity } from './tenant-scheduling-settings.entity';
 import { ScheduleBookingEntity } from './schedule-booking.entity';
+import { GroupSessionEntity } from './group-session.entity';
+import { GroupSessionParticipantEntity } from './group-session-participant.entity';
 
 export {
   AuditLogEntity,
@@ -97,6 +99,8 @@ export {
   TrainerAvailabilityOverrideEntity,
   TenantSchedulingSettingsEntity,
   ScheduleBookingEntity,
+  GroupSessionEntity,
+  GroupSessionParticipantEntity,
 };
 
 export const ALL_ENTITIES = [
@@ -143,4 +147,6 @@ export const ALL_ENTITIES = [
   TrainerAvailabilityOverrideEntity,
   TenantSchedulingSettingsEntity,
   ScheduleBookingEntity,
+  GroupSessionEntity,
+  GroupSessionParticipantEntity,
 ];

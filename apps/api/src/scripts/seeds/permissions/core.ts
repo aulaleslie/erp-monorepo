@@ -241,4 +241,30 @@ export const corePermissions: SeedPermission[] = [
     name: 'Cancel PT Packages',
     group: 'PT Sessions',
   },
+  // Group Sessions
+  {
+    code: PERMISSIONS.GROUP_SESSIONS.READ,
+    name: 'Read Group Sessions',
+    group: 'Group Sessions',
+  },
+  {
+    code: PERMISSIONS.GROUP_SESSIONS.CREATE,
+    name: 'Create Group Sessions',
+    group: 'Group Sessions',
+  },
+  {
+    code: PERMISSIONS.GROUP_SESSIONS.UPDATE,
+    name: 'Update Group Sessions',
+    group: 'Group Sessions',
+  },
+  {
+    code: PERMISSIONS.GROUP_SESSIONS.CANCEL,
+    name: 'Cancel Group Sessions',
+    group: 'Group Sessions',
+  },
+  {
+    code: PERMISSIONS.GROUP_SESSIONS.MANAGE_PARTICIPANTS,
+    name: 'Manage Group Session Participants',
+    group: 'Group Sessions',
+  },
 ];

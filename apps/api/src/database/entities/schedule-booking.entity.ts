@@ -11,6 +11,7 @@ import { TenantEntity } from './tenant.entity';
 import { MemberEntity } from './member.entity';
 import { PeopleEntity } from './people.entity';
 import { PtPackageEntity } from './pt-package.entity';
+import { GroupSessionEntity } from './group-session.entity';
 
 @Entity('schedule_bookings')
 export class ScheduleBookingEntity extends BaseAuditEntity {
@@ -85,5 +86,7 @@ export class ScheduleBookingEntity extends BaseAuditEntity {
   @JoinColumn({ name: 'ptPackageId' })
   ptPackage: PtPackageEntity | null;
 
-  // Relation to GroupSession will be added when C6F is implemented
+  @ManyToOne(() => GroupSessionEntity, { nullable: true })
+  @JoinColumn({ name: 'groupSessionId' })
+  groupSession: GroupSessionEntity | null;
 }

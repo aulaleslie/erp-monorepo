@@ -18,6 +18,7 @@ import { SalesCreditNotesModule } from '../credit-notes/sales-credit-notes.modul
 import { SalesApprovalsModule } from '../approvals/sales-approvals.module';
 import { MembershipsModule } from '../../memberships/memberships.module';
 import { PtSessionPackagesModule } from '../../pt-session-packages/pt-session-packages.module';
+import { GroupSessionsModule } from '../../group-sessions/group-sessions.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { PtSessionPackagesModule } from '../../pt-session-packages/pt-session-pa
     SalesApprovalsModule,
     MembershipsModule,
     PtSessionPackagesModule,
+    GroupSessionsModule,
   ],
   controllers: [SalesInvoicesController],
   providers: [SalesInvoicesService],

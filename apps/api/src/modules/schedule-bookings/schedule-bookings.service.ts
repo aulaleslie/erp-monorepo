@@ -17,6 +17,7 @@ import {
   BOOKING_ERRORS,
   PtPackageStatus,
   OverrideType,
+  GroupSessionStatus,
 } from '@gym-monorepo/shared';
 import { ScheduleBookingEntity } from '../../database/entities/schedule-booking.entity';
 import { CreateBookingDto } from './dto/create-booking.dto';
@@ -26,6 +27,7 @@ import { CalendarQueryDto } from './dto/calendar-query.dto';
 import { TrainerAvailabilityEntity } from '../../database/entities/trainer-availability.entity';
 import { TrainerAvailabilityOverrideEntity } from '../../database/entities/trainer-availability-override.entity';
 import { PtPackageEntity } from '../../database/entities/pt-package.entity';
+import { GroupSessionEntity } from '../../database/entities/group-session.entity';
 import { TenantSchedulingSettingsEntity } from '../../database/entities/tenant-scheduling-settings.entity';
 import { ConflictType } from '@gym-monorepo/shared';
 import { ConflictDetail } from './dto/conflict-check.dto';
@@ -42,6 +44,8 @@ export class ScheduleBookingsService {
     private readonly overrideRepo: Repository<TrainerAvailabilityOverrideEntity>,
     @InjectRepository(PtPackageEntity)
     private readonly ptPackageRepo: Repository<PtPackageEntity>,
+    @InjectRepository(GroupSessionEntity)
+    private readonly groupSessionRepo: Repository<GroupSessionEntity>,
     @InjectRepository(TenantSchedulingSettingsEntity)
     private readonly settingsRepo: Repository<TenantSchedulingSettingsEntity>,
     private readonly dataSource: DataSource,
@@ -111,10 +115,48 @@ export class ScheduleBookingsService {
         }
       }
 
+      // 4. Validate member Group sessions if GROUP_SESSION
+      let groupSessionId = dto.groupSessionId;
+      if (dto.bookingType === BookingType.GROUP_SESSION) {
+        if (groupSessionId) {
+          const session = await manager.findOne(GroupSessionEntity, {
+            where: { id: groupSessionId, tenantId },
+          });
+          if (
+            !session ||
+            session.status !== GroupSessionStatus.ACTIVE ||
+            session.remainingSessions <= 0
+          ) {
+            throw new BadRequestException('Insufficient group sessions');
+          }
+        } else {
+          // Find oldest active session where member is purchaser or participant
+          const qb = manager.createQueryBuilder(GroupSessionEntity, 'session');
+          qb.leftJoin('session.participants', 'participant')
+            .where('session.tenantId = :tenantId', { tenantId })
+            .andWhere('session.status = :status', {
+              status: GroupSessionStatus.ACTIVE,
+            })
+            .andWhere('session.remainingSessions >= 1')
+            .andWhere(
+              '(session.purchaserMemberId = :memberId OR (participant.memberId = :memberId AND participant.isActive = true))',
+              { memberId: dto.memberId },
+            )
+            .orderBy('session.createdAt', 'ASC');
+
+          const session = await qb.getOne();
+          if (!session) {
+            throw new BadRequestException('Insufficient group sessions');
+          }
+          groupSessionId = session.id;
+        }
+      }
+
       const booking = this.bookingRepo.create({
         ...dto,
         tenantId,
         ptPackageId,
+        groupSessionId,
       });
 
       return await manager.save(ScheduleBookingEntity, booking);
@@ -208,6 +250,11 @@ export class ScheduleBookingsService {
 
     if (booking.bookingType === BookingType.PT_SESSION && booking.ptPackageId) {
       await this.deductSession(tenantId, booking.ptPackageId);
+    } else if (
+      booking.bookingType === BookingType.GROUP_SESSION &&
+      booking.groupSessionId
+    ) {
+      await this.deductGroupSession(tenantId, booking.groupSessionId);
     }
 
     booking.status = BookingStatus.COMPLETED;
@@ -237,6 +284,11 @@ export class ScheduleBookingsService {
 
     if (booking.bookingType === BookingType.PT_SESSION && booking.ptPackageId) {
       await this.deductSession(tenantId, booking.ptPackageId);
+    } else if (
+      booking.bookingType === BookingType.GROUP_SESSION &&
+      booking.groupSessionId
+    ) {
+      await this.deductGroupSession(tenantId, booking.groupSessionId);
     }
 
     booking.status = BookingStatus.NO_SHOW;
@@ -425,6 +477,22 @@ export class ScheduleBookingsService {
     e2: string,
   ): boolean {
     return s1 < e2 && s2 < e1;
+  }
+
+  private async deductGroupSession(tenantId: string, groupSessionId: string) {
+    const session = await this.groupSessionRepo.findOne({
+      where: { id: groupSessionId, tenantId },
+    });
+    if (!session || session.remainingSessions <= 0) {
+      throw new BadRequestException('Insufficient group sessions');
+    }
+
+    session.usedSessions += 1;
+    session.remainingSessions -= 1;
+    if (session.remainingSessions === 0) {
+      session.status = GroupSessionStatus.EXHAUSTED;
+    }
+    await this.groupSessionRepo.save(session);
   }
 
   async getCalendarData(tenantId: string, query: CalendarQueryDto) {
