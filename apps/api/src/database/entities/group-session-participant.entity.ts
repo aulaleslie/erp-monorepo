@@ -1,17 +1,16 @@
 import {
   Column,
-  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
+import { BaseAuditEntity } from '../../common/entities/base-audit.entity';
 import { GroupSessionEntity } from './group-session.entity';
 import { MemberEntity } from './member.entity';
 
 @Entity('group_session_participants')
-export class GroupSessionParticipantEntity {
+export class GroupSessionParticipantEntity extends BaseAuditEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -23,12 +22,6 @@ export class GroupSessionParticipantEntity {
 
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
-
-  @CreateDateColumn({ type: 'timestamptz' })
-  createdAt: Date;
-
-  @UpdateDateColumn({ type: 'timestamptz' })
-  updatedAt: Date;
 
   @ManyToOne(() => GroupSessionEntity, (session) => session.participants)
   @JoinColumn({ name: 'groupSessionId' })

@@ -8,11 +8,11 @@ import {
 
 export class CreateGroupSessionsTables1769610000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // 1. Add max_participants to items
+    // 1. Add maxParticipants to items
     await queryRunner.addColumn(
       'items',
       new TableColumn({
-        name: 'max_participants',
+        name: 'maxParticipants',
         type: 'int',
         default: 1,
       }),
@@ -31,33 +31,33 @@ export class CreateGroupSessionsTables1769610000000 implements MigrationInterfac
             generationStrategy: 'uuid',
           },
           {
-            name: 'tenant_id',
+            name: 'tenantId',
             type: 'uuid',
           },
           {
-            name: 'purchaser_member_id',
+            name: 'purchaserMemberId',
             type: 'uuid',
           },
           {
-            name: 'item_id',
+            name: 'itemId',
             type: 'uuid',
           },
           {
-            name: 'item_name',
+            name: 'itemName',
             type: 'varchar',
           },
           {
-            name: 'source_document_id',
+            name: 'sourceDocumentId',
             type: 'uuid',
             isNullable: true,
           },
           {
-            name: 'source_document_item_id',
+            name: 'sourceDocumentItemId',
             type: 'uuid',
             isNullable: true,
           },
           {
-            name: 'instructor_id',
+            name: 'instructorId',
             type: 'uuid',
             isNullable: true,
           },
@@ -68,33 +68,33 @@ export class CreateGroupSessionsTables1769610000000 implements MigrationInterfac
             default: "'ACTIVE'",
           },
           {
-            name: 'total_sessions',
+            name: 'totalSessions',
             type: 'int',
           },
           {
-            name: 'used_sessions',
+            name: 'usedSessions',
             type: 'int',
             default: 0,
           },
           {
-            name: 'remaining_sessions',
+            name: 'remainingSessions',
             type: 'int',
           },
           {
-            name: 'max_participants',
+            name: 'maxParticipants',
             type: 'int',
           },
           {
-            name: 'start_date',
+            name: 'startDate',
             type: 'date',
           },
           {
-            name: 'expiry_date',
+            name: 'expiryDate',
             type: 'date',
             isNullable: true,
           },
           {
-            name: 'price_paid',
+            name: 'pricePaid',
             type: 'decimal',
             precision: 18,
             scale: 2,
@@ -106,22 +106,32 @@ export class CreateGroupSessionsTables1769610000000 implements MigrationInterfac
             isNullable: true,
           },
           {
-            name: 'created_at',
+            name: 'createdAt',
             type: 'timestamptz',
             default: 'now()',
           },
           {
-            name: 'updated_at',
-            type: 'timestamptz',
-            default: 'now()',
-          },
-          {
-            name: 'created_by_user_id',
+            name: 'createdBy',
             type: 'uuid',
             isNullable: true,
           },
           {
-            name: 'updated_by_user_id',
+            name: 'updatedAt',
+            type: 'timestamptz',
+            default: 'now()',
+          },
+          {
+            name: 'updatedBy',
+            type: 'uuid',
+            isNullable: true,
+          },
+          {
+            name: 'deletedAt',
+            type: 'timestamptz',
+            isNullable: true,
+          },
+          {
+            name: 'deletedBy',
             type: 'uuid',
             isNullable: true,
           },
@@ -132,25 +142,25 @@ export class CreateGroupSessionsTables1769610000000 implements MigrationInterfac
 
     await queryRunner.createForeignKeys('group_sessions', [
       new TableForeignKey({
-        columnNames: ['tenant_id'],
+        columnNames: ['tenantId'],
         referencedColumnNames: ['id'],
         referencedTableName: 'tenants',
         onDelete: 'CASCADE',
       }),
       new TableForeignKey({
-        columnNames: ['purchaser_member_id'],
+        columnNames: ['purchaserMemberId'],
         referencedColumnNames: ['id'],
         referencedTableName: 'members',
         onDelete: 'CASCADE',
       }),
       new TableForeignKey({
-        columnNames: ['item_id'],
+        columnNames: ['itemId'],
         referencedColumnNames: ['id'],
         referencedTableName: 'items',
         onDelete: 'SET NULL',
       }),
       new TableForeignKey({
-        columnNames: ['instructor_id'],
+        columnNames: ['instructorId'],
         referencedColumnNames: ['id'],
         referencedTableName: 'people',
         onDelete: 'SET NULL',
@@ -170,27 +180,47 @@ export class CreateGroupSessionsTables1769610000000 implements MigrationInterfac
             generationStrategy: 'uuid',
           },
           {
-            name: 'group_session_id',
+            name: 'groupSessionId',
             type: 'uuid',
           },
           {
-            name: 'member_id',
+            name: 'memberId',
             type: 'uuid',
           },
           {
-            name: 'is_active',
+            name: 'isActive',
             type: 'boolean',
             default: true,
           },
           {
-            name: 'created_at',
+            name: 'createdAt',
             type: 'timestamptz',
             default: 'now()',
           },
           {
-            name: 'updated_at',
+            name: 'createdBy',
+            type: 'uuid',
+            isNullable: true,
+          },
+          {
+            name: 'updatedAt',
             type: 'timestamptz',
             default: 'now()',
+          },
+          {
+            name: 'updatedBy',
+            type: 'uuid',
+            isNullable: true,
+          },
+          {
+            name: 'deletedAt',
+            type: 'timestamptz',
+            isNullable: true,
+          },
+          {
+            name: 'deletedBy',
+            type: 'uuid',
+            isNullable: true,
           },
         ],
       }),
@@ -199,13 +229,13 @@ export class CreateGroupSessionsTables1769610000000 implements MigrationInterfac
 
     await queryRunner.createForeignKeys('group_session_participants', [
       new TableForeignKey({
-        columnNames: ['group_session_id'],
+        columnNames: ['groupSessionId'],
         referencedColumnNames: ['id'],
         referencedTableName: 'group_sessions',
         onDelete: 'CASCADE',
       }),
       new TableForeignKey({
-        columnNames: ['member_id'],
+        columnNames: ['memberId'],
         referencedColumnNames: ['id'],
         referencedTableName: 'members',
         onDelete: 'CASCADE',
@@ -216,7 +246,7 @@ export class CreateGroupSessionsTables1769610000000 implements MigrationInterfac
     await queryRunner.addColumn(
       'schedule_bookings',
       new TableColumn({
-        name: 'group_session_id',
+        name: 'groupSessionId',
         type: 'uuid',
         isNullable: true,
       }),
@@ -225,7 +255,7 @@ export class CreateGroupSessionsTables1769610000000 implements MigrationInterfac
     await queryRunner.createForeignKey(
       'schedule_bookings',
       new TableForeignKey({
-        columnNames: ['group_session_id'],
+        columnNames: ['groupSessionId'],
         referencedColumnNames: ['id'],
         referencedTableName: 'group_sessions',
         onDelete: 'SET NULL',
@@ -237,12 +267,12 @@ export class CreateGroupSessionsTables1769610000000 implements MigrationInterfac
     // 4. Update schedule_bookings
     const table = await queryRunner.getTable('schedule_bookings');
     const foreignKey = table?.foreignKeys.find(
-      (fk) => fk.columnNames.indexOf('group_session_id') !== -1,
+      (fk) => fk.columnNames.indexOf('groupSessionId') !== -1,
     );
     if (foreignKey) {
       await queryRunner.dropForeignKey('schedule_bookings', foreignKey);
     }
-    await queryRunner.dropColumn('schedule_bookings', 'group_session_id');
+    await queryRunner.dropColumn('schedule_bookings', 'groupSessionId');
 
     // 3. Create group_session_participants table
     await queryRunner.dropTable('group_session_participants');
@@ -250,7 +280,7 @@ export class CreateGroupSessionsTables1769610000000 implements MigrationInterfac
     // 2. Create group_sessions table
     await queryRunner.dropTable('group_sessions');
 
-    // 1. Add max_participants to items
-    await queryRunner.dropColumn('items', 'max_participants');
+    // 1. Add maxParticipants to items
+    await queryRunner.dropColumn('items', 'maxParticipants');
   }
 }
