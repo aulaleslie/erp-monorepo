@@ -77,8 +77,7 @@ export class ScheduleBookingsService {
 
       if (conflict) {
         throw new BadRequestException({
-          message: BOOKING_ERRORS.CONFLICT,
-          error: BOOKING_ERRORS.CONFLICT_DETAIL,
+          ...BOOKING_ERRORS.CONFLICT,
           detail: conflict,
         });
       }
@@ -177,7 +176,7 @@ export class ScheduleBookingsService {
     } = query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    const where: Record<string, any> = { tenantId };
+    const where: FindOptionsWhere<ScheduleBookingEntity> = { tenantId };
     if (trainerId) where.trainerId = trainerId;
     if (memberId) where.memberId = memberId;
     if (status) where.status = status;
@@ -230,8 +229,7 @@ export class ScheduleBookingsService {
 
         if (conflict) {
           throw new BadRequestException({
-            message: BOOKING_ERRORS.CONFLICT,
-            error: BOOKING_ERRORS.CONFLICT_DETAIL,
+            ...BOOKING_ERRORS.CONFLICT,
             detail: conflict,
           });
         }

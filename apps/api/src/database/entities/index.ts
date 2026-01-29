@@ -50,6 +50,8 @@ import { ScheduleBookingEntity } from './schedule-booking.entity';
 import { GroupSessionEntity } from './group-session.entity';
 import { GroupSessionParticipantEntity } from './group-session-participant.entity';
 import { AttendanceRecordEntity } from './attendance-record.entity';
+import { NotificationEntity } from './notification.entity';
+import { NotificationLogEntity } from './notification-log.entity';
 
 export {
   AuditLogEntity,
@@ -103,6 +105,8 @@ export {
   GroupSessionEntity,
   GroupSessionParticipantEntity,
   AttendanceRecordEntity,
+  NotificationEntity,
+  NotificationLogEntity,
 };
 
 export const ALL_ENTITIES = [
@@ -152,4 +156,6 @@ export const ALL_ENTITIES = [
   GroupSessionEntity,
   GroupSessionParticipantEntity,
   AttendanceRecordEntity,
+  NotificationEntity,
+  NotificationLogEntity,
 ];

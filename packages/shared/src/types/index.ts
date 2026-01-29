@@ -10,5 +10,6 @@ export * from './trainer-availability';
 export * from './booking';
 export * from './group-session';
 export * from './attendance';
+export * from './notifications';
 // export * from './sales';
 

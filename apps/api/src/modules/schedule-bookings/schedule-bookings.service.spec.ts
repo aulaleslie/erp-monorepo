@@ -20,8 +20,8 @@ import { BadRequestException } from '@nestjs/common';
 import { ConflictDetail } from './dto/conflict-check.dto';
 
 interface ConflictResponse {
+  code: string;
   message: string;
-  error: string;
   detail: ConflictDetail;
 }
 
@@ -369,7 +369,7 @@ describe('ScheduleBookingsService', () => {
         const response = (
           e as BadRequestException
         ).getResponse() as ConflictResponse;
-        expect(response.message).toBe(BOOKING_ERRORS.CONFLICT);
+        expect(response.code).toBe(BOOKING_ERRORS.CONFLICT.code);
         expect(response.detail.type).toBe(ConflictType.OUTSIDE_AVAILABILITY);
       }
     });
