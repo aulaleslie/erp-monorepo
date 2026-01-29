@@ -49,6 +49,7 @@ import { TenantSchedulingSettingsEntity } from './tenant-scheduling-settings.ent
 import { ScheduleBookingEntity } from './schedule-booking.entity';
 import { GroupSessionEntity } from './group-session.entity';
 import { GroupSessionParticipantEntity } from './group-session-participant.entity';
+import { AttendanceRecordEntity } from './attendance-record.entity';
 
 export {
   AuditLogEntity,
@@ -101,6 +102,7 @@ export {
   ScheduleBookingEntity,
   GroupSessionEntity,
   GroupSessionParticipantEntity,
+  AttendanceRecordEntity,
 };
 
 export const ALL_ENTITIES = [
@@ -149,4 +151,5 @@ export const ALL_ENTITIES = [
   ScheduleBookingEntity,
   GroupSessionEntity,
   GroupSessionParticipantEntity,
+  AttendanceRecordEntity,
 ];

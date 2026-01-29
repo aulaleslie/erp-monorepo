@@ -272,4 +272,15 @@ export const corePermissions: SeedPermission[] = [
     name: 'Manage Group Session Participants',
     group: 'Group Sessions',
   },
+  // Attendance
+  {
+    code: PERMISSIONS.ATTENDANCE.READ,
+    name: 'Read Attendance',
+    group: 'Attendance',
+  },
+  {
+    code: PERMISSIONS.ATTENDANCE.CREATE,
+    name: 'Create Attendance',
+    group: 'Attendance',
+  },
 ];

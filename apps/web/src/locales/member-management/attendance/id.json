@@ -1,0 +1,38 @@
+{
+    "checkIn": {
+        "title": "Check-in Member",
+        "search": {
+            "placeholder": "Cari berdasarkan nama, kode, atau telepon...",
+            "noResults": "Member tidak ditemukan."
+        },
+        "memberCard": {
+            "memberCode": "Kode Member",
+            "expiry": "Berlaku hingga",
+            "status": "Status",
+            "expired": "KADALUWARSA",
+            "active": "AKTIF"
+        },
+        "form": {
+            "type": "Tipe Kehadiran",
+            "notes": "Catatan (Opsional)",
+            "submit": "Check In",
+            "success": "Check-in berhasil",
+            "error": "Check-in gagal"
+        },
+        "types": {
+            "GYM_ENTRY": "Entry Gym",
+            "PT_SESSION": "Sesi PT",
+            "GROUP_CLASS": "Kelas Grup"
+        }
+    },
+    "history": {
+        "title": "Riwayat Kehadiran",
+        "table": {
+            "member": "Member",
+            "type": "Tipe",
+            "checkIn": "Check In",
+            "checkOut": "Check Out",
+            "method": "Metode"
+        }
+    }
+}

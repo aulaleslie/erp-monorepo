@@ -61,6 +61,21 @@ export class MembersService {
     return paginate(items, total, page, limit);
   }
 
+  async lookup(tenantId: string, query: string): Promise<MemberEntity[]> {
+    const qb = this.memberRepository.createQueryBuilder('member');
+    qb.leftJoinAndSelect('member.person', 'person');
+    qb.where('member.tenantId = :tenantId', { tenantId });
+    qb.andWhere(
+      '(member.memberCode = :exactMatch OR person.phone = :exactMatch OR person.fullName ILIKE :partialMatch OR person.email ILIKE :partialMatch)',
+      {
+        exactMatch: query,
+        partialMatch: `%${query}%`,
+      },
+    );
+    qb.take(5);
+    return qb.getMany();
+  }
+
   async findOne(tenantId: string, id: string): Promise<MemberEntity> {
     const member = await this.memberRepository.findOne({
       where: { id, tenantId },

@@ -3,6 +3,7 @@
 import { PageHeader } from "@/components/common/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslations } from "next-intl";
+import { TodayAttendanceWidget } from "@/components/attendance/TodayAttendanceWidget";
 
 export default function DashboardPage() {
     const t = useTranslations("dashboard");
@@ -28,6 +29,7 @@ export default function DashboardPage() {
                         </p>
                     </CardContent>
                 </Card>
+                <TodayAttendanceWidget />
                 {/* Add more cards here */}
             </div>
         </div>

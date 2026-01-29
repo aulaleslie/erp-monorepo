@@ -6,6 +6,7 @@ import selectTenantEn from './select-tenant/en.json';
 import dashboardEn from './dashboard/en.json';
 import memberMembersEn from './member-management/members/en.json';
 import memberSchedulingEn from './member-management/scheduling/en.json';
+import memberAttendanceEn from './member-management/attendance/en.json';
 import inventoryEn from './inventory/en.json';
 import purchaseEn from './purchase/en.json';
 import salesOrdersEn from './sales/orders/en.json';
@@ -32,6 +33,7 @@ import selectTenantId from './select-tenant/id.json';
 import dashboardId from './dashboard/id.json';
 import memberMembersId from './member-management/members/id.json';
 import memberSchedulingId from './member-management/scheduling/id.json';
+import memberAttendanceId from './member-management/attendance/id.json';
 import inventoryId from './inventory/id.json';
 import purchaseId from './purchase/id.json';
 import salesOrdersId from './sales/orders/id.json';
@@ -63,6 +65,7 @@ const en = {
   memberManagement: {
     members: memberMembersEn,
     scheduling: memberSchedulingEn,
+    attendance: memberAttendanceEn,
   },
   inventory: {
     ...inventoryEn.page,
@@ -112,11 +115,11 @@ const en = {
   taxes: setTaxesEn,
   auditLogs: setAuditLogsEn,
   tags: setTagsEn,
-  
+
   // Restore nested-to-root aliases
   authGuard: authEn.guard,
   navbar: layoutEn.navbar,
-  
+
   labels: {
     tenantSettings: setTenantEn.labels,
     tenants: setTenantsEn.labels,
@@ -136,6 +139,7 @@ const id = {
   memberManagement: {
     members: memberMembersId,
     scheduling: memberSchedulingId,
+    attendance: memberAttendanceId,
   },
   inventory: {
     ...inventoryId.page,
