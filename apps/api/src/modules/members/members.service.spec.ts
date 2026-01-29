@@ -286,4 +286,74 @@ describe('MembersService', () => {
       expect(memberRepository.save).not.toHaveBeenCalled();
     });
   });
+
+  describe('lookup', () => {
+    it('should search by memberCode exact match', async () => {
+      const query = 'MBR-123';
+      const mockResult = [
+        { id: '1', memberCode: query, person: { fullName: 'John Doe' } },
+      ];
+      const mockQb = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue(mockResult),
+      };
+
+      memberRepository.createQueryBuilder!.mockReturnValue(mockQb as any);
+
+      const result = await service.lookup(tenantId, query);
+
+      expect(memberRepository.createQueryBuilder).toHaveBeenCalledWith(
+        'member',
+      );
+      expect(mockQb.andWhere).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          exactMatch: query,
+          partialMatch: `%${query}%`,
+        }),
+      );
+      expect(result).toEqual(mockResult);
+    });
+
+    it('should search by fullName partial match', async () => {
+      const query = 'John';
+      const mockResult = [
+        { id: '1', memberCode: 'MBR-001', person: { fullName: 'John Doe' } },
+      ];
+      const mockQb = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue(mockResult),
+      };
+
+      memberRepository.createQueryBuilder!.mockReturnValue(mockQb as any);
+
+      const result = await service.lookup(tenantId, query);
+
+      expect(result).toEqual(mockResult);
+      expect(mockQb.take).toHaveBeenCalledWith(5);
+    });
+
+    it('should limit results to 5', async () => {
+      const query = 'test';
+      const mockQb = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([]),
+      };
+
+      memberRepository.createQueryBuilder!.mockReturnValue(mockQb as any);
+
+      await service.lookup(tenantId, query);
+
+      expect(mockQb.take).toHaveBeenCalledWith(5);
+    });
+  });
 });
