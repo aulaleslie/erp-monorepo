@@ -263,6 +263,11 @@ export const corePermissions: SeedPermission[] = [
     group: 'Group Sessions',
   },
   {
+    code: PERMISSIONS.GROUP_SESSIONS.DELETE,
+    name: 'Delete Group Sessions',
+    group: 'Group Sessions',
+  },
+  {
     code: PERMISSIONS.GROUP_SESSIONS.MANAGE_PARTICIPANTS,
     name: 'Manage Group Session Participants',
     group: 'Group Sessions',

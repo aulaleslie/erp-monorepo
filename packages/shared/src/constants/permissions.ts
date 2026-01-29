@@ -137,6 +137,7 @@ export const PERMISSIONS = {
     CREATE: 'group_sessions.create',
     UPDATE: 'group_sessions.update',
     CANCEL: 'group_sessions.cancel',
+    DELETE: 'group_sessions.delete',
     MANAGE_PARTICIPANTS: 'group_sessions.participants.manage',
   },
 } as const;
@@ -257,5 +258,6 @@ export const ALL_PERMISSION_CODES: PermissionCode[] = [
   PERMISSIONS.GROUP_SESSIONS.CREATE,
   PERMISSIONS.GROUP_SESSIONS.UPDATE,
   PERMISSIONS.GROUP_SESSIONS.CANCEL,
+  PERMISSIONS.GROUP_SESSIONS.DELETE,
   PERMISSIONS.GROUP_SESSIONS.MANAGE_PARTICIPANTS,
 ];
