@@ -257,6 +257,12 @@ export class MembersService {
 
     if (currentDate !== newDate) {
       member.currentExpiryDate = date;
+
+      // If no active memberships, set status to EXPIRED
+      if (date === null && member.status === MemberStatus.ACTIVE) {
+        member.status = MemberStatus.EXPIRED;
+      }
+
       await this.memberRepository.save(member);
     }
   }

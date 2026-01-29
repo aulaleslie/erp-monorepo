@@ -356,4 +356,59 @@ describe('MembersService', () => {
       expect(mockQb.take).toHaveBeenCalledWith(5);
     });
   });
+
+  describe('updateCurrentExpiryDate', () => {
+    it('should update currentExpiryDate and transition to EXPIRED if date is null', async () => {
+      const memberId = 'member-1';
+      const member = {
+        id: memberId,
+        tenantId,
+        status: MemberStatus.ACTIVE,
+        currentExpiryDate: new Date(),
+      };
+
+      memberRepository.findOne!.mockResolvedValue(member);
+      memberRepository.save!.mockResolvedValue(member);
+
+      await service.updateCurrentExpiryDate(tenantId, memberId, null);
+
+      expect(member.currentExpiryDate).toBeNull();
+      expect(member.status).toBe(MemberStatus.EXPIRED);
+      expect(memberRepository.save).toHaveBeenCalled();
+    });
+
+    it('should not transition to EXPIRED if already NOT ACTIVE', async () => {
+      const memberId = 'member-1';
+      const member = {
+        id: memberId,
+        tenantId,
+        status: MemberStatus.NEW,
+        currentExpiryDate: new Date(),
+      };
+
+      memberRepository.findOne!.mockResolvedValue(member);
+      memberRepository.save!.mockResolvedValue(member);
+
+      await service.updateCurrentExpiryDate(tenantId, memberId, null);
+
+      expect(member.currentExpiryDate).toBeNull();
+      expect(member.status).toBe(MemberStatus.NEW);
+    });
+
+    it('should not save if currentExpiryDate has not changed', async () => {
+      const memberId = 'member-1';
+      const date = new Date('2025-01-01');
+      const member = {
+        id: memberId,
+        tenantId,
+        currentExpiryDate: date,
+      };
+
+      memberRepository.findOne!.mockResolvedValue(member);
+
+      await service.updateCurrentExpiryDate(tenantId, memberId, date);
+
+      expect(memberRepository.save).not.toHaveBeenCalled();
+    });
+  });
 });
