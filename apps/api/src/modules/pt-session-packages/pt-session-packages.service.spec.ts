@@ -141,7 +141,7 @@ describe('PtSessionPackagesService', () => {
         status: PtPackageStatus.ACTIVE,
         expiryDate: new Date('2024-01-01'),
         save: jest.fn(),
-      } as any;
+      } as unknown as PtPackageEntity;
 
       mockRepository.find = jest.fn().mockResolvedValue([expiredPackage]);
       mockRepository.save = jest.fn().mockResolvedValue(expiredPackage);
@@ -152,7 +152,7 @@ describe('PtSessionPackagesService', () => {
         expect.objectContaining({
           where: {
             status: PtPackageStatus.ACTIVE,
-            expiryDate: expect.anything(),
+            expiryDate: expect.anything() as Date,
           },
         }),
       );
