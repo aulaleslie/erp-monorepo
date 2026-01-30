@@ -1,6 +1,10 @@
 {
   "page": {
     "title": "Scheduling",
+    "availability": {
+      "title": "Trainer Availability",
+      "description": "Manage trainer weekly schedules and date overrides."
+    },
     "comingSoon": {
       "title": "Scheduling Module Coming Soon",
       "description": "Manage classes, sessions, and trainer schedules efficiently."
