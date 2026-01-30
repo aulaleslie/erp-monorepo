@@ -19,6 +19,7 @@ import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { MembershipsList } from "@/components/members/MembershipsList";
+import { PtPackagesList } from "@/components/members/PtPackagesList";
 
 export default function MemberDetailPage() {
     const { id } = useParams() as { id: string };
@@ -236,32 +237,17 @@ export default function MemberDetailPage() {
 
                 <TabsContent value="pt-packages">
                     <Card>
-                        <CardHeader>
-                            <CardTitle>PT Packages</CardTitle>
-                            <CardDescription>Personal training session packages.</CardDescription>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                            <div>
+                                <CardTitle>PT Packages</CardTitle>
+                                <CardDescription>Personal training session packages.</CardDescription>
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <DataTable
-                                columns={[
-                                    { header: "Item", accessorKey: "itemName" as any },
-                                    { header: "Trainer", cell: (p) => p.trainer?.fullName || "—" },
-                                    {
-                                        header: "Status",
-                                        cell: (p) => (
-                                            <Badge variant="outline" className={p.status === "ACTIVE" ? "text-green-500" : "text-gray-500"}>
-                                                {p.status}
-                                            </Badge>
-                                        )
-                                    },
-                                    { header: "Sessions", cell: (p) => `${p.usedSessions} / ${p.totalSessions}` },
-                                    { header: "Remaining", cell: (p) => p.remainingSessions },
-                                    {
-                                        header: "Expiry",
-                                        cell: (p) => p.expiryDate ? format(new Date(p.expiryDate), "dd MMM yyyy") : "—"
-                                    },
-                                ]}
-                                data={ptPackages}
-                                emptyMessage="No PT packages found."
+                            <PtPackagesList
+                                memberId={id}
+                                ptPackages={ptPackages}
+                                onRefresh={fetchData}
                             />
                         </CardContent>
                     </Card>
