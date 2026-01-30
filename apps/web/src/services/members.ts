@@ -6,7 +6,8 @@ import type {
     Membership,
     CreateMembershipDto,
     PtSessionPackage,
-    CreatePtPackageDto
+    CreatePtPackageDto,
+    UpdatePtPackageDto
 } from '@gym-monorepo/shared';
 
 export interface MemberLookupResult {
@@ -93,6 +94,11 @@ export const MembersService = {
 
     cancelPtPackage: async (id: string): Promise<PtSessionPackage> => {
         const { data } = await api.post(`/pt-packages/${id}/cancel`);
+        return data;
+    },
+
+    updatePtPackage: async (id: string, payload: UpdatePtPackageDto): Promise<PtSessionPackage> => {
+        const { data } = await api.put(`/pt-packages/${id}`, payload);
         return data;
     },
 };

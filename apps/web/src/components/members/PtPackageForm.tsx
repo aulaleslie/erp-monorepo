@@ -127,7 +127,7 @@ export function PtPackageForm({ memberId, onSuccess, onCancel }: PtPackageFormPr
             const payload: CreatePtPackageDto = {
                 memberId,
                 itemId: formData.itemId,
-                trainerId: formData.trainerId,
+                preferredTrainerId: formData.trainerId,
                 totalSessions: formData.totalSessions,
                 startDate: formData.startDate,
                 expiryDate: formData.expiryDate || undefined,

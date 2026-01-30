@@ -5,7 +5,7 @@ import { PtSessionPackage, PtPackageStatus } from "@gym-monorepo/shared";
 import { DataTable } from "@/components/common/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Plus, XCircle, FileText, Loader2 } from "lucide-react";
+import { Plus, XCircle, FileText, Loader2, User as UserIcon } from "lucide-react";
 import { format } from "date-fns";
 import Link from "next/link";
 import {
@@ -29,6 +29,16 @@ import {
 import { PtPackageForm } from "./PtPackageForm";
 import { useToast } from "@/hooks/use-toast";
 import { MembersService } from "@/services/members";
+import { peopleService, PersonListItem } from "@/services/people";
+import { PeopleType } from "@gym-monorepo/shared";
+import { Label } from "@/components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 interface PtPackagesListProps {
     memberId: string;
@@ -40,7 +50,59 @@ export function PtPackagesList({ memberId, ptPackages, onRefresh }: PtPackagesLi
     const { toast } = useToast();
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [packageToCancel, setPackageToCancel] = useState<PtSessionPackage | null>(null);
+    const [packageToChangeTrainer, setPackageToChangeTrainer] = useState<PtSessionPackage | null>(null);
+    const [trainers, setTrainers] = useState<PersonListItem[]>([]);
+    const [selectedTrainerId, setSelectedTrainerId] = useState<string>("");
+    const [loadingTrainers, setLoadingTrainers] = useState(false);
     const [cancelling, setCancelling] = useState(false);
+    const [updatingTrainer, setUpdatingTrainer] = useState(false);
+
+    const loadTrainers = async () => {
+        setLoadingTrainers(true);
+        try {
+            const response = await peopleService.list({
+                page: 1,
+                limit: 100,
+                type: PeopleType.STAFF
+            });
+            setTrainers(response.items);
+        } catch (error) {
+            console.error("Failed to load trainers", error);
+            toast({
+                title: "Error",
+                description: "Failed to load trainers.",
+                variant: "destructive",
+            });
+        } finally {
+            setLoadingTrainers(false);
+        }
+    };
+
+    const handleChangeTrainer = async () => {
+        if (!packageToChangeTrainer || !selectedTrainerId) return;
+
+        setUpdatingTrainer(true);
+        try {
+            await MembersService.updatePtPackage(packageToChangeTrainer.id, {
+                preferredTrainerId: selectedTrainerId
+            });
+            toast({
+                title: "Success",
+                description: "Trainer updated successfully.",
+            });
+            onRefresh();
+            setPackageToChangeTrainer(null);
+        } catch (error) {
+            console.error("Failed to update trainer", error);
+            toast({
+                title: "Error",
+                description: "Failed to update trainer.",
+                variant: "destructive",
+            });
+        } finally {
+            setUpdatingTrainer(false);
+        }
+    };
 
     const handleCancel = async () => {
         if (!packageToCancel) return;
@@ -108,7 +170,7 @@ export function PtPackagesList({ memberId, ptPackages, onRefresh }: PtPackagesLi
                     },
                     {
                         header: "Trainer",
-                        cell: (p) => p.trainer?.fullName || "—"
+                        cell: (p) => p.preferredTrainer?.fullName || "—"
                     },
                     {
                         header: "Status",
@@ -163,14 +225,30 @@ export function PtPackagesList({ memberId, ptPackages, onRefresh }: PtPackagesLi
                         cell: (p) => (
                             <div className="flex justify-end gap-2">
                                 {p.status === PtPackageStatus.ACTIVE && (
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                        onClick={() => setPackageToCancel(p)}
-                                    >
-                                        <XCircle className="h-4 w-4" />
-                                    </Button>
+                                    <>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10"
+                                            onClick={() => {
+                                                setPackageToChangeTrainer(p);
+                                                setSelectedTrainerId(p.preferredTrainerId || "");
+                                                loadTrainers();
+                                            }}
+                                            title="Change Trainer"
+                                        >
+                                            <UserIcon className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                            onClick={() => setPackageToCancel(p)}
+                                            title="Cancel Package"
+                                        >
+                                            <XCircle className="h-4 w-4" />
+                                        </Button>
+                                    </>
                                 )}
                             </div>
                         )
@@ -205,6 +283,58 @@ export function PtPackagesList({ memberId, ptPackages, onRefresh }: PtPackagesLi
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
+            <Dialog open={!!packageToChangeTrainer} onOpenChange={(open) => !open && setPackageToChangeTrainer(null)}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Change Trainer</DialogTitle>
+                        <DialogDescription>
+                            Select a new trainer for this PT package.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label>Current Package</Label>
+                            <div className="text-sm font-medium">{packageToChangeTrainer?.itemName}</div>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="trainer">New Trainer</Label>
+                            <Select
+                                value={selectedTrainerId}
+                                onValueChange={setSelectedTrainerId}
+                                disabled={loadingTrainers || updatingTrainer}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder={loadingTrainers ? "Loading trainers..." : "Select a trainer"} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {trainers.map((trainer) => (
+                                        <SelectItem key={trainer.id} value={trainer.id}>
+                                            {trainer.fullName}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                    <div className="flex justify-end gap-3">
+                        <Button
+                            variant="outline"
+                            onClick={() => setPackageToChangeTrainer(null)}
+                            disabled={updatingTrainer}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleChangeTrainer}
+                            disabled={updatingTrainer || !selectedTrainerId || selectedTrainerId === packageToChangeTrainer?.preferredTrainerId}
+                        >
+                            {updatingTrainer && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Update Trainer
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
