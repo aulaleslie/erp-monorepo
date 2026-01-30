@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { PermissionGuard } from "@/components/guards/PermissionGuard";
+import { PERMISSIONS } from "@gym-monorepo/shared";
 import { MemberForm } from "@/components/members/member-form";
 import { MembersService } from "@/services/members";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -35,15 +37,24 @@ export default function NewMemberPage() {
     };
 
     return (
-        <div className="flex-1 space-y-4 p-8 pt-6">
-            <PageHeader
-                title="New Member"
-                description="Register a new person as a member"
-                showBackButton
-            />
-            <div className="max-w-3xl mx-auto">
-                <MemberForm onSubmit={handleSubmit} isLoading={loading} />
+        <PermissionGuard
+            requiredPermissions={[PERMISSIONS.MEMBERS.CREATE]}
+            fallback={
+                <div className="flex-1 space-y-4 p-8 pt-6">
+                    <p className="text-muted-foreground">You do not have permission to create members.</p>
+                </div>
+            }
+        >
+            <div className="flex-1 space-y-4 p-8 pt-6">
+                <PageHeader
+                    title="New Member"
+                    description="Register a new person as a member"
+                    showBackButton
+                />
+                <div className="max-w-3xl mx-auto">
+                    <MemberForm onSubmit={handleSubmit} isLoading={loading} />
+                </div>
             </div>
-        </div>
+        </PermissionGuard>
     );
 }

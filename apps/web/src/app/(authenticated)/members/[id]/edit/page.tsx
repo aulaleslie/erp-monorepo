@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { PermissionGuard } from "@/components/guards/PermissionGuard";
+import { PERMISSIONS } from "@gym-monorepo/shared";
 import { MemberForm } from "@/components/members/member-form";
 import { MembersService } from "@/services/members";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -68,19 +70,28 @@ export default function EditMemberPage() {
     if (!member) return null;
 
     return (
-        <div className="flex-1 space-y-4 p-8 pt-6">
-            <PageHeader
-                title={`Edit Member: ${member.person?.fullName}`}
-                description="Update member status and information"
-                showBackButton
-            />
-            <div className="max-w-3xl mx-auto">
-                <MemberForm
-                    initialData={member}
-                    onSubmit={handleSubmit}
-                    isLoading={submitting}
+        <PermissionGuard
+            requiredPermissions={[PERMISSIONS.MEMBERS.UPDATE]}
+            fallback={
+                <div className="flex-1 space-y-4 p-8 pt-6">
+                    <p className="text-muted-foreground">You do not have permission to edit members.</p>
+                </div>
+            }
+        >
+            <div className="flex-1 space-y-4 p-8 pt-6">
+                <PageHeader
+                    title={`Edit Member: ${member.person?.fullName}`}
+                    description="Update member status and information"
+                    showBackButton
                 />
+                <div className="max-w-3xl mx-auto">
+                    <MemberForm
+                        initialData={member}
+                        onSubmit={handleSubmit}
+                        isLoading={submitting}
+                    />
+                </div>
             </div>
-        </div>
+        </PermissionGuard>
     );
 }

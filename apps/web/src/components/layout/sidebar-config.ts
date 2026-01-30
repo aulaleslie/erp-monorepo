@@ -57,6 +57,8 @@ export const sidebarConfig: SidebarItem[] = [
                 labelKey: "members",
                 icon: UserCheck,
                 href: "/members",
+                permissions: ["members.read"],
+                routePermissions: ["members.read"],
             },
             {
                 label: "Scheduling",
@@ -143,7 +145,7 @@ export const sidebarConfig: SidebarItem[] = [
                         href: "/sales/invoices/approvals",
                         permissions: ["sales.read"],
                     },
-                     {
+                    {
                         label: "Configuration",
                         labelKey: "approvalConfig",
                         icon: Settings,
