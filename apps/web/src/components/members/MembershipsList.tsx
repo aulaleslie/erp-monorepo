@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Plus, XCircle, FileText, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import Link from "next/link";
 import {
     Dialog,
     DialogContent,
@@ -138,10 +139,13 @@ export function MembershipsList({ memberId, memberships, onRefresh }: Membership
                         cell: (m) => (
                             <div className="flex items-center gap-1 text-muted-foreground">
                                 {m.sourceDocumentId ? (
-                                    <>
+                                    <Link
+                                        href={`/sales/invoices/${m.sourceDocumentId}`}
+                                        className="flex items-center gap-1 text-primary hover:underline cursor-pointer"
+                                    >
                                         <FileText className="h-3 w-3" />
-                                        <span className="text-xs text-primary hover:underline cursor-pointer">Invoice</span>
-                                    </>
+                                        <span className="text-xs">Invoice</span>
+                                    </Link>
                                 ) : (
                                     <span className="text-xs italic">Manual</span>
                                 )}
