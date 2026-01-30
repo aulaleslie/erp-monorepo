@@ -4,6 +4,7 @@ import type {
     CreateMemberDto,
     UpdateMemberDto,
     Membership,
+    CreateMembershipDto,
     PtSessionPackage
 } from '@gym-monorepo/shared';
 
@@ -71,6 +72,16 @@ export const MembersService = {
 
     getHistory: async (id: string): Promise<Record<string, unknown>[]> => {
         const { data } = await api.get(`/members/${id}/history`);
+        return data;
+    },
+
+    createMembership: async (payload: CreateMembershipDto): Promise<Membership> => {
+        const { data } = await api.post('/memberships', payload);
+        return data;
+    },
+
+    cancelMembership: async (id: string): Promise<Membership> => {
+        const { data } = await api.post(`/memberships/${id}/cancel`);
         return data;
     },
 };

@@ -18,6 +18,7 @@ import { getProfileCompletion } from "../columns";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { MembershipsList } from "@/components/members/MembershipsList";
 
 export default function MemberDetailPage() {
     const { id } = useParams() as { id: string };
@@ -217,30 +218,17 @@ export default function MemberDetailPage() {
 
                 <TabsContent value="memberships">
                     <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
                             <div>
-                                <CardTitle>Memberships</CardTitle>
-                                <CardDescription>All membership plans linked to this member.</CardDescription>
+                                <CardTitle>Membership Management</CardTitle>
+                                <CardDescription>View, create, and cancel memberships for this member.</CardDescription>
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <DataTable
-                                columns={[
-                                    { header: "Item", accessorKey: "itemName" as any },
-                                    {
-                                        header: "Status",
-                                        cell: (m) => (
-                                            <Badge variant="outline" className={m.status === "ACTIVE" ? "text-green-500" : "text-gray-500"}>
-                                                {m.status}
-                                            </Badge>
-                                        )
-                                    },
-                                    { header: "Start Date", cell: (m) => format(new Date(m.startDate), "dd MMM yyyy") },
-                                    { header: "End Date", cell: (m) => format(new Date(m.endDate), "dd MMM yyyy") },
-                                    { header: "Price", cell: (m) => `$${m.price}` },
-                                ]}
-                                data={memberships}
-                                emptyMessage="No memberships found."
+                            <MembershipsList
+                                memberId={id}
+                                memberships={memberships}
+                                onRefresh={fetchData}
                             />
                         </CardContent>
                     </Card>

@@ -23,8 +23,9 @@ export interface Membership {
   status: MembershipStatus;
   startDate: string;
   endDate: string;
-  price: number;
+  pricePaid: number;
   sourceDocumentId: string | null;
+  notes?: string | null;
   createdAt: string;
   updatedAt: string;
   item?: {
@@ -37,6 +38,6 @@ export interface CreateMembershipDto {
   memberId: string;
   itemId: string;
   startDate?: string;
-  price?: number;
+  pricePaid?: number;
   notes?: string;
 }
