@@ -14,10 +14,29 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { format } from "date-fns";
+import { format, isAfter, isBefore, addDays, startOfDay } from "date-fns";
 import { Column } from "@/components/common/DataTable";
+import { MemberActions } from "./MemberActions";
+import { Progress } from "@/components/ui/progress";
 
-export const columns: Column<Member>[] = [
+export const getProfileCompletion = (member: Member): number => {
+    const fields = [
+        member.person?.fullName,
+        member.person?.email,
+        member.person?.phone,
+        member.person?.avatarUrl,
+        member.agreedToTerms,
+    ];
+
+    const completed = fields.filter((field) => {
+        if (typeof field === "boolean") return field === true;
+        return !!field;
+    }).length;
+
+    return Math.round((completed / fields.length) * 100);
+};
+
+export const getColumns = (onUpdate?: () => void): Column<Member>[] => [
     {
         header: "Code",
         accessorKey: "code",
@@ -57,47 +76,45 @@ export const columns: Column<Member>[] = [
     {
         header: "Expiry Date",
         cell: (member) => {
-            const date = member.currentExpiryDate;
-            if (!date) return "—";
-            return format(new Date(date), "dd MMM yyyy");
+            const dateStr = member.currentExpiryDate;
+            if (!dateStr) return "—";
+
+            const expiryDate = new Date(dateStr);
+            const today = startOfDay(new Date());
+            const sevenDaysFromNow = addDays(today, 7);
+
+            const isExpired = isBefore(expiryDate, today);
+            const isExpiringSoon = !isExpired && isBefore(expiryDate, sevenDaysFromNow);
+
+            let colorClass = "";
+            if (isExpired) {
+                colorClass = "text-red-500 font-medium";
+            } else if (isExpiringSoon) {
+                colorClass = "text-orange-500 font-medium";
+            }
+
+            return (
+                <span className={colorClass}>
+                    {format(expiryDate, "dd MMM yyyy")}
+                </span>
+            );
+        },
+    },
+    {
+        header: "Profile %",
+        cell: (member) => {
+            const completion = getProfileCompletion(member);
+            return (
+                <div className="flex items-center gap-2 min-w-[100px]">
+                    <Progress value={completion} className="h-2" />
+                    <span className="text-xs text-muted-foreground">{completion}%</span>
+                </div>
+            );
         },
     },
     {
         header: "Actions",
         className: "text-right",
-        cell: (member) => {
-            return (
-                <div className="flex justify-end">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem asChild>
-                                <Link href={`/members/${member.id}`} className="flex items-center gap-2">
-                                    <Eye className="h-4 w-4" />
-                                    View Details
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href={`/members/${member.id}/edit`} className="flex items-center gap-2">
-                                    <Edit className="h-4 w-4" />
-                                    Edit Member
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-destructive flex items-center gap-2">
-                                <Trash2 className="h-4 w-4" />
-                                Deactivate
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
-            );
-        },
+        cell: (member) => <MemberActions member={member} onUpdate={onUpdate} />,
     },
 ];

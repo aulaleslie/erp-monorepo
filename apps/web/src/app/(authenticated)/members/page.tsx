@@ -18,7 +18,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { DataTable } from "@/components/common/DataTable";
-import { columns } from "./columns";
+import { getColumns } from "./columns";
 import { usePermissions } from "@/hooks/use-permissions";
 import { PERMISSIONS } from "@gym-monorepo/shared";
 
@@ -52,7 +52,9 @@ export default function MembersPage() {
         } finally {
             setLoading(false);
         }
-    }, [pagination, search, status]);
+    }, [pagination.page, pagination.limit, search, status]); // Fixed dependency array
+
+    const columns = React.useMemo(() => getColumns(fetchMembers), [fetchMembers]);
 
     useEffect(() => {
         fetchMembers();
