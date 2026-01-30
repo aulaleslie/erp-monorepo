@@ -14,6 +14,10 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import Link from "next/link";
 import { DataTable } from "@/components/common/DataTable";
+import { getProfileCompletion } from "../columns";
+import { Progress } from "@/components/ui/progress";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 export default function MemberDetailPage() {
     const { id } = useParams() as { id: string };
@@ -26,34 +30,57 @@ export default function MemberDetailPage() {
     const [history, setHistory] = useState<Record<string, unknown>[]>([]);
     const [loading, setLoading] = useState(true);
 
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const [memberData, membershipData, ptData, attendanceData, historyData] = await Promise.all([
+                MembersService.findOne(id),
+                MembersService.getMemberships(id),
+                MembersService.getPtPackages(id),
+                MembersService.getAttendance(id, { limit: 5 }),
+                MembersService.getHistory(id)
+            ]);
+            setMember(memberData);
+            setMemberships(membershipData);
+            setPtPackages(ptData);
+            setAttendance(attendanceData.items || []);
+            setHistory(historyData);
+        } catch (error: unknown) {
+            toast({
+                title: "Error",
+                description: "Failed to fetch member details.",
+                variant: "destructive",
+            });
+            router.push("/members");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [memberData, membershipData, ptData, attendanceData, historyData] = await Promise.all([
-                    MembersService.findOne(id),
-                    MembersService.getMemberships(id),
-                    MembersService.getPtPackages(id),
-                    MembersService.getAttendance(id, { limit: 5 }),
-                    MembersService.getHistory(id)
-                ]);
-                setMember(memberData);
-                setMemberships(membershipData);
-                setPtPackages(ptData);
-                setAttendance(attendanceData.items || []);
-                setHistory(historyData);
-            } catch (error: unknown) {
-                toast({
-                    title: "Error",
-                    description: "Failed to fetch member details.",
-                    variant: "destructive",
-                });
-                router.push("/members");
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchData();
     }, [id, router, toast]);
+
+    const handleAgreeToTerms = async (checked: boolean) => {
+        if (!member) return;
+        try {
+            const updated = await MembersService.update(member.id, { agreedToTerms: checked });
+            setMember(updated);
+            toast({
+                title: "Success",
+                description: checked ? "Terms agreement recorded." : "Terms agreement removed.",
+            });
+            // Refresh history after status change
+            const historyData = await MembersService.getHistory(id);
+            setHistory(historyData);
+        } catch (error: unknown) {
+            toast({
+                title: "Error",
+                description: "Failed to update terms agreement.",
+                variant: "destructive",
+            });
+        }
+    };
 
     if (loading) {
         return (
@@ -119,46 +146,63 @@ export default function MemberDetailPage() {
                             <CardHeader>
                                 <CardTitle>Contact Details</CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-2">
-                                <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Email:</span>
-                                    <span>{member.person?.email || "—"}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Phone:</span>
-                                    <span>{member.person?.phone || "—"}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Member Since:</span>
-                                    <span>{format(new Date(member.createdAt), "dd MMM yyyy")}</span>
+                            <CardContent className="space-y-4">
+                                <div className="space-y-2">
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Email:</span>
+                                        <span className="font-medium">{member.person?.email || "—"}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Phone:</span>
+                                        <span className="font-medium">{member.person?.phone || "—"}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Member Since:</span>
+                                        <span className="font-medium">{format(new Date(member.createdAt), "dd MMM yyyy")}</span>
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>
 
                         <Card>
                             <CardHeader>
-                                <CardTitle>Current Status</CardTitle>
+                                <CardTitle>Status & Completion</CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-2">
-                                <div className="flex justify-between font-medium">
-                                    <span className="text-muted-foreground font-normal">Expiry Date:</span>
-                                    <span className={member.currentExpiryDate && new Date(member.currentExpiryDate) < new Date() ? "text-destructive" : ""}>
-                                        {member.currentExpiryDate ? format(new Date(member.currentExpiryDate), "dd MMM yyyy") : "No active membership"}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Terms Agreed:</span>
-                                    <span>{member.agreedToTerms ? "Yes" : "No"}</span>
-                                </div>
-                                {member.agreedAt && (
-                                    <div className="flex justify-between text-xs text-muted-foreground">
-                                        <span>Agreed on {format(new Date(member.agreedAt), "dd MMM yyyy HH:mm")}</span>
+                            <CardContent className="space-y-4">
+                                <div className="space-y-2">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-muted-foreground">Profile Completion:</span>
+                                        <span className="text-xs font-bold">{getProfileCompletion(member)}%</span>
                                     </div>
-                                )}
+                                    <Progress value={getProfileCompletion(member)} className="h-2" />
+                                </div>
+                                <div className="space-y-2 pt-2 border-t">
+                                    <div className="flex justify-between font-medium">
+                                        <span className="text-muted-foreground font-normal">Expiry Date:</span>
+                                        <span className={member.currentExpiryDate && new Date(member.currentExpiryDate) < new Date() ? "text-destructive" : ""}>
+                                            {member.currentExpiryDate ? format(new Date(member.currentExpiryDate), "dd MMM yyyy") : "No active membership"}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center space-x-2 pt-1">
+                                        <Checkbox
+                                            id="terms"
+                                            checked={member.agreedToTerms}
+                                            onCheckedChange={(checked) => handleAgreeToTerms(checked as boolean)}
+                                        />
+                                        <Label htmlFor="terms" className="text-sm font-medium leading-none cursor-pointer">
+                                            Agreed to Terms & Conditions
+                                        </Label>
+                                    </div>
+                                    {member.agreedAt && (
+                                        <div className="text-[10px] text-muted-foreground pl-6">
+                                            Agreed on {format(new Date(member.agreedAt), "dd MMM yyyy HH:mm")}
+                                        </div>
+                                    )}
+                                </div>
                             </CardContent>
                         </Card>
 
-                        <Card>
+                        <Card className="md:col-span-2 lg:col-span-1">
                             <CardHeader>
                                 <CardTitle>Internal Notes</CardTitle>
                             </CardHeader>
