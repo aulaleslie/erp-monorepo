@@ -1,0 +1,289 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { MembersService } from "@/services/members";
+import { PageHeader } from "@/components/common/PageHeader";
+import { useToast } from "@/hooks/use-toast";
+import { Member, Membership, PtSessionPackage, MemberStatus } from "@gym-monorepo/shared";
+import { Loader2, Edit, Calendar, Package, Clock, History as HistoryIcon, User as UserIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
+import Link from "next/link";
+import { DataTable } from "@/components/common/DataTable";
+
+export default function MemberDetailPage() {
+    const { id } = useParams() as { id: string };
+    const router = useRouter();
+    const { toast } = useToast();
+    const [member, setMember] = useState<Member | null>(null);
+    const [memberships, setMemberships] = useState<Membership[]>([]);
+    const [ptPackages, setPtPackages] = useState<PtSessionPackage[]>([]);
+    const [attendance, setAttendance] = useState<Record<string, unknown>[]>([]);
+    const [history, setHistory] = useState<Record<string, unknown>[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [memberData, membershipData, ptData, attendanceData, historyData] = await Promise.all([
+                    MembersService.findOne(id),
+                    MembersService.getMemberships(id),
+                    MembersService.getPtPackages(id),
+                    MembersService.getAttendance(id, { limit: 5 }),
+                    MembersService.getHistory(id)
+                ]);
+                setMember(memberData);
+                setMemberships(membershipData);
+                setPtPackages(ptData);
+                setAttendance(attendanceData.items || []);
+                setHistory(historyData);
+            } catch (error: unknown) {
+                toast({
+                    title: "Error",
+                    description: "Failed to fetch member details.",
+                    variant: "destructive",
+                });
+                router.push("/members");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, [id, router, toast]);
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+        );
+    }
+
+    if (!member) return null;
+
+    return (
+        <div className="flex-1 space-y-4 p-8 pt-6">
+            <PageHeader
+                title={`${member.person?.fullName} (${member.code})`}
+                description="View and manage member details"
+                showBackButton
+            >
+                <div className="flex items-center gap-2">
+                    <Badge variant="outline" className={
+                        member.status === MemberStatus.ACTIVE ? "bg-green-500/10 text-green-500" :
+                            member.status === MemberStatus.EXPIRED ? "bg-red-500/10 text-red-500" :
+                                "bg-gray-500/10 text-gray-500"
+                    }>
+                        {member.status}
+                    </Badge>
+                    <Button variant="outline" size="sm" asChild>
+                        <Link href={`/members/${id}/edit`}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit
+                        </Link>
+                    </Button>
+                </div>
+            </PageHeader>
+
+            <Tabs defaultValue="overview" className="space-y-4">
+                <TabsList>
+                    <TabsTrigger value="overview" className="flex items-center gap-2">
+                        <UserIcon className="h-4 w-4" />
+                        Overview
+                    </TabsTrigger>
+                    <TabsTrigger value="memberships" className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        Memberships
+                    </TabsTrigger>
+                    <TabsTrigger value="pt-packages" className="flex items-center gap-2">
+                        <Package className="h-4 w-4" />
+                        PT Packages
+                    </TabsTrigger>
+                    <TabsTrigger value="attendance" className="flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        Attendance
+                    </TabsTrigger>
+                    <TabsTrigger value="history" className="flex items-center gap-2">
+                        <HistoryIcon className="h-4 w-4" />
+                        History
+                    </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="overview" className="space-y-4">
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Contact Details</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-2">
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Email:</span>
+                                    <span>{member.person?.email || "—"}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Phone:</span>
+                                    <span>{member.person?.phone || "—"}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Member Since:</span>
+                                    <span>{format(new Date(member.createdAt), "dd MMM yyyy")}</span>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Current Status</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-2">
+                                <div className="flex justify-between font-medium">
+                                    <span className="text-muted-foreground font-normal">Expiry Date:</span>
+                                    <span className={member.currentExpiryDate && new Date(member.currentExpiryDate) < new Date() ? "text-destructive" : ""}>
+                                        {member.currentExpiryDate ? format(new Date(member.currentExpiryDate), "dd MMM yyyy") : "No active membership"}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Terms Agreed:</span>
+                                    <span>{member.agreedToTerms ? "Yes" : "No"}</span>
+                                </div>
+                                {member.agreedAt && (
+                                    <div className="flex justify-between text-xs text-muted-foreground">
+                                        <span>Agreed on {format(new Date(member.agreedAt), "dd MMM yyyy HH:mm")}</span>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Internal Notes</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-sm text-muted-foreground italic whitespace-pre-wrap">
+                                    {member.notes || "No notes available."}
+                                </p>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </TabsContent>
+
+                <TabsContent value="memberships">
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                            <div>
+                                <CardTitle>Memberships</CardTitle>
+                                <CardDescription>All membership plans linked to this member.</CardDescription>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <DataTable
+                                columns={[
+                                    { header: "Item", accessorKey: "itemName" as any },
+                                    {
+                                        header: "Status",
+                                        cell: (m) => (
+                                            <Badge variant="outline" className={m.status === "ACTIVE" ? "text-green-500" : "text-gray-500"}>
+                                                {m.status}
+                                            </Badge>
+                                        )
+                                    },
+                                    { header: "Start Date", cell: (m) => format(new Date(m.startDate), "dd MMM yyyy") },
+                                    { header: "End Date", cell: (m) => format(new Date(m.endDate), "dd MMM yyyy") },
+                                    { header: "Price", cell: (m) => `$${m.price}` },
+                                ]}
+                                data={memberships}
+                                emptyMessage="No memberships found."
+                            />
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                <TabsContent value="pt-packages">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>PT Packages</CardTitle>
+                            <CardDescription>Personal training session packages.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <DataTable
+                                columns={[
+                                    { header: "Item", accessorKey: "itemName" as any },
+                                    { header: "Trainer", cell: (p) => p.trainer?.fullName || "—" },
+                                    {
+                                        header: "Status",
+                                        cell: (p) => (
+                                            <Badge variant="outline" className={p.status === "ACTIVE" ? "text-green-500" : "text-gray-500"}>
+                                                {p.status}
+                                            </Badge>
+                                        )
+                                    },
+                                    { header: "Sessions", cell: (p) => `${p.usedSessions} / ${p.totalSessions}` },
+                                    { header: "Remaining", cell: (p) => p.remainingSessions },
+                                    {
+                                        header: "Expiry",
+                                        cell: (p) => p.expiryDate ? format(new Date(p.expiryDate), "dd MMM yyyy") : "—"
+                                    },
+                                ]}
+                                data={ptPackages}
+                                emptyMessage="No PT packages found."
+                            />
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                <TabsContent value="attendance">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Recent Attendance</CardTitle>
+                            <CardDescription>Last 5 check-in records.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <DataTable
+                                columns={[
+                                    { header: "Type", accessorKey: "attendanceType" as keyof Record<string, unknown> },
+                                    { header: "Check-in", cell: (a: Record<string, any>) => format(new Date(a.checkInAt), "dd MMM yyyy HH:mm") },
+                                    { header: "Method", accessorKey: "checkInMethod" as keyof Record<string, unknown> },
+                                    { header: "Notes", accessorKey: "notes" as keyof Record<string, unknown> },
+                                ]}
+                                data={attendance}
+                                emptyMessage="No attendance records found."
+                            />
+                            {attendance.length > 0 && (
+                                <div className="mt-4 text-center">
+                                    <Button variant="link" asChild>
+                                        <Link href={`/attendance?memberId=${id}`}>View Full History</Link>
+                                    </Button>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                <TabsContent value="history">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Member History</CardTitle>
+                            <CardDescription>Audit logs and status changes.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <DataTable
+                                columns={[
+                                    { header: "Date", cell: (h: Record<string, any>) => format(new Date(h.createdAt), "dd MMM yyyy HH:mm") },
+                                    { header: "Action", accessorKey: "action" as keyof Record<string, unknown> },
+                                    { header: "Description", accessorKey: "description" as keyof Record<string, unknown> },
+                                    { header: "User", cell: (h: Record<string, any>) => h.user?.fullName || "System" },
+                                ]}
+                                data={history}
+                                emptyMessage="No history logs found."
+                            />
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+            </Tabs>
+        </div>
+    );
+}
