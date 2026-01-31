@@ -10,7 +10,18 @@
             "expiry": "Expires",
             "status": "Status",
             "expired": "EXPIRED",
-            "active": "ACTIVE"
+            "active": "ACTIVE",
+            "details": "Member Details"
+        },
+        "bookings": {
+            "title": "Today's Bookings",
+            "description": "Scheduled sessions for today",
+            "noBookings": "No bookings scheduled for today.",
+            "checkIn": "Check-in"
+        },
+        "actions": {
+            "cancel": "Cancel and Search Again",
+            "gymEntry": "Gym Entry Check-in"
         },
         "form": {
             "type": "Attendance Type",

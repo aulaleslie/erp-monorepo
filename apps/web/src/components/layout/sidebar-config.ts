@@ -21,6 +21,7 @@ import {
     FileText,
     FileMinus,
     CheckCircle2,
+    ClipboardCheck,
 } from "lucide-react";
 
 export interface SidebarItem {
@@ -215,6 +216,29 @@ export const sidebarConfig: SidebarItem[] = [
                     "departments.delete",
                 ],
                 routePermissions: ["departments.read"],
+            },
+        ],
+    },
+    {
+        label: "Attendance",
+        labelKey: "attendance",
+        icon: ClipboardCheck,
+        children: [
+            {
+                label: "Check-in",
+                labelKey: "checkIn",
+                icon: UserCheck,
+                href: "/attendance/check-in",
+                permissions: ["attendance.create"],
+                routePermissions: ["attendance.create"],
+            },
+            {
+                label: "History",
+                labelKey: "attendanceHistory",
+                icon: History,
+                href: "/attendance",
+                permissions: ["attendance.read"],
+                routePermissions: ["attendance.read"],
             },
         ],
     },

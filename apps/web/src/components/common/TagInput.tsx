@@ -47,20 +47,28 @@ export function TagInput({
     // Fetch suggestions when debounced search changes
     React.useEffect(() => {
         if (!open) return;
+        let isCancelled = false;
 
         const fetchSuggestions = async () => {
             setLoading(true);
             try {
                 const results = await tagsService.suggest(debouncedSearch);
-                setSuggestions(results);
+                if (!isCancelled) {
+                    setSuggestions(results);
+                }
             } catch (error) {
-                console.error("Failed to fetch tag suggestions:", error);
+                if (!isCancelled) {
+                    console.error("Failed to fetch tag suggestions:", error);
+                }
             } finally {
-                setLoading(false);
+                if (!isCancelled) {
+                    setLoading(false);
+                }
             }
         };
 
         fetchSuggestions();
+        return () => { isCancelled = true; };
     }, [debouncedSearch, open]);
 
     const handleAddTag = (tagName: string) => {

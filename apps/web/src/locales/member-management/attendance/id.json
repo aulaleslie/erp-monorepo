@@ -10,7 +10,18 @@
             "expiry": "Berlaku hingga",
             "status": "Status",
             "expired": "KADALUWARSA",
-            "active": "AKTIF"
+            "active": "AKTIF",
+            "details": "Detail Member"
+        },
+        "bookings": {
+            "title": "Booking Hari Ini",
+            "description": "Sesi terjadwal untuk hari ini",
+            "noBookings": "Tidak ada sesi terjadwal untuk hari ini.",
+            "checkIn": "Check-in"
+        },
+        "actions": {
+            "cancel": "Batal dan Cari Lagi",
+            "gymEntry": "Check-in Entry Gym"
         },
         "form": {
             "type": "Tipe Kehadiran",
