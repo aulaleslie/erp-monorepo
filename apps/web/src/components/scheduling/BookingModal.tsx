@@ -44,6 +44,15 @@ const bookingSchema = z.object({
     startTime: z.string(),
     durationMinutes: z.coerce.number().min(15).max(480),
     notes: z.string().optional(),
+    ptPackageId: z.string().optional(),
+}).refine((data) => {
+    if (data.bookingType === BookingType.PT_SESSION && !data.ptPackageId) {
+        return false;
+    }
+    return true;
+}, {
+    message: "PT Package is required for PT Sessions",
+    path: ["ptPackageId"],
 });
 
 type BookingFormValues = z.infer<typeof bookingSchema>;
@@ -67,6 +76,8 @@ export function BookingModal({
     const [memberSearch, setMemberSearch] = useState("");
     const [members, setMembers] = useState<MemberLookupResult[]>([]);
     const [searchingMembers, setSearchingMembers] = useState(false);
+    const [ptPackages, setPtPackages] = useState<any[]>([]);
+    const [loadingPackages, setLoadingPackages] = useState(false);
 
     const form = useForm<BookingFormValues>({
         resolver: zodResolver(bookingSchema),
@@ -116,6 +127,40 @@ export function BookingModal({
 
         return () => clearTimeout(delayDebounceFn);
     }, [memberSearch]);
+
+    const memberId = form.watch("memberId");
+    const bookingType = form.watch("bookingType");
+
+    useEffect(() => {
+        const fetchPtPackages = async () => {
+            if (!memberId) {
+                setPtPackages([]);
+                return;
+            }
+            setLoadingPackages(true);
+            try {
+                const packages = await MembersService.getPtPackages(memberId);
+                // Filter for active and has remaining sessions
+                const activePackages = packages.filter(
+                    (p: any) => p.status === "ACTIVE" && p.remainingSessions > 0
+                );
+                setPtPackages(activePackages);
+
+                // If there's only one package, auto-select it
+                if (activePackages.length === 1) {
+                    form.setValue("ptPackageId", activePackages[0].id);
+                }
+            } catch (error) {
+                console.error("Failed to fetch PT packages", error);
+            } finally {
+                setLoadingPackages(false);
+            }
+        };
+
+        if (isOpen) {
+            fetchPtPackages();
+        }
+    }, [memberId, isOpen, form]);
 
     const handleFormSubmit = async (values: BookingFormValues) => {
         setSubmitting(true);
@@ -280,6 +325,50 @@ export function BookingModal({
                                 )}
                             />
                         </div>
+
+                        {bookingType === BookingType.PT_SESSION && (
+                            <FormField
+                                control={form.control}
+                                name="ptPackageId"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>PT Package</FormLabel>
+                                        <Select
+                                            onValueChange={field.onChange}
+                                            value={field.value}
+                                            disabled={loadingPackages || ptPackages.length === 0}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue
+                                                        placeholder={
+                                                            loadingPackages
+                                                                ? "Loading packages..."
+                                                                : ptPackages.length === 0
+                                                                    ? "No active packages found"
+                                                                    : "Select a package"
+                                                        }
+                                                    />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {ptPackages.map((p) => (
+                                                    <SelectItem key={p.id} value={p.id}>
+                                                        {p.itemName} ({p.remainingSessions} sessions left)
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        {ptPackages.length === 0 && !loadingPackages && memberId && (
+                                            <p className="text-xs text-destructive mt-1">
+                                                This member has no active PT packages.
+                                            </p>
+                                        )}
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        )}
 
                         <FormField
                             control={form.control}
