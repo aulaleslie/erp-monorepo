@@ -76,6 +76,14 @@ export const sidebarConfig: SidebarItem[] = [
                 permissions: ["trainer_availability.read"],
                 routePermissions: ["trainer_availability.read"],
             },
+            {
+                label: "Group Sessions",
+                labelKey: "groupSessions",
+                icon: Users,
+                href: "/group-sessions",
+                permissions: ["group_sessions.read"],
+                routePermissions: ["group_sessions.read"],
+            },
         ],
     },
     {
