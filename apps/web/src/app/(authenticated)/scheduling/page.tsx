@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
-import { format, addWeeks, subWeeks, startOfToday, startOfWeek, endOfWeek } from "date-fns";
+import { ChevronLeft, ChevronRight, Loader2, Calendar as CalendarIcon } from "lucide-react";
+import { format, addWeeks, subWeeks, startOfToday, startOfWeek, endOfWeek, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { WeekCalendar } from "@/components/scheduling/WeekCalendar";
@@ -10,6 +10,7 @@ import { TrainerSelector } from "@/components/scheduling/TrainerSelector";
 import { BookingModal } from "@/components/scheduling/BookingModal";
 import { BookingDetailModal } from "@/components/scheduling/BookingDetailModal";
 import { AvailabilityManager } from "@/components/scheduling/AvailabilityManager";
+import { DateTimeInput } from "@/components/ui/date-time-input";
 import { peopleService, type PersonListItem } from "@/services/people";
 import { ScheduleBookingsService } from "@/services/schedule-bookings";
 import { TrainerAvailabilityService } from "@/services/trainer-availability";
@@ -203,10 +204,23 @@ export default function SchedulingPage() {
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
+                        <div className="w-[160px]">
+                            <DateTimeInput
+                                enableTime={false}
+                                value={format(viewDate, "yyyy-MM-dd")}
+                                onChange={(e) => {
+                                    const newDate = parseISO(e.target.value);
+                                    if (!isNaN(newDate.getTime())) {
+                                        setViewDate(newDate);
+                                    }
+                                }}
+                                className="h-9"
+                            />
+                        </div>
                         <Button variant="outline" size="sm" onClick={handleToday}>
                             Today
                         </Button>
-                        <div className="flex items-center rounded-md border shadow-sm">
+                        <div className="flex items-center rounded-md border shadow-sm bg-background">
                             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-none border-r" onClick={handlePrevWeek}>
                                 <ChevronLeft className="h-4 w-4" />
                             </Button>

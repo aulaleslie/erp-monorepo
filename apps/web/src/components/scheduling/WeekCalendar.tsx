@@ -62,23 +62,41 @@ export function WeekCalendar({
         return colors[index % colors.length] || "bg-slate-500 border-slate-600 text-white";
     };
 
-    const isSlotAvailable = (day: Date, hour: number) => {
+    const getAvailableTrainerIds = (day: Date, hour: number) => {
         const dayOfWeek = day.getDay();
         const timeStr = `${hour.toString().padStart(2, "0")}:00:00`;
-
-        // Check template
-        const hasTemplate = availability.some(
-            (a) => a.dayOfWeek === dayOfWeek && a.isActive && a.startTime <= timeStr && a.endTime > timeStr
-        );
-
-        // Check overrides (simplified for now: just BLOCKED)
         const dateStr = format(day, "yyyy-MM-dd");
-        const isBlocked = overrides.some(
-            (o) => o.date === dateStr && o.overrideType === "BLOCKED" &&
-                (!o.startTime || (o.startTime <= timeStr && o.endTime! > timeStr))
-        );
 
-        return hasTemplate && !isBlocked;
+        return trainers
+            .filter((t) => {
+                // Check template
+                const hasTemplate = availability.some(
+                    (a) =>
+                        a.trainerId === t.id &&
+                        a.dayOfWeek === dayOfWeek &&
+                        a.isActive &&
+                        a.startTime <= timeStr &&
+                        a.endTime > timeStr
+                );
+
+                // Check overrides
+                const override = overrides.find(
+                    (o) =>
+                        o.trainerId === t.id &&
+                        o.date === dateStr &&
+                        (!o.startTime || (o.startTime <= timeStr && o.endTime! > timeStr))
+                );
+
+                if (override) {
+                    if (override.overrideType === "BLOCKED") return false;
+                    if (override.overrideType === "MODIFIED") {
+                        return override.startTime! <= timeStr && override.endTime! > timeStr;
+                    }
+                }
+
+                return hasTemplate;
+            })
+            .map((t) => t.id);
     };
 
     const renderBooking = (booking: ScheduleBooking) => {
@@ -86,7 +104,7 @@ export function WeekCalendar({
         const startM = parseInt(booking.startTime.split(":")[1]);
         const duration = booking.durationMinutes;
 
-        const top = ((startH - 6) * 60 + startM);
+        const top = (startH - 6) * 60 + startM;
         const height = duration;
 
         return (
@@ -97,7 +115,7 @@ export function WeekCalendar({
                     onBookingClick?.(booking);
                 }}
                 className={cn(
-                    "absolute left-1 right-1 z-10 rounded border p-1 text-[10px] leading-tight shadow-sm cursor-pointer transition-opacity hover:opacity-90 overflow-hidden",
+                    "absolute left-1 right-1 z-10 rounded-md border p-1.5 text-[10px] leading-tight shadow-sm cursor-pointer transition-all hover:scale-[1.02] hover:shadow-md overflow-hidden",
                     getTrainerColor(booking.trainerId)
                 )}
                 style={{
@@ -105,46 +123,67 @@ export function WeekCalendar({
                     height: `${(height / 60) * 4}rem`,
                 }}
             >
-                <div className="font-bold truncate">{booking.startTime.substring(0, 5)}</div>
-                <div className="truncate font-semibold text-[11px]">
+                <div className="flex items-center justify-between gap-1 mb-0.5">
+                    <span className="font-bold whitespace-nowrap">{booking.startTime.substring(0, 5)}</span>
+                    {booking.bookingType === "GROUP_SESSION" && (
+                        <div className="rounded-full bg-white/20 px-1 py-0.5 text-[8px] font-bold uppercase tracking-wider">
+                            Group
+                        </div>
+                    )}
+                </div>
+                <div className="truncate font-bold text-[11px] leading-tight">
                     {booking.member?.person.fullName || booking.memberId}
                 </div>
+                {duration >= 60 && (
+                    <div className="mt-1 truncate opacity-90 italic">
+                        {booking.notes || "No notes"}
+                    </div>
+                )}
             </div>
         );
     };
 
     return (
-        <div className="flex h-full flex-col bg-background">
+        <div className="flex h-full flex-col bg-background select-none">
             {/* Header */}
-            <div className="grid grid-cols-[80px_1fr] border-b">
-                <div className="bg-muted/30" />
-                <div className="grid grid-cols-7 border-l">
-                    {weekDays.map((day) => (
-                        <div
-                            key={day.toISOString()}
-                            className={cn(
-                                "flex flex-col items-center py-2 border-r last:border-r-0",
-                                isSameDay(day, new Date()) && "bg-accent/50"
-                            )}
-                        >
-                            <span className="text-xs font-medium text-muted-foreground">
-                                {format(day, "EEE")}
-                            </span>
-                            <span className="text-sm font-bold">
-                                {format(day, "d")}
-                            </span>
-                        </div>
-                    ))}
+            <div className="grid grid-cols-[80px_1fr] border-b sticky top-0 z-30 bg-background">
+                <div className="bg-muted/30 border-r" />
+                <div className="grid grid-cols-7">
+                    {weekDays.map((day) => {
+                        const isToday = isSameDay(day, new Date());
+                        return (
+                            <div
+                                key={day.toISOString()}
+                                className={cn(
+                                    "flex flex-col items-center py-3 border-r last:border-r-0",
+                                    isToday && "bg-primary/5"
+                                )}
+                            >
+                                <span className={cn(
+                                    "text-xs font-semibold uppercase tracking-wider mb-1",
+                                    isToday ? "text-primary" : "text-muted-foreground"
+                                )}>
+                                    {format(day, "EEE")}
+                                </span>
+                                <span className={cn(
+                                    "flex h-8 w-8 items-center justify-center rounded-full text-lg font-bold",
+                                    isToday ? "bg-primary text-primary-foreground" : "text-foreground"
+                                )}>
+                                    {format(day, "d")}
+                                </span>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 
             {/* Grid */}
-            <div className="flex-1 overflow-auto">
-                <div className="grid grid-cols-[80px_1fr] relative">
+            <div className="flex-1 overflow-y-auto">
+                <div className="grid grid-cols-[80px_1fr] relative min-w-[700px]">
                     {/* Time labels */}
-                    <div className="border-r bg-muted/10">
+                    <div className="border-r bg-muted/5 sticky left-0 z-20">
                         {HOURS.map((hour) => (
-                            <div key={hour} className="h-16 pr-2 text-right text-xs text-muted-foreground pt-1">
+                            <div key={hour} className="h-16 pr-3 text-right text-xs font-medium text-muted-foreground pt-1 bg-background/80 backdrop-blur-sm">
                                 {format(setHours(new Date(), hour), "h a")}
                             </div>
                         ))}
@@ -152,32 +191,55 @@ export function WeekCalendar({
 
                     {/* Day columns */}
                     <div className="grid grid-cols-7 relative">
-                        {weekDays.map((day) => (
-                            <div key={day.toISOString()} className="h-[64rem] border-r last:border-r-0 relative group">
-                                {/* Hour markers */}
-                                {HOURS.map((hour) => (
-                                    <div
-                                        key={hour}
-                                        className={cn(
-                                            "h-16 border-b transition-colors",
-                                            isSlotAvailable(day, hour)
-                                                ? "bg-emerald-50/10 group-hover:bg-emerald-50/20 cursor-pointer"
-                                                : "bg-slate-100/50"
-                                        )}
-                                        onClick={() => {
-                                            if (isSlotAvailable(day, hour)) {
-                                                onSlotClick?.(day, `${hour.toString().padStart(2, "0")}:00`);
-                                            }
-                                        }}
-                                    />
-                                ))}
+                        {weekDays.map((day) => {
+                            return (
+                                <div key={day.toISOString()} className="h-[64rem] border-r last:border-r-0 relative group">
+                                    {/* Hour markers */}
+                                    {HOURS.map((hour) => {
+                                        const availableTrainerIds = getAvailableTrainerIds(day, hour);
+                                        const isAvailable = availableTrainerIds.length > 0;
 
-                                {/* Bookings */}
-                                {bookings
-                                    .filter((b) => isSameDay(new Date(b.bookingDate), day))
-                                    .map(renderBooking)}
-                            </div>
-                        ))}
+                                        return (
+                                            <div
+                                                key={hour}
+                                                className={cn(
+                                                    "h-16 border-b transition-colors relative",
+                                                    isAvailable
+                                                        ? "bg-emerald-50/20 hover:bg-emerald-100/30 cursor-pointer"
+                                                        : "bg-slate-50/50"
+                                                )}
+                                                onClick={() => {
+                                                    if (isAvailable) {
+                                                        onSlotClick?.(day, `${hour.toString().padStart(2, "0")}:00`);
+                                                    }
+                                                }}
+                                            >
+                                                {/* Mini availability indicators for trainers */}
+                                                {isAvailable && (
+                                                    <div className="absolute right-1 top-1 flex flex-wrap-reverse justify-end gap-0.5 max-w-[40%]">
+                                                        {availableTrainerIds.map(tid => {
+                                                            const colorClass = getTrainerColor(tid).split(' ')[0];
+                                                            return (
+                                                                <div
+                                                                    key={tid}
+                                                                    className={cn("h-1.5 w-1.5 rounded-full shadow-sm", colorClass)}
+                                                                    title={trainers.find(t => t.id === tid)?.fullName}
+                                                                />
+                                                            );
+                                                        })}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+
+                                    {/* Bookings */}
+                                    {bookings
+                                        .filter((b) => isSameDay(new Date(b.bookingDate), day))
+                                        .map(renderBooking)}
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </div>
