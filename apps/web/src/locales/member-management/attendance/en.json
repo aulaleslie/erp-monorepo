@@ -43,7 +43,14 @@
             "type": "Type",
             "checkIn": "Check In",
             "checkOut": "Check Out",
-            "method": "Method"
+            "method": "Method",
+            "staff": "Staff",
+            "export": "Export"
+        },
+        "filters": {
+            "all": "All Types",
+            "dateFrom": "From Date",
+            "dateTo": "To Date"
         }
     }
 }

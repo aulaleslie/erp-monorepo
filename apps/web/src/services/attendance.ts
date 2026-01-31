@@ -26,6 +26,9 @@ export interface AttendanceRecord {
             fullName: string;
         };
     };
+    checkedInByUser?: {
+        fullName: string;
+    };
 }
 
 export const AttendanceService = {

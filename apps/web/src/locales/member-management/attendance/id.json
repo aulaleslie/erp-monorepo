@@ -43,7 +43,14 @@
             "type": "Tipe",
             "checkIn": "Check In",
             "checkOut": "Check Out",
-            "method": "Metode"
+            "method": "Metode",
+            "staff": "Staf",
+            "export": "Ekspor"
+        },
+        "filters": {
+            "all": "Semua Tipe",
+            "dateFrom": "Dari Tanggal",
+            "dateTo": "Sampai Tanggal"
         }
     }
 }
