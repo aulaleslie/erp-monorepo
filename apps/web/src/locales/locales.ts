@@ -24,6 +24,7 @@ import setTaxesEn from './settings/taxes/en.json';
 import setAuditLogsEn from './settings/audit-logs/en.json';
 import setTagsEn from './settings/tags/en.json';
 import profileEn from './profile/en.json';
+import notificationsEn from './notifications/en.json';
 
 import commonId from './common/id.json';
 import sidebarId from './sidebar/id.json';
@@ -51,6 +52,7 @@ import setTaxesId from './settings/taxes/id.json';
 import setAuditLogsId from './settings/audit-logs/id.json';
 import setTagsId from './settings/tags/id.json';
 import profileId from './profile/id.json';
+import notificationsId from './notifications/id.json';
 
 const en = {
   common: commonEn,
@@ -102,6 +104,7 @@ const en = {
     ...profileEn,
     page: profileEn, // Forward compatibility for profile.page.*
   },
+  notifications: notificationsEn,
 
   // Aliases for backward compatibility
   people: orgPeopleEn,
@@ -176,6 +179,7 @@ const id = {
     ...profileId,
     page: profileId,
   },
+  notifications: notificationsId,
 
   // Aliases for backward compatibility
   people: orgPeopleId,
