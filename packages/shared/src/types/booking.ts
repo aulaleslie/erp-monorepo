@@ -44,6 +44,8 @@ export interface ScheduleBooking {
         id: string;
         fullName: string;
     };
+    createdAt: string;
+    updatedAt: string;
 }
 
 export interface CreateBookingDto {

@@ -20,12 +20,14 @@ import {
     UserMinus,
     MoreHorizontal,
     Loader2,
-    CalendarClock
+    CalendarClock,
+    History
 } from "lucide-react";
 import {
     BookingStatus,
     BookingType,
-    type ScheduleBooking
+    type ScheduleBooking,
+    type UpdateBookingDto
 } from "@gym-monorepo/shared";
 import { cn } from "@/lib/utils";
 
@@ -34,7 +36,7 @@ interface BookingDetailModalProps {
     isOpen: boolean;
     onClose: () => void;
     onStatusUpdate: (id: string, action: 'complete' | 'cancel' | 'no-show', reason?: string) => Promise<void>;
-    onReschedule: (id: string, date: string, time: string) => Promise<void>;
+    onUpdate: (id: string, data: UpdateBookingDto) => Promise<void>;
 }
 
 export function BookingDetailModal({
@@ -42,11 +44,11 @@ export function BookingDetailModal({
     isOpen,
     onClose,
     onStatusUpdate,
-    onReschedule,
+    onUpdate,
 }: BookingDetailModalProps) {
     const [loading, setLoading] = useState(false);
-    const [action, setAction] = useState<'view' | 'reschedule' | 'cancel'>('view');
-    const [rescheduleData, setRescheduleData] = useState({ date: "", time: "" });
+    const [action, setAction] = useState<'view' | 'edit' | 'cancel'>('view');
+    const [editData, setEditData] = useState<UpdateBookingDto>({});
     const [cancelReason, setCancelReason] = useState("");
 
     if (!booking) return null;
@@ -63,13 +65,14 @@ export function BookingDetailModal({
         }
     };
 
-    const handleRescheduleSubmit = async () => {
+    const handleEditSubmit = async () => {
         setLoading(true);
         try {
-            await onReschedule(booking.id, rescheduleData.date, rescheduleData.time);
+            await onUpdate(booking.id, editData);
             onClose();
+            setAction('view');
         } catch (error) {
-            console.error("Reschedule failed", error);
+            console.error("Update failed", error);
         } finally {
             setLoading(false);
         }
@@ -149,6 +152,45 @@ export function BookingDetailModal({
                             </div>
                         )}
 
+                        <div className="space-y-3 pt-2 border-t">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                                <History className="h-4 w-4" />
+                                <h3 className="text-sm font-semibold">Booking History</h3>
+                            </div>
+                            <div className="space-y-2 pl-6 border-l ml-2">
+                                <div className="text-xs">
+                                    <span className="font-semibold">Created:</span>{" "}
+                                    {format(parseISO(booking.createdAt), "MMM d, yyyy HH:mm")}
+                                </div>
+                                {booking.status === BookingStatus.COMPLETED && booking.completedAt && (
+                                    <div className="text-xs text-emerald-600">
+                                        <span className="font-semibold">Completed:</span>{" "}
+                                        {format(parseISO(booking.completedAt), "MMM d, yyyy HH:mm")}
+                                    </div>
+                                )}
+                                {booking.status === BookingStatus.CANCELLED && booking.cancelledAt && (
+                                    <div className="text-xs text-red-600">
+                                        <span className="font-semibold">Cancelled:</span>{" "}
+                                        {format(parseISO(booking.cancelledAt), "MMM d, yyyy HH:mm")}
+                                        {booking.cancelledReason && (
+                                            <div className="mt-1 italic">Reason: {booking.cancelledReason}</div>
+                                        )}
+                                    </div>
+                                )}
+                                {booking.status === BookingStatus.NO_SHOW && (
+                                    <div className="text-xs text-orange-600">
+                                        <span className="font-semibold">Marked No-Show</span>
+                                    </div>
+                                )}
+                                {booking.updatedAt !== booking.createdAt && (
+                                    <div className="text-xs text-muted-foreground">
+                                        <span className="font-semibold">Last Updated:</span>{" "}
+                                        {format(parseISO(booking.updatedAt), "MMM d, yyyy HH:mm")}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
                         {booking.status === BookingStatus.SCHEDULED && (
                             <div className="flex flex-wrap gap-2 pt-2 border-t">
                                 <Button
@@ -164,16 +206,18 @@ export function BookingDetailModal({
                                     size="sm"
                                     variant="outline"
                                     onClick={() => {
-                                        setRescheduleData({
-                                            date: booking.bookingDate,
-                                            time: booking.startTime.substring(0, 5)
+                                        setEditData({
+                                            bookingDate: booking.bookingDate,
+                                            startTime: booking.startTime.substring(0, 5),
+                                            durationMinutes: booking.durationMinutes,
+                                            notes: booking.notes || ""
                                         });
-                                        setAction('reschedule');
+                                        setAction('edit');
                                     }}
                                     disabled={loading}
                                 >
                                     <CalendarClock className="mr-2 h-4 w-4" />
-                                    Reschedule
+                                    Edit / Reschedule
                                 </Button>
                                 <Button
                                     size="sm"
@@ -200,32 +244,50 @@ export function BookingDetailModal({
                     </div>
                 )}
 
-                {action === 'reschedule' && (
+                {action === 'edit' && (
                     <div className="space-y-4 pt-4">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">New Date</label>
+                                <label className="text-sm font-medium">Date</label>
                                 <input
                                     type="date"
                                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                    value={rescheduleData.date}
-                                    onChange={(e) => setRescheduleData({ ...rescheduleData, date: e.target.value })}
+                                    value={editData.bookingDate || ""}
+                                    onChange={(e) => setEditData({ ...editData, bookingDate: e.target.value })}
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">New Time</label>
+                                <label className="text-sm font-medium">Time</label>
                                 <input
                                     type="time"
                                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                    value={rescheduleData.time}
-                                    onChange={(e) => setRescheduleData({ ...rescheduleData, time: e.target.value })}
+                                    value={editData.startTime || ""}
+                                    onChange={(e) => setEditData({ ...editData, startTime: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Duration (min)</label>
+                                <input
+                                    type="number"
+                                    step="15"
+                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                    value={editData.durationMinutes || ""}
+                                    onChange={(e) => setEditData({ ...editData, durationMinutes: parseInt(e.target.value) })}
                                 />
                             </div>
                         </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">Notes</label>
+                            <textarea
+                                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                value={editData.notes || ""}
+                                onChange={(e) => setEditData({ ...editData, notes: e.target.value })}
+                            />
+                        </div>
                         <div className="flex gap-2">
-                            <Button className="flex-1" onClick={handleRescheduleSubmit} disabled={loading}>
+                            <Button className="flex-1" onClick={handleEditSubmit} disabled={loading}>
                                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Update Schedule
+                                Save Changes
                             </Button>
                             <Button variant="outline" onClick={() => setAction('view')}>Cancel</Button>
                         </div>

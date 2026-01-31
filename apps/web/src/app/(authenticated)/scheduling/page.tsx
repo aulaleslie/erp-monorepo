@@ -14,7 +14,7 @@ import { DateTimeInput } from "@/components/ui/date-time-input";
 import { peopleService, type PersonListItem } from "@/services/people";
 import { ScheduleBookingsService } from "@/services/schedule-bookings";
 import { TrainerAvailabilityService } from "@/services/trainer-availability";
-import type { ScheduleBooking, TrainerAvailability, TrainerAvailabilityOverride } from "@gym-monorepo/shared";
+import type { ScheduleBooking, TrainerAvailability, TrainerAvailabilityOverride, UpdateBookingDto } from "@gym-monorepo/shared";
 import { PeopleType, BookingType, BookingStatus } from "@gym-monorepo/shared";
 import { useToast } from "@/hooks/use-toast";
 import { PermissionGuard } from "@/components/guards/PermissionGuard";
@@ -150,16 +150,16 @@ export default function SchedulingPage() {
         }
     };
 
-    const handleReschedule = async (id: string, date: string, time: string) => {
+    const handleUpdateBooking = async (id: string, data: UpdateBookingDto) => {
         try {
-            await ScheduleBookingsService.update(id, { bookingDate: date, startTime: time });
-            toast({ title: "Success", description: "Booking rescheduled." });
+            await ScheduleBookingsService.update(id, data);
+            toast({ title: "Success", description: "Booking updated." });
             fetchData();
         } catch (error: any) {
             toast({
                 variant: "destructive",
                 title: "Error",
-                description: error.response?.data?.message || "Failed to reschedule booking.",
+                description: error.response?.data?.message || "Failed to update booking.",
             });
             throw error;
         }
@@ -273,7 +273,7 @@ export default function SchedulingPage() {
                     isOpen={isDetailModalOpen}
                     onClose={() => setIsDetailModalOpen(false)}
                     onStatusUpdate={handleStatusUpdate}
-                    onReschedule={handleReschedule}
+                    onUpdate={handleUpdateBooking}
                 />
 
                 {managingTrainer && (
