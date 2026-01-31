@@ -23,7 +23,7 @@ export const TrainerAvailabilityService = {
         return data;
     },
 
-    async createOverride(trainerId: string, payload: any): Promise<TrainerAvailabilityOverride> {
+    async createOverride(trainerId: string, payload: CreateTrainerAvailabilityOverrideDto): Promise<TrainerAvailabilityOverride> {
         const { data } = await api.post(`/trainer-availability/${trainerId}/overrides`, payload);
         return data;
     },

@@ -3,16 +3,15 @@
 import React, { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
     Plus,
     Trash2,
     Calendar,
-    Clock,
     Save,
     Loader2,
-    CalendarX
+    CalendarX,
+    Info
 } from "lucide-react";
 import { TrainerAvailabilityService } from "@/services/trainer-availability";
 import {
@@ -22,22 +21,15 @@ import {
 } from "@gym-monorepo/shared";
 import { format, parseISO } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
+import { WeeklyAvailabilityGrid } from "./WeeklyAvailabilityGrid";
+import { OverrideDialog } from "./OverrideDialog";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface AvailabilityEditorProps {
     trainerId: string;
     trainerName: string;
     onUpdate?: () => void;
 }
-
-const DAYS = [
-    { id: 1, name: "Monday" },
-    { id: 2, name: "Tuesday" },
-    { id: 3, name: "Wednesday" },
-    { id: 4, name: "Thursday" },
-    { id: 5, name: "Friday" },
-    { id: 6, name: "Saturday" },
-    { id: 0, name: "Sunday" },
-];
 
 export function AvailabilityEditor({
     trainerId,
@@ -49,6 +41,7 @@ export function AvailabilityEditor({
     const [template, setTemplate] = useState<TrainerAvailability[]>([]);
     const [overrides, setOverrides] = useState<TrainerAvailabilityOverride[]>([]);
     const [saving, setSaving] = useState(false);
+    const [isOverrideDialogOpen, setIsOverrideDialogOpen] = useState(false);
 
     useEffect(() => {
         if (trainerId) {
@@ -72,25 +65,6 @@ export function AvailabilityEditor({
         }
     };
 
-    const handleAddSlot = (dayId: number) => {
-        setTemplate([...template, {
-            id: `new-${Math.random()}`,
-            trainerId,
-            dayOfWeek: dayId,
-            startTime: "09:00:00",
-            endTime: "17:00:00",
-            isActive: true,
-        } as any]);
-    };
-
-    const handleRemoveSlot = (id: string) => {
-        setTemplate(template.filter(t => t.id !== id));
-    };
-
-    const handleSlotChange = (id: string, field: string, value: string) => {
-        setTemplate(template.map(t => t.id === id ? { ...t, [field]: value.length === 5 ? value + ":00" : value } : t));
-    };
-
     const handleSaveTemplate = async () => {
         setSaving(true);
         try {
@@ -110,16 +84,12 @@ export function AvailabilityEditor({
         }
     };
 
-    const handleAddOverride = async () => {
+    const handleAddOverride = async (payload: any) => {
         try {
-            const date = format(new Date(), "yyyy-MM-dd");
-            await TrainerAvailabilityService.createOverride(trainerId, {
-                date,
-                overrideType: OverrideType.BLOCKED,
-                notes: "Manual override",
-            });
+            await TrainerAvailabilityService.createOverride(trainerId, payload);
             fetchData();
-            toast({ title: "Success", description: "Override added. Please edit it below." });
+            toast({ title: "Success", description: "Override added successfully." });
+            onUpdate?.();
         } catch (error) {
             toast({ variant: "destructive", title: "Error", description: "Failed to add override." });
         }
@@ -138,123 +108,114 @@ export function AvailabilityEditor({
 
     if (loading) {
         return (
-            <div className="flex h-64 items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <div className="flex h-96 items-center justify-center">
+                <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <p className="text-sm text-muted-foreground">Loading availability data...</p>
+                </div>
             </div>
         );
     }
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium">Availability for {trainerName}</h3>
-            </div>
-
             <Tabs defaultValue="template" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="mb-4">
                     <TabsTrigger value="template">Weekly Template</TabsTrigger>
                     <TabsTrigger value="overrides">Overrides & Holidays</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="template" className="pt-4">
-                    <div className="space-y-6">
-                        {DAYS.map(day => (
-                            <div key={day.id} className="space-y-2 border-b pb-4 last:border-0">
-                                <div className="flex items-center justify-between">
-                                    <h4 className="font-semibold text-sm">{day.name}</h4>
-                                    <Button
-                                        size="sm"
-                                        variant="ghost"
-                                        className="h-8 text-[10px] uppercase tracking-wider text-primary"
-                                        onClick={() => handleAddSlot(day.id)}
-                                    >
-                                        <Plus className="mr-1 h-3 w-3" /> Add Slot
-                                    </Button>
-                                </div>
-                                <div className="space-y-2">
-                                    {template.filter(t => t.dayOfWeek === day.id).map(slot => (
-                                        <div key={slot.id} className="flex items-center gap-2">
-                                            <Input
-                                                type="time"
-                                                className="h-9 w-32"
-                                                value={slot.startTime.substring(0, 5)}
-                                                onChange={(e) => handleSlotChange(slot.id, "startTime", e.target.value)}
-                                            />
-                                            <span className="text-muted-foreground">-</span>
-                                            <Input
-                                                type="time"
-                                                className="h-9 w-32"
-                                                value={slot.endTime.substring(0, 5)}
-                                                onChange={(e) => handleSlotChange(slot.id, "endTime", e.target.value)}
-                                            />
-                                            <Button
-                                                size="icon"
-                                                variant="ghost"
-                                                className="h-8 w-8 text-destructive hover:bg-destructive/10"
-                                                onClick={() => handleRemoveSlot(slot.id)}
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    ))}
-                                    {template.filter(t => t.dayOfWeek === day.id).length === 0 && (
-                                        <p className="text-xs text-muted-foreground italic">No slots defined (Unavailable)</p>
-                                    )}
-                                </div>
+                <TabsContent value="template" className="space-y-4">
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <div className="space-y-1">
+                                <CardTitle className="text-xl font-bold">Weekly Availability Grid</CardTitle>
+                                <CardDescription>Define the standard working hours for {trainerName}.</CardDescription>
                             </div>
-                        ))}
-                    </div>
-                    <div className="mt-6 flex justify-end">
-                        <Button onClick={handleSaveTemplate} disabled={saving}>
-                            {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                            Save Template
-                        </Button>
-                    </div>
+                            <Button onClick={handleSaveTemplate} disabled={saving} size="sm">
+                                {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                                Save Template
+                            </Button>
+                        </CardHeader>
+                        <CardContent className="pt-6">
+                            <WeeklyAvailabilityGrid
+                                value={template}
+                                onChange={setTemplate}
+                            />
+                        </CardContent>
+                    </Card>
                 </TabsContent>
 
-                <TabsContent value="overrides" className="pt-4">
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <p className="text-sm text-muted-foreground">Manage specific dates, vacations, or blocked times.</p>
-                            <Button size="sm" onClick={handleAddOverride}>
-                                <CalendarX className="mr-2 h-4 w-4" /> Add Override
-                            </Button>
+                <TabsContent value="overrides" className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                            <h3 className="text-lg font-semibold">Exceptions & Overrides</h3>
+                            <p className="text-sm text-muted-foreground">Manage vacations, holidays, or specific date changes.</p>
                         </div>
+                        <Button onClick={() => setIsOverrideDialogOpen(true)}>
+                            <Plus className="mr-2 h-4 w-4" /> Add Override
+                        </Button>
+                    </div>
 
-                        <div className="space-y-2">
-                            {overrides.map(o => (
-                                <div key={o.id} className="flex items-center justify-between rounded-lg border p-3 bg-muted/20">
-                                    <div className="flex items-center gap-4">
-                                        <div className="flex flex-col">
-                                            <span className="text-sm font-bold">{format(parseISO(o.date), "MMM d, yyyy")}</span>
-                                            <span className="text-xs text-muted-foreground">
-                                                {o.startTime ? `${o.startTime.substring(0, 5)} - ${o.endTime?.substring(0, 5)}` : "Full Day"}
-                                            </span>
+                    <div className="grid gap-4">
+                        {overrides.length > 0 ? (
+                            overrides.map(o => (
+                                <Card key={o.id}>
+                                    <CardContent className="flex items-center justify-between p-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                                                <Calendar className="h-5 w-5" />
+                                            </div>
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-bold">{format(parseISO(o.date), "EEEE, MMM d, yyyy")}</span>
+                                                    <Badge variant={o.overrideType === OverrideType.BLOCKED ? "destructive" : "secondary"}>
+                                                        {o.overrideType}
+                                                    </Badge>
+                                                </div>
+                                                <div className="flex flex-col text-sm text-muted-foreground">
+                                                    <span>
+                                                        {o.overrideType === OverrideType.BLOCKED
+                                                            ? "Unavailable all day"
+                                                            : `${o.startTime?.substring(0, 5)} - ${o.endTime?.substring(0, 5)}`
+                                                        }
+                                                    </span>
+                                                    {o.reason && (
+                                                        <span className="mt-1 flex items-center gap-1 text-[11px] italic">
+                                                            <Info className="h-3 w-3" /> {o.reason}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
-                                        <Badge variant={o.overrideType === OverrideType.BLOCKED ? "destructive" : "secondary"}>
-                                            {o.overrideType}
-                                        </Badge>
-                                    </div>
-                                    <Button
-                                        size="icon"
-                                        variant="ghost"
-                                        className="text-destructive"
-                                        onClick={() => handleDeleteOverride(o.id)}
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            ))}
-                            {overrides.length === 0 && (
-                                <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
-                                    <Calendar className="h-10 w-10 mb-2 opacity-20" />
-                                    <p className="text-sm">No future overrides found.</p>
-                                </div>
-                            )}
-                        </div>
+                                        <Button
+                                            size="icon"
+                                            variant="ghost"
+                                            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                            onClick={() => handleDeleteOverride(o.id)}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </CardContent>
+                                </Card>
+                            ))
+                        ) : (
+                            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-12 text-muted-foreground">
+                                <CalendarX className="mb-4 h-12 w-12 opacity-20" />
+                                <p className="text-lg font-medium">No overrides found</p>
+                                <p className="text-sm">Click the button above to add a new exception for {trainerName}.</p>
+                            </div>
+                        )}
                     </div>
                 </TabsContent>
             </Tabs>
+
+            <OverrideDialog
+                isOpen={isOverrideDialogOpen}
+                onClose={() => setIsOverrideDialogOpen(false)}
+                onSubmit={handleAddOverride}
+                trainerName={trainerName}
+            />
         </div>
     );
 }
