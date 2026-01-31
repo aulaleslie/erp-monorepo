@@ -16,6 +16,8 @@ import { TrainerAvailabilityService } from "@/services/trainer-availability";
 import type { ScheduleBooking, TrainerAvailability, TrainerAvailabilityOverride } from "@gym-monorepo/shared";
 import { PeopleType, BookingType, BookingStatus } from "@gym-monorepo/shared";
 import { useToast } from "@/hooks/use-toast";
+import { PermissionGuard } from "@/components/guards/PermissionGuard";
+import { PERMISSIONS } from "@gym-monorepo/shared";
 
 export default function SchedulingPage() {
     const t = useTranslations("memberManagement.scheduling.page");
@@ -191,83 +193,85 @@ export default function SchedulingPage() {
     );
 
     return (
-        <div className="flex h-full flex-col space-y-4">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
-                    <p className="text-sm text-muted-foreground">
-                        {format(startOfWeek(viewDate, { weekStartsOn: 1 }), "MMM d")} - {format(endOfWeek(viewDate, { weekStartsOn: 1 }), "MMM d, yyyy")}
-                    </p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={handleToday}>
-                        Today
-                    </Button>
-                    <div className="flex items-center rounded-md border shadow-sm">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-none border-r" onClick={handlePrevWeek}>
-                            <ChevronLeft className="h-4 w-4" />
+        <PermissionGuard requiredPermissions={[PERMISSIONS.SCHEDULES.READ]}>
+            <div className="flex h-full flex-col space-y-4">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
+                        <p className="text-sm text-muted-foreground">
+                            {format(startOfWeek(viewDate, { weekStartsOn: 1 }), "MMM d")} - {format(endOfWeek(viewDate, { weekStartsOn: 1 }), "MMM d, yyyy")}
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Button variant="outline" size="sm" onClick={handleToday}>
+                            Today
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-none" onClick={handleNextWeek}>
-                            <ChevronRight className="h-4 w-4" />
-                        </Button>
+                        <div className="flex items-center rounded-md border shadow-sm">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-none border-r" onClick={handlePrevWeek}>
+                                <ChevronLeft className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-none" onClick={handleNextWeek}>
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div className="rounded-xl border bg-card p-4 shadow-sm">
-                <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-center">
-                    <span className="text-sm font-semibold">Trainers:</span>
-                    <TrainerSelector
-                        trainers={trainers}
-                        selectedIds={selectedTrainerIds}
-                        onToggle={toggleTrainer}
-                        onManage={handleManageTrainer}
-                    />
+                <div className="rounded-xl border bg-card p-4 shadow-sm">
+                    <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-center">
+                        <span className="text-sm font-semibold">Trainers:</span>
+                        <TrainerSelector
+                            trainers={trainers}
+                            selectedIds={selectedTrainerIds}
+                            onToggle={toggleTrainer}
+                            onManage={handleManageTrainer}
+                        />
+                    </div>
+
+                    <div className="relative min-h-[500px] overflow-hidden rounded-lg border bg-background">
+                        {loading && (
+                            <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/50 backdrop-blur-[1px]">
+                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                            </div>
+                        )}
+                        <WeekCalendar
+                            date={viewDate}
+                            bookings={bookings}
+                            trainers={selectedTrainers}
+                            availability={availability}
+                            overrides={overrides}
+                            onSlotClick={handleSlotClick}
+                            onBookingClick={handleBookingClick}
+                        />
+                    </div>
                 </div>
 
-                <div className="relative min-h-[500px] overflow-hidden rounded-lg border bg-background">
-                    {loading && (
-                        <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/50 backdrop-blur-[1px]">
-                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                        </div>
-                    )}
-                    <WeekCalendar
-                        date={viewDate}
-                        bookings={bookings}
-                        trainers={selectedTrainers}
-                        availability={availability}
-                        overrides={overrides}
-                        onSlotClick={handleSlotClick}
-                        onBookingClick={handleBookingClick}
-                    />
-                </div>
-            </div>
-
-            <BookingModal
-                isOpen={isBookingModalOpen}
-                onClose={() => setIsBookingModalOpen(false)}
-                onSubmit={handleBookingSubmit}
-                trainers={trainers}
-                initialData={bookingModalInitialData}
-            />
-
-            <BookingDetailModal
-                booking={selectedBooking}
-                isOpen={isDetailModalOpen}
-                onClose={() => setIsDetailModalOpen(false)}
-                onStatusUpdate={handleStatusUpdate}
-                onReschedule={handleReschedule}
-            />
-
-            {managingTrainer && (
-                <AvailabilityManager
-                    trainerId={managingTrainer.id}
-                    trainerName={managingTrainer.fullName}
-                    isOpen={isAvailManagerOpen}
-                    onClose={() => setIsAvailManagerOpen(false)}
-                    onUpdate={fetchData}
+                <BookingModal
+                    isOpen={isBookingModalOpen}
+                    onClose={() => setIsBookingModalOpen(false)}
+                    onSubmit={handleBookingSubmit}
+                    trainers={trainers}
+                    initialData={bookingModalInitialData}
                 />
-            )}
-        </div>
+
+                <BookingDetailModal
+                    booking={selectedBooking}
+                    isOpen={isDetailModalOpen}
+                    onClose={() => setIsDetailModalOpen(false)}
+                    onStatusUpdate={handleStatusUpdate}
+                    onReschedule={handleReschedule}
+                />
+
+                {managingTrainer && (
+                    <AvailabilityManager
+                        trainerId={managingTrainer.id}
+                        trainerName={managingTrainer.fullName}
+                        isOpen={isAvailManagerOpen}
+                        onClose={() => setIsAvailManagerOpen(false)}
+                        onUpdate={fetchData}
+                    />
+                )}
+            </div>
+        </PermissionGuard>
     );
 }
