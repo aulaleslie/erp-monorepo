@@ -1,6 +1,7 @@
 {
     "checkIn": {
         "title": "Check-in Member",
+        "quickCheckIn": "Check-in Cepat",
         "search": {
             "placeholder": "Cari berdasarkan nama, kode, atau telepon...",
             "noResults": "Member tidak ditemukan."

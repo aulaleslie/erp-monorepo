@@ -86,11 +86,19 @@ export function TodayAttendanceWidget() {
                             No check-ins today.
                         </p>
                     )}
-                    <Button variant="ghost" className="w-full text-xs hover:bg-primary/5 hover:text-primary transition-colors mt-2" size="sm" asChild>
-                        <Link href="/attendance">
-                            View All History <ArrowRight className="ml-1 h-3 w-3" />
-                        </Link>
-                    </Button>
+                    <div className="flex flex-col gap-2 mt-2">
+                        <Button className="w-full text-xs" size="sm" asChild>
+                            <Link href="/attendance/check-in">
+                                <UserCheck className="mr-2 h-3 w-3" />
+                                {t("checkIn.quickCheckIn")}
+                            </Link>
+                        </Button>
+                        <Button variant="ghost" className="w-full text-xs hover:bg-primary/5 hover:text-primary transition-colors" size="sm" asChild>
+                            <Link href="/attendance">
+                                {t("history.title")} <ArrowRight className="ml-1 h-3 w-3" />
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
             </CardContent>
         </Card>

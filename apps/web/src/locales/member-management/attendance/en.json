@@ -1,6 +1,7 @@
 {
     "checkIn": {
         "title": "Member Check-in",
+        "quickCheckIn": "Quick Check-in",
         "search": {
             "placeholder": "Search by name, code, or phone...",
             "noResults": "No members found."
