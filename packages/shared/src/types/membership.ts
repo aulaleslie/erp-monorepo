@@ -32,6 +32,13 @@ export interface Membership {
     id: string;
     name: string;
   };
+  member?: {
+    id: string;
+    memberCode: string;
+    person: {
+      fullName: string;
+    };
+  };
 }
 
 export interface CreateMembershipDto {

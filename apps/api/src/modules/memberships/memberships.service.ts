@@ -59,7 +59,29 @@ export class MembershipsService {
       qb.andWhere('membership.status = :status', { status });
     }
 
-    qb.orderBy('membership.createdAt', 'DESC')
+    if (query.expiresAfter) {
+      const date = new Date(query.expiresAfter);
+      date.setHours(0, 0, 0, 0);
+      qb.andWhere('membership.endDate >= :expiresAfter', {
+        expiresAfter: date,
+      });
+    }
+
+    if (query.expiresBefore) {
+      const date = new Date(query.expiresBefore);
+      date.setHours(23, 59, 59, 999);
+      qb.andWhere('membership.endDate <= :expiresBefore', {
+        expiresBefore: date,
+      });
+    }
+
+    if (query.requiresReview !== undefined) {
+      qb.andWhere('membership.requiresReview = :requiresReview', {
+        requiresReview: query.requiresReview,
+      });
+    }
+
+    qb.orderBy('membership.endDate', 'ASC')
       .skip(calculateSkip(page, limit))
       .take(limit);
 

@@ -58,13 +58,13 @@ export const MembersService = {
     },
 
     getMemberships: async (id: string): Promise<Membership[]> => {
-        const { data } = await api.get(`/members/${id}/memberships`);
-        return data;
+        const { data } = await api.get(`/memberships`, { params: { memberId: id } });
+        return data.items;
     },
 
     getPtPackages: async (id: string): Promise<PtSessionPackage[]> => {
-        const { data } = await api.get(`/members/${id}/pt-packages`);
-        return data;
+        const { data } = await api.get(`/pt-packages`, { params: { memberId: id } });
+        return data.items;
     },
 
     getAttendance: async (id: string, params?: Record<string, unknown>): Promise<{ items: Record<string, unknown>[]; total: number }> => {
