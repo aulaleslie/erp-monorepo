@@ -2,6 +2,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { TenantType, Locale } from '@gym-monorepo/shared';
 import { TenantTaxEntity } from './tenant-tax.entity';
 import { TenantThemeEntity } from './tenant-theme.entity';
+import { TenantSchedulingSettingsEntity } from './tenant-scheduling-settings.entity';
 import { BaseAuditEntity } from '../../common/entities/base-audit.entity';
 
 @Entity('tenants')
@@ -54,4 +55,10 @@ export class TenantEntity extends BaseAuditEntity {
 
   @OneToMany(() => TenantThemeEntity, (tenantTheme) => tenantTheme.tenant)
   theme: TenantThemeEntity[];
+
+  @OneToMany(
+    () => TenantSchedulingSettingsEntity,
+    (schedulingSettings) => schedulingSettings.tenant,
+  )
+  schedulingSettings: TenantSchedulingSettingsEntity[];
 }
