@@ -1,0 +1,57 @@
+{
+    "checkIn": {
+        "title": "Member Check-in",
+        "quickCheckIn": "Quick Check-in",
+        "search": {
+            "placeholder": "Search by name, code, or phone...",
+            "noResults": "No members found."
+        },
+        "memberCard": {
+            "memberCode": "Member Code",
+            "expiry": "Expires",
+            "status": "Status",
+            "expired": "EXPIRED",
+            "active": "ACTIVE",
+            "details": "Member Details"
+        },
+        "bookings": {
+            "title": "Today's Bookings",
+            "description": "Scheduled sessions for today",
+            "noBookings": "No bookings scheduled for today.",
+            "checkIn": "Check-in"
+        },
+        "actions": {
+            "cancel": "Cancel and Search Again",
+            "gymEntry": "Gym Entry Check-in"
+        },
+        "form": {
+            "type": "Attendance Type",
+            "notes": "Notes (Optional)",
+            "submit": "Check In",
+            "success": "Check-in successful",
+            "error": "Check-in failed"
+        },
+        "types": {
+            "GYM_ENTRY": "Gym Entry",
+            "PT_SESSION": "PT Session",
+            "GROUP_CLASS": "Group Class"
+        }
+    },
+    "history": {
+        "title": "Attendance History",
+        "table": {
+            "member": "Member",
+            "type": "Type",
+            "checkIn": "Check In",
+            "checkOut": "Check Out",
+            "method": "Method",
+            "staff": "Staff",
+            "export": "Export"
+        },
+        "filters": {
+            "all": "All Types",
+            "dateFrom": "From Date",
+            "dateTo": "To Date"
+        }
+    }
+}

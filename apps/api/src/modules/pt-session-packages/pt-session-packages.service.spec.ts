@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PtSessionPackagesService } from './pt-session-packages.service';
-import { ItemDurationUnit } from '@gym-monorepo/shared';
+import { ItemDurationUnit, PtPackageStatus } from '@gym-monorepo/shared';
 import { format } from 'date-fns';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { PtPackageEntity } from '../../database/entities/pt-package.entity';
@@ -13,6 +13,7 @@ describe('PtSessionPackagesService', () => {
 
   const mockRepository = {
     createQueryBuilder: jest.fn(),
+    find: jest.fn(),
     findOne: jest.fn(),
     create: jest.fn(),
     save: jest.fn(),
@@ -31,6 +32,7 @@ describe('PtSessionPackagesService', () => {
   };
 
   beforeEach(async () => {
+    jest.clearAllMocks();
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PtSessionPackagesService,
@@ -127,6 +129,41 @@ describe('PtSessionPackagesService', () => {
         ItemDurationUnit.YEAR,
       );
       expect(format(expiry!, 'yyyy-MM-dd')).toBe('2025-01-01');
+    });
+  });
+  describe('processExpiries', () => {
+    it('should expire active packages that have passed their expiry date', async () => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const expiredPackage = {
+        id: 'pkg-1',
+        status: PtPackageStatus.ACTIVE,
+        expiryDate: new Date('2024-01-01'),
+        save: jest.fn(),
+      } as unknown as PtPackageEntity;
+
+      mockRepository.find = jest.fn().mockResolvedValue([expiredPackage]);
+      mockRepository.save = jest.fn().mockResolvedValue(expiredPackage);
+
+      await service.processExpiries();
+
+      expect(mockRepository.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            status: PtPackageStatus.ACTIVE,
+            expiryDate: expect.anything() as Date,
+          },
+        }),
+      );
+      expect(expiredPackage.status).toBe(PtPackageStatus.EXPIRED);
+      expect(mockRepository.save).toHaveBeenCalledWith(expiredPackage);
+    });
+
+    it('should not expire packages that are not yet expired', async () => {
+      mockRepository.find = jest.fn().mockResolvedValue([]);
+      await service.processExpiries();
+      expect(mockRepository.save).not.toHaveBeenCalled();
     });
   });
 });

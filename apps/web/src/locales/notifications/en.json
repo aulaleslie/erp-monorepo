@@ -1,0 +1,13 @@
+{
+    "title": "Notifications",
+    "unread": "Unread only",
+    "markAllRead": "Mark all as read",
+    "viewAll": "View all",
+    "noNotifications": "No notifications",
+    "types": {
+        "MEMBERSHIP_EXPIRING": "Membership Expiring",
+        "PT_EXPIRING": "PT Session Expiring",
+        "BOOKING_REMINDER": "Booking Reminder"
+    },
+    "history": "Notification History"
+}

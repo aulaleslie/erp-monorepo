@@ -109,6 +109,9 @@ export class ItemEntity extends BaseAuditEntity {
   @Column({ type: 'int', nullable: true })
   includedPtSessions: number | null;
 
+  @Column({ type: 'int', default: 1 })
+  maxParticipants: number;
+
   @Column({ type: 'varchar', nullable: true })
   imageKey: string | null;
 

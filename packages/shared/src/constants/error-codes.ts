@@ -538,6 +538,113 @@ export const MEMBERSHIP_ERRORS = {
 } as const;
 
 // ============================================================================
+// PT Package Errors
+// ============================================================================
+
+export const PT_PACKAGE_ERRORS = {
+  NOT_FOUND: {
+    code: 'PT_PACKAGE_NOT_FOUND',
+    message: 'PT package not found',
+  },
+  INSUFFICIENT_SESSIONS: {
+    code: 'PT_PACKAGE_INSUFFICIENT_SESSIONS',
+    message: 'Insufficient sessions remaining in package',
+  },
+  EXPIRED: {
+    code: 'PT_PACKAGE_EXPIRED',
+    message: 'PT package has expired',
+  },
+} as const;
+
+// ============================================================================
+// Booking Errors
+// ============================================================================
+
+export const BOOKING_ERRORS = {
+  NOT_FOUND: {
+    code: 'BOOKING_NOT_FOUND',
+    message: 'Booking not found',
+  },
+  CONFLICT: {
+    code: 'BOOKING_CONFLICT',
+    message: 'Time slot conflict detected',
+  },
+  OUTSIDE_AVAILABILITY: {
+    code: 'BOOKING_OUTSIDE_AVAILABILITY',
+    message: 'Selected time is outside trainer availability',
+  },
+  INVALID_STATUS: {
+    code: 'BOOKING_INVALID_STATUS',
+    message: 'Invalid booking status for this action',
+  },
+  INVALID_DURATION: {
+    code: 'BOOKING_INVALID_DURATION',
+    message: 'Booking duration must be a multiple of the slot duration',
+  },
+  INSUFFICIENT_SESSIONS: {
+    code: 'BOOKING_INSUFFICIENT_SESSIONS',
+    message: 'Member has insufficient remaining sessions',
+  },
+  CONFLICT_DETAIL: {
+    code: 'BOOKING_CONFLICT_DETAIL',
+    message: 'Detailed conflict information is provided',
+  },
+  TRAINER_UNAVAILABLE: {
+    code: 'TRAINER_UNAVAILABLE',
+    message: 'Trainer is unavailable at the selected time',
+  },
+  PAST_DATE: {
+    code: 'BOOKING_PAST_DATE',
+    message: 'Booking date cannot be in the past',
+  },
+  CANCEL_WINDOW_EXCEEDED: {
+    code: 'BOOKING_CANCEL_WINDOW_EXCEEDED',
+    message: 'Cancellation window has been exceeded',
+  },
+} as const;
+
+// ============================================================================
+// Attendance Errors
+// ============================================================================
+
+export const ATTENDANCE_ERRORS = {
+  NOT_FOUND: {
+    code: 'ATTENDANCE_NOT_FOUND',
+    message: 'Attendance record not found',
+  },
+  ALREADY_CHECKED_IN: {
+    code: 'ATTENDANCE_ALREADY_CHECKED_IN',
+    message: 'Member is already checked in',
+  },
+} as const;
+
+// ============================================================================
+// Group Session Errors
+// ============================================================================
+
+export const GROUP_SESSION_ERRORS = {
+  NOT_FOUND: {
+    code: 'GROUP_SESSION_NOT_FOUND',
+    message: 'Group session not found',
+  },
+  FULL: {
+    code: 'GROUP_SESSION_FULL',
+    message: 'Group session is full',
+  },
+} as const;
+
+// ============================================================================
+// Notification Errors
+// ============================================================================
+
+export const NOTIFICATION_ERRORS = {
+  NOT_FOUND: {
+    code: 'NOTIFICATION_NOT_FOUND',
+    message: 'Notification not found',
+  },
+} as const;
+
+// ============================================================================
 // Aggregated Error Codes
 // ============================================================================
 
@@ -561,6 +668,11 @@ export const ERROR_CODES = {
   SALES: SALES_ERRORS,
   MEMBER: MEMBER_ERRORS,
   MEMBERSHIP: MEMBERSHIP_ERRORS,
+  PT_PACKAGE: PT_PACKAGE_ERRORS,
+  BOOKING: BOOKING_ERRORS,
+  ATTENDANCE: ATTENDANCE_ERRORS,
+  GROUP_SESSION: GROUP_SESSION_ERRORS,
+  NOTIFICATION: NOTIFICATION_ERRORS,
 } as const;
 
 // ============================================================================
@@ -586,12 +698,17 @@ export type OutboxErrorCode = typeof OUTBOX_ERRORS[keyof typeof OUTBOX_ERRORS];
 export type SalesErrorCode = typeof SALES_ERRORS[keyof typeof SALES_ERRORS];
 export type MemberErrorCode = typeof MEMBER_ERRORS[keyof typeof MEMBER_ERRORS];
 export type MembershipErrorCode = typeof MEMBERSHIP_ERRORS[keyof typeof MEMBERSHIP_ERRORS];
+export type PTPackageErrorCode = typeof PT_PACKAGE_ERRORS[keyof typeof PT_PACKAGE_ERRORS];
+export type BookingErrorCode = typeof BOOKING_ERRORS[keyof typeof BOOKING_ERRORS];
+export type AttendanceErrorCode = typeof ATTENDANCE_ERRORS[keyof typeof ATTENDANCE_ERRORS];
+export type GroupSessionErrorCode = typeof GROUP_SESSION_ERRORS[keyof typeof GROUP_SESSION_ERRORS];
+export type NotificationErrorCode = typeof NOTIFICATION_ERRORS[keyof typeof NOTIFICATION_ERRORS];
 
-export type AnyErrorCode = 
-  | AuthErrorCode 
-  | TenantErrorCode 
-  | UserErrorCode 
-  | RoleErrorCode 
+export type AnyErrorCode =
+  | AuthErrorCode
+  | TenantErrorCode
+  | UserErrorCode
+  | RoleErrorCode
   | TaxErrorCode
   | PeopleErrorCode
   | DepartmentErrorCode
@@ -599,11 +716,16 @@ export type AnyErrorCode =
   | CategoryErrorCode
   | ImportErrorCode
   | StorageErrorCode
-  | ThemeErrorCode 
+  | ThemeErrorCode
   | ValidationErrorCode
   | DocumentErrorCode
   | TagErrorCode
   | OutboxErrorCode
   | SalesErrorCode
   | MemberErrorCode
-  | MembershipErrorCode;
+  | MembershipErrorCode
+  | PTPackageErrorCode
+  | BookingErrorCode
+  | AttendanceErrorCode
+  | GroupSessionErrorCode
+  | NotificationErrorCode;

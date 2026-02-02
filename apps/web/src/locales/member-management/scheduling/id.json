@@ -1,6 +1,10 @@
 {
   "page": {
     "title": "Penjadwalan",
+    "availability": {
+      "title": "Ketersediaan Pelatih",
+      "description": "Kelola jadwal mingguan pelatih dan pengecualian tanggal."
+    },
     "comingSoon": {
       "title": "Modul Penjadwalan Segera Hadir",
       "description": "Kelola kelas, sesi, dan jadwal pelatih dengan efisien."

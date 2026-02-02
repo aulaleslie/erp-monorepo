@@ -286,4 +286,129 @@ describe('MembersService', () => {
       expect(memberRepository.save).not.toHaveBeenCalled();
     });
   });
+
+  describe('lookup', () => {
+    it('should search by memberCode exact match', async () => {
+      const query = 'MBR-123';
+      const mockResult = [
+        { id: '1', memberCode: query, person: { fullName: 'John Doe' } },
+      ];
+      const mockQb = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue(mockResult),
+      };
+
+      memberRepository.createQueryBuilder!.mockReturnValue(mockQb as any);
+
+      const result = await service.lookup(tenantId, query);
+
+      expect(memberRepository.createQueryBuilder).toHaveBeenCalledWith(
+        'member',
+      );
+      expect(mockQb.andWhere).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          exactMatch: query,
+          partialMatch: `%${query}%`,
+        }),
+      );
+      expect(result).toEqual(mockResult);
+    });
+
+    it('should search by fullName partial match', async () => {
+      const query = 'John';
+      const mockResult = [
+        { id: '1', memberCode: 'MBR-001', person: { fullName: 'John Doe' } },
+      ];
+      const mockQb = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue(mockResult),
+      };
+
+      memberRepository.createQueryBuilder!.mockReturnValue(mockQb as any);
+
+      const result = await service.lookup(tenantId, query);
+
+      expect(result).toEqual(mockResult);
+      expect(mockQb.take).toHaveBeenCalledWith(5);
+    });
+
+    it('should limit results to 5', async () => {
+      const query = 'test';
+      const mockQb = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([]),
+      };
+
+      memberRepository.createQueryBuilder!.mockReturnValue(mockQb as any);
+
+      await service.lookup(tenantId, query);
+
+      expect(mockQb.take).toHaveBeenCalledWith(5);
+    });
+  });
+
+  describe('updateCurrentExpiryDate', () => {
+    it('should update currentExpiryDate and transition to EXPIRED if date is null', async () => {
+      const memberId = 'member-1';
+      const member = {
+        id: memberId,
+        tenantId,
+        status: MemberStatus.ACTIVE,
+        currentExpiryDate: new Date(),
+      };
+
+      memberRepository.findOne!.mockResolvedValue(member);
+      memberRepository.save!.mockResolvedValue(member);
+
+      await service.updateCurrentExpiryDate(tenantId, memberId, null);
+
+      expect(member.currentExpiryDate).toBeNull();
+      expect(member.status).toBe(MemberStatus.EXPIRED);
+      expect(memberRepository.save).toHaveBeenCalled();
+    });
+
+    it('should not transition to EXPIRED if already NOT ACTIVE', async () => {
+      const memberId = 'member-1';
+      const member = {
+        id: memberId,
+        tenantId,
+        status: MemberStatus.NEW,
+        currentExpiryDate: new Date(),
+      };
+
+      memberRepository.findOne!.mockResolvedValue(member);
+      memberRepository.save!.mockResolvedValue(member);
+
+      await service.updateCurrentExpiryDate(tenantId, memberId, null);
+
+      expect(member.currentExpiryDate).toBeNull();
+      expect(member.status).toBe(MemberStatus.NEW);
+    });
+
+    it('should not save if currentExpiryDate has not changed', async () => {
+      const memberId = 'member-1';
+      const date = new Date('2025-01-01');
+      const member = {
+        id: memberId,
+        tenantId,
+        currentExpiryDate: date,
+      };
+
+      memberRepository.findOne!.mockResolvedValue(member);
+
+      await service.updateCurrentExpiryDate(tenantId, memberId, date);
+
+      expect(memberRepository.save).not.toHaveBeenCalled();
+    });
+  });
 });

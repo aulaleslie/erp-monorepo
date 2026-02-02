@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, LessThan } from 'typeorm';
 import {
   ItemDurationUnit,
   ItemServiceKind,
@@ -195,5 +195,27 @@ export class PtSessionPackagesService {
     }
 
     return calculateMembershipEndDate(startDate, durationValue, durationUnit);
+  }
+
+  async processExpiries(): Promise<void> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const expiredPackages = await this.ptPackageRepository.find({
+      where: {
+        status: PtPackageStatus.ACTIVE,
+        expiryDate: LessThan(today),
+      },
+    });
+
+    for (const pkg of expiredPackages) {
+      await this.expirePackage(pkg);
+    }
+  }
+
+  private async expirePackage(pkg: PtPackageEntity): Promise<void> {
+    pkg.status = PtPackageStatus.EXPIRED;
+    // Forfeit remaining sessions (no refund) - already implied by status transition
+    await this.ptPackageRepository.save(pkg);
   }
 }

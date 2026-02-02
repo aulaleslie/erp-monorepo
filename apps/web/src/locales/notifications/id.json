@@ -1,0 +1,13 @@
+{
+    "title": "Notifikasi",
+    "unread": "Hanya yang belum dibaca",
+    "markAllRead": "Tandai semua sudah dibaca",
+    "viewAll": "Lihat semua",
+    "noNotifications": "Tidak ada notifikasi",
+    "types": {
+        "MEMBERSHIP_EXPIRING": "Keanggotaan Berakhir",
+        "PT_EXPIRING": "Sesi PT Berakhir",
+        "BOOKING_REMINDER": "Pengingat Booking"
+    },
+    "history": "Riwayat Notifikasi"
+}

@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { TagInput } from './TagInput';
 import { tagsService } from '@/services/tags';
 
@@ -29,6 +29,10 @@ describe('TagInput', () => {
         vi.mocked(tagsService.suggest).mockResolvedValue([]);
     });
 
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
     it('renders with placeholder when empty', () => {
         render(<TagInput value={[]} onChange={() => { }} />);
         expect(screen.getByPlaceholderText('placeholder')).toBeInTheDocument();
@@ -56,8 +60,7 @@ describe('TagInput', () => {
         render(<TagInput value={['tag1', 'tag2']} onChange={onChange} />);
 
         const removeButtons = screen.getAllByRole('button');
-        // Now buttons are just the X marks on badges
-        fireEvent.click(removeButtons[0]); // Remove 'tag1'
+        fireEvent.click(removeButtons[0]);
 
         expect(onChange).toHaveBeenCalledWith(['tag2']);
     });
@@ -72,13 +75,16 @@ describe('TagInput', () => {
         const input = screen.getByRole('textbox');
         fireEvent.change(input, { target: { value: 'sug' } });
 
+        // Wait for 300ms debounce
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 400));
+        });
+
         await waitFor(() => {
             expect(tagsService.suggest).toHaveBeenCalledWith('sug');
         });
 
-        await waitFor(() => {
-            expect(screen.getByText('suggestion1')).toBeInTheDocument();
-        });
+        expect(await screen.findByText('suggestion1')).toBeInTheDocument();
     });
 
     it('adds tag when clicking a suggestion', async () => {
@@ -92,11 +98,12 @@ describe('TagInput', () => {
         const input = screen.getByRole('textbox');
         fireEvent.change(input, { target: { value: 'sug' } });
 
-        await waitFor(() => {
-            expect(screen.getByText('suggestion1')).toBeInTheDocument();
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 450));
         });
 
-        fireEvent.click(screen.getByText('suggestion1'));
+        const suggestion = await screen.findByText('suggestion1');
+        fireEvent.click(suggestion);
 
         expect(onChange).toHaveBeenCalledWith(['suggestion1']);
     });
@@ -106,10 +113,10 @@ describe('TagInput', () => {
         render(<TagInput value={['Existing']} onChange={onChange} />);
 
         const input = screen.getByRole('textbox');
-
-        // Try adding "existing" (lowercase)
         fireEvent.change(input, { target: { value: 'existing' } });
-        fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
+        await act(async () => {
+            fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
+        });
 
         expect(onChange).not.toHaveBeenCalled();
     });
@@ -120,9 +127,11 @@ describe('TagInput', () => {
         const input = screen.getByRole('textbox');
         fireEvent.change(input, { target: { value: 'unique-tag' } });
 
-        await waitFor(() => {
-            expect(screen.getByText('Create "unique-tag"')).toBeInTheDocument();
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 400));
         });
+
+        expect(await screen.findByText(/Create "unique-tag"/)).toBeInTheDocument();
     });
 
     it('removes last tag when Backspace is pressed on empty input', () => {

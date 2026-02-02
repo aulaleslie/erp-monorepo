@@ -22,4 +22,16 @@ export class MembershipQueryDto {
   @Min(1)
   @IsOptional()
   limit?: number = 10;
+
+  @IsOptional()
+  @Type(() => Date)
+  expiresAfter?: Date;
+
+  @IsOptional()
+  @Type(() => Date)
+  expiresBefore?: Date;
+
+  @IsOptional()
+  @Type(() => Boolean)
+  requiresReview?: boolean;
 }

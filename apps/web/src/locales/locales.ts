@@ -6,6 +6,7 @@ import selectTenantEn from './select-tenant/en.json';
 import dashboardEn from './dashboard/en.json';
 import memberMembersEn from './member-management/members/en.json';
 import memberSchedulingEn from './member-management/scheduling/en.json';
+import memberAttendanceEn from './member-management/attendance/en.json';
 import inventoryEn from './inventory/en.json';
 import purchaseEn from './purchase/en.json';
 import salesOrdersEn from './sales/orders/en.json';
@@ -23,6 +24,7 @@ import setTaxesEn from './settings/taxes/en.json';
 import setAuditLogsEn from './settings/audit-logs/en.json';
 import setTagsEn from './settings/tags/en.json';
 import profileEn from './profile/en.json';
+import notificationsEn from './notifications/en.json';
 
 import commonId from './common/id.json';
 import sidebarId from './sidebar/id.json';
@@ -32,6 +34,7 @@ import selectTenantId from './select-tenant/id.json';
 import dashboardId from './dashboard/id.json';
 import memberMembersId from './member-management/members/id.json';
 import memberSchedulingId from './member-management/scheduling/id.json';
+import memberAttendanceId from './member-management/attendance/id.json';
 import inventoryId from './inventory/id.json';
 import purchaseId from './purchase/id.json';
 import salesOrdersId from './sales/orders/id.json';
@@ -49,6 +52,7 @@ import setTaxesId from './settings/taxes/id.json';
 import setAuditLogsId from './settings/audit-logs/id.json';
 import setTagsId from './settings/tags/id.json';
 import profileId from './profile/id.json';
+import notificationsId from './notifications/id.json';
 
 const en = {
   common: commonEn,
@@ -63,6 +67,7 @@ const en = {
   memberManagement: {
     members: memberMembersEn,
     scheduling: memberSchedulingEn,
+    attendance: memberAttendanceEn,
   },
   inventory: {
     ...inventoryEn.page,
@@ -99,6 +104,7 @@ const en = {
     ...profileEn,
     page: profileEn, // Forward compatibility for profile.page.*
   },
+  notifications: notificationsEn,
 
   // Aliases for backward compatibility
   people: orgPeopleEn,
@@ -112,11 +118,11 @@ const en = {
   taxes: setTaxesEn,
   auditLogs: setAuditLogsEn,
   tags: setTagsEn,
-  
+
   // Restore nested-to-root aliases
   authGuard: authEn.guard,
   navbar: layoutEn.navbar,
-  
+
   labels: {
     tenantSettings: setTenantEn.labels,
     tenants: setTenantsEn.labels,
@@ -136,6 +142,7 @@ const id = {
   memberManagement: {
     members: memberMembersId,
     scheduling: memberSchedulingId,
+    attendance: memberAttendanceId,
   },
   inventory: {
     ...inventoryId.page,
@@ -172,6 +179,7 @@ const id = {
     ...profileId,
     page: profileId,
   },
+  notifications: notificationsId,
 
   // Aliases for backward compatibility
   people: orgPeopleId,

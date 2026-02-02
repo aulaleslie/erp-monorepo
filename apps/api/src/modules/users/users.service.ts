@@ -276,4 +276,37 @@ export class UsersService {
       hasMore: page * limit < total,
     };
   }
+
+  async findAllWithPermission(
+    tenantId: string,
+    permissionCode: string,
+  ): Promise<UserEntity[]> {
+    const permission = await this.permissionsRepository.findOne({
+      where: { code: permissionCode },
+    });
+
+    if (!permission) return [];
+
+    const rolePermissions = await this.rolePermissionsRepository.find({
+      where: { permissionId: permission.id },
+    });
+
+    const roleIds = rolePermissions.map((rp) => rp.roleId);
+
+    const qb = this.usersRepository.createQueryBuilder('user');
+    qb.innerJoin(TenantUserEntity, 'tu', 'tu.userId = user.id');
+    qb.leftJoin(RoleEntity, 'role', 'role.id = tu.roleId');
+    qb.where('tu.tenantId = :tenantId', { tenantId });
+
+    if (roleIds.length > 0) {
+      qb.andWhere(
+        '(tu.roleId IN (:...roleIds) OR role.isSuperAdmin = true OR user.isSuperAdmin = true)',
+        { roleIds },
+      );
+    } else {
+      qb.andWhere('(role.isSuperAdmin = true OR user.isSuperAdmin = true)');
+    }
+
+    return qb.getMany();
+  }
 }

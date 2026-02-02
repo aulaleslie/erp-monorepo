@@ -126,10 +126,31 @@ export const PERMISSIONS = {
     READ: 'trainer_availability.read',
     UPDATE: 'trainer_availability.update',
   },
+  SCHEDULES: {
+    READ: 'schedules.read',
+    CREATE: 'schedules.create',
+    UPDATE: 'schedules.update',
+    DELETE: 'schedules.delete',
+  },
+  GROUP_SESSIONS: {
+    READ: 'group_sessions.read',
+    CREATE: 'group_sessions.create',
+    UPDATE: 'group_sessions.update',
+    CANCEL: 'group_sessions.cancel',
+    DELETE: 'group_sessions.delete',
+    MANAGE_PARTICIPANTS: 'group_sessions.participants.manage',
+  },
+  ATTENDANCE: {
+    READ: 'attendance.read',
+    CREATE: 'attendance.create',
+  },
+  NOTIFICATIONS: {
+    READ: 'notifications.read',
+  },
 } as const;
 
 // Type-safe permission values
-export type PermissionCode = 
+export type PermissionCode =
   | typeof PERMISSIONS.ROLES[keyof typeof PERMISSIONS.ROLES]
   | typeof PERMISSIONS.PEOPLE[keyof typeof PERMISSIONS.PEOPLE]
   | typeof PERMISSIONS.DEPARTMENTS[keyof typeof PERMISSIONS.DEPARTMENTS]
@@ -148,7 +169,11 @@ export type PermissionCode =
   | typeof PERMISSIONS.MEMBERS[keyof typeof PERMISSIONS.MEMBERS]
   | typeof PERMISSIONS.MEMBERSHIPS[keyof typeof PERMISSIONS.MEMBERSHIPS]
   | typeof PERMISSIONS.PT_SESSIONS[keyof typeof PERMISSIONS.PT_SESSIONS]
-  | typeof PERMISSIONS.TRAINER_AVAILABILITY[keyof typeof PERMISSIONS.TRAINER_AVAILABILITY];
+  | typeof PERMISSIONS.TRAINER_AVAILABILITY[keyof typeof PERMISSIONS.TRAINER_AVAILABILITY]
+  | typeof PERMISSIONS.SCHEDULES[keyof typeof PERMISSIONS.SCHEDULES]
+  | typeof PERMISSIONS.GROUP_SESSIONS[keyof typeof PERMISSIONS.GROUP_SESSIONS]
+  | typeof PERMISSIONS.ATTENDANCE[keyof typeof PERMISSIONS.ATTENDANCE]
+  | typeof PERMISSIONS.NOTIFICATIONS[keyof typeof PERMISSIONS.NOTIFICATIONS];
 
 // All permission codes as a flat array (useful for validation)
 export const ALL_PERMISSION_CODES: PermissionCode[] = [
@@ -234,4 +259,17 @@ export const ALL_PERMISSION_CODES: PermissionCode[] = [
   PERMISSIONS.PT_SESSIONS.CANCEL,
   PERMISSIONS.TRAINER_AVAILABILITY.READ,
   PERMISSIONS.TRAINER_AVAILABILITY.UPDATE,
+  PERMISSIONS.SCHEDULES.READ,
+  PERMISSIONS.SCHEDULES.CREATE,
+  PERMISSIONS.SCHEDULES.UPDATE,
+  PERMISSIONS.SCHEDULES.DELETE,
+  PERMISSIONS.GROUP_SESSIONS.READ,
+  PERMISSIONS.GROUP_SESSIONS.CREATE,
+  PERMISSIONS.GROUP_SESSIONS.UPDATE,
+  PERMISSIONS.GROUP_SESSIONS.CANCEL,
+  PERMISSIONS.GROUP_SESSIONS.DELETE,
+  PERMISSIONS.GROUP_SESSIONS.MANAGE_PARTICIPANTS,
+  PERMISSIONS.ATTENDANCE.READ,
+  PERMISSIONS.ATTENDANCE.CREATE,
+  PERMISSIONS.NOTIFICATIONS.READ,
 ];

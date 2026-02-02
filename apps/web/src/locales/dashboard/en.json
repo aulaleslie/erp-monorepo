@@ -4,5 +4,10 @@
     "description": "Overview of your activity.",
     "myStatsTitle": "My Stats",
     "pendingTasks": "Pending tasks"
-  }
+  },
+  "expiringSoonTitle": "Expiring Soon",
+  "membershipsCount": "{count} Memberships",
+  "noExpiringMemberships": "No memberships expiring soon.",
+  "viewAllMembers": "View All Members",
+  "expiresOn": "Expires on {date}"
 }

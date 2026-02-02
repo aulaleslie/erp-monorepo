@@ -7,5 +7,9 @@ export * from './member';
 export * from './membership';
 export * from './pt-package';
 export * from './trainer-availability';
+export * from './booking';
+export * from './group-session';
+export * from './attendance';
+export * from './notifications';
 // export * from './sales';
 

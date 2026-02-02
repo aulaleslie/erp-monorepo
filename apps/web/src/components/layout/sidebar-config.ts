@@ -21,6 +21,7 @@ import {
     FileText,
     FileMinus,
     CheckCircle2,
+    ClipboardCheck,
 } from "lucide-react";
 
 export interface SidebarItem {
@@ -57,12 +58,32 @@ export const sidebarConfig: SidebarItem[] = [
                 labelKey: "members",
                 icon: UserCheck,
                 href: "/members",
+                permissions: ["members.read"],
+                routePermissions: ["members.read"],
             },
             {
                 label: "Scheduling",
                 labelKey: "scheduling",
                 icon: Calendar,
                 href: "/scheduling",
+                permissions: ["schedules.read"],
+                routePermissions: ["schedules.read"],
+            },
+            {
+                label: "Availability",
+                labelKey: "availability",
+                icon: Calendar,
+                href: "/scheduling/availability",
+                permissions: ["trainer_availability.read"],
+                routePermissions: ["trainer_availability.read"],
+            },
+            {
+                label: "Group Sessions",
+                labelKey: "groupSessions",
+                icon: Users,
+                href: "/group-sessions",
+                permissions: ["group_sessions.read"],
+                routePermissions: ["group_sessions.read"],
             },
         ],
     },
@@ -143,7 +164,7 @@ export const sidebarConfig: SidebarItem[] = [
                         href: "/sales/invoices/approvals",
                         permissions: ["sales.read"],
                     },
-                     {
+                    {
                         label: "Configuration",
                         labelKey: "approvalConfig",
                         icon: Settings,
@@ -195,6 +216,29 @@ export const sidebarConfig: SidebarItem[] = [
                     "departments.delete",
                 ],
                 routePermissions: ["departments.read"],
+            },
+        ],
+    },
+    {
+        label: "Attendance",
+        labelKey: "attendance",
+        icon: ClipboardCheck,
+        children: [
+            {
+                label: "Check-in",
+                labelKey: "checkIn",
+                icon: UserCheck,
+                href: "/attendance/check-in",
+                permissions: ["attendance.create"],
+                routePermissions: ["attendance.create"],
+            },
+            {
+                label: "History",
+                labelKey: "attendanceHistory",
+                icon: History,
+                href: "/attendance",
+                permissions: ["attendance.read"],
+                routePermissions: ["attendance.read"],
             },
         ],
     },

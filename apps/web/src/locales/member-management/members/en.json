@@ -4,6 +4,63 @@
     "comingSoon": {
       "title": "Members Module Coming Soon",
       "description": "Manage your gym members, memberships, and profiles in one place."
+    },
+    "new": {
+      "title": "New Member"
+    },
+    "edit": {
+      "title": "Edit Member"
+    },
+    "noPermission": "You do not have permission to access this page."
+  },
+  "form": {
+    "sections": {
+      "personInfo": "Person Information",
+      "memberProfile": "Member Profile",
+      "additionalInfo": "Additional Information"
+    },
+    "personType": {
+      "existing": "Existing Person",
+      "new": "New Person"
+    },
+    "labels": {
+      "searchPerson": "Search Person",
+      "status": "Member Status",
+      "notes": "Internal Notes",
+      "agreedToTerms": "Agreed to Terms & Conditions",
+      "code": "Member Code"
+    },
+    "placeholders": {
+      "searchPerson": "Search by name, email or phone...",
+      "notes": "Add any additional details about the member...",
+      "status": "Select status"
+    },
+    "descriptions": {
+      "agreedToTerms": "Member has signed and agreed to the facility's terms of service and liability waiver."
+    },
+    "validation": {
+      "personRequired": "Selecting a person is required for member creation"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "create": "Create Member",
+      "save": "Save Changes"
+    }
+  },
+  "status": {
+    "NEW": "New",
+    "ACTIVE": "Active",
+    "EXPIRED": "Expired",
+    "INACTIVE": "Inactive"
+  },
+  "toast": {
+    "createSuccess": {
+      "title": "Member Created",
+      "description": "Member has been successfully registered."
+    },
+    "updateSuccess": {
+      "title": "Member Updated",
+      "description": "Member details have been updated."
     }
   }
 }

@@ -23,6 +23,7 @@ import { MembersService } from './members.service';
 import { CreateMemberDto } from './dto/create-member.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
 import { MemberQueryDto } from './dto/member-query.dto';
+import { MemberLookupDto } from './dto/member-lookup.dto';
 
 @ApiTags('members')
 @ApiCookieAuth('access_token')
@@ -43,6 +44,15 @@ export class MembersController {
     @Query() query: MemberQueryDto,
   ) {
     return this.membersService.findAll(tenantId, query);
+  }
+
+  @Get('lookup')
+  @RequirePermissions(PERMISSIONS.MEMBERS.READ)
+  async lookup(
+    @CurrentTenant() tenantId: string,
+    @Query() query: MemberLookupDto,
+  ) {
+    return this.membersService.lookup(tenantId, query.q);
   }
 
   @Get(':id')

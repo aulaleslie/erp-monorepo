@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Between, LessThan } from 'typeorm';
 import { MembershipEntity } from '../../database/entities/membership.entity';
 import {
   ERROR_CODES,
@@ -59,7 +59,29 @@ export class MembershipsService {
       qb.andWhere('membership.status = :status', { status });
     }
 
-    qb.orderBy('membership.createdAt', 'DESC')
+    if (query.expiresAfter) {
+      const date = new Date(query.expiresAfter);
+      date.setHours(0, 0, 0, 0);
+      qb.andWhere('membership.endDate >= :expiresAfter', {
+        expiresAfter: date,
+      });
+    }
+
+    if (query.expiresBefore) {
+      const date = new Date(query.expiresBefore);
+      date.setHours(23, 59, 59, 999);
+      qb.andWhere('membership.endDate <= :expiresBefore', {
+        expiresBefore: date,
+      });
+    }
+
+    if (query.requiresReview !== undefined) {
+      qb.andWhere('membership.requiresReview = :requiresReview', {
+        requiresReview: query.requiresReview,
+      });
+    }
+
+    qb.orderBy('membership.endDate', 'ASC')
       .skip(calculateSkip(page, limit))
       .take(limit);
 
@@ -354,5 +376,52 @@ export class MembershipsService {
       memberId,
       maxExpiry,
     );
+  }
+
+  async processExpiries(): Promise<void> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const expiredMemberships = await this.membershipRepo.find({
+      where: {
+        status: MembershipStatus.ACTIVE,
+        endDate: LessThan(today),
+      },
+    });
+
+    for (const membership of expiredMemberships) {
+      await this.expireMembership(membership);
+    }
+  }
+
+  async findExpiringMemberships(days: number): Promise<MembershipEntity[]> {
+    const targetDate = addDays(new Date(), days);
+    targetDate.setHours(0, 0, 0, 0);
+    const nextDay = addDays(targetDate, 1);
+
+    return await this.membershipRepo.find({
+      where: {
+        status: MembershipStatus.ACTIVE,
+        endDate: Between(targetDate, nextDay),
+      },
+      relations: ['member', 'member.person'],
+    });
+  }
+
+  private async expireMembership(membership: MembershipEntity): Promise<void> {
+    membership.status = MembershipStatus.EXPIRED;
+    await this.membershipRepo.save(membership);
+
+    await this.historyService.logHistory(
+      membership.id,
+      MembershipHistoryAction.EXPIRED,
+      {
+        fromStatus: MembershipStatus.ACTIVE,
+        toStatus: MembershipStatus.EXPIRED,
+        notes: 'Automated expiry job',
+      },
+    );
+
+    await this.updateMemberExpiry(membership.tenantId, membership.memberId);
   }
 }

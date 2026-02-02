@@ -4,6 +4,63 @@
     "comingSoon": {
       "title": "Modul Anggota Segera Hadir",
       "description": "Kelola anggota gym, keanggotaan, dan profil Anda di satu tempat."
+    },
+    "new": {
+      "title": "Anggota Baru"
+    },
+    "edit": {
+      "title": "Ubah Anggota"
+    },
+    "noPermission": "Anda tidak memiliki izin untuk mengakses halaman ini."
+  },
+  "form": {
+    "sections": {
+      "personInfo": "Informasi Orang",
+      "memberProfile": "Profil Anggota",
+      "additionalInfo": "Informasi Tambahan"
+    },
+    "personType": {
+      "existing": "Orang yang Sudah Ada",
+      "new": "Orang Baru"
+    },
+    "labels": {
+      "searchPerson": "Cari Orang",
+      "status": "Status Anggota",
+      "notes": "Catatan Internal",
+      "agreedToTerms": "Setuju dengan Syarat & Ketentuan",
+      "code": "Kode Anggota"
+    },
+    "placeholders": {
+      "searchPerson": "Cari berdasarkan nama, email atau telepon...",
+      "notes": "Tambahkan detail tambahan tentang anggota...",
+      "status": "Pilih status"
+    },
+    "descriptions": {
+      "agreedToTerms": "Anggota telah menandatangani dan menyetujui syarat layanan dan pernyataan pelepasan tanggung jawab fasilitas."
+    },
+    "validation": {
+      "personRequired": "Memilih orang diperlukan untuk pembuatan anggota"
+    },
+    "buttons": {
+      "cancel": "Batal",
+      "create": "Buat Anggota",
+      "save": "Simpan Perubahan"
+    }
+  },
+  "status": {
+    "NEW": "Baru",
+    "ACTIVE": "Aktif",
+    "EXPIRED": "Kedaluwarsa",
+    "INACTIVE": "Tidak Aktif"
+  },
+  "toast": {
+    "createSuccess": {
+      "title": "Anggota Dibuat",
+      "description": "Anggota telah berhasil didaftarkan."
+    },
+    "updateSuccess": {
+      "title": "Anggota Diperbarui",
+      "description": "Detail anggota telah diperbarui."
     }
   }
 }

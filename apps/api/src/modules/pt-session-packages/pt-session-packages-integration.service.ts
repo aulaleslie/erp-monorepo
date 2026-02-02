@@ -38,7 +38,9 @@ export class PtSessionPackagesIntegrationService {
     }
 
     const ptItems = document.items.filter(
-      (docItem) => docItem.item?.serviceKind === ItemServiceKind.PT_SESSION,
+      (docItem) =>
+        docItem.item?.serviceKind === ItemServiceKind.PT_SESSION &&
+        (docItem.item?.maxParticipants ?? 1) === 1,
     );
 
     if (ptItems.length === 0) {

@@ -4,5 +4,10 @@
     "description": "Ikhtisar aktivitas Anda.",
     "myStatsTitle": "Statistik Saya",
     "pendingTasks": "Tugas menunggu"
-  }
+  },
+  "expiringSoonTitle": "Segera Berakhir",
+  "membershipsCount": "{count} Keanggotaan",
+  "noExpiringMemberships": "Tidak ada keanggotaan yang segera berakhir.",
+  "viewAllMembers": "Lihat Semua Member",
+  "expiresOn": "Berakhir pada {date}"
 }
