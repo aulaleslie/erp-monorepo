@@ -97,8 +97,16 @@ export function Sidebar() {
     const pathname = usePathname();
     const { canAny, isSuperAdmin } = usePermissions();
     const t = useTranslations("sidebar");
-    const getLabel = (item: SidebarItem) =>
-        item.labelKey ? t(item.labelKey) : item.label;
+    const getLabel = (item: SidebarItem) => {
+        if (item.labelKey) {
+            try {
+                return t(item.labelKey);
+            } catch (e) {
+                return item.label ?? item.labelKey;
+            }
+        }
+        return item.label ?? "";
+    };
 
     const toggleSidebar = () => {
         setIsCollapsed(!isCollapsed);

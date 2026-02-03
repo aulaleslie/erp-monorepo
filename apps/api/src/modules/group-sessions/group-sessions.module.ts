@@ -8,6 +8,7 @@ import { GroupSessionsController } from './group-sessions.controller';
 import { MembersModule } from '../members/members.module';
 import { CatalogModule } from '../catalog/catalog.module';
 import { PeopleModule } from '../people/people.module';
+import { TenantsModule } from '../tenants/tenants.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PeopleModule } from '../people/people.module';
     MembersModule,
     CatalogModule,
     PeopleModule,
+    TenantsModule,
   ],
   providers: [GroupSessionsService, GroupSessionsIntegrationService],
   controllers: [GroupSessionsController],

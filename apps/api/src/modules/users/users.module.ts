@@ -1,4 +1,4 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module, forwardRef, Global } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersService } from './users.service';
 import { UserEntity } from '../../database/entities/user.entity';
@@ -11,6 +11,7 @@ import { TenantsModule } from '../tenants/tenants.module';
 
 import { PermissionGuard } from './guards/permission.guard';
 
+@Global()
 @Module({
   imports: [
     TypeOrmModule.forFeature([

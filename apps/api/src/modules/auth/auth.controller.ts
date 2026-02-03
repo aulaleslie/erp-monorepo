@@ -37,7 +37,11 @@ export class AuthController {
     res.setCookie('access_token', access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      // Allow cross-origin requests from dev frontend (different port).
+      // 'lax' permits cookies on top-level navigations and same-site requests,
+      // avoiding the strict blocking behavior that prevented cookies from
+      // being sent during development (localhost:3000 -> localhost:3001).
+      sameSite: 'lax',
       path: '/',
     });
 

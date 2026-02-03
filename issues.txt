@@ -1,0 +1,83 @@
+## Error Type
+Console AxiosError
+
+## Error Message
+Request failed with status code 403
+
+
+    at async Object.getTodayCheckIns (src/services/attendance.ts:51:26)
+    at async TodayAttendanceWidget.useEffect.load (src/components/attendance/TodayAttendanceWidget.tsx:22:30)
+
+## Code Frame
+  49 |
+  50 |     getTodayCheckIns: async () => {
+> 51 |         const { data } = await api.get('/attendance/today');
+     |                          ^
+  52 |         return data;
+  53 |     },
+  54 | };
+
+Next.js version: 16.1.1 (Turbopack)
+
+## Error Type
+Console AxiosError
+
+## Error Message
+Request failed with status code 403
+
+
+    at async Object.findAll (src/services/memberships.ts:15:26)
+    at async ExpiringMembershipsWidget.useEffect.load (src/components/dashboard/ExpiringMembershipsWidget.tsx:27:34)
+
+## Code Frame
+  13 | export const MembershipsService = {
+  14 |     findAll: async (params: MembershipQueryFilters): Promise<PaginatedResponse<Membership>> => {
+> 15 |         const { data } = await api.get('/memberships', { params });
+     |                          ^
+  16 |         return data;
+  17 |     },
+  18 |
+
+Next.js version: 16.1.1 (Turbopack)
+
+## Error Type
+Console AxiosError
+
+## Error Message
+Request failed with status code 403
+
+
+    at async Object.findAll (src/services/memberships.ts:15:26)
+    at async DashboardPage.useEffect.load (src/app/(authenticated)/dashboard/page.tsx:18:34)
+
+## Code Frame
+  13 | export const MembershipsService = {
+  14 |     findAll: async (params: MembershipQueryFilters): Promise<PaginatedResponse<Membership>> => {
+> 15 |         const { data } = await api.get('/memberships', { params });
+     |                          ^
+  16 |         return data;
+  17 |     },
+  18 |
+
+Next.js version: 16.1.1 (Turbopack)
+
+## Error Type
+Console AxiosError
+
+## Error Message
+Request failed with status code 403
+
+
+    at async Object.getUnreadCount (src/services/notifications.ts:16:26)
+    at async NotificationBell.useCallback[fetchUnreadCount] (src/components/notifications/NotificationBell.tsx:24:31)
+
+## Code Frame
+  14 |
+  15 |     async getUnreadCount() {
+> 16 |         const response = await api.get<{ count: number }>(`${BASE_URL}/count`);
+     |                          ^
+  17 |         return response.data;
+  18 |     },
+  19 |
+
+Next.js version: 16.1.1 (Turbopack)

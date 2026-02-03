@@ -7,6 +7,9 @@ import { PtPackageEntity } from '../../database/entities/pt-package.entity';
 import { GroupSessionEntity } from '../../database/entities/group-session.entity';
 import { AttendanceService } from './attendance.service';
 import { AttendanceController } from './attendance.controller';
+import { UsersModule } from '../users/users.module';
+import { PermissionGuard } from '../users/guards/permission.guard';
+import { TenantsModule } from '../tenants/tenants.module';
 
 @Module({
   imports: [
@@ -17,9 +20,11 @@ import { AttendanceController } from './attendance.controller';
       PtPackageEntity,
       GroupSessionEntity,
     ]),
+    TenantsModule,
+    UsersModule,
   ],
   controllers: [AttendanceController],
-  providers: [AttendanceService],
+  providers: [AttendanceService, PermissionGuard],
   exports: [AttendanceService],
 })
 export class AttendanceModule {}

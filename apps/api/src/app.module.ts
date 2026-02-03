@@ -31,8 +31,9 @@ import { GroupSessionsModule } from './modules/group-sessions/group-sessions.mod
 import { AttendanceModule } from './modules/attendance/attendance.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_INTERCEPTOR, APP_GUARD } from '@nestjs/core';
 import { UserContextInterceptor } from './common/interceptors/user-context.interceptor';
+import { PermissionGuard } from './modules/users/guards/permission.guard';
 
 @Module({
   imports: [
@@ -76,6 +77,10 @@ import { UserContextInterceptor } from './common/interceptors/user-context.inter
     {
       provide: APP_INTERCEPTOR,
       useClass: UserContextInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: PermissionGuard,
     },
   ],
 })

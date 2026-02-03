@@ -39,6 +39,18 @@ export class PermissionGuard implements CanActivate {
       return true;
     }
 
+    // Double-check database in case JWT payload omitted `isSuperAdmin`.
+    // This handles cases where the token was issued without the flag but the
+    // user record is actually a super admin (safe fallback).
+    try {
+      const freshUser = await this.usersService.findOneById(user.id);
+      if (freshUser?.isSuperAdmin) {
+        return true;
+      }
+    } catch {
+      // ignore and continue to permission resolution
+    }
+
     // If no tenant context, and not super admin, we can't check tenant permissions.
     // However, getPermissions handles undefined tenantId gracefully (returns empty).
 

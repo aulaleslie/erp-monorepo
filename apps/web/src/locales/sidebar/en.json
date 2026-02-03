@@ -31,4 +31,9 @@
   "approvalOrders": "Orders",
   "approvalInvoices": "Invoices",
   "approvalConfig": "Configuration"
+,
+  "groupSessions": "Group Sessions",
+  "attendance": "Attendance",
+  "checkIn": "Check-in",
+  "attendanceHistory": "Attendance History"
 }

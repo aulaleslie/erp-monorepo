@@ -220,6 +220,27 @@ export const corePermissions: SeedPermission[] = [
     name: 'Delete Members',
     group: 'Members',
   },
+  // Memberships
+  {
+    code: PERMISSIONS.MEMBERSHIPS.READ,
+    name: 'Read Memberships',
+    group: 'Memberships',
+  },
+  {
+    code: PERMISSIONS.MEMBERSHIPS.CREATE,
+    name: 'Create Memberships',
+    group: 'Memberships',
+  },
+  {
+    code: PERMISSIONS.MEMBERSHIPS.UPDATE,
+    name: 'Update Memberships',
+    group: 'Memberships',
+  },
+  {
+    code: PERMISSIONS.MEMBERSHIPS.CANCEL,
+    name: 'Cancel Memberships',
+    group: 'Memberships',
+  },
   // PT Sessions
   {
     code: PERMISSIONS.PT_SESSIONS.READ,
@@ -282,5 +303,11 @@ export const corePermissions: SeedPermission[] = [
     code: PERMISSIONS.ATTENDANCE.CREATE,
     name: 'Create Attendance',
     group: 'Attendance',
+  },
+  // Notifications
+  {
+    code: PERMISSIONS.NOTIFICATIONS.READ,
+    name: 'Read Notifications',
+    group: 'Notifications',
   },
 ];
