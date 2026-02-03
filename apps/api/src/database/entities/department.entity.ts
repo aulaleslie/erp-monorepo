@@ -10,7 +10,8 @@ import {
 } from 'typeorm';
 import { DepartmentStatus } from '@gym-monorepo/shared';
 import { BaseAuditEntity } from '../../common/entities/base-audit.entity';
-import { TenantEntity, PeopleEntity } from '../../database/entities';
+import { TenantEntity } from './tenant.entity';
+import { PeopleEntity } from './people.entity';
 
 @Entity('departments')
 @Unique('UQ_departments_tenant_code', ['tenantId', 'code'])

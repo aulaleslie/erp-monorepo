@@ -7,7 +7,7 @@ import {
   Unique,
 } from 'typeorm';
 import { BaseAuditEntity } from '../../common/entities/base-audit.entity';
-import { TenantEntity } from '../../database/entities';
+import { TenantEntity } from './tenant.entity';
 
 @Entity('tenant_counters')
 @Unique('UQ_tenant_counters_tenant_key', ['tenantId', 'key'])

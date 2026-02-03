@@ -242,25 +242,31 @@ export class CreateGroupSessionsTables1769610000000 implements MigrationInterfac
       }),
     ]);
 
-    // 4. Update schedule_bookings
-    await queryRunner.addColumn(
-      'schedule_bookings',
-      new TableColumn({
-        name: 'groupSessionId',
-        type: 'uuid',
-        isNullable: true,
-      }),
+    // 4. Update schedule_bookings - only add the column if it doesn't exist
+    const scheduleTable = await queryRunner.getTable('schedule_bookings');
+    const hasGroupSessionColumn = scheduleTable?.columns.some(
+      (c) => c.name === 'groupSessionId',
     );
+    if (!hasGroupSessionColumn) {
+      await queryRunner.addColumn(
+        'schedule_bookings',
+        new TableColumn({
+          name: 'groupSessionId',
+          type: 'uuid',
+          isNullable: true,
+        }),
+      );
 
-    await queryRunner.createForeignKey(
-      'schedule_bookings',
-      new TableForeignKey({
-        columnNames: ['groupSessionId'],
-        referencedColumnNames: ['id'],
-        referencedTableName: 'group_sessions',
-        onDelete: 'SET NULL',
-      }),
-    );
+      await queryRunner.createForeignKey(
+        'schedule_bookings',
+        new TableForeignKey({
+          columnNames: ['groupSessionId'],
+          referencedColumnNames: ['id'],
+          referencedTableName: 'group_sessions',
+          onDelete: 'SET NULL',
+        }),
+      );
+    }
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
