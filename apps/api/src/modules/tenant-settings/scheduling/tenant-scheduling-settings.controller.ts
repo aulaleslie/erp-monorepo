@@ -3,7 +3,7 @@ import { ApiTags, ApiCookieAuth } from '@nestjs/swagger';
 import { TenantSchedulingSettingsService } from './tenant-scheduling-settings.service';
 import { UpdateTenantSchedulingSettingsDto } from './dto/update-tenant-scheduling-settings.dto';
 import { TenantSchedulingSettingsResponseDto } from './dto/tenant-scheduling-settings-response.dto';
-import { ActiveTenantGuard } from '../../tenants/guards/active-tenant.guard';
+import { ActiveTenantGuard } from '../../../common/guards/active-tenant.guard';
 import { TenantMembershipGuard } from '../../tenants/guards/tenant-membership.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentTenant } from '../../../common/decorators/current-tenant.decorator';

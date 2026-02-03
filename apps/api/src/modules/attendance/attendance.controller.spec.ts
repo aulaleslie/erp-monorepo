@@ -4,7 +4,7 @@ import { AttendanceService } from './attendance.service';
 import { CheckInDto } from './dto/check-in.dto';
 import { AttendanceType, CheckInMethod } from '@gym-monorepo/shared';
 import { AuthGuard } from '@nestjs/passport';
-import { ActiveTenantGuard } from '../tenants/guards/active-tenant.guard';
+import { ActiveTenantGuard } from '../../common/guards/active-tenant.guard';
 import { TenantMembershipGuard } from '../tenants/guards/tenant-membership.guard';
 import { PermissionGuard } from '../users/guards/permission.guard';
 import { AttendanceQueryDto } from './dto/attendance-query.dto';

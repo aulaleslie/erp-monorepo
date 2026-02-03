@@ -17,7 +17,7 @@ import { QueryBookingDto } from './dto/query-booking.dto';
 import { CalendarQueryDto } from './dto/calendar-query.dto';
 import { CurrentTenant } from '../../common/decorators/current-tenant.decorator';
 import { RequirePermissions } from '../../common/decorators/require-permissions.decorator';
-import { ActiveTenantGuard } from '../tenants/guards/active-tenant.guard';
+import { ActiveTenantGuard } from '../../common/guards/active-tenant.guard';
 import { TenantMembershipGuard } from '../tenants/guards/tenant-membership.guard';
 import { PermissionGuard } from '../users/guards/permission.guard';
 

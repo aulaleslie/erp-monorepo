@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationsController } from './notifications.controller';
 import { NotificationsService } from './notifications.service';
 import { AuthGuard } from '@nestjs/passport';
-import { ActiveTenantGuard } from '../tenants/guards/active-tenant.guard';
+import { ActiveTenantGuard } from '../../common/guards/active-tenant.guard';
 import { TenantMembershipGuard } from '../tenants/guards/tenant-membership.guard';
 import { PermissionGuard } from '../users/guards/permission.guard';
 import { NotificationQueryDto } from './dto/notification-query.dto';

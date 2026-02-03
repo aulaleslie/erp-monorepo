@@ -10,7 +10,7 @@ import {
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { PERMISSIONS } from '@gym-monorepo/shared';
-import { ActiveTenantGuard } from '../tenants/guards/active-tenant.guard';
+import { ActiveTenantGuard } from '../../common/guards/active-tenant.guard';
 import { TenantMembershipGuard } from '../tenants/guards/tenant-membership.guard';
 import { PermissionGuard } from '../users/guards/permission.guard';
 import { RequirePermissions } from '../../common/decorators/require-permissions.decorator';

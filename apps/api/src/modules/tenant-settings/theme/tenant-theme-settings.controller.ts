@@ -3,7 +3,7 @@ import { ApiTags, ApiCookieAuth } from '@nestjs/swagger';
 import { TenantThemeSettingsService } from './tenant-theme-settings.service';
 import { UpdateTenantThemeSettingsDto } from './dto/update-tenant-theme-settings.dto';
 import { TenantThemeSettingsResponseDto } from './dto/tenant-theme-settings-response.dto';
-import { ActiveTenantGuard } from '../../tenants/guards/active-tenant.guard';
+import { ActiveTenantGuard } from '../../../common/guards/active-tenant.guard';
 import { TenantMembershipGuard } from '../../tenants/guards/tenant-membership.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentTenant } from '../../../common/decorators/current-tenant.decorator';
