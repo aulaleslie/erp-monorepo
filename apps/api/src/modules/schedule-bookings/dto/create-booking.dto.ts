@@ -8,6 +8,7 @@ import {
   IsInt,
   Min,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { BookingType } from '@gym-monorepo/shared';
 
 export class CreateBookingDto {
@@ -43,6 +44,7 @@ export class CreateBookingDto {
   @IsNotEmpty()
   endTime: string;
 
+  @Transform(({ value }) => parseInt(value as string, 10))
   @IsInt()
   @Min(1)
   @IsNotEmpty()

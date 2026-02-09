@@ -74,7 +74,7 @@ export function AvailabilityEditor({
                 endTime: t.endTime,
                 isActive: true,
             }));
-            await TrainerAvailabilityService.updateAvailability(trainerId, { slots });
+            await TrainerAvailabilityService.updateAvailability(trainerId, slots);
             toast({ title: "Success", description: "Weekly template updated." });
             onUpdate?.();
         } catch (error) {

@@ -107,6 +107,10 @@ const en = {
   notifications: notificationsEn,
 
   // Aliases for backward compatibility
+  members: {
+    ...memberMembersEn.page,
+    ...memberMembersEn,
+  },
   people: orgPeopleEn,
   departments: orgDepartmentsEn,
   items: catalogItemsEn,
@@ -182,6 +186,10 @@ const id = {
   notifications: notificationsId,
 
   // Aliases for backward compatibility
+  members: {
+    ...memberMembersId.page,
+    ...memberMembersId,
+  },
   people: orgPeopleId,
   departments: orgDepartmentsId,
   items: catalogItemsId,

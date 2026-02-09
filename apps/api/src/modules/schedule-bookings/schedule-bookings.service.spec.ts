@@ -93,6 +93,7 @@ describe('ScheduleBookingsService', () => {
             orderBy: jest.fn().mockReturnThis(),
             setLock: jest.fn().mockReturnThis(),
             getOne: jest.fn().mockResolvedValue(null),
+            getMany: jest.fn().mockResolvedValue([]),
           };
           return qb;
         }),
@@ -102,8 +103,8 @@ describe('ScheduleBookingsService', () => {
       transaction: jest
         .fn()
         .mockImplementation(
-          (cb: (manager: typeof managerMock) => Promise<unknown>) => {
-            return cb(managerMock);
+          async (cb: (manager: typeof managerMock) => Promise<unknown>) => {
+            return await cb(managerMock);
           },
         ),
     };
@@ -350,6 +351,7 @@ describe('ScheduleBookingsService', () => {
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
         getOne: jest.fn().mockResolvedValue(null),
+        getMany: jest.fn().mockResolvedValue([]),
       };
       (bookingRepo.createQueryBuilder as jest.Mock).mockReturnValue(
         queryBuilderMock,
@@ -406,6 +408,13 @@ describe('ScheduleBookingsService', () => {
           startTime: '10:00',
           endTime: '11:00',
         }),
+        getMany: jest.fn().mockResolvedValue([
+          {
+            id: 'existing-booking',
+            startTime: '10:00',
+            endTime: '11:00',
+          },
+        ]),
       };
       (bookingRepo.createQueryBuilder as jest.Mock).mockReturnValue(
         queryBuilderMock,
@@ -445,7 +454,11 @@ describe('ScheduleBookingsService', () => {
       });
 
       // Mock save to return booking
-      (managerMock.save as jest.Mock).mockResolvedValue({ id: 'new-booking' });
+      const savedBooking = { ...dto, id: 'new-booking' };
+      (managerMock.save as jest.Mock).mockResolvedValue(savedBooking);
+
+      // Mock findOne for the final return
+      jest.spyOn(bookingRepo, 'findOne').mockResolvedValue(savedBooking as any);
 
       await service.create(tenantId, dto);
       expect(managerMock.save).toHaveBeenCalled();
@@ -470,6 +483,12 @@ describe('ScheduleBookingsService', () => {
             };
           return null;
         });
+
+        const savedBooking = { ...groupDto, id: 'new-booking' };
+        (managerMock.save as jest.Mock).mockResolvedValue(savedBooking);
+        jest
+          .spyOn(bookingRepo, 'findOne')
+          .mockResolvedValue(savedBooking as any);
 
         await service.create(tenantId, groupDto);
         expect(managerMock.save).toHaveBeenCalled();
@@ -511,6 +530,7 @@ describe('ScheduleBookingsService', () => {
           where: jest.fn().mockReturnThis(),
           setLock: jest.fn().mockReturnThis(),
           getOne: jest.fn().mockResolvedValue(null),
+          getMany: jest.fn().mockResolvedValue([]),
         };
 
         (managerMock.createQueryBuilder as jest.Mock).mockImplementation(
@@ -526,11 +546,82 @@ describe('ScheduleBookingsService', () => {
           return null;
         });
 
+        const savedBooking = {
+          ...dtoNoId,
+          groupSessionId: 'gs-auto',
+          id: 'new-booking',
+        };
+        (managerMock.save as jest.Mock).mockResolvedValue(savedBooking);
+        jest
+          .spyOn(bookingRepo, 'findOne')
+          .mockResolvedValue(savedBooking as any);
+
         await service.create(tenantId, dtoNoId);
         expect(qbGsSearchMock.getOne).toHaveBeenCalled();
         expect(managerMock.save).toHaveBeenCalledWith(
           ScheduleBookingEntity,
           expect.objectContaining({ groupSessionId: 'gs-auto' }),
+        );
+      });
+
+      it('should throw if group session overlaps with a PT session even if it also overlaps another group session', async () => {
+        // Mock multiple overlapping bookings: one Group, one PT
+        const queryBuilderMock = {
+          where: jest.fn().mockReturnThis(),
+          andWhere: jest.fn().mockReturnThis(),
+          getMany: jest.fn().mockResolvedValue([
+            {
+              id: 'existing-group-booking',
+              startTime: '10:00',
+              endTime: '11:00',
+              bookingType: BookingType.GROUP_SESSION,
+            },
+            {
+              id: 'existing-pt-booking',
+              startTime: '10:30',
+              endTime: '11:30',
+              bookingType: BookingType.PT_SESSION,
+            },
+          ]),
+          getOne: jest.fn().mockResolvedValue({
+            id: 'existing-group-booking',
+            startTime: '10:00',
+            endTime: '11:00',
+            bookingType: BookingType.GROUP_SESSION,
+          }), // Existing implementation uses getOne, so we mock it to return the non-conflicting one first
+        };
+        (bookingRepo.createQueryBuilder as jest.Mock).mockReturnValue(
+          queryBuilderMock,
+        );
+
+        (managerMock.findOne as jest.Mock).mockImplementation((entity) => {
+          if (entity === TenantSchedulingSettingsEntity)
+            return { slotDurationMinutes: 60 };
+          if (entity === GroupSessionEntity)
+            return {
+              id: 'gs-1',
+              status: GroupSessionStatus.ACTIVE,
+              remainingSessions: 5,
+            };
+          return null;
+        });
+
+        // The current implementation will pass because getOne returns existing-group-booking, which returns null in checkForConflicts
+        // We want this to FAIL.
+        let error: unknown;
+        try {
+          await service.create(tenantId, groupDto);
+        } catch (e) {
+          error = e;
+        }
+
+        expect(error).toBeInstanceOf(BadRequestException);
+        const response = (
+          error as BadRequestException
+        ).getResponse() as ConflictResponse;
+        expect(response.detail.type).toBe(ConflictType.TRAINER_DOUBLE_BOOKED);
+        expect(response.detail.conflictingBookingId).toBe(
+          'existing-pt-booking',
         );
       });
     });

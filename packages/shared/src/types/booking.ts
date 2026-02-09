@@ -56,6 +56,7 @@ export interface CreateBookingDto {
     groupSessionId?: string;
     bookingDate: string;
     startTime: string;
+    endTime: string;
     durationMinutes: number;
     notes?: string;
 }

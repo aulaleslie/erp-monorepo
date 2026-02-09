@@ -93,17 +93,17 @@ export class MembersService {
     let personId = dto.personId;
 
     if (!personId) {
-      // Create new person
-      if (!dto.firstName || !dto.lastName || !dto.email) {
+      // Create new person from nested person object
+      if (!dto.person?.fullName) {
         throw new BadRequestException(
-          'Person details (firstName, lastName, email) are required if personId is not provided',
+          'Person details (person.fullName) are required if personId is not provided',
         );
       }
 
       const person = await this.peopleService.create(tenantId, {
-        fullName: `${dto.firstName} ${dto.lastName}`,
-        email: dto.email,
-        phone: dto.phone,
+        fullName: dto.person.fullName,
+        email: dto.person.email,
+        phone: dto.person.phone,
         type: PeopleType.CUSTOMER,
       });
       personId = person.id;
@@ -129,20 +129,21 @@ export class MembersService {
     const memberCode =
       await this.tenantCountersService.getNextMemberCode(tenantId);
 
+    const agreedToTerms = dto.agreedToTerms ?? false;
+
     const member = this.memberRepository.create({
       tenantId,
       personId,
       memberCode,
       status: MemberStatus.NEW,
-      agreesToTerms: dto.agreesToTerms,
-      termsAgreedAt: dto.agreesToTerms ? new Date() : null,
+      agreesToTerms: agreedToTerms,
+      termsAgreedAt: agreedToTerms ? new Date() : null,
       notes: dto.notes,
-      profileCompletionPercent: this.calculateProfileCompletion(
-        dto.agreesToTerms,
-      ),
+      profileCompletionPercent: this.calculateProfileCompletion(agreedToTerms),
     });
 
-    return this.memberRepository.save(member);
+    const saved = await this.memberRepository.save(member);
+    return this.findOne(tenantId, saved.id);
   }
 
   async update(
@@ -156,8 +157,8 @@ export class MembersService {
       if (member.status !== MemberStatus.ACTIVE) {
         // transitioning to ACTIVE
         // Use current member state merged with updates to validate
-        const updatedMemberHelper = { ...member, ...dto };
-        this.validateProfileCompletion(updatedMemberHelper);
+        const agreesToTermsValue = dto.agreedToTerms ?? member.agreesToTerms;
+        this.validateProfileCompletion({ agreesToTerms: agreesToTermsValue });
       }
     }
 
@@ -168,11 +169,11 @@ export class MembersService {
       }
     }
 
-    if (dto.agreesToTerms !== undefined) {
-      member.agreesToTerms = dto.agreesToTerms;
-      member.termsAgreedAt = dto.agreesToTerms ? new Date() : null;
+    if (dto.agreedToTerms !== undefined) {
+      member.agreesToTerms = dto.agreedToTerms;
+      member.termsAgreedAt = dto.agreedToTerms ? new Date() : null;
       member.profileCompletionPercent = this.calculateProfileCompletion(
-        dto.agreesToTerms,
+        dto.agreedToTerms,
       );
     }
 

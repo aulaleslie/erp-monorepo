@@ -1,6 +1,18 @@
 {
+  "addNew": "Anggota Baru",
+  "title": "Anggota",
+  "description": "Kelola anggota gym Anda",
+  "searchPlaceholder": "Cari berdasarkan nama, kode, email...",
+  "filterStatus": "Semua Status",
+  "status_all": "Semua Status",
+  "status_active": "Aktif",
+  "status_new": "Baru",
+  "status_expired": "Kadaluwarsa",
+  "status_inactive": "Tidak Aktif",
+  "noMembersFound": "Tidak ada anggota ditemukan.",
   "page": {
     "title": "Anggota",
+    "description": "Kelola anggota gym, keanggotaan, dan profil Anda di satu tempat.",
     "comingSoon": {
       "title": "Modul Anggota Segera Hadir",
       "description": "Kelola anggota gym, keanggotaan, dan profil Anda di satu tempat."

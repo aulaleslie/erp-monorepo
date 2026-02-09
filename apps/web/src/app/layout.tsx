@@ -32,7 +32,7 @@ export default function RootLayout({
         "min-h-screen bg-background font-sans antialiased",
         geistSans.variable,
         geistMono.variable
-      )}>
+      )} suppressHydrationWarning>
         <Providers>
           {children}
           <Toaster />

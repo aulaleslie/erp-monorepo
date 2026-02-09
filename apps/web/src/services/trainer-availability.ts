@@ -12,7 +12,7 @@ export const TrainerAvailabilityService = {
         return data;
     },
 
-    updateAvailability: async (trainerId: string, payload: UpdateTrainerAvailabilityDto): Promise<void> => {
+    updateAvailability: async (trainerId: string, payload: UpdateTrainerAvailabilityDto[]): Promise<void> => {
         await api.put(`/trainer-availability/${trainerId}`, payload);
     },
 

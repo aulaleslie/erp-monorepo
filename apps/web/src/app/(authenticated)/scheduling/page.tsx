@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { ChevronLeft, ChevronRight, Loader2, Calendar as CalendarIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Calendar as CalendarIcon, Plus } from "lucide-react";
 import { format, addWeeks, subWeeks, startOfToday, startOfWeek, endOfWeek, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
@@ -174,10 +174,28 @@ export default function SchedulingPage() {
             });
             fetchData();
         } catch (error: any) {
+            const errorData = error.response?.data;
+            let errorMessage = "Failed to create booking.";
+
+            if (errorData?.errors) {
+                const detailedErrors = Object.entries(errorData.errors)
+                    .map(([field, messages]: [string, any]) => `${field}: ${Array.isArray(messages) ? messages.join(", ") : messages}`)
+                    .join("; ");
+                errorMessage = `Validation failed: ${detailedErrors}`;
+            } else if (errorData?.message) {
+                if (Array.isArray(errorData.message)) {
+                    errorMessage = errorData.message.join(", ");
+                } else if (typeof errorData.message === 'object' && errorData.message.message) {
+                    errorMessage = errorData.message.message;
+                } else {
+                    errorMessage = errorData.message;
+                }
+            }
+
             toast({
                 variant: "destructive",
                 title: "Error",
-                description: error.response?.data?.message || "Failed to create booking.",
+                description: errorMessage,
             });
             throw error;
         }
@@ -228,6 +246,20 @@ export default function SchedulingPage() {
                                 <ChevronRight className="h-4 w-4" />
                             </Button>
                         </div>
+                        <Button
+                            size="sm"
+                            onClick={() => {
+                                setBookingModalInitialData({
+                                    bookingDate: format(new Date(), "yyyy-MM-dd"),
+                                    startTime: "09:00",
+                                    trainerId: selectedTrainerIds[0] || "",
+                                });
+                                setIsBookingModalOpen(true);
+                            }}
+                        >
+                            <Plus className="mr-2 h-4 w-4" />
+                            New Booking
+                        </Button>
                     </div>
                 </div>
 

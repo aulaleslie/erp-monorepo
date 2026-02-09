@@ -129,7 +129,7 @@ export function WeekCalendar({
                     )}
                 </div>
                 <div className="truncate font-bold text-[11px] leading-tight">
-                    {booking.member?.person.fullName || booking.memberId}
+                    {booking.member?.person?.fullName || booking.memberId}
                 </div>
                 {duration >= 60 && (
                     <div className="mt-1 truncate opacity-90 italic">
@@ -232,7 +232,7 @@ export function WeekCalendar({
 
                                     {/* Bookings */}
                                     {bookings
-                                        .filter((b) => isSameDay(new Date(b.bookingDate), day))
+                                        .filter((b) => b.bookingDate === format(day, "yyyy-MM-dd"))
                                         .map(renderBooking)}
                                 </div>
                             );

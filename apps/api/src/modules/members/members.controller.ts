@@ -10,6 +10,8 @@ import {
   Put,
   Query,
   UseGuards,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
@@ -28,6 +30,7 @@ import { MemberLookupDto } from './dto/member-lookup.dto';
 @ApiTags('members')
 @ApiCookieAuth('access_token')
 @Controller('members')
+@UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(
   AuthGuard('jwt'),
   ActiveTenantGuard,
@@ -85,5 +88,13 @@ export class MembersController {
   @RequirePermissions(PERMISSIONS.MEMBERS.DELETE)
   async remove(@CurrentTenant() tenantId: string, @Param('id') id: string) {
     await this.membersService.remove(tenantId, id);
+  }
+
+  @Get(':id/history')
+  @RequirePermissions(PERMISSIONS.MEMBERS.READ)
+  getHistory(@CurrentTenant() _tenantId: string, @Param('id') _id: string) {
+    // TODO: Implement member history/audit log
+    // For now, return empty array to prevent frontend errors
+    return [];
   }
 }

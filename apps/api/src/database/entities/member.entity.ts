@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
+import { Expose } from 'class-transformer';
 import { MemberStatus } from '@gym-monorepo/shared';
 import { BaseAuditEntity } from '../../common/entities/base-audit.entity';
 import { TenantEntity } from './tenant.entity';
@@ -27,6 +28,12 @@ export class MemberEntity extends BaseAuditEntity {
   @Column()
   memberCode: string;
 
+  // Virtual getter to expose memberCode as 'code' for API responses
+  @Expose()
+  get code(): string {
+    return this.memberCode;
+  }
+
   @Column({
     type: 'enum',
     enum: MemberStatus,
@@ -45,6 +52,18 @@ export class MemberEntity extends BaseAuditEntity {
 
   @Column({ type: 'boolean', default: false })
   agreesToTerms: boolean;
+
+  // Virtual getter to expose agreesToTerms as 'agreedToTerms' for API responses
+  @Expose()
+  get agreedToTerms(): boolean {
+    return this.agreesToTerms;
+  }
+
+  // Virtual getter to expose termsAgreedAt as 'agreedAt' for API responses
+  @Expose()
+  get agreedAt(): Date | null {
+    return this.termsAgreedAt;
+  }
 
   @Column({ type: 'timestamptz', nullable: true })
   termsAgreedAt: Date | null;

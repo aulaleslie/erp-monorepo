@@ -109,7 +109,7 @@ export function BookingDetailModal({
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-muted-foreground">Member</p>
-                                <p className="text-lg font-bold">{booking.member?.person.fullName || 'Unknown Member'}</p>
+                                <p className="text-lg font-bold">{booking.member?.person?.fullName || 'Unknown Member'}</p>
                                 <p className="text-xs text-muted-foreground">{booking.member?.memberCode}</p>
                             </div>
                         </div>

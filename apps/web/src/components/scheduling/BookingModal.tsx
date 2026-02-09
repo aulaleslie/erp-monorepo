@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format } from "date-fns";
+import { format, addMinutes, parse } from "date-fns";
 import {
     Dialog,
     DialogContent,
@@ -33,8 +33,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { BookingType } from "@gym-monorepo/shared";
 import { MembersService, type MemberLookupResult } from "@/services/members";
 import type { PersonListItem } from "@/services/people";
-import { SearchableDropdown } from "@/components/ui/searchable-dropdown";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const bookingSchema = z.object({
     memberId: z.string().min(1, "Member is required"),
@@ -42,7 +42,7 @@ const bookingSchema = z.object({
     bookingType: z.nativeEnum(BookingType),
     bookingDate: z.string(),
     startTime: z.string(),
-    durationMinutes: z.coerce.number().min(15).max(480),
+    durationMinutes: z.coerce.number().min(60, "Duration must be at least 60 minutes").max(480).refine(val => val % 60 === 0, "Duration must be a multiple of 60 minutes"),
     notes: z.string().optional(),
     ptPackageId: z.string().optional(),
 }).refine((data) => {
@@ -53,6 +53,13 @@ const bookingSchema = z.object({
 }, {
     message: "PT Package is required for PT Sessions",
     path: ["ptPackageId"],
+}).refine((data) => {
+    // Current UI uses step=15. However, backend might require 60.
+    // We'll keep it at 15 for now but ensure we capture the backend error message properly.
+    return data.durationMinutes >= 15;
+}, {
+    message: "Duration must be at least 15 minutes",
+    path: ["durationMinutes"],
 });
 
 type BookingFormValues = z.infer<typeof bookingSchema>;
@@ -60,7 +67,7 @@ type BookingFormValues = z.infer<typeof bookingSchema>;
 interface BookingModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSubmit: (values: BookingFormValues) => Promise<void>;
+    onSubmit: (values: BookingFormValues & { endTime: string }) => Promise<void>;
     trainers: PersonListItem[];
     initialData?: Partial<BookingFormValues>;
 }
@@ -72,6 +79,7 @@ export function BookingModal({
     trainers,
     initialData,
 }: BookingModalProps) {
+    const { toast } = useToast();
     const [submitting, setSubmitting] = useState(false);
     const [memberSearch, setMemberSearch] = useState("");
     const [members, setMembers] = useState<MemberLookupResult[]>([]);
@@ -165,11 +173,37 @@ export function BookingModal({
     const handleFormSubmit = async (values: BookingFormValues) => {
         setSubmitting(true);
         try {
-            await onSubmit(values);
+            // Calculate endTime
+            const startDateTime = parse(`${values.bookingDate} ${values.startTime}`, "yyyy-MM-dd HH:mm", new Date());
+            const endDateTime = addMinutes(startDateTime, values.durationMinutes);
+            const endTime = format(endDateTime, "HH:mm");
+
+            // Clean payload: remove empty/undefined optional fields
+            // This prevents 400 errors from backend @IsUUID validation failing on ""
+            const payload = {
+                memberId: values.memberId,
+                trainerId: values.trainerId,
+                bookingType: values.bookingType,
+                bookingDate: values.bookingDate,
+                startTime: values.startTime,
+                durationMinutes: values.durationMinutes,
+                endTime,
+            } as any;
+
+            if (values.notes) payload.notes = values.notes;
+            if (values.ptPackageId && values.ptPackageId.trim() !== "") {
+                payload.ptPackageId = values.ptPackageId;
+            }
+
+            console.log("Submitting booking payload:", payload);
+            await onSubmit(payload);
             form.reset();
             onClose();
-        } catch (error) {
-            console.error("Failed to submit booking", error);
+        } catch (error: any) {
+            if (error.response?.data) {
+                console.error("Booking submission error details:", JSON.stringify(error.response.data, null, 2));
+            }
+            console.error("Booking submission error:", error.message || error);
         } finally {
             setSubmitting(false);
         }
@@ -244,17 +278,19 @@ export function BookingModal({
 
                         <div className="space-y-2">
                             <FormLabel>Member</FormLabel>
-                            <SearchableDropdown
-                                label=""
-                                value={memberSearch}
-                                onChange={(val) => {
-                                    setMemberSearch(val);
-                                    // If user selected an option from the list, we'll handle it below
-                                }}
-                                options={members.map(m => `${m.person.fullName} (${m.memberCode})`)}
-                                placeholder="Search by name or code..."
-                                helperText={searchingMembers ? "Searching..." : undefined}
-                            />
+                            <div className="relative">
+                                <Input
+                                    value={memberSearch}
+                                    onChange={(e) => setMemberSearch(e.target.value)}
+                                    placeholder="Search by name or code..."
+                                    autoComplete="off"
+                                />
+                                {searchingMembers && (
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                                    </div>
+                                )}
+                            </div>
                             {/* Simple hack: if member is found and unique, auto-select or show a list */}
                             {/* For now, let's just use a select if members are loaded */}
                             {members.length > 0 && (
@@ -318,7 +354,7 @@ export function BookingModal({
                                     <FormItem>
                                         <FormLabel>Duration (min)</FormLabel>
                                         <FormControl>
-                                            <Input type="number" step="15" {...field} />
+                                            <Input type="number" step="60" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

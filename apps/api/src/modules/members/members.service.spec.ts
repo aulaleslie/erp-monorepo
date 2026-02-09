@@ -79,13 +79,15 @@ describe('MembersService', () => {
   describe('create', () => {
     it('should create a member from existing person', async () => {
       const personId = 'person-1';
-      const dto = { personId, agreesToTerms: true };
+      const dto = { personId, agreedToTerms: true };
 
       peopleService.findOne.mockResolvedValue({
         id: personId,
         type: PeopleType.CUSTOMER,
       });
-      memberRepository.findOne!.mockResolvedValue(null);
+      memberRepository
+        .findOne!.mockResolvedValueOnce(null) // Check if member already exists
+        .mockResolvedValueOnce({ ...dto, id: 'member-1' }); // findOne after save
       memberRepository.create!.mockReturnValue({ ...dto, id: 'member-1' });
       memberRepository.save!.mockResolvedValue({ ...dto, id: 'member-1' });
 
@@ -98,17 +100,24 @@ describe('MembersService', () => {
 
     it('should create a person and member if personId is missing', async () => {
       const dto = {
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'john@example.com',
-        agreesToTerms: true,
+        person: {
+          fullName: 'John Doe',
+          email: 'john@example.com',
+        },
+        agreedToTerms: true,
       };
 
       peopleService.create.mockResolvedValue({
         id: 'person-new',
         type: PeopleType.CUSTOMER,
       });
-      memberRepository.findOne!.mockResolvedValue(null);
+      memberRepository
+        .findOne!.mockResolvedValueOnce(null) // Check if member already exists
+        .mockResolvedValueOnce({
+          ...dto,
+          personId: 'person-new',
+          id: 'member-1',
+        }); // findOne after save
       memberRepository.create!.mockReturnValue({
         ...dto,
         personId: 'person-new',
@@ -134,7 +143,7 @@ describe('MembersService', () => {
 
     it('should throw ConflictException if member already exists', async () => {
       const personId = 'person-1';
-      const dto = { personId, agreesToTerms: true };
+      const dto = { personId, agreedToTerms: true };
 
       peopleService.findOne.mockResolvedValue({
         id: personId,
@@ -149,7 +158,7 @@ describe('MembersService', () => {
 
     it('should throw BadRequestException if person is not a customer', async () => {
       const personId = 'person-1';
-      const dto = { personId, agreesToTerms: true };
+      const dto = { personId, agreedToTerms: true };
 
       peopleService.findOne.mockResolvedValue({
         id: personId,

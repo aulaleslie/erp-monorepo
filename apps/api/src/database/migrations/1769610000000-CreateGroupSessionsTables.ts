@@ -243,14 +243,8 @@ export class CreateGroupSessionsTables1769610000000 implements MigrationInterfac
     ]);
 
     // 4. Update schedule_bookings
-    await queryRunner.addColumn(
-      'schedule_bookings',
-      new TableColumn({
-        name: 'groupSessionId',
-        type: 'uuid',
-        isNullable: true,
-      }),
-    );
+    // 4. Update schedule_bookings
+    // groupSessionId column is already created in CreateScheduleBookingsTable migration
 
     await queryRunner.createForeignKey(
       'schedule_bookings',

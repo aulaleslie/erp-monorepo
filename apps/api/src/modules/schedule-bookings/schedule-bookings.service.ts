@@ -70,6 +70,7 @@ export class ScheduleBookingsService {
           bookingDate: dto.bookingDate,
           startTime: dto.startTime,
           endTime: dto.endTime,
+          bookingType: dto.bookingType,
         },
         undefined,
         manager,
@@ -158,7 +159,8 @@ export class ScheduleBookingsService {
         groupSessionId,
       });
 
-      return await manager.save(ScheduleBookingEntity, booking);
+      const saved = await manager.save(ScheduleBookingEntity, booking);
+      return await this.findOne(tenantId, saved.id, manager);
     });
   }
 
@@ -188,7 +190,13 @@ export class ScheduleBookingsService {
 
     const [items, total] = await this.bookingRepo.findAndCount({
       where,
-      relations: ['member', 'trainer', 'ptPackage', 'groupSession'],
+      relations: [
+        'member',
+        'member.person',
+        'trainer',
+        'ptPackage',
+        'groupSession',
+      ],
       order: { bookingDate: 'DESC', startTime: 'ASC' },
       skip,
       take: parseInt(limit),
@@ -197,10 +205,19 @@ export class ScheduleBookingsService {
     return { items, total, page: parseInt(page), limit: parseInt(limit) };
   }
 
-  async findOne(tenantId: string, id: string) {
-    const booking = await this.bookingRepo.findOne({
+  async findOne(tenantId: string, id: string, manager?: EntityManager) {
+    const repo = manager
+      ? manager.getRepository(ScheduleBookingEntity)
+      : this.bookingRepo;
+    const booking = await repo.findOne({
       where: { id, tenantId },
-      relations: ['member', 'trainer', 'ptPackage', 'groupSession'],
+      relations: [
+        'member',
+        'member.person',
+        'trainer',
+        'ptPackage',
+        'groupSession',
+      ],
     });
     if (!booking) throw new NotFoundException(BOOKING_ERRORS.NOT_FOUND);
     return booking;
@@ -222,6 +239,7 @@ export class ScheduleBookingsService {
             bookingDate: dto.bookingDate || booking.bookingDate,
             startTime: dto.startTime || booking.startTime,
             endTime: dto.endTime || booking.endTime,
+            bookingType: booking.bookingType,
           },
           id, // Exclude self
           manager,
@@ -300,6 +318,7 @@ export class ScheduleBookingsService {
       bookingDate: string | Date;
       startTime: string;
       endTime: string;
+      bookingType: BookingType;
     },
     excludeBookingId?: string,
     manager?: EntityManager,
@@ -358,9 +377,15 @@ export class ScheduleBookingsService {
     );
     let isAvailable = false;
 
+    const normalizeTime = (t: string) => t.substring(0, 5);
+    const start = normalizeTime(dto.startTime);
+    const end = normalizeTime(dto.endTime);
+
     if (modified.length > 0) {
       isAvailable = modified.some(
-        (o) => o.startTime! <= dto.startTime && o.endTime! >= dto.endTime,
+        (o) =>
+          normalizeTime(o.startTime!) <= start &&
+          normalizeTime(o.endTime!) >= end,
       );
     } else {
       const template = await availabilityRepo.find({
@@ -371,8 +396,15 @@ export class ScheduleBookingsService {
           isActive: true,
         },
       });
+
+      const normalizeTime = (t: string) => t.substring(0, 5);
+      const start = normalizeTime(dto.startTime);
+      const end = normalizeTime(dto.endTime);
+
       isAvailable = template.some(
-        (t) => t.startTime <= dto.startTime && t.endTime >= dto.endTime,
+        (t) =>
+          normalizeTime(t.startTime) <= start &&
+          normalizeTime(t.endTime) >= end,
       );
     }
 
@@ -425,28 +457,32 @@ export class ScheduleBookingsService {
         .getOne();
     }
 
-    const conflict = await conflictQuery.getOne();
+    const conflicts = await conflictQuery.getMany();
 
-    if (conflict) {
-      // Double check overlap just in case logic above has edge cases (it shouldn't due to query construction)
+    for (const conflict of conflicts) {
+      // If BOTH the new booking and the existing conflict are GROUP_SESSION, we allow overlap.
+      // This allows multiple members to join a group session at the same time for the same trainer.
       if (
-        this.isOverlapping(
-          dto.startTime,
-          dto.endTime,
-          conflict.startTime,
-          conflict.endTime,
-        )
+        dto.bookingType === BookingType.GROUP_SESSION &&
+        conflict.bookingType === BookingType.GROUP_SESSION
       ) {
-        return {
-          type: ConflictType.TRAINER_DOUBLE_BOOKED,
-          message: 'Trainer already has a booking at this time',
-          conflictingBookingId: conflict.id,
-          conflictingTimeSlot: {
-            startTime: conflict.startTime,
-            endTime: conflict.endTime,
-          },
-        };
+        continue;
       }
+
+      // If we reach here, it's either:
+      // 1. New booking is PT_SESSION (no overlap allowed)
+      // 2. New booking is GROUP_SESSION but it overlaps a PT_SESSION (no overlap allowed)
+      // 3. New booking overlaps some other future type that doesn't allow overlap.
+
+      return {
+        type: ConflictType.TRAINER_DOUBLE_BOOKED,
+        message: 'Trainer already has a booking at this time',
+        conflictingBookingId: conflict.id,
+        conflictingTimeSlot: {
+          startTime: conflict.startTime,
+          endTime: conflict.endTime,
+        },
+      };
     }
 
     return null;
@@ -511,7 +547,7 @@ export class ScheduleBookingsService {
 
     const bookings = await this.bookingRepo.find({
       where: bookingWhere,
-      relations: ['member', 'ptPackage'],
+      relations: ['member', 'member.person', 'ptPackage'],
       order: { bookingDate: 'ASC', startTime: 'ASC' },
     });
 
@@ -565,7 +601,7 @@ export class ScheduleBookingsService {
 
       for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
         const dateStr = d.toISOString().split('T')[0];
-        const dayOfWeek = d.getDay();
+        const dayOfWeek = d.getUTCDay();
 
         // 4a. Base Template
         let slots = trainerTemplates
@@ -620,29 +656,35 @@ export class ScheduleBookingsService {
     blockEnd: string,
   ) {
     const result: { startTime: string; endTime: string }[] = [];
+    const normalizeTime = (t: string) => t.substring(0, 5);
+    const bStart = normalizeTime(blockStart);
+    const bEnd = normalizeTime(blockEnd);
 
     for (const window of windows) {
-      if (blockEnd <= window.startTime || blockStart >= window.endTime) {
+      const wStart = normalizeTime(window.startTime);
+      const wEnd = normalizeTime(window.endTime);
+
+      if (bEnd <= wStart || bStart >= wEnd) {
         result.push(window);
         continue;
       }
 
-      if (blockStart <= window.startTime && blockEnd >= window.endTime) {
+      if (bStart <= wStart && bEnd >= wEnd) {
         continue;
       }
 
-      if (blockStart > window.startTime && blockEnd < window.endTime) {
+      if (bStart > wStart && bEnd < wEnd) {
         result.push({ startTime: window.startTime, endTime: blockStart });
         result.push({ startTime: blockEnd, endTime: window.endTime });
         continue;
       }
 
-      if (blockStart <= window.startTime && blockEnd < window.endTime) {
+      if (bStart <= wStart && bEnd < wEnd) {
         result.push({ startTime: blockEnd, endTime: window.endTime });
         continue;
       }
 
-      if (blockStart > window.startTime && blockEnd >= window.endTime) {
+      if (bStart > wStart && bEnd >= wEnd) {
         result.push({ startTime: window.startTime, endTime: blockStart });
         continue;
       }

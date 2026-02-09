@@ -4,7 +4,6 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
-  BadRequestException,
 } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
 import { BaseResponse } from '@gym-monorepo/shared';
@@ -16,30 +15,28 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<FastifyReply>();
     const status = exception.getStatus() as HttpStatus;
     const exceptionResponse: unknown = exception.getResponse();
-
-    const responseBody: BaseResponse = {
+    const responseBody: BaseResponse & { code?: string; detail?: any } = {
       success: false,
       message: exception.message,
     };
 
-    if (
-      status === HttpStatus.BAD_REQUEST &&
-      isExceptionResponse(exceptionResponse) &&
-      'errors' in exceptionResponse
-    ) {
-      // This comes from our custom ValidationPipe exceptionFactory
-      responseBody.message =
-        normalizeMessage(exceptionResponse.message) || 'Validation failed';
-      responseBody.errors = exceptionResponse.errors;
-    } else if (
-      exception instanceof BadRequestException &&
-      isExceptionResponse(exceptionResponse) &&
-      'message' in exceptionResponse
-    ) {
-      // Handle manual BadRequestException(message)
-      // If message is "Role with this name already exists", we might want to map it?
-      // Or we just send it as general message.
-      // If we want field specific manual errors, we should populate 'errors' in the exception.
+    if (isExceptionResponse(exceptionResponse)) {
+      if ('code' in exceptionResponse) {
+        responseBody.code = exceptionResponse.code as string;
+      }
+      if ('detail' in exceptionResponse) {
+        responseBody.detail = exceptionResponse.detail;
+      }
+      if ('errors' in exceptionResponse && status === HttpStatus.BAD_REQUEST) {
+        // This comes from our custom ValidationPipe exceptionFactory
+        responseBody.message =
+          normalizeMessage(exceptionResponse.message) || 'Validation failed';
+        responseBody.errors = exceptionResponse.errors;
+      } else if ('message' in exceptionResponse) {
+        responseBody.message = normalizeMessage(
+          exceptionResponse.message,
+        ) as string;
+      }
     }
 
     response.status(status).send(responseBody);

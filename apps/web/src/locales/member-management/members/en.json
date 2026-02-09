@@ -1,6 +1,18 @@
 {
+  "addNew": "New Member",
+  "title": "Members",
+  "description": "Manage your gym members",
+  "searchPlaceholder": "Search by name, code, email...",
+  "filterStatus": "All Statuses",
+  "status_all": "All Statuses",
+  "status_active": "Active",
+  "status_new": "New",
+  "status_expired": "Expired",
+  "status_inactive": "Inactive",
+  "noMembersFound": "No members found.",
   "page": {
     "title": "Members",
+    "description": "Manage your gym members",
     "comingSoon": {
       "title": "Members Module Coming Soon",
       "description": "Manage your gym members, memberships, and profiles in one place."

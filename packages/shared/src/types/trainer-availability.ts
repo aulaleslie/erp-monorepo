@@ -25,11 +25,10 @@ export interface TrainerAvailabilityOverride {
 }
 
 export interface UpdateTrainerAvailabilityDto {
-  slots: {
-    dayOfWeek: number;
-    startTime: string;
-    endTime: string;
-  }[];
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  isActive: boolean;
 }
 
 export interface CreateTrainerAvailabilityOverrideDto {

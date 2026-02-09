@@ -8,6 +8,8 @@ import { GroupSessionsController } from './group-sessions.controller';
 import { MembersModule } from '../members/members.module';
 import { CatalogModule } from '../catalog/catalog.module';
 import { PeopleModule } from '../people/people.module';
+import { TenantsModule } from '../tenants/tenants.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { PeopleModule } from '../people/people.module';
     MembersModule,
     CatalogModule,
     PeopleModule,
+    TenantsModule,
+    UsersModule,
   ],
   providers: [GroupSessionsService, GroupSessionsIntegrationService],
   controllers: [GroupSessionsController],

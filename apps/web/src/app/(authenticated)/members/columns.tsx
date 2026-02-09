@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { Member, MemberStatus } from "@gym-monorepo/shared";
 import { Badge } from "@/components/ui/badge";
 import { format, isBefore, addDays, startOfDay } from "date-fns";
@@ -33,7 +34,14 @@ export const getColumns = (onUpdate?: () => void): Column<Member>[] => [
     {
         header: "Name",
         cell: (member) => {
-            return <div className="font-medium">{member.person?.fullName || "—"}</div>;
+            return (
+                <Link
+                    href={`/members/${member.id}`}
+                    className="font-medium text-primary hover:underline"
+                >
+                    {member.person?.fullName || "—"}
+                </Link>
+            );
         },
     },
     {

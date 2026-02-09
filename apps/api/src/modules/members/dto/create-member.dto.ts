@@ -5,22 +5,14 @@ import {
   IsOptional,
   IsString,
   IsUUID,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
-export class CreateMemberDto {
-  @IsOptional()
-  @IsUUID()
-  personId?: string;
-
-  @IsOptional()
+class CreatePersonDto {
   @IsString()
   @IsNotEmpty()
-  firstName?: string;
-
-  @IsOptional()
-  @IsString()
-  @IsNotEmpty()
-  lastName?: string;
+  fullName: string;
 
   @IsOptional()
   @IsEmail()
@@ -29,9 +21,21 @@ export class CreateMemberDto {
   @IsOptional()
   @IsString()
   phone?: string;
+}
 
+export class CreateMemberDto {
+  @IsOptional()
+  @IsUUID()
+  personId?: string;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => CreatePersonDto)
+  person?: CreatePersonDto;
+
+  @IsOptional()
   @IsBoolean()
-  agreesToTerms: boolean;
+  agreedToTerms?: boolean;
 
   @IsOptional()
   @IsString()

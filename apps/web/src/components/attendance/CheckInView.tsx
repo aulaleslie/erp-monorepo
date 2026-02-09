@@ -30,7 +30,7 @@ import { useToast } from "@/hooks/use-toast";
 import { MembersService, MemberLookupResult } from "@/services/members";
 import { AttendanceService } from "@/services/attendance";
 import { ScheduleBookingsService } from "@/services/schedule-bookings";
-import { AttendanceType, CheckInMethod, ScheduleBooking } from "@gym-monorepo/shared";
+import { AttendanceType, BookingStatus, CheckInMethod, ScheduleBooking } from "@gym-monorepo/shared";
 import { PageHeader } from "@/components/common/PageHeader";
 import { getApiErrorMessage } from "@/lib/api";
 
@@ -46,18 +46,6 @@ export function CheckInView() {
     const [isLoadingBookings, setIsLoadingBookings] = useState(false);
     const [isCheckingIn, setIsCheckingIn] = useState(false);
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (searchQuery.trim().length >= 2) {
-                handleSearch();
-            } else {
-                setSearchResults([]);
-            }
-        }, 300);
-
-        return () => clearTimeout(timer);
-    }, [searchQuery, handleSearch]);
-
     const handleSearch = useCallback(async () => {
         setIsSearching(true);
         try {
@@ -69,6 +57,18 @@ export function CheckInView() {
             setIsSearching(false);
         }
     }, [searchQuery]);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (searchQuery.trim().length >= 2) {
+                handleSearch();
+            } else {
+                setSearchResults([]);
+            }
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [searchQuery, handleSearch]);
 
     const handleSelectMember = async (member: MemberLookupResult) => {
         setSelectedMember(member);
@@ -85,7 +85,7 @@ export function CheckInView() {
                 memberId,
                 dateFrom: today,
                 dateTo: today,
-                status: "SCHEDULED" as const
+                status: BookingStatus.SCHEDULED
             });
             setTodayBookings(response.items);
         } catch (error) {
